@@ -39,7 +39,7 @@ type ServerInterface interface {
 	RecordTransactionOutline(c *gin.Context)
 	// Create transaction outline
 	// (POST /api/v2/transactions/outlines)
-	CreateTransactionOutline(c *gin.Context)
+	CreateTransactionOutline(c *gin.Context, params CreateTransactionOutlineParams)
 	// Get current user
 	// (GET /api/v2/users/current)
 	CurrentUser(c *gin.Context)
@@ -247,7 +247,20 @@ func (siw *ServerInterfaceWrapper) RecordTransactionOutline(c *gin.Context) {
 // CreateTransactionOutline operation middleware
 func (siw *ServerInterfaceWrapper) CreateTransactionOutline(c *gin.Context) {
 
+	var err error
+
 	c.Set(XPubAuthScopes, []string{"user"})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateTransactionOutlineParams
+
+	// ------------- Optional query parameter "format" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "format", c.Request.URL.Query(), &params.Format)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter format: %w", err), http.StatusBadRequest)
+		return
+	}
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -256,7 +269,7 @@ func (siw *ServerInterfaceWrapper) CreateTransactionOutline(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.CreateTransactionOutline(c)
+	siw.Handler.CreateTransactionOutline(c, params)
 }
 
 // CurrentUser operation middleware

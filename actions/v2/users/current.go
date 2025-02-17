@@ -3,8 +3,8 @@ package users
 import (
 	"net/http"
 
+	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
@@ -24,7 +24,7 @@ func (s *APIUsers) CurrentUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, &response.UserInfo{
-		CurrentBalance: satoshis,
+	c.JSON(http.StatusOK, &api.ModelsUserInfo{
+		CurrentBalance: uint64(satoshis),
 	})
 }

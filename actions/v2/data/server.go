@@ -13,8 +13,10 @@ type APIData struct {
 
 // NewAPIData creates a new server with API endpoints
 func NewAPIData(engine engine.ClientInterface, log *zerolog.Logger) APIData {
+	logger := log.With().Str("api", "data").Logger()
+
 	return APIData{
 		engine: engine,
-		logger: log,
+		logger: &logger,
 	}
 }

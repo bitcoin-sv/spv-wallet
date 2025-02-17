@@ -9,11 +9,24 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
-	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
+)
+
+// DataType represents the type of data in the OP_RETURN output.
+type DataType int
+
+// Enum values for DataType
+const (
+	// DataTypeStrings marks the data type as strings.
+	DataTypeStrings DataType = iota
+	// DataTypeHexes marks the data type as hexes.
+	DataTypeHexes
 )
 
 // OpReturn represents an OP_RETURN output specification.
-type OpReturn opreturn.Output
+type OpReturn struct {
+	DataType DataType `json:"dataType,omitempty"`
+	Data     []string `json:"data"`
+}
 
 func (o *OpReturn) evaluate(*evaluationContext) (annotatedOutputs, error) {
 	if len(o.Data) == 0 {
@@ -49,11 +62,11 @@ func (o *OpReturn) getData() ([][]byte, error) {
 	return data, nil
 }
 
-func toBytes(data string, dataType opreturn.DataType) ([]byte, error) {
+func toBytes(data string, dataType DataType) ([]byte, error) {
 	switch dataType {
-	case opreturn.DataTypeDefault, opreturn.DataTypeStrings:
+	case DataTypeStrings:
 		return []byte(data), nil
-	case opreturn.DataTypeHexes:
+	case DataTypeHexes:
 		dataHex, err := hex.DecodeString(data)
 		if err != nil {
 			return nil, txerrors.ErrFailedToDecodeHex.Wrap(err)

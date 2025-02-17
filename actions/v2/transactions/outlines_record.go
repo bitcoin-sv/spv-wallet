@@ -11,7 +11,7 @@ import (
 
 // RecordTransactionOutline records transaction outline
 func (s *APITransactions) RecordTransactionOutline(c *gin.Context) {
-	var requestBody api.RequestsAnnotatedTransaction
+	var requestBody api.RequestsTransactionOutline
 	err := c.ShouldBindWith(&requestBody, binding.JSON)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), s.logger)
@@ -25,7 +25,7 @@ func (s *APITransactions) RecordTransactionOutline(c *gin.Context) {
 		return
 	}
 
-	outline, err := mapping.AnnotatedTransactionRequestToOutline(&requestBody)
+	outline, err := mapping.RequestsTransactionOutlineToOutline(&requestBody)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return

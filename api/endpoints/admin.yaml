@@ -19,7 +19,7 @@ paths:
         200:
           description: Success
         401:
-          $ref: "../components/responses.yaml#/components/responses/NotAuthorized"
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
 
 
   /api/v2/admin/users:
@@ -45,7 +45,7 @@ paths:
         400:
           $ref: "../components/responses.yaml#/components/responses/AdminUserBadRequest"
         401:
-          $ref: "../components/responses.yaml#/components/responses/NotAuthorized"
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
         500:
           $ref: "../components/responses.yaml#/components/responses/AdminCreateUserInternalServerError"
 
@@ -105,4 +105,4 @@ paths:
         400:
           $ref: "../components/responses.yaml#/components/responses/AdminUserBadRequest"
         401:
-          $ref: "../components/responses.yaml#/components/responses/NotAuthorized"
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"

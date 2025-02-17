@@ -13,8 +13,8 @@ import (
 	"github.com/samber/lo"
 )
 
-// AnnotatedTransactionRequestToOutline maps request's AnnotatedTransaction to outlines.Transaction.
-func AnnotatedTransactionRequestToOutline(req *api.RequestsAnnotatedTransaction) (*outlines.Transaction, error) {
+// RequestsTransactionOutlineToOutline maps request's AnnotatedTransaction to outlines.Transaction.
+func RequestsTransactionOutlineToOutline(req *api.RequestsTransactionOutline) (*outlines.Transaction, error) {
 	errorCollector := lox.NewErrorCollector()
 
 	return &outlines.Transaction{
@@ -24,7 +24,7 @@ func AnnotatedTransactionRequestToOutline(req *api.RequestsAnnotatedTransaction)
 				IfF(
 					req.Annotations != nil,
 					lox.CatchFn(errorCollector, func() (transaction.OutputsAnnotations, error) {
-						return lox.MapEntriesOrError(*req.Annotations.Outputs, mapOutputAnnotationEntry)
+						return lox.MapEntriesOrError(req.Annotations.Outputs, mapOutputAnnotationEntry)
 					}),
 				).Else(nil),
 		},
@@ -42,16 +42,15 @@ func mapOutputAnnotationEntry(key string, value api.ModelsOutputAnnotation) (int
 func annotatedOutputToOutline(from api.ModelsOutputAnnotation) *transaction.OutputAnnotation {
 	return &transaction.OutputAnnotation{
 		Bucket: bucket.Name(from.Bucket),
-		Paymail: lo.
-			IfF(
-				from.Paymail != nil,
-				func() *transaction.PaymailAnnotation {
-					return &transaction.PaymailAnnotation{
-						Sender:    from.Paymail.Sender,
-						Receiver:  from.Paymail.Receiver,
-						Reference: from.Paymail.Reference,
-					}
-				},
-			).Else(nil),
+		Paymail: lo.IfF(
+			from.Paymail != nil,
+			func() *transaction.PaymailAnnotation {
+				return &transaction.PaymailAnnotation{
+					Sender:    from.Paymail.Sender,
+					Receiver:  from.Paymail.Receiver,
+					Reference: from.Paymail.Reference,
+				}
+			},
+		).Else(nil),
 	}
 }

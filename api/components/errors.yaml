@@ -19,11 +19,20 @@ components:
         - message
       additionalProperties: false
 
-    Authorization:
+    AnyAuthorization:
+      oneOf:
+        - $ref: '#/components/schemas/Unauthorized'
+        - $ref: '#/components/schemas/AuthXPubRequired'
+
+    AdminAuthorization:
+      oneOf:
+        - $ref: '#/components/schemas/UserAuthOnNonUserEndpoint'
+        - $ref: '#/components/schemas/AuthXPubRequired'
+
+    UserAuthorization:
       oneOf:
         - $ref: '#/components/schemas/Unauthorized'
         - $ref: '#/components/schemas/AdminAuthOnNonAdminEndpoint'
-        - $ref: '#/components/schemas/UserAuthOnNonUserEndpoint'
         - $ref: '#/components/schemas/AuthXPubRequired'
 
     Unauthorized:
@@ -176,6 +185,76 @@ components:
             message:
               example: "Internal server error"
 
+    TxSpecNoDefaultPaymailAddress:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-tx-spec-no-default-paymail-address"
+            message:
+              example: "no default paymail address"
+
+    TxSpecOutputsRequired:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "tx-spec-output-required"
+            message:
+              example: "transaction outline requires at least one output"
+
+    TxSpecOpReturnDataRequired:
+        allOf:
+            - $ref: '#/components/schemas/Schema'
+            - type: object
+              properties:
+                code:
+                  example: "tx-spec-op-return-data-required"
+                message:
+                  example: "data is required for OP_RETURN output"
+
+    TxSpecFailedToDecodeHex:
+        allOf:
+            - $ref: '#/components/schemas/Schema'
+            - type: object
+              properties:
+                code:
+                  example: "failed-to-decode-hex"
+                message:
+                  example: "failed to decode hex"
+
+    TxSpecInvalidPaymailReceiver:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-paymail-address-invalid-receiver"
+            message:
+              example: "receiver paymail address is invalid"
+
+    TxSpecInvalidPaymailSender:
+        allOf:
+            - $ref: '#/components/schemas/Schema'
+            - type: object
+              properties:
+                code:
+                  example: "error-paymail-address-invalid-sender"
+                message:
+                  example: "sender paymail address is invalid"
+
+    TxOutlineUserHasNotEnoughFunds:
+        allOf:
+            - $ref: '#/components/schemas/Schema'
+            - type: object
+              properties:
+                code:
+                  example: "tx-outline-not-enough-funds"
+                message:
+                  example: "not enough funds to make the transaction"
+
     TxValidation:
       allOf:
         - $ref: '#/components/schemas/Schema'
@@ -202,8 +281,12 @@ components:
         - type: object
           properties:
             code:
+              enum:
+                - "error-utxo-spent"
               example: "error-utxo-spent"
             message:
+              enum:
+                - "UTXO is already spent"
               example: "UTXO is already spent"
 
     AnnotationIndexOutOfRange:

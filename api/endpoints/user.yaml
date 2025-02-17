@@ -11,7 +11,7 @@ paths:
         - XPubAuth:
             - "user"
       tags:
-        - User endpoints
+        - User
       summary: Get current user
       description: >-
         This endpoint return balance of current authenticated user
@@ -30,7 +30,7 @@ paths:
         - XPubAuth:
             - "user"
       tags:
-        - User endpoints
+        - Data
       summary: Get data for user
       description: >-
         This endpoint gets data by its id for authenticated user
@@ -60,7 +60,7 @@ paths:
         - XPubAuth:
             - "user"
       tags:
-        - User endpoints
+        - Operations
       summary: Get operations for user
       description: >-
         This endpoint allows to search operations for authenticated user
@@ -86,7 +86,7 @@ paths:
         - XPubAuth:
             - "user"
       tags:
-        - User endpoints
+        - Transactions
       summary: Record transaction outline
       description: >-
         This endpoint allows to record transaction outline for authenticated user
@@ -95,9 +95,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "../components/requests.yaml#/components/schemas/AnnotatedTransaction"
+              $ref: "../components/requests.yaml#/components/schemas/TransactionOutline"
       responses:
-        200:
+        201:
           $ref: "../components/responses.yaml#/components/responses/RecordTransactionSuccess"
         400:
           $ref: "../components/responses.yaml#/components/responses/RecordTransactionBadRequest"
@@ -113,22 +113,35 @@ paths:
         - XPubAuth:
             - "user"
       tags:
-        - User endpoints
+        - Transactions
       summary: Create transaction outline
       description: >-
         This endpoint allows to create transaction outline for authenticated user
+      parameters:
+        - name: format
+          in: query
+          description: Required format of transaction hex
+          schema:
+            type: string
+            enum:
+              - "beef"
+              - "raw"
+            default: "beef"
+          example: "beef"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "../components/requests.yaml#/components/schemas/AnnotatedTransaction"
+              $ref: "../components/requests.yaml#/components/schemas/TransactionSpecification"
       responses:
         200:
-          $ref: "../components/responses.yaml#/components/responses/RecordTransactionSuccess"
+          $ref: "../components/responses.yaml#/components/responses/CreateTransactionOutlineSuccess"
         400:
-          $ref: "../components/responses.yaml#/components/responses/RecordTransactionBadRequest"
+          $ref: "../components/responses.yaml#/components/responses/CreateTransactionOutlineBadRequest"
+        422:
+          $ref: "../components/responses.yaml#/components/responses/CreateTransactionOutlineUnprocessable"
         401:
           $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
         500:
-          $ref: "../components/responses.yaml#/components/responses/RecordTransactionInternalServerError"
+          $ref: "../components/responses.yaml#/components/responses/InternalServerError"

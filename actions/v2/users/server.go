@@ -13,8 +13,10 @@ type APIUsers struct {
 
 // NewAPIUsers creates a new server with API endpoints
 func NewAPIUsers(engine engine.ClientInterface, log *zerolog.Logger) APIUsers {
+	logger := log.With().Str("api", "users").Logger()
+
 	return APIUsers{
 		engine: engine,
-		logger: log,
+		logger: &logger,
 	}
 }

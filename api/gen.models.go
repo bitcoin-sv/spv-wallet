@@ -5,6 +5,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"time"
 
 	"github.com/oapi-codegen/runtime"
@@ -12,6 +13,17 @@ import (
 
 const (
 	XPubAuthScopes = "XPubAuth.Scopes"
+)
+
+// Defines values for ModelsAnnotatedTransactionOutlineFormat.
+const (
+	ModelsAnnotatedTransactionOutlineFormatBEEF ModelsAnnotatedTransactionOutlineFormat = "BEEF"
+	ModelsAnnotatedTransactionOutlineFormatRAW  ModelsAnnotatedTransactionOutlineFormat = "RAW"
+)
+
+// Defines values for ModelsDataAnnotationBucket.
+const (
+	Data ModelsDataAnnotationBucket = "data"
 )
 
 // Defines values for ModelsOperationTxStatus.
@@ -29,16 +41,59 @@ const (
 	Outgoing ModelsOperationType = "outgoing"
 )
 
-// Defines values for ModelsSearchPageSort.
+// Defines values for ModelsOutputAnnotationBucket.
 const (
-	Asc  ModelsSearchPageSort = "asc"
-	Desc ModelsSearchPageSort = "desc"
+	ModelsOutputAnnotationBucketBsv ModelsOutputAnnotationBucket = "bsv"
+)
+
+// Defines values for ModelsPaymailAnnotationBucket.
+const (
+	ModelsPaymailAnnotationBucketBsv ModelsPaymailAnnotationBucket = "bsv"
+)
+
+// Defines values for ModelsTransactionHexFormat.
+const (
+	ModelsTransactionHexFormatBEEF ModelsTransactionHexFormat = "BEEF"
+	ModelsTransactionHexFormatRAW  ModelsTransactionHexFormat = "RAW"
+)
+
+// Defines values for RequestsOpReturnOutputSpecificationDataType.
+const (
+	Hexes   RequestsOpReturnOutputSpecificationDataType = "hexes"
+	Strings RequestsOpReturnOutputSpecificationDataType = "strings"
+)
+
+// Defines values for RequestsOpReturnOutputSpecificationType.
+const (
+	OpReturn RequestsOpReturnOutputSpecificationType = "op_return"
+)
+
+// Defines values for RequestsPaymailOutputSpecificationType.
+const (
+	Paymail RequestsPaymailOutputSpecificationType = "paymail"
+)
+
+// Defines values for RequestsTransactionOutlineFormat.
+const (
+	BEEF RequestsTransactionOutlineFormat = "BEEF"
+	RAW  RequestsTransactionOutlineFormat = "RAW"
+)
+
+// Defines values for CreateTransactionOutlineParamsFormat.
+const (
+	Beef CreateTransactionOutlineParamsFormat = "beef"
+	Raw  CreateTransactionOutlineParamsFormat = "raw"
 )
 
 // ErrorsAdminAuthOnNonAdminEndpoint defines model for errors_AdminAuthOnNonAdminEndpoint.
 type ErrorsAdminAuthOnNonAdminEndpoint struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
+}
+
+// ErrorsAdminAuthorization defines model for errors_AdminAuthorization.
+type ErrorsAdminAuthorization struct {
+	union json.RawMessage
 }
 
 // ErrorsAnnotationIndexConversion defines model for errors_AnnotationIndexConversion.
@@ -53,15 +108,15 @@ type ErrorsAnnotationIndexOutOfRange struct {
 	Message interface{} `json:"message"`
 }
 
+// ErrorsAnyAuthorization defines model for errors_AnyAuthorization.
+type ErrorsAnyAuthorization struct {
+	union json.RawMessage
+}
+
 // ErrorsAuthXPubRequired defines model for errors_AuthXPubRequired.
 type ErrorsAuthXPubRequired struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
-}
-
-// ErrorsAuthorization defines model for errors_Authorization.
-type ErrorsAuthorization struct {
-	union json.RawMessage
 }
 
 // ErrorsCannotBindRequest defines model for errors_CannotBindRequest.
@@ -151,6 +206,48 @@ type ErrorsTxBroadcast struct {
 	Message interface{} `json:"message"`
 }
 
+// ErrorsTxOutlineUserHasNotEnoughFunds defines model for errors_TxOutlineUserHasNotEnoughFunds.
+type ErrorsTxOutlineUserHasNotEnoughFunds struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsTxSpecFailedToDecodeHex defines model for errors_TxSpecFailedToDecodeHex.
+type ErrorsTxSpecFailedToDecodeHex struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsTxSpecInvalidPaymailReceiver defines model for errors_TxSpecInvalidPaymailReceiver.
+type ErrorsTxSpecInvalidPaymailReceiver struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsTxSpecInvalidPaymailSender defines model for errors_TxSpecInvalidPaymailSender.
+type ErrorsTxSpecInvalidPaymailSender struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsTxSpecNoDefaultPaymailAddress defines model for errors_TxSpecNoDefaultPaymailAddress.
+type ErrorsTxSpecNoDefaultPaymailAddress struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsTxSpecOpReturnDataRequired defines model for errors_TxSpecOpReturnDataRequired.
+type ErrorsTxSpecOpReturnDataRequired struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsTxSpecOutputsRequired defines model for errors_TxSpecOutputsRequired.
+type ErrorsTxSpecOutputsRequired struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ErrorsUTXOSpent defines model for errors_UTXOSpent.
 type ErrorsUTXOSpent struct {
 	Code    interface{} `json:"code"`
@@ -169,13 +266,34 @@ type ErrorsUserAuthOnNonUserEndpoint struct {
 	Message interface{} `json:"message"`
 }
 
-// ModelsAnnotations defines model for models_Annotations.
-type ModelsAnnotations struct {
-	// Inputs Map of input annotations
-	Inputs *map[string]ModelsInputAnnotation `json:"inputs,omitempty"`
+// ErrorsUserAuthorization defines model for errors_UserAuthorization.
+type ErrorsUserAuthorization struct {
+	union json.RawMessage
+}
 
-	// Outputs Map of output annotations
-	Outputs *map[string]ModelsOutputAnnotation `json:"outputs,omitempty"`
+// ModelsAnnotatedTransactionOutline defines model for models_AnnotatedTransactionOutline.
+type ModelsAnnotatedTransactionOutline struct {
+	Annotations *ModelsOutlineAnnotations `json:"annotations,omitempty"`
+
+	// Format Transaction format
+	Format ModelsAnnotatedTransactionOutlineFormat `json:"format"`
+
+	// Hex Transaction hex
+	Hex string `json:"hex"`
+}
+
+// ModelsAnnotatedTransactionOutlineFormat Transaction format
+type ModelsAnnotatedTransactionOutlineFormat string
+
+// ModelsBucketAnnotation defines model for models_BucketAnnotation.
+type ModelsBucketAnnotation struct {
+	// Bucket Type of bucket where this output should be stored.
+	Bucket string `json:"bucket"`
+}
+
+// ModelsCustomInstructions defines model for models_CustomInstructions.
+type ModelsCustomInstructions struct {
+	union json.RawMessage
 }
 
 // ModelsData defines model for models_Data.
@@ -187,31 +305,44 @@ type ModelsData struct {
 	Id string `json:"id"`
 }
 
+// ModelsDataAnnotation defines model for models_DataAnnotation.
+type ModelsDataAnnotation struct {
+	Bucket ModelsDataAnnotationBucket `json:"bucket"`
+}
+
+// ModelsDataAnnotationBucket defines model for ModelsDataAnnotation.Bucket.
+type ModelsDataAnnotationBucket string
+
 // ModelsInputAnnotation defines model for models_InputAnnotation.
 type ModelsInputAnnotation struct {
-	// CustomInstructions Instructions about how to unlock this input.
-	CustomInstructions string `json:"customInstructions"`
+	CustomInstructions ModelsCustomInstructions `json:"customInstructions"`
+}
+
+// ModelsInputsAnnotations defines model for models_InputsAnnotations.
+type ModelsInputsAnnotations struct {
+	// Inputs Map of input annotations
+	Inputs map[string]ModelsInputAnnotation `json:"inputs"`
 }
 
 // ModelsOperation defines model for models_Operation.
 type ModelsOperation struct {
 	// Counterparty Counterparty of operation
-	Counterparty *string `json:"counterparty,omitempty"`
+	Counterparty string `json:"counterparty"`
 
 	// CreatedAt Creation date of operation
-	CreatedAt *time.Time `json:"createdAt,omitempty"`
+	CreatedAt time.Time `json:"createdAt"`
 
 	// TxID Transaction ID
-	TxID *string `json:"txID,omitempty"`
+	TxID string `json:"txID"`
 
 	// TxStatus Status of transaction
-	TxStatus *ModelsOperationTxStatus `json:"txStatus,omitempty"`
+	TxStatus ModelsOperationTxStatus `json:"txStatus"`
 
 	// Type Type of operation
-	Type *ModelsOperationType `json:"type,omitempty"`
+	Type ModelsOperationType `json:"type"`
 
 	// Value Value of operation
-	Value *int64 `json:"value,omitempty"`
+	Value int64 `json:"value"`
 }
 
 // ModelsOperationTxStatus Status of transaction
@@ -222,15 +353,32 @@ type ModelsOperationType string
 
 // ModelsOperationsSearchResult defines model for models_OperationsSearchResult.
 type ModelsOperationsSearchResult struct {
-	Operations *[]ModelsOperation `json:"operations,omitempty"`
-	Page       *ModelsSearchPage  `json:"page,omitempty"`
+	Content []ModelsOperation `json:"content"`
+	Page    ModelsSearchPage  `json:"page"`
+}
+
+// ModelsOutlineAnnotations defines model for models_OutlineAnnotations.
+type ModelsOutlineAnnotations struct {
+	// Inputs Map of input annotations
+	Inputs map[string]ModelsInputAnnotation `json:"inputs"`
+
+	// Outputs Map of output annotations
+	Outputs map[string]ModelsOutputAnnotation `json:"outputs"`
 }
 
 // ModelsOutputAnnotation defines model for models_OutputAnnotation.
 type ModelsOutputAnnotation struct {
-	// Bucket Type of bucket where this output should be stored.
-	Bucket  string                   `json:"bucket"`
-	Paymail *ModelsPaymailAnnotation `json:"paymail,omitempty"`
+	Bucket  ModelsOutputAnnotationBucket    `json:"bucket"`
+	Paymail *ModelsPaymailAnnotationDetails `json:"paymail,omitempty"`
+}
+
+// ModelsOutputAnnotationBucket defines model for ModelsOutputAnnotation.Bucket.
+type ModelsOutputAnnotationBucket string
+
+// ModelsOutputsAnnotations defines model for models_OutputsAnnotations.
+type ModelsOutputsAnnotations struct {
+	// Outputs Map of output annotations
+	Outputs map[string]ModelsOutputAnnotation `json:"outputs"`
 }
 
 // ModelsPaymail defines model for models_Paymail.
@@ -245,6 +393,15 @@ type ModelsPaymail struct {
 
 // ModelsPaymailAnnotation defines model for models_PaymailAnnotation.
 type ModelsPaymailAnnotation struct {
+	Bucket  *ModelsPaymailAnnotationBucket  `json:"bucket,omitempty"`
+	Paymail *ModelsPaymailAnnotationDetails `json:"paymail,omitempty"`
+}
+
+// ModelsPaymailAnnotationBucket defines model for ModelsPaymailAnnotation.Bucket.
+type ModelsPaymailAnnotationBucket string
+
+// ModelsPaymailAnnotationDetails defines model for models_PaymailAnnotationDetails.
+type ModelsPaymailAnnotationDetails struct {
 	// Receiver Paymail address of the receiver
 	Receiver string `json:"receiver"`
 
@@ -261,29 +418,50 @@ type ModelsRecordedOutline struct {
 	TxID string `json:"txID"`
 }
 
+// ModelsSPVWalletCustomInstruction defines model for models_SPVWalletCustomInstruction.
+type ModelsSPVWalletCustomInstruction struct {
+	// Instruction Custom instruction
+	Instruction string `json:"instruction"`
+
+	// Type Type of custom instructions
+	Type string `json:"type"`
+}
+
+// ModelsSPVWalletCustomInstructions defines model for models_SPVWalletCustomInstructions.
+type ModelsSPVWalletCustomInstructions = []ModelsSPVWalletCustomInstruction
+
 // ModelsSearchPage defines model for models_SearchPage.
 type ModelsSearchPage struct {
 	// Number Page number for pagination
-	Number *int `json:"number,omitempty"`
+	Number int `json:"number"`
 
 	// Size Number of items per page
-	Size *int `json:"size,omitempty"`
+	Size int `json:"size"`
 
-	// Sort Sorting order (asc or desc)
-	Sort *ModelsSearchPageSort `json:"sort,omitempty"`
+	// TotalElements Total number of items
+	TotalElements int `json:"totalElements"`
 
-	// SortBy Field to sort by
-	SortBy *string `json:"sortBy,omitempty"`
+	// TotalPages Total number of pages
+	TotalPages int `json:"totalPages"`
 }
-
-// ModelsSearchPageSort Sorting order (asc or desc)
-type ModelsSearchPageSort string
 
 // ModelsSharedConfig Shared config
 type ModelsSharedConfig struct {
 	ExperimentalFeatures map[string]bool `json:"experimentalFeatures"`
 	PaymailDomains       []string        `json:"paymailDomains"`
 }
+
+// ModelsTransactionHex defines model for models_TransactionHex.
+type ModelsTransactionHex struct {
+	// Format Transaction format
+	Format ModelsTransactionHexFormat `json:"format"`
+
+	// Hex Transaction hex
+	Hex string `json:"hex"`
+}
+
+// ModelsTransactionHexFormat Transaction format
+type ModelsTransactionHexFormat string
 
 // ModelsUser defines model for models_User.
 type ModelsUser struct {
@@ -294,10 +472,13 @@ type ModelsUser struct {
 	UpdatedAt time.Time       `json:"updatedAt"`
 }
 
+// ModelsUserDefinedCustomInstructions Instructions about how to unlock this input.
+type ModelsUserDefinedCustomInstructions = string
+
 // ModelsUserInfo defines model for models_UserInfo.
 type ModelsUserInfo struct {
 	// CurrentBalance Current balance of user
-	CurrentBalance *string `json:"currentBalance,omitempty"`
+	CurrentBalance uint64 `json:"currentBalance"`
 }
 
 // RequestsAddPaymail defines model for requests_AddPaymail.
@@ -309,21 +490,69 @@ type RequestsAddPaymail struct {
 	PublicName string `json:"publicName"`
 }
 
-// RequestsAnnotatedTransaction defines model for requests_AnnotatedTransaction.
-type RequestsAnnotatedTransaction struct {
-	Annotations *ModelsAnnotations `json:"annotations,omitempty"`
+// RequestsCreateUser defines model for requests_CreateUser.
+type RequestsCreateUser struct {
+	Paymail   *RequestsAddPaymail `json:"paymail,omitempty"`
+	PublicKey string              `json:"publicKey"`
+}
+
+// RequestsOpReturnHexesOutput defines model for requests_OpReturnHexesOutput.
+type RequestsOpReturnHexesOutput = []string
+
+// RequestsOpReturnOutputSpecification defines model for requests_OpReturnOutputSpecification.
+type RequestsOpReturnOutputSpecification struct {
+	Data     *RequestsOpReturnOutputSpecification_Data    `json:"data,omitempty"`
+	DataType *RequestsOpReturnOutputSpecificationDataType `json:"dataType,omitempty"`
+	Type     RequestsOpReturnOutputSpecificationType      `json:"type"`
+}
+
+// RequestsOpReturnOutputSpecification_Data defines model for RequestsOpReturnOutputSpecification.Data.
+type RequestsOpReturnOutputSpecification_Data struct {
+	union json.RawMessage
+}
+
+// RequestsOpReturnOutputSpecificationDataType defines model for RequestsOpReturnOutputSpecification.DataType.
+type RequestsOpReturnOutputSpecificationDataType string
+
+// RequestsOpReturnOutputSpecificationType defines model for RequestsOpReturnOutputSpecification.Type.
+type RequestsOpReturnOutputSpecificationType string
+
+// RequestsOpReturnStringsOutput defines model for requests_OpReturnStringsOutput.
+type RequestsOpReturnStringsOutput = []string
+
+// RequestsPaymailOutputSpecification defines model for requests_PaymailOutputSpecification.
+type RequestsPaymailOutputSpecification struct {
+	From     *string                                `json:"from"`
+	Satoshis uint64                                 `json:"satoshis"`
+	To       string                                 `json:"to"`
+	Type     RequestsPaymailOutputSpecificationType `json:"type"`
+}
+
+// RequestsPaymailOutputSpecificationType defines model for RequestsPaymailOutputSpecification.Type.
+type RequestsPaymailOutputSpecificationType string
+
+// RequestsTransactionOutline defines model for requests_TransactionOutline.
+type RequestsTransactionOutline struct {
+	Annotations *ModelsOutputsAnnotations `json:"annotations,omitempty"`
 
 	// Format Transaction format
-	Format string `json:"format"`
+	Format RequestsTransactionOutlineFormat `json:"format"`
 
 	// Hex Transaction hex
 	Hex string `json:"hex"`
 }
 
-// RequestsCreateUser defines model for requests_CreateUser.
-type RequestsCreateUser struct {
-	Paymail   *RequestsAddPaymail `json:"paymail,omitempty"`
-	PublicKey string              `json:"publicKey"`
+// RequestsTransactionOutlineFormat Transaction format
+type RequestsTransactionOutlineFormat string
+
+// RequestsTransactionOutlineOutputSpecification defines model for requests_TransactionOutlineOutputSpecification.
+type RequestsTransactionOutlineOutputSpecification struct {
+	union json.RawMessage
+}
+
+// RequestsTransactionSpecification defines model for requests_TransactionSpecification.
+type RequestsTransactionSpecification struct {
+	Outputs []RequestsTransactionOutlineOutputSpecification `json:"outputs"`
 }
 
 // RequestsPageNumber defines model for requests_PageNumber.
@@ -358,6 +587,19 @@ type ResponsesAdminUserBadRequest struct {
 	union json.RawMessage
 }
 
+// ResponsesCreateTransactionOutlineBadRequest defines model for responses_CreateTransactionOutlineBadRequest.
+type ResponsesCreateTransactionOutlineBadRequest struct {
+	union json.RawMessage
+}
+
+// ResponsesCreateTransactionOutlineSuccess defines model for responses_CreateTransactionOutlineSuccess.
+type ResponsesCreateTransactionOutlineSuccess = ModelsAnnotatedTransactionOutline
+
+// ResponsesCreateTransactionOutlineUnprocessable defines model for responses_CreateTransactionOutlineUnprocessable.
+type ResponsesCreateTransactionOutlineUnprocessable struct {
+	union json.RawMessage
+}
+
 // ResponsesGetCurrentUserSuccess defines model for responses_GetCurrentUserSuccess.
 type ResponsesGetCurrentUserSuccess = ModelsUserInfo
 
@@ -373,7 +615,10 @@ type ResponsesGetDataSuccess = ModelsData
 type ResponsesInternalServerError = ErrorsInternal
 
 // ResponsesNotAuthorized defines model for responses_NotAuthorized.
-type ResponsesNotAuthorized = ErrorsAuthorization
+type ResponsesNotAuthorized = ErrorsAnyAuthorization
+
+// ResponsesNotAuthorizedToAdminEndpoint defines model for responses_NotAuthorizedToAdminEndpoint.
+type ResponsesNotAuthorizedToAdminEndpoint = ErrorsAdminAuthorization
 
 // ResponsesRecordTransactionBadRequest defines model for responses_RecordTransactionBadRequest.
 type ResponsesRecordTransactionBadRequest struct {
@@ -401,9 +646,7 @@ type ResponsesSharedConfig = ModelsSharedConfig
 type ResponsesUserBadRequest = ErrorsInvalidDataID
 
 // ResponsesUserNotAuthorized defines model for responses_UserNotAuthorized.
-type ResponsesUserNotAuthorized struct {
-	union json.RawMessage
-}
+type ResponsesUserNotAuthorized = ErrorsUserAuthorization
 
 // SearchOperationsParams defines parameters for SearchOperations.
 type SearchOperationsParams struct {
@@ -420,6 +663,15 @@ type SearchOperationsParams struct {
 	SortBy *RequestsSortBy `form:"sortBy,omitempty" json:"sortBy,omitempty"`
 }
 
+// CreateTransactionOutlineParams defines parameters for CreateTransactionOutline.
+type CreateTransactionOutlineParams struct {
+	// Format Required format of transaction hex
+	Format *CreateTransactionOutlineParamsFormat `form:"format,omitempty" json:"format,omitempty"`
+}
+
+// CreateTransactionOutlineParamsFormat defines parameters for CreateTransactionOutline.
+type CreateTransactionOutlineParamsFormat string
+
 // CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
 type CreateUserJSONRequestBody = RequestsCreateUser
 
@@ -427,79 +679,27 @@ type CreateUserJSONRequestBody = RequestsCreateUser
 type AddPaymailToUserJSONRequestBody = RequestsAddPaymail
 
 // RecordTransactionOutlineJSONRequestBody defines body for RecordTransactionOutline for application/json ContentType.
-type RecordTransactionOutlineJSONRequestBody = RequestsAnnotatedTransaction
+type RecordTransactionOutlineJSONRequestBody = RequestsTransactionOutline
 
 // CreateTransactionOutlineJSONRequestBody defines body for CreateTransactionOutline for application/json ContentType.
-type CreateTransactionOutlineJSONRequestBody = RequestsAnnotatedTransaction
+type CreateTransactionOutlineJSONRequestBody = RequestsTransactionSpecification
 
-// AsErrorsUnauthorized returns the union data inside the ErrorsAuthorization as a ErrorsUnauthorized
-func (t ErrorsAuthorization) AsErrorsUnauthorized() (ErrorsUnauthorized, error) {
-	var body ErrorsUnauthorized
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromErrorsUnauthorized overwrites any union data inside the ErrorsAuthorization as the provided ErrorsUnauthorized
-func (t *ErrorsAuthorization) FromErrorsUnauthorized(v ErrorsUnauthorized) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeErrorsUnauthorized performs a merge with any union data inside the ErrorsAuthorization, using the provided ErrorsUnauthorized
-func (t *ErrorsAuthorization) MergeErrorsUnauthorized(v ErrorsUnauthorized) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-// AsErrorsAdminAuthOnNonAdminEndpoint returns the union data inside the ErrorsAuthorization as a ErrorsAdminAuthOnNonAdminEndpoint
-func (t ErrorsAuthorization) AsErrorsAdminAuthOnNonAdminEndpoint() (ErrorsAdminAuthOnNonAdminEndpoint, error) {
-	var body ErrorsAdminAuthOnNonAdminEndpoint
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromErrorsAdminAuthOnNonAdminEndpoint overwrites any union data inside the ErrorsAuthorization as the provided ErrorsAdminAuthOnNonAdminEndpoint
-func (t *ErrorsAuthorization) FromErrorsAdminAuthOnNonAdminEndpoint(v ErrorsAdminAuthOnNonAdminEndpoint) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeErrorsAdminAuthOnNonAdminEndpoint performs a merge with any union data inside the ErrorsAuthorization, using the provided ErrorsAdminAuthOnNonAdminEndpoint
-func (t *ErrorsAuthorization) MergeErrorsAdminAuthOnNonAdminEndpoint(v ErrorsAdminAuthOnNonAdminEndpoint) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-// AsErrorsUserAuthOnNonUserEndpoint returns the union data inside the ErrorsAuthorization as a ErrorsUserAuthOnNonUserEndpoint
-func (t ErrorsAuthorization) AsErrorsUserAuthOnNonUserEndpoint() (ErrorsUserAuthOnNonUserEndpoint, error) {
+// AsErrorsUserAuthOnNonUserEndpoint returns the union data inside the ErrorsAdminAuthorization as a ErrorsUserAuthOnNonUserEndpoint
+func (t ErrorsAdminAuthorization) AsErrorsUserAuthOnNonUserEndpoint() (ErrorsUserAuthOnNonUserEndpoint, error) {
 	var body ErrorsUserAuthOnNonUserEndpoint
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromErrorsUserAuthOnNonUserEndpoint overwrites any union data inside the ErrorsAuthorization as the provided ErrorsUserAuthOnNonUserEndpoint
-func (t *ErrorsAuthorization) FromErrorsUserAuthOnNonUserEndpoint(v ErrorsUserAuthOnNonUserEndpoint) error {
+// FromErrorsUserAuthOnNonUserEndpoint overwrites any union data inside the ErrorsAdminAuthorization as the provided ErrorsUserAuthOnNonUserEndpoint
+func (t *ErrorsAdminAuthorization) FromErrorsUserAuthOnNonUserEndpoint(v ErrorsUserAuthOnNonUserEndpoint) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeErrorsUserAuthOnNonUserEndpoint performs a merge with any union data inside the ErrorsAuthorization, using the provided ErrorsUserAuthOnNonUserEndpoint
-func (t *ErrorsAuthorization) MergeErrorsUserAuthOnNonUserEndpoint(v ErrorsUserAuthOnNonUserEndpoint) error {
+// MergeErrorsUserAuthOnNonUserEndpoint performs a merge with any union data inside the ErrorsAdminAuthorization, using the provided ErrorsUserAuthOnNonUserEndpoint
+func (t *ErrorsAdminAuthorization) MergeErrorsUserAuthOnNonUserEndpoint(v ErrorsUserAuthOnNonUserEndpoint) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -510,22 +710,22 @@ func (t *ErrorsAuthorization) MergeErrorsUserAuthOnNonUserEndpoint(v ErrorsUserA
 	return err
 }
 
-// AsErrorsAuthXPubRequired returns the union data inside the ErrorsAuthorization as a ErrorsAuthXPubRequired
-func (t ErrorsAuthorization) AsErrorsAuthXPubRequired() (ErrorsAuthXPubRequired, error) {
+// AsErrorsAuthXPubRequired returns the union data inside the ErrorsAdminAuthorization as a ErrorsAuthXPubRequired
+func (t ErrorsAdminAuthorization) AsErrorsAuthXPubRequired() (ErrorsAuthXPubRequired, error) {
 	var body ErrorsAuthXPubRequired
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromErrorsAuthXPubRequired overwrites any union data inside the ErrorsAuthorization as the provided ErrorsAuthXPubRequired
-func (t *ErrorsAuthorization) FromErrorsAuthXPubRequired(v ErrorsAuthXPubRequired) error {
+// FromErrorsAuthXPubRequired overwrites any union data inside the ErrorsAdminAuthorization as the provided ErrorsAuthXPubRequired
+func (t *ErrorsAdminAuthorization) FromErrorsAuthXPubRequired(v ErrorsAuthXPubRequired) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeErrorsAuthXPubRequired performs a merge with any union data inside the ErrorsAuthorization, using the provided ErrorsAuthXPubRequired
-func (t *ErrorsAuthorization) MergeErrorsAuthXPubRequired(v ErrorsAuthXPubRequired) error {
+// MergeErrorsAuthXPubRequired performs a merge with any union data inside the ErrorsAdminAuthorization, using the provided ErrorsAuthXPubRequired
+func (t *ErrorsAdminAuthorization) MergeErrorsAuthXPubRequired(v ErrorsAuthXPubRequired) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -536,12 +736,375 @@ func (t *ErrorsAuthorization) MergeErrorsAuthXPubRequired(v ErrorsAuthXPubRequir
 	return err
 }
 
-func (t ErrorsAuthorization) MarshalJSON() ([]byte, error) {
+func (t ErrorsAdminAuthorization) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
-func (t *ErrorsAuthorization) UnmarshalJSON(b []byte) error {
+func (t *ErrorsAdminAuthorization) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsUnauthorized returns the union data inside the ErrorsAnyAuthorization as a ErrorsUnauthorized
+func (t ErrorsAnyAuthorization) AsErrorsUnauthorized() (ErrorsUnauthorized, error) {
+	var body ErrorsUnauthorized
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsUnauthorized overwrites any union data inside the ErrorsAnyAuthorization as the provided ErrorsUnauthorized
+func (t *ErrorsAnyAuthorization) FromErrorsUnauthorized(v ErrorsUnauthorized) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsUnauthorized performs a merge with any union data inside the ErrorsAnyAuthorization, using the provided ErrorsUnauthorized
+func (t *ErrorsAnyAuthorization) MergeErrorsUnauthorized(v ErrorsUnauthorized) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsAuthXPubRequired returns the union data inside the ErrorsAnyAuthorization as a ErrorsAuthXPubRequired
+func (t ErrorsAnyAuthorization) AsErrorsAuthXPubRequired() (ErrorsAuthXPubRequired, error) {
+	var body ErrorsAuthXPubRequired
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsAuthXPubRequired overwrites any union data inside the ErrorsAnyAuthorization as the provided ErrorsAuthXPubRequired
+func (t *ErrorsAnyAuthorization) FromErrorsAuthXPubRequired(v ErrorsAuthXPubRequired) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsAuthXPubRequired performs a merge with any union data inside the ErrorsAnyAuthorization, using the provided ErrorsAuthXPubRequired
+func (t *ErrorsAnyAuthorization) MergeErrorsAuthXPubRequired(v ErrorsAuthXPubRequired) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ErrorsAnyAuthorization) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ErrorsAnyAuthorization) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsUnauthorized returns the union data inside the ErrorsUserAuthorization as a ErrorsUnauthorized
+func (t ErrorsUserAuthorization) AsErrorsUnauthorized() (ErrorsUnauthorized, error) {
+	var body ErrorsUnauthorized
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsUnauthorized overwrites any union data inside the ErrorsUserAuthorization as the provided ErrorsUnauthorized
+func (t *ErrorsUserAuthorization) FromErrorsUnauthorized(v ErrorsUnauthorized) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsUnauthorized performs a merge with any union data inside the ErrorsUserAuthorization, using the provided ErrorsUnauthorized
+func (t *ErrorsUserAuthorization) MergeErrorsUnauthorized(v ErrorsUnauthorized) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsAdminAuthOnNonAdminEndpoint returns the union data inside the ErrorsUserAuthorization as a ErrorsAdminAuthOnNonAdminEndpoint
+func (t ErrorsUserAuthorization) AsErrorsAdminAuthOnNonAdminEndpoint() (ErrorsAdminAuthOnNonAdminEndpoint, error) {
+	var body ErrorsAdminAuthOnNonAdminEndpoint
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsAdminAuthOnNonAdminEndpoint overwrites any union data inside the ErrorsUserAuthorization as the provided ErrorsAdminAuthOnNonAdminEndpoint
+func (t *ErrorsUserAuthorization) FromErrorsAdminAuthOnNonAdminEndpoint(v ErrorsAdminAuthOnNonAdminEndpoint) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsAdminAuthOnNonAdminEndpoint performs a merge with any union data inside the ErrorsUserAuthorization, using the provided ErrorsAdminAuthOnNonAdminEndpoint
+func (t *ErrorsUserAuthorization) MergeErrorsAdminAuthOnNonAdminEndpoint(v ErrorsAdminAuthOnNonAdminEndpoint) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsAuthXPubRequired returns the union data inside the ErrorsUserAuthorization as a ErrorsAuthXPubRequired
+func (t ErrorsUserAuthorization) AsErrorsAuthXPubRequired() (ErrorsAuthXPubRequired, error) {
+	var body ErrorsAuthXPubRequired
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsAuthXPubRequired overwrites any union data inside the ErrorsUserAuthorization as the provided ErrorsAuthXPubRequired
+func (t *ErrorsUserAuthorization) FromErrorsAuthXPubRequired(v ErrorsAuthXPubRequired) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsAuthXPubRequired performs a merge with any union data inside the ErrorsUserAuthorization, using the provided ErrorsAuthXPubRequired
+func (t *ErrorsUserAuthorization) MergeErrorsAuthXPubRequired(v ErrorsAuthXPubRequired) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ErrorsUserAuthorization) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ErrorsUserAuthorization) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsModelsSPVWalletCustomInstructions returns the union data inside the ModelsCustomInstructions as a ModelsSPVWalletCustomInstructions
+func (t ModelsCustomInstructions) AsModelsSPVWalletCustomInstructions() (ModelsSPVWalletCustomInstructions, error) {
+	var body ModelsSPVWalletCustomInstructions
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromModelsSPVWalletCustomInstructions overwrites any union data inside the ModelsCustomInstructions as the provided ModelsSPVWalletCustomInstructions
+func (t *ModelsCustomInstructions) FromModelsSPVWalletCustomInstructions(v ModelsSPVWalletCustomInstructions) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeModelsSPVWalletCustomInstructions performs a merge with any union data inside the ModelsCustomInstructions, using the provided ModelsSPVWalletCustomInstructions
+func (t *ModelsCustomInstructions) MergeModelsSPVWalletCustomInstructions(v ModelsSPVWalletCustomInstructions) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsModelsUserDefinedCustomInstructions returns the union data inside the ModelsCustomInstructions as a ModelsUserDefinedCustomInstructions
+func (t ModelsCustomInstructions) AsModelsUserDefinedCustomInstructions() (ModelsUserDefinedCustomInstructions, error) {
+	var body ModelsUserDefinedCustomInstructions
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromModelsUserDefinedCustomInstructions overwrites any union data inside the ModelsCustomInstructions as the provided ModelsUserDefinedCustomInstructions
+func (t *ModelsCustomInstructions) FromModelsUserDefinedCustomInstructions(v ModelsUserDefinedCustomInstructions) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeModelsUserDefinedCustomInstructions performs a merge with any union data inside the ModelsCustomInstructions, using the provided ModelsUserDefinedCustomInstructions
+func (t *ModelsCustomInstructions) MergeModelsUserDefinedCustomInstructions(v ModelsUserDefinedCustomInstructions) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ModelsCustomInstructions) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ModelsCustomInstructions) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsRequestsOpReturnHexesOutput returns the union data inside the RequestsOpReturnOutputSpecification_Data as a RequestsOpReturnHexesOutput
+func (t RequestsOpReturnOutputSpecification_Data) AsRequestsOpReturnHexesOutput() (RequestsOpReturnHexesOutput, error) {
+	var body RequestsOpReturnHexesOutput
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromRequestsOpReturnHexesOutput overwrites any union data inside the RequestsOpReturnOutputSpecification_Data as the provided RequestsOpReturnHexesOutput
+func (t *RequestsOpReturnOutputSpecification_Data) FromRequestsOpReturnHexesOutput(v RequestsOpReturnHexesOutput) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeRequestsOpReturnHexesOutput performs a merge with any union data inside the RequestsOpReturnOutputSpecification_Data, using the provided RequestsOpReturnHexesOutput
+func (t *RequestsOpReturnOutputSpecification_Data) MergeRequestsOpReturnHexesOutput(v RequestsOpReturnHexesOutput) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsRequestsOpReturnStringsOutput returns the union data inside the RequestsOpReturnOutputSpecification_Data as a RequestsOpReturnStringsOutput
+func (t RequestsOpReturnOutputSpecification_Data) AsRequestsOpReturnStringsOutput() (RequestsOpReturnStringsOutput, error) {
+	var body RequestsOpReturnStringsOutput
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromRequestsOpReturnStringsOutput overwrites any union data inside the RequestsOpReturnOutputSpecification_Data as the provided RequestsOpReturnStringsOutput
+func (t *RequestsOpReturnOutputSpecification_Data) FromRequestsOpReturnStringsOutput(v RequestsOpReturnStringsOutput) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeRequestsOpReturnStringsOutput performs a merge with any union data inside the RequestsOpReturnOutputSpecification_Data, using the provided RequestsOpReturnStringsOutput
+func (t *RequestsOpReturnOutputSpecification_Data) MergeRequestsOpReturnStringsOutput(v RequestsOpReturnStringsOutput) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t RequestsOpReturnOutputSpecification_Data) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *RequestsOpReturnOutputSpecification_Data) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsRequestsOpReturnOutputSpecification returns the union data inside the RequestsTransactionOutlineOutputSpecification as a RequestsOpReturnOutputSpecification
+func (t RequestsTransactionOutlineOutputSpecification) AsRequestsOpReturnOutputSpecification() (RequestsOpReturnOutputSpecification, error) {
+	var body RequestsOpReturnOutputSpecification
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromRequestsOpReturnOutputSpecification overwrites any union data inside the RequestsTransactionOutlineOutputSpecification as the provided RequestsOpReturnOutputSpecification
+func (t *RequestsTransactionOutlineOutputSpecification) FromRequestsOpReturnOutputSpecification(v RequestsOpReturnOutputSpecification) error {
+	v.Type = "requests_OpReturnOutputSpecification"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeRequestsOpReturnOutputSpecification performs a merge with any union data inside the RequestsTransactionOutlineOutputSpecification, using the provided RequestsOpReturnOutputSpecification
+func (t *RequestsTransactionOutlineOutputSpecification) MergeRequestsOpReturnOutputSpecification(v RequestsOpReturnOutputSpecification) error {
+	v.Type = "requests_OpReturnOutputSpecification"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsRequestsPaymailOutputSpecification returns the union data inside the RequestsTransactionOutlineOutputSpecification as a RequestsPaymailOutputSpecification
+func (t RequestsTransactionOutlineOutputSpecification) AsRequestsPaymailOutputSpecification() (RequestsPaymailOutputSpecification, error) {
+	var body RequestsPaymailOutputSpecification
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromRequestsPaymailOutputSpecification overwrites any union data inside the RequestsTransactionOutlineOutputSpecification as the provided RequestsPaymailOutputSpecification
+func (t *RequestsTransactionOutlineOutputSpecification) FromRequestsPaymailOutputSpecification(v RequestsPaymailOutputSpecification) error {
+	v.Type = "requests_PaymailOutputSpecification"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeRequestsPaymailOutputSpecification performs a merge with any union data inside the RequestsTransactionOutlineOutputSpecification, using the provided RequestsPaymailOutputSpecification
+func (t *RequestsTransactionOutlineOutputSpecification) MergeRequestsPaymailOutputSpecification(v RequestsPaymailOutputSpecification) error {
+	v.Type = "requests_PaymailOutputSpecification"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t RequestsTransactionOutlineOutputSpecification) Discriminator() (string, error) {
+	var discriminator struct {
+		Discriminator string `json:"type"`
+	}
+	err := json.Unmarshal(t.union, &discriminator)
+	return discriminator.Discriminator, err
+}
+
+func (t RequestsTransactionOutlineOutputSpecification) ValueByDiscriminator() (interface{}, error) {
+	discriminator, err := t.Discriminator()
+	if err != nil {
+		return nil, err
+	}
+	switch discriminator {
+	case "requests_OpReturnOutputSpecification":
+		return t.AsRequestsOpReturnOutputSpecification()
+	case "requests_PaymailOutputSpecification":
+		return t.AsRequestsPaymailOutputSpecification()
+	default:
+		return nil, errors.New("unknown discriminator value: " + discriminator)
+	}
+}
+
+func (t RequestsTransactionOutlineOutputSpecification) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *RequestsTransactionOutlineOutputSpecification) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
@@ -682,6 +1245,208 @@ func (t ResponsesAdminUserBadRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (t *ResponsesAdminUserBadRequest) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsTxSpecNoDefaultPaymailAddress returns the union data inside the ResponsesCreateTransactionOutlineBadRequest as a ErrorsTxSpecNoDefaultPaymailAddress
+func (t ResponsesCreateTransactionOutlineBadRequest) AsErrorsTxSpecNoDefaultPaymailAddress() (ErrorsTxSpecNoDefaultPaymailAddress, error) {
+	var body ErrorsTxSpecNoDefaultPaymailAddress
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsTxSpecNoDefaultPaymailAddress overwrites any union data inside the ResponsesCreateTransactionOutlineBadRequest as the provided ErrorsTxSpecNoDefaultPaymailAddress
+func (t *ResponsesCreateTransactionOutlineBadRequest) FromErrorsTxSpecNoDefaultPaymailAddress(v ErrorsTxSpecNoDefaultPaymailAddress) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsTxSpecNoDefaultPaymailAddress performs a merge with any union data inside the ResponsesCreateTransactionOutlineBadRequest, using the provided ErrorsTxSpecNoDefaultPaymailAddress
+func (t *ResponsesCreateTransactionOutlineBadRequest) MergeErrorsTxSpecNoDefaultPaymailAddress(v ErrorsTxSpecNoDefaultPaymailAddress) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsTxSpecOutputsRequired returns the union data inside the ResponsesCreateTransactionOutlineBadRequest as a ErrorsTxSpecOutputsRequired
+func (t ResponsesCreateTransactionOutlineBadRequest) AsErrorsTxSpecOutputsRequired() (ErrorsTxSpecOutputsRequired, error) {
+	var body ErrorsTxSpecOutputsRequired
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsTxSpecOutputsRequired overwrites any union data inside the ResponsesCreateTransactionOutlineBadRequest as the provided ErrorsTxSpecOutputsRequired
+func (t *ResponsesCreateTransactionOutlineBadRequest) FromErrorsTxSpecOutputsRequired(v ErrorsTxSpecOutputsRequired) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsTxSpecOutputsRequired performs a merge with any union data inside the ResponsesCreateTransactionOutlineBadRequest, using the provided ErrorsTxSpecOutputsRequired
+func (t *ResponsesCreateTransactionOutlineBadRequest) MergeErrorsTxSpecOutputsRequired(v ErrorsTxSpecOutputsRequired) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsTxSpecOpReturnDataRequired returns the union data inside the ResponsesCreateTransactionOutlineBadRequest as a ErrorsTxSpecOpReturnDataRequired
+func (t ResponsesCreateTransactionOutlineBadRequest) AsErrorsTxSpecOpReturnDataRequired() (ErrorsTxSpecOpReturnDataRequired, error) {
+	var body ErrorsTxSpecOpReturnDataRequired
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsTxSpecOpReturnDataRequired overwrites any union data inside the ResponsesCreateTransactionOutlineBadRequest as the provided ErrorsTxSpecOpReturnDataRequired
+func (t *ResponsesCreateTransactionOutlineBadRequest) FromErrorsTxSpecOpReturnDataRequired(v ErrorsTxSpecOpReturnDataRequired) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsTxSpecOpReturnDataRequired performs a merge with any union data inside the ResponsesCreateTransactionOutlineBadRequest, using the provided ErrorsTxSpecOpReturnDataRequired
+func (t *ResponsesCreateTransactionOutlineBadRequest) MergeErrorsTxSpecOpReturnDataRequired(v ErrorsTxSpecOpReturnDataRequired) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsTxSpecFailedToDecodeHex returns the union data inside the ResponsesCreateTransactionOutlineBadRequest as a ErrorsTxSpecFailedToDecodeHex
+func (t ResponsesCreateTransactionOutlineBadRequest) AsErrorsTxSpecFailedToDecodeHex() (ErrorsTxSpecFailedToDecodeHex, error) {
+	var body ErrorsTxSpecFailedToDecodeHex
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsTxSpecFailedToDecodeHex overwrites any union data inside the ResponsesCreateTransactionOutlineBadRequest as the provided ErrorsTxSpecFailedToDecodeHex
+func (t *ResponsesCreateTransactionOutlineBadRequest) FromErrorsTxSpecFailedToDecodeHex(v ErrorsTxSpecFailedToDecodeHex) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsTxSpecFailedToDecodeHex performs a merge with any union data inside the ResponsesCreateTransactionOutlineBadRequest, using the provided ErrorsTxSpecFailedToDecodeHex
+func (t *ResponsesCreateTransactionOutlineBadRequest) MergeErrorsTxSpecFailedToDecodeHex(v ErrorsTxSpecFailedToDecodeHex) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsTxSpecInvalidPaymailReceiver returns the union data inside the ResponsesCreateTransactionOutlineBadRequest as a ErrorsTxSpecInvalidPaymailReceiver
+func (t ResponsesCreateTransactionOutlineBadRequest) AsErrorsTxSpecInvalidPaymailReceiver() (ErrorsTxSpecInvalidPaymailReceiver, error) {
+	var body ErrorsTxSpecInvalidPaymailReceiver
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsTxSpecInvalidPaymailReceiver overwrites any union data inside the ResponsesCreateTransactionOutlineBadRequest as the provided ErrorsTxSpecInvalidPaymailReceiver
+func (t *ResponsesCreateTransactionOutlineBadRequest) FromErrorsTxSpecInvalidPaymailReceiver(v ErrorsTxSpecInvalidPaymailReceiver) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsTxSpecInvalidPaymailReceiver performs a merge with any union data inside the ResponsesCreateTransactionOutlineBadRequest, using the provided ErrorsTxSpecInvalidPaymailReceiver
+func (t *ResponsesCreateTransactionOutlineBadRequest) MergeErrorsTxSpecInvalidPaymailReceiver(v ErrorsTxSpecInvalidPaymailReceiver) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsTxSpecInvalidPaymailSender returns the union data inside the ResponsesCreateTransactionOutlineBadRequest as a ErrorsTxSpecInvalidPaymailSender
+func (t ResponsesCreateTransactionOutlineBadRequest) AsErrorsTxSpecInvalidPaymailSender() (ErrorsTxSpecInvalidPaymailSender, error) {
+	var body ErrorsTxSpecInvalidPaymailSender
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsTxSpecInvalidPaymailSender overwrites any union data inside the ResponsesCreateTransactionOutlineBadRequest as the provided ErrorsTxSpecInvalidPaymailSender
+func (t *ResponsesCreateTransactionOutlineBadRequest) FromErrorsTxSpecInvalidPaymailSender(v ErrorsTxSpecInvalidPaymailSender) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsTxSpecInvalidPaymailSender performs a merge with any union data inside the ResponsesCreateTransactionOutlineBadRequest, using the provided ErrorsTxSpecInvalidPaymailSender
+func (t *ResponsesCreateTransactionOutlineBadRequest) MergeErrorsTxSpecInvalidPaymailSender(v ErrorsTxSpecInvalidPaymailSender) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesCreateTransactionOutlineBadRequest) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesCreateTransactionOutlineBadRequest) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsTxOutlineUserHasNotEnoughFunds returns the union data inside the ResponsesCreateTransactionOutlineUnprocessable as a ErrorsTxOutlineUserHasNotEnoughFunds
+func (t ResponsesCreateTransactionOutlineUnprocessable) AsErrorsTxOutlineUserHasNotEnoughFunds() (ErrorsTxOutlineUserHasNotEnoughFunds, error) {
+	var body ErrorsTxOutlineUserHasNotEnoughFunds
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsTxOutlineUserHasNotEnoughFunds overwrites any union data inside the ResponsesCreateTransactionOutlineUnprocessable as the provided ErrorsTxOutlineUserHasNotEnoughFunds
+func (t *ResponsesCreateTransactionOutlineUnprocessable) FromErrorsTxOutlineUserHasNotEnoughFunds(v ErrorsTxOutlineUserHasNotEnoughFunds) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsTxOutlineUserHasNotEnoughFunds performs a merge with any union data inside the ResponsesCreateTransactionOutlineUnprocessable, using the provided ErrorsTxOutlineUserHasNotEnoughFunds
+func (t *ResponsesCreateTransactionOutlineUnprocessable) MergeErrorsTxOutlineUserHasNotEnoughFunds(v ErrorsTxOutlineUserHasNotEnoughFunds) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesCreateTransactionOutlineUnprocessable) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesCreateTransactionOutlineUnprocessable) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
@@ -946,68 +1711,6 @@ func (t ResponsesRecordTransactionInternalServerError) MarshalJSON() ([]byte, er
 }
 
 func (t *ResponsesRecordTransactionInternalServerError) UnmarshalJSON(b []byte) error {
-	err := t.union.UnmarshalJSON(b)
-	return err
-}
-
-// AsErrorsAuthorization returns the union data inside the ResponsesUserNotAuthorized as a ErrorsAuthorization
-func (t ResponsesUserNotAuthorized) AsErrorsAuthorization() (ErrorsAuthorization, error) {
-	var body ErrorsAuthorization
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromErrorsAuthorization overwrites any union data inside the ResponsesUserNotAuthorized as the provided ErrorsAuthorization
-func (t *ResponsesUserNotAuthorized) FromErrorsAuthorization(v ErrorsAuthorization) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeErrorsAuthorization performs a merge with any union data inside the ResponsesUserNotAuthorized, using the provided ErrorsAuthorization
-func (t *ResponsesUserNotAuthorized) MergeErrorsAuthorization(v ErrorsAuthorization) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-// AsErrorsAuthXPubRequired returns the union data inside the ResponsesUserNotAuthorized as a ErrorsAuthXPubRequired
-func (t ResponsesUserNotAuthorized) AsErrorsAuthXPubRequired() (ErrorsAuthXPubRequired, error) {
-	var body ErrorsAuthXPubRequired
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromErrorsAuthXPubRequired overwrites any union data inside the ResponsesUserNotAuthorized as the provided ErrorsAuthXPubRequired
-func (t *ResponsesUserNotAuthorized) FromErrorsAuthXPubRequired(v ErrorsAuthXPubRequired) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeErrorsAuthXPubRequired performs a merge with any union data inside the ResponsesUserNotAuthorized, using the provided ErrorsAuthXPubRequired
-func (t *ResponsesUserNotAuthorized) MergeErrorsAuthXPubRequired(v ErrorsAuthXPubRequired) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-func (t ResponsesUserNotAuthorized) MarshalJSON() ([]byte, error) {
-	b, err := t.union.MarshalJSON()
-	return b, err
-}
-
-func (t *ResponsesUserNotAuthorized) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }

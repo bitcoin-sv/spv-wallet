@@ -2,24 +2,24 @@ package transactions
 
 import (
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/transactions/internal/mapping"
+	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/bsv"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
-	"github.com/bitcoin-sv/spv-wallet/models/request"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 )
 
 // CreateTransactionOutline creates a transaction outline
-func (s *APITransactions) CreateTransactionOutline(c *gin.Context) {
-	format, err := getOutlineTransactionFormat(c)
+func (s *APITransactions) CreateTransactionOutline(c *gin.Context, params api.CreateTransactionOutlineParams) {
+	format, err := getOutlineTransactionFormat(params)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return
 	}
 
-	var requestBody request.TransactionSpecification
+	var requestBody api.RequestsTransactionSpecification
 	err = c.ShouldBindWith(&requestBody, binding.JSON)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), s.logger)
@@ -35,7 +35,7 @@ func (s *APITransactions) CreateTransactionOutline(c *gin.Context) {
 
 	spec, err := mapping.TransactionSpecificationRequestToOutline(&requestBody, userID)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, s.logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), s.logger)
 		return
 	}
 
@@ -52,15 +52,22 @@ func (s *APITransactions) CreateTransactionOutline(c *gin.Context) {
 		return
 	}
 
-	res := mapping.TransactionOutlineToResponse(txOutline)
+	res, err := mapping.TransactionOutlineToResponse(txOutline)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, s.logger)
+		return
+	}
+
 	c.JSON(200, res)
 }
 
-func getOutlineTransactionFormat(c *gin.Context) (bsv.TxHexFormat, error) {
-	queryFormat, _ := c.GetQuery("format")
-	if queryFormat == "" {
+func getOutlineTransactionFormat(params api.CreateTransactionOutlineParams) (bsv.TxHexFormat, error) {
+	if params.Format == nil {
 		return bsv.TxHexFormatBEEF, nil
 	}
+
+	formatValue := *params.Format
+	queryFormat := string(formatValue)
 
 	format, err := bsv.ParseTxHexFormat(queryFormat)
 	if err == nil {

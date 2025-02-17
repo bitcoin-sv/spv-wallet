@@ -13,8 +13,10 @@ type APIOperations struct {
 
 // NewAPIOperations creates a new server with API endpoints
 func NewAPIOperations(engine engine.ClientInterface, log *zerolog.Logger) APIOperations {
+	logger := log.With().Str("api", "operations").Logger()
+
 	return APIOperations{
 		engine: engine,
-		logger: log,
+		logger: &logger,
 	}
 }

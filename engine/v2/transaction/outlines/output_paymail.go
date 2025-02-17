@@ -10,12 +10,17 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
-	paymailreq "github.com/bitcoin-sv/spv-wallet/models/request/paymail"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/bitcoin-sv/spv-wallet/models/optional"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
 
 // Paymail represents a paymail output
-type Paymail paymailreq.Output
+type Paymail struct {
+	To       string                 `json:"to"`
+	Satoshis bsv.Satoshis           `json:"satoshis"`
+	From     optional.Param[string] `json:"from,omitempty"`
+}
 
 func (p *Paymail) evaluate(ctx *evaluationContext) (annotatedOutputs, error) {
 	paymailClient := ctx.Paymail()
