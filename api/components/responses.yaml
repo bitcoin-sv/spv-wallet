@@ -11,3 +11,56 @@ components:
         application/json:
           schema:
             $ref: "./models.yaml#/components/schemas/SharedConfig"
+    NotAuthorized:
+      description: Security requirements failed
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/Unauthorized"
+
+    AdminUserBadRequest:
+      description: Bad request is an error that occurs when the request is malformed.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "./errors.yaml#/components/schemas/CannotBindRequest"
+              - $ref: "./errors.yaml#/components/schemas/InvalidPubKey"
+              - $ref: "./errors.yaml#/components/schemas/InvalidPaymail"
+              - $ref: "./errors.yaml#/components/schemas/PaymailInconsistent"
+              - $ref: "./errors.yaml#/components/schemas/InvalidDomain"
+
+    AdminCreateUserInternalServerError:
+      description: Internal error while creating user
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/CreatingUser"
+
+    AdminCreateUserSuccess:
+      description: User created
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/User"
+
+    AdminAddPaymailSuccess:
+      description: Paymail added to user
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/Paymail"
+
+    AdminGetUser:
+      description: User found
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/User"
+
+    AdminGetUserInternalServerError:
+      description: Internal error while getting user
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/GettingUser"

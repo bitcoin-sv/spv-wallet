@@ -6,13 +6,13 @@ paths:
 
   /api/v2/configs/shared:
     get:
+      operationId: sharedConfig
       security:
         - XPubAuth:
             - "admin"
             - "user"
       tags:
         - Admin endpoints
-        - User endpoints
         - Configurations
       summary: Get shared config
       description: >-
@@ -21,4 +21,4 @@ paths:
         200:
           $ref: "../components/responses.yaml#/components/responses/SharedConfig"
         401:
-          $ref: "../components/errors.yaml#/components/responses/NotAuthorized"
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorized"
