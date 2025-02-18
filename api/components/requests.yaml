@@ -40,3 +40,130 @@ components:
         - domain
         - publicName
         - avatarURL
+
+    TransactionOutline:
+      allOf:
+        - $ref: '../components/models.yaml#/components/schemas/TransactionHex'
+        - type: object
+          properties:
+            annotations:
+              $ref: '../components/models.yaml#/components/schemas/OutputsAnnotations'
+
+    TransactionSpecification:
+      type: object
+      properties:
+        outputs:
+          type: array
+          items:
+            $ref: "#/components/schemas/TransactionOutlineOutputSpecification"
+      required:
+        - outputs
+
+    TransactionOutlineOutputSpecification:
+      oneOf:
+        - $ref: "#/components/schemas/OpReturnOutputSpecification"
+        - $ref: "#/components/schemas/PaymailOutputSpecification"
+      discriminator:
+        propertyName: type
+        mapping:
+          op_return: '#/components/schemas/OpReturnOutput'
+          paymail: '#/components/schemas/PaymailOutput'
+
+
+    OpReturnOutputSpecification:
+      allOf:
+        - type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum: [op_return]
+              example: op_return
+            dataType:
+              type: string
+              enum: [hexes, strings]
+              default: strings
+              example: strings
+            data:
+              oneOf:
+                - $ref: "#/components/schemas/OpReturnHexesOutput"
+                - $ref: "#/components/schemas/OpReturnStringsOutput"
+          discriminator:
+            propertyName: dataType
+            mapping:
+              hexes: '#/components/schemas/OpReturnHexesOutput'
+              strings: '#/components/schemas/OpReturnStringsOutput'
+
+    OpReturnHexesOutput:
+      type: array
+      items:
+        type: string
+        example: "68656c6c6f20776f726c64"
+
+    OpReturnStringsOutput:
+      type: array
+      items:
+        type: string
+        example: "hello world"
+
+    PaymailOutputSpecification:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [paymail]
+          example: paymail
+        to:
+          type: string
+          example: "bob@example.com"
+        satoshis:
+          type: integer
+          format: int64
+          x-go-type: uint64
+          example: 1000
+        from:
+          type: string
+          example: "bob@example.com"
+          nullable: true
+      required:
+        - type
+        - to
+        - satoshis
+
+  parameters:
+    PageNumber:
+      in: query
+      name: page
+      description: Page number for pagination
+      required: false
+      schema:
+        type: integer
+      example: 1
+
+    PageSize:
+      in: query
+      name: size
+      description: Number of items per page
+      required: false
+      schema:
+        type: integer
+      example: 10
+
+    Sort:
+      in: query
+      name: sort
+      description: Sorting order (asc or desc)
+      required: false
+      schema:
+        type: string
+      example: "asc"
+
+    SortBy:
+      name: sortBy
+      in: query
+      description: Field to sort by
+      required: false
+      schema:
+        type: string
+      example: "name"
