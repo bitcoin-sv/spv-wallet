@@ -3,3 +3,145 @@ info:
   title: ignored
   version: ignored
 paths:
+
+  /api/v2/users/current:
+    get:
+      operationId: currentUser
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - User
+      summary: Get current user
+      description: >-
+        This endpoint return balance of current authenticated user
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/GetCurrentUserSuccess"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+
+  /api/v2/data/{id}:
+    get:
+      operationId: dataById
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - Data
+      summary: Get data for user
+      description: >-
+        This endpoint gets data by its id for authenticated user
+      parameters:
+        - name: id
+          in: path
+          description: Data ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/GetDataSuccess"
+        400:
+          $ref: "../components/responses.yaml#/components/responses/UserBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        404:
+          $ref: "../components/responses.yaml#/components/responses/GetDataNotFound"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+
+  /api/v2/operations/search:
+    get:
+      operationId: searchOperations
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - Operations
+      summary: Get operations for user
+      description: >-
+        This endpoint allows to search operations for authenticated user
+      parameters:
+        - $ref: "../components/requests.yaml#/components/parameters/PageNumber"
+        - $ref: "../components/requests.yaml#/components/parameters/PageSize"
+        - $ref: "../components/requests.yaml#/components/parameters/Sort"
+        - $ref: "../components/requests.yaml#/components/parameters/SortBy"
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/SearchOperationsSuccess"
+        400:
+          $ref: "../components/responses.yaml#/components/responses/SearchBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+
+  /api/v2/transactions:
+    post:
+      operationId: recordTransactionOutline
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - Transactions
+      summary: Record transaction outline
+      description: >-
+        This endpoint allows to record transaction outline for authenticated user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../components/requests.yaml#/components/schemas/TransactionOutline"
+      responses:
+        201:
+          $ref: "../components/responses.yaml#/components/responses/RecordTransactionSuccess"
+        400:
+          $ref: "../components/responses.yaml#/components/responses/RecordTransactionBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/RecordTransactionInternalServerError"
+
+  /api/v2/transactions/outlines:
+    post:
+      operationId: createTransactionOutline
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - Transactions
+      summary: Create transaction outline
+      description: >-
+        This endpoint allows to create transaction outline for authenticated user
+      parameters:
+        - name: format
+          in: query
+          description: Required format of transaction hex
+          schema:
+            type: string
+            enum:
+              - "beef"
+              - "raw"
+            default: "beef"
+          example: "beef"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../components/requests.yaml#/components/schemas/TransactionSpecification"
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/CreateTransactionOutlineSuccess"
+        400:
+          $ref: "../components/responses.yaml#/components/responses/CreateTransactionOutlineBadRequest"
+        422:
+          $ref: "../components/responses.yaml#/components/responses/CreateTransactionOutlineUnprocessable"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
