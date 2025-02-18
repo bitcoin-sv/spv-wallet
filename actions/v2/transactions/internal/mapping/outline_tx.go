@@ -80,6 +80,14 @@ func outlineOutputEntryToResponse(index int, value *transaction.OutputAnnotation
 func outlineOutputToResponse(from *transaction.OutputAnnotation) api.ModelsOutputAnnotation {
 	return api.ModelsOutputAnnotation{
 		Bucket: api.ModelsOutputAnnotationBucket(from.Bucket),
+		CustomInstructions: lo.IfF(
+			from.CustomInstructions != nil,
+			func() *api.ModelsSPVWalletCustomInstructions {
+				return lo.ToPtr(
+					lo.Map(*from.CustomInstructions, lox.MappingFn(customInstructionsToResponse)),
+				)
+			},
+		).Else(nil),
 		Paymail: lo.IfF(
 			from.Paymail != nil,
 			func() *api.ModelsPaymailAnnotationDetails {
