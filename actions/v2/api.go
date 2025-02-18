@@ -13,8 +13,8 @@ import (
 	"github.com/rs/zerolog"
 )
 
-// Server is the implementation of the server oapi-codegen's interface
-type Server struct {
+// apiV2 is the implementation of the server oapi-codegen's interface
+type apiV2 struct {
 	admin.APIAdmin
 	base.APIBase
 	data.APIData
@@ -23,12 +23,9 @@ type Server struct {
 	transactions.APITransactions
 }
 
-// _ check if the Server implements the interface api.ServerInterface
-var _ api.ServerInterface = &Server{}
-
-// NewServer creates a new server
-func NewServer(config *config.AppConfig, engine engine.ClientInterface, logger *zerolog.Logger) *Server {
-	return &Server{
+// NewV2API creates a new server
+func NewV2API(config *config.AppConfig, engine engine.ClientInterface, logger *zerolog.Logger) api.ServerInterface {
+	return &apiV2{
 		admin.NewAPIAdmin(engine, logger),
 		base.NewAPIBase(config),
 		data.NewAPIData(engine, logger),
