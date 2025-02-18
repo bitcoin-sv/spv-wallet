@@ -46,3 +46,19 @@ func MapAndCollect[T, R any](catcher *ErrorCollector, iteratee NoIndexIterateeWi
 		return res
 	}
 }
+
+// MapEntriesOrError manipulates a map entries and transforms it to a map of another type.
+// If the iteratee function returns an error, the function returns the error.
+func MapEntriesOrError[K1 comparable, V1 any, K2 comparable, V2 any](in map[K1]V1, iteratee func(key K1, value V1) (K2, V2, error)) (map[K2]V2, error) {
+	result := make(map[K2]V2, len(in))
+
+	for k1 := range in {
+		k2, v2, err := iteratee(k1, in[k1])
+		if err != nil {
+			return nil, err
+		}
+		result[k2] = v2
+	}
+
+	return result, nil
+}
