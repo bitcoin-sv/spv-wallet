@@ -32,6 +32,7 @@ func TestInputsSelector(t *testing.T) {
 	singleSelectTests := map[string]struct {
 		selectBy             selectBy
 		expectToSelectInputs []int
+		expectedChange       uint
 	}{
 		"select empty list when user has not enough funds": {
 			selectBy: selectBy{
@@ -43,18 +44,21 @@ func TestInputsSelector(t *testing.T) {
 				satoshis: 9,
 			},
 			expectToSelectInputs: []int{0},
+			expectedChange:       0, // utxo0(10) - output(9) - fee(1)
 		},
 		"select inputs that covers outputs and fee with change": {
 			selectBy: selectBy{
 				satoshis: 15,
 			},
 			expectToSelectInputs: []int{0, 1},
+			expectedChange:       4, // (utxo0(10) + utxo1(10)) - output(15) - fee(1)
 		},
 		"select more inputs with change when satoshis are equal to single utxo": {
 			selectBy: selectBy{
 				satoshis: 10,
 			},
 			expectToSelectInputs: []int{0, 1},
+			expectedChange:       9, // (utxo0(10) + utxo1(10)) - output(10) - fee(1)
 		},
 		"select inputs that covers outputs and fee for data requiring more fee": {
 			selectBy: selectBy{
@@ -62,6 +66,7 @@ func TestInputsSelector(t *testing.T) {
 				txSizeWithoutInputs: testabilities.MaxSizeWithoutFeeForSingleInput + 1,
 			},
 			expectToSelectInputs: []int{0, 1},
+			expectedChange:       9, // (utxo0(10) + utxo1(10)) - output(9) - feeForMorData(2)
 		},
 		"select inputs when size is equal to fee unit bytes": {
 			selectBy: selectBy{
@@ -69,6 +74,7 @@ func TestInputsSelector(t *testing.T) {
 				txSizeWithoutInputs: testabilities.MaxSizeWithoutFeeForSingleInput,
 			},
 			expectToSelectInputs: []int{0},
+			expectedChange:       0, // utxo0(10) - output(9) - fee(1)
 		},
 	}
 	for name, test := range singleSelectTests {
@@ -83,6 +89,10 @@ func TestInputsSelector(t *testing.T) {
 				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
 				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
 				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
+				given.DB().HasUTXO().OwnedByRecipient().P2PKH().WithSatoshis(10).Stored(),
+				given.DB().HasUTXO().OwnedByRecipient().P2PKH().WithSatoshis(10).Stored(),
+				given.DB().HasUTXO().OwnedByRecipient().P2PKH().WithSatoshis(10).Stored(),
+				given.DB().HasUTXO().OwnedByRecipient().P2PKH().WithSatoshis(10).Stored(),
 			}
 
 			// and:
@@ -96,7 +106,8 @@ func TestInputsSelector(t *testing.T) {
 
 			// then:
 			then.WithoutError(err).SelectedInputs(utxos).
-				ComparingTo(ownedInputs).AreEntries(test.expectToSelectInputs)
+				ComparingTo(ownedInputs).AreEntries(test.expectToSelectInputs).
+				HasChange(test.expectedChange)
 
 		})
 	}
@@ -130,6 +141,10 @@ func TestInputsSelector(t *testing.T) {
 				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
 				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
 				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
+				given.DB().HasUTXO().OwnedByRecipient().P2PKH().WithSatoshis(10).Stored(),
+				given.DB().HasUTXO().OwnedByRecipient().P2PKH().WithSatoshis(10).Stored(),
+				given.DB().HasUTXO().OwnedByRecipient().P2PKH().WithSatoshis(10).Stored(),
+				given.DB().HasUTXO().OwnedByRecipient().P2PKH().WithSatoshis(10).Stored(),
 			}
 
 			// and:

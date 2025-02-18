@@ -21,6 +21,8 @@ type DatabaseDataFixtures interface {
 type UserUtxoFixture interface {
 	// OwnedBySender ensures that the UTXO is owned by the sender (which is default behavior of this fixture).
 	OwnedBySender() UserUtxoFixture
+	// OwnedByRecipient ensures that the UTXO is owned by the recipient
+	OwnedByRecipient() UserUtxoFixture
 	// P2PKH ensures that the UTXO is with P2PKH locking script (which is default behavior of this fixture).
 	P2PKH() UserUtxoFixture
 	// WithSatoshis sets the satoshis value of the UTXO.

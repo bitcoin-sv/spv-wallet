@@ -39,6 +39,7 @@ type UTXO struct {
 	Satoshis           bsvmodel.Satoshis
 	EstimatedInputSize uint64
 	bsvmodel.CustomInstructions
+	Change uint64
 }
 
 // Transaction represents a transaction outline.

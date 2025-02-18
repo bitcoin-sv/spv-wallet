@@ -17,6 +17,7 @@ import (
 const (
 	txIdColumn               = "tx_id"
 	voutColumn               = "vout"
+	minChange                = "min_change"
 	satoshisColumn           = "satoshis"
 	customInstructionsColumn = "custom_instructions"
 	estimatedInputSizeColumn = "estimated_input_size"
@@ -61,16 +62,15 @@ func (r *UTXOSelector) Select(ctx context.Context, tx *sdk.Transaction, userID s
 		result = append(result, &outlines.UTXO{
 			TxID:               utxo.TxID,
 			Vout:               utxo.Vout,
-			Satoshis:           bsv.Satoshis(utxo.Satoshis),
-			EstimatedInputSize: utxo.EstimatedInputSize,
 			CustomInstructions: bsv.CustomInstructions(utxo.CustomInstructions),
+			Change:             utxo.Change, // TODO: this should rather be in single place - I mean we should return some struct containing utxos and change value
 		})
 	}
 
 	return result, nil
 }
 
-func (r *UTXOSelector) selectInputsForTransaction(ctx context.Context, userID string, outputsTotalValue bsv.Satoshis, byteSizeOfTxWithoutInputs uint64) (utxos []*database.UserUTXO, err error) {
+func (r *UTXOSelector) selectInputsForTransaction(ctx context.Context, userID string, outputsTotalValue bsv.Satoshis, byteSizeOfTxWithoutInputs uint64) (utxos []*selectedUTXO, err error) {
 	err = r.db.WithContext(ctx).Transaction(func(db *gorm.DB) error {
 		inputsQuery := r.buildQueryForInputs(db, userID, outputsTotalValue, byteSizeOfTxWithoutInputs)
 
@@ -109,7 +109,7 @@ func (r *UTXOSelector) buildQueryForInputs(db *gorm.DB, userID string, outputsTo
 	return composer.build(db)
 }
 
-func (r *UTXOSelector) buildUpdateTouchedAtQuery(db *gorm.DB, utxos []*database.UserUTXO) *gorm.DB {
+func (r *UTXOSelector) buildUpdateTouchedAtQuery(db *gorm.DB, utxos []*selectedUTXO) *gorm.DB {
 	outpoints := make([][]any, 0, len(utxos))
 	for _, utxo := range utxos {
 		outpoints = append(outpoints, []any{utxo.TxID, utxo.Vout})

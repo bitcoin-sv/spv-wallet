@@ -24,7 +24,8 @@ type SelectedInputsAssertions interface {
 }
 
 type ComparingSelectedInputsAssertions interface {
-	AreEntries(expectedIndexes []int)
+	AreEntries(expectedIndexes []int) ComparingSelectedInputsAssertions
+	HasChange(change uint)
 }
 
 type assertion struct {
@@ -66,7 +67,7 @@ func (a assertion) ComparingTo(inputs []*database.UserUTXO) ComparingSelectedInp
 	return a
 }
 
-func (a assertion) AreEntries(expectedIndexes []int) {
+func (a assertion) AreEntries(expectedIndexes []int) ComparingSelectedInputsAssertions {
 	a.t.Helper()
 	a.require.Len(a.actual, len(expectedIndexes))
 
@@ -76,5 +77,13 @@ func (a assertion) AreEntries(expectedIndexes []int) {
 		a.assert.Equalf(expectedUTXO.TxID, selectedUTXO.TxID, "Selected different TxID at index %d", i)
 		a.assert.EqualValuesf(expectedUTXO.Vout, selectedUTXO.Vout, "Selected different vout at index %d", i)
 		a.assert.Equalf(bsv.CustomInstructions(expectedUTXO.CustomInstructions), selectedUTXO.CustomInstructions, "Selected different custom instructions at index %d", i)
+	}
+
+	return a
+}
+
+func (a assertion) HasChange(change uint) {
+	for i, utxo := range a.actual {
+		a.assert.EqualValuesf(change, utxo.Change, "Selected UTXO %d (%s - %d) has different change", i, utxo.TxID, utxo.Vout)
 	}
 }
