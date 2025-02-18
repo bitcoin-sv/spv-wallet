@@ -25,9 +25,9 @@ type txFlow struct {
 	operations map[string]*txmodels.NewOperation
 }
 
-func newTxFlow(ctx context.Context, service *Service, tx *trx.Transaction) *txFlow {
+func newTxFlow(ctx context.Context, service *Service, tx *trx.Transaction) (*txFlow, error) {
 	txID := tx.TxID().String()
-	return &txFlow{
+	f := &txFlow{
 		ctx:     ctx,
 		service: service,
 
@@ -40,6 +40,33 @@ func newTxFlow(ctx context.Context, service *Service, tx *trx.Transaction) *txFl
 
 		operations: map[string]*txmodels.NewOperation{},
 	}
+
+	if err := f.setTxRowHex(); err != nil {
+		return nil, err
+	}
+
+	return f, nil
+}
+
+func (f *txFlow) setTxRowHex() error {
+	txID := f.tx.TxID().String()
+	isRawTx, err := f.service.transactions.HasTransactionInputSources(f.ctx, f.tx.Inputs...)
+	if err != nil {
+		return spverrors.Wrapf(err, "database query failed to check input source transactions for transaction %s", txID)
+	}
+
+	if isRawTx {
+		f.txRow.SetRawHex(f.tx.Hex())
+		return nil
+	}
+
+	hex, err := f.tx.BEEFHex()
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to generate BEEF hex for transaction %s", txID)
+	}
+	f.txRow.SetBEEFHex(hex)
+
+	return nil
 }
 
 func (f *txFlow) verifyScripts() error {
@@ -163,20 +190,5 @@ func (f *txFlow) broadcast() error {
 }
 
 func (f *txFlow) save() error {
-	isRawTx, err := f.service.transactions.HasTransactionInputSources(f.ctx, f.tx.Inputs...)
-	if err != nil {
-		return spverrors.Wrapf(err, "database query failed to check input source transactions for transaction %s", f.txID)
-	}
-
-	if isRawTx {
-		f.txRow.SetRawHex(f.tx.Hex())
-	} else {
-		hex, err := f.tx.BEEFHex()
-		if err != nil {
-			return spverrors.Wrapf(err, "failed to generate BEEF hex for transaction %s", f.txID)
-		}
-		f.txRow.SetBEEFHex(hex)
-	}
-
 	return f.service.SaveOperations(f.ctx, maps.Values(f.operations))
 }
