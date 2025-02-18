@@ -19,14 +19,23 @@ components:
         - message
       additionalProperties: false
 
-    Unauthorized:
+    AnyAuthorization:
       oneOf:
-        - $ref: '#/components/schemas/Authorization'
-        - $ref: '#/components/schemas/WrongAuthScopeFormat'
-        - $ref: '#/components/schemas/AdminAuthOnNonAdminEndpoint'
-        - $ref: '#/components/schemas/UserAuthOnNonUserEndpoint'
+        - $ref: '#/components/schemas/Unauthorized'
+        - $ref: '#/components/schemas/AuthXPubRequired'
 
-    Authorization:
+    AdminAuthorization:
+      oneOf:
+        - $ref: '#/components/schemas/UserAuthOnNonUserEndpoint'
+        - $ref: '#/components/schemas/AuthXPubRequired'
+
+    UserAuthorization:
+      oneOf:
+        - $ref: '#/components/schemas/Unauthorized'
+        - $ref: '#/components/schemas/AdminAuthOnNonAdminEndpoint'
+        - $ref: '#/components/schemas/AuthXPubRequired'
+
+    Unauthorized:
       allOf:
         - $ref: '#/components/schemas/Schema'
         - type: object
@@ -35,16 +44,6 @@ components:
               example: "error-unauthorized"
             message:
               example: "unauthorized"
-
-    WrongAuthScopeFormat:
-      allOf:
-        - $ref: '#/components/schemas/Schema'
-        - type: object
-          properties:
-            code:
-              example: "error-wrong-auth-scope-format"
-            message:
-              example: "wrong auth scope format"
 
     AdminAuthOnNonAdminEndpoint:
       allOf:
@@ -66,6 +65,26 @@ components:
             message:
               example: "cannot call non-user endpoints with user authorization"
 
+    AuthXPubRequired:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-xpub-authorization-required"
+            message:
+              example: "xpub authorization required"
+
+    CannotParseQueryParams:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-query-params-invalid"
+            message:
+              example: "cannot parse request query params"
+
     CannotBindRequest:
       allOf:
         - $ref: '#/components/schemas/Schema'
@@ -75,6 +94,36 @@ components:
               example: "error-bind-body-invalid"
             message:
               example: "cannot bind request body"
+
+    Internal:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-internal-server-error"
+            message:
+              example: "internal server error"
+
+    InvalidDataID:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-invalid-data-id"
+            message:
+              example: "invalid data id"
+
+    DataNotFound:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-data-not-found"
+            message:
+              example: "data not found"
 
     InvalidPubKey:
       allOf:
@@ -135,3 +184,147 @@ components:
               example: "error-unknown"
             message:
               example: "Internal server error"
+
+    TxSpecNoDefaultPaymailAddress:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-tx-spec-no-default-paymail-address"
+            message:
+              example: "no default paymail address"
+
+    TxSpecOutputsRequired:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "tx-spec-output-required"
+            message:
+              example: "transaction outline requires at least one output"
+
+    TxSpecOpReturnDataRequired:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "tx-spec-op-return-data-required"
+            message:
+              example: "data is required for OP_RETURN output"
+
+    TxSpecFailedToDecodeHex:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "failed-to-decode-hex"
+            message:
+              example: "failed to decode hex"
+
+    TxSpecInvalidPaymailReceiver:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-paymail-address-invalid-receiver"
+            message:
+              example: "receiver paymail address is invalid"
+
+    TxSpecInvalidPaymailSender:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-paymail-address-invalid-sender"
+            message:
+              example: "sender paymail address is invalid"
+
+    TxOutlineUserHasNotEnoughFunds:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "tx-outline-not-enough-funds"
+            message:
+              example: "not enough funds to make the transaction"
+
+    TxValidation:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-transaction-validation"
+            message:
+              example: "transaction validation failed"
+
+    GettingOutputs:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-getting-outputs"
+            message:
+              example: "failed to get outputs"
+
+    UTXOSpent:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              enum:
+                - "error-utxo-spent"
+              example: "error-utxo-spent"
+            message:
+              enum:
+                - "UTXO is already spent"
+              example: "UTXO is already spent"
+
+    AnnotationIndexOutOfRange:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-annotation-index-out-of-range"
+            message:
+              example: "annotation index out of range"
+
+    AnnotationIndexConversion:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-annotation-index-conversion"
+            message:
+              example: "failed to convert annotation index"
+
+    NoOperations:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-no-operations"
+            message:
+              example: "no operations to save"
+
+    TxBroadcast:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-tx-broadcast"
+            message:
+              example: "failed to broadcast transaction"

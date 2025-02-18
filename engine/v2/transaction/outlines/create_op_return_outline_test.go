@@ -11,7 +11,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
 
@@ -25,28 +24,28 @@ func TestCreateOpReturnTransactionOutlineBEEF(t *testing.T) {
 	}{
 		"return transaction outline for single string": {
 			opReturn: &outlines.OpReturn{
-				DataType: opreturn.DataTypeStrings,
+				DataType: outlines.DataTypeStrings,
 				Data:     []string{"Example data"},
 			},
 			lockingScript: "006a0c4578616d706c652064617461",
 		},
 		"return transaction outline for multiple strings": {
 			opReturn: &outlines.OpReturn{
-				DataType: opreturn.DataTypeStrings,
+				DataType: outlines.DataTypeStrings,
 				Data:     []string{"Example", " ", "data"},
 			},
 			lockingScript: "006a074578616d706c6501200464617461",
 		},
 		"return transaction outline for single hex": {
 			opReturn: &outlines.OpReturn{
-				DataType: opreturn.DataTypeHexes,
+				DataType: outlines.DataTypeHexes,
 				Data:     []string{toHex("Example data")},
 			},
 			lockingScript: "006a0c4578616d706c652064617461",
 		},
 		"return transaction outline for multiple hexes": {
 			opReturn: &outlines.OpReturn{
-				DataType: opreturn.DataTypeHexes,
+				DataType: outlines.DataTypeHexes,
 				Data:     []string{toHex("Example"), toHex(" "), toHex("data")},
 			},
 			lockingScript: "006a074578616d706c6501200464617461",
@@ -90,13 +89,13 @@ func TestCreateOpReturnTransactionOutlineBEEF(t *testing.T) {
 		},
 		"return error for no data string type": {
 			spec: &outlines.OpReturn{
-				DataType: opreturn.DataTypeStrings,
+				DataType: outlines.DataTypeStrings,
 			},
 			expectedError: txerrors.ErrTxOutlineOpReturnDataRequired,
 		},
 		"return error for invalid hex": {
 			spec: &outlines.OpReturn{
-				DataType: opreturn.DataTypeHexes,
+				DataType: outlines.DataTypeHexes,
 				Data:     []string{"invalid hex"},
 			},
 			expectedError: txerrors.ErrFailedToDecodeHex,
@@ -110,7 +109,7 @@ func TestCreateOpReturnTransactionOutlineBEEF(t *testing.T) {
 		},
 		"return error for to big string": {
 			spec: &outlines.OpReturn{
-				DataType: opreturn.DataTypeStrings,
+				DataType: outlines.DataTypeStrings,
 				Data:     []string{strings.Repeat("1", maxOpPushDataSize+1)},
 			},
 			expectedError: txerrors.ErrTxOutlineOpReturnDataTooLarge,
@@ -154,28 +153,28 @@ func TestCreateOpReturnTransactionOutlineRAW(t *testing.T) {
 		},
 		"return transaction outline for single string": {
 			opReturn: &outlines.OpReturn{
-				DataType: opreturn.DataTypeStrings,
+				DataType: outlines.DataTypeStrings,
 				Data:     []string{"Example data"},
 			},
 			lockingScript: "006a0c4578616d706c652064617461",
 		},
 		"return transaction outline for multiple strings": {
 			opReturn: &outlines.OpReturn{
-				DataType: opreturn.DataTypeStrings,
+				DataType: outlines.DataTypeStrings,
 				Data:     []string{"Example", " ", "data"},
 			},
 			lockingScript: "006a074578616d706c6501200464617461",
 		},
 		"return transaction outline for single hex": {
 			opReturn: &outlines.OpReturn{
-				DataType: opreturn.DataTypeHexes,
+				DataType: outlines.DataTypeHexes,
 				Data:     []string{toHex("Example data")},
 			},
 			lockingScript: "006a0c4578616d706c652064617461",
 		},
 		"return transaction outline for multiple hexes": {
 			opReturn: &outlines.OpReturn{
-				DataType: opreturn.DataTypeHexes,
+				DataType: outlines.DataTypeHexes,
 				Data:     []string{toHex("Example"), toHex(" "), toHex("data")},
 			},
 			lockingScript: "006a074578616d706c6501200464617461",
@@ -225,13 +224,13 @@ func TestCreateOpReturnTransactionOutlineRAW(t *testing.T) {
 		},
 		"return error for no data string type": {
 			spec: &outlines.OpReturn{
-				DataType: opreturn.DataTypeStrings,
+				DataType: outlines.DataTypeStrings,
 			},
 			expectedError: txerrors.ErrTxOutlineOpReturnDataRequired,
 		},
 		"return error for invalid hex": {
 			spec: &outlines.OpReturn{
-				DataType: opreturn.DataTypeHexes,
+				DataType: outlines.DataTypeHexes,
 				Data:     []string{"invalid hex"},
 			},
 			expectedError: txerrors.ErrFailedToDecodeHex,
@@ -245,7 +244,7 @@ func TestCreateOpReturnTransactionOutlineRAW(t *testing.T) {
 		},
 		"return error for to big string": {
 			spec: &outlines.OpReturn{
-				DataType: opreturn.DataTypeStrings,
+				DataType: outlines.DataTypeStrings,
 				Data:     []string{strings.Repeat("1", maxOpPushDataSize+1)},
 			},
 			expectedError: txerrors.ErrTxOutlineOpReturnDataTooLarge,

@@ -28,6 +28,21 @@ type ServerInterface interface {
 	// Get shared config
 	// (GET /api/v2/configs/shared)
 	SharedConfig(c *gin.Context)
+	// Get data for user
+	// (GET /api/v2/data/{id})
+	DataById(c *gin.Context, id string)
+	// Get operations for user
+	// (GET /api/v2/operations/search)
+	SearchOperations(c *gin.Context, params SearchOperationsParams)
+	// Record transaction outline
+	// (POST /api/v2/transactions)
+	RecordTransactionOutline(c *gin.Context)
+	// Create transaction outline
+	// (POST /api/v2/transactions/outlines)
+	CreateTransactionOutline(c *gin.Context, params CreateTransactionOutlineParams)
+	// Get current user
+	// (GET /api/v2/users/current)
+	CurrentUser(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -136,6 +151,142 @@ func (siw *ServerInterfaceWrapper) SharedConfig(c *gin.Context) {
 	siw.Handler.SharedConfig(c)
 }
 
+// DataById operation middleware
+func (siw *ServerInterfaceWrapper) DataById(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(XPubAuthScopes, []string{"user"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.DataById(c, id)
+}
+
+// SearchOperations operation middleware
+func (siw *ServerInterfaceWrapper) SearchOperations(c *gin.Context) {
+
+	var err error
+
+	c.Set(XPubAuthScopes, []string{"user"})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params SearchOperationsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", c.Request.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter page: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "size" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "size", c.Request.URL.Query(), &params.Size)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter size: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "sort" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sort", c.Request.URL.Query(), &params.Sort)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter sort: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "sortBy" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sortBy", c.Request.URL.Query(), &params.SortBy)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter sortBy: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.SearchOperations(c, params)
+}
+
+// RecordTransactionOutline operation middleware
+func (siw *ServerInterfaceWrapper) RecordTransactionOutline(c *gin.Context) {
+
+	c.Set(XPubAuthScopes, []string{"user"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.RecordTransactionOutline(c)
+}
+
+// CreateTransactionOutline operation middleware
+func (siw *ServerInterfaceWrapper) CreateTransactionOutline(c *gin.Context) {
+
+	var err error
+
+	c.Set(XPubAuthScopes, []string{"user"})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateTransactionOutlineParams
+
+	// ------------- Optional query parameter "format" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "format", c.Request.URL.Query(), &params.Format)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter format: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.CreateTransactionOutline(c, params)
+}
+
+// CurrentUser operation middleware
+func (siw *ServerInterfaceWrapper) CurrentUser(c *gin.Context) {
+
+	c.Set(XPubAuthScopes, []string{"user"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.CurrentUser(c)
+}
+
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -168,4 +319,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/api/v2/admin/users/:id", wrapper.UserById)
 	router.POST(options.BaseURL+"/api/v2/admin/users/:id/paymails", wrapper.AddPaymailToUser)
 	router.GET(options.BaseURL+"/api/v2/configs/shared", wrapper.SharedConfig)
+	router.GET(options.BaseURL+"/api/v2/data/:id", wrapper.DataById)
+	router.GET(options.BaseURL+"/api/v2/operations/search", wrapper.SearchOperations)
+	router.POST(options.BaseURL+"/api/v2/transactions", wrapper.RecordTransactionOutline)
+	router.POST(options.BaseURL+"/api/v2/transactions/outlines", wrapper.CreateTransactionOutline)
+	router.GET(options.BaseURL+"/api/v2/users/current", wrapper.CurrentUser)
 }

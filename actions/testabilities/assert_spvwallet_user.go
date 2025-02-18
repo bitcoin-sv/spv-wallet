@@ -3,8 +3,8 @@ package testabilities
 import (
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/require"
 )
@@ -49,7 +49,7 @@ func (u *userAssertions) Operations() OperationsAssertions {
 func (u *userAssertions) Last() LastOperationAssertions {
 	u.t.Helper()
 
-	var result response.PageModel[response.Operation]
+	var result api.ModelsOperationsSearchResult
 	_, err := u.userClient.R().SetResult(&result).Get("/api/v2/operations/search")
 	u.require.NoError(err)
 	u.require.NotEmpty(result.Content, "No operations found")
@@ -64,11 +64,11 @@ func (u *userAssertions) Last() LastOperationAssertions {
 func (u *userAssertions) balance() bsv.Satoshis {
 	u.t.Helper()
 
-	var userInfo response.UserInfo
+	var userInfo api.ModelsUserInfo
 	_, err := u.userClient.R().SetResult(&userInfo).Get("/api/v2/users/current")
 	u.require.NoError(err)
 
-	return userInfo.CurrentBalance
+	return bsv.Satoshis(userInfo.CurrentBalance)
 }
 
 func (u *userAssertions) IsEqualTo(expected bsv.Satoshis) {
@@ -92,7 +92,7 @@ func (u *userAssertions) IsZero() {
 type lastOperationAssertions struct {
 	t       testing.TB
 	require *require.Assertions
-	content *response.Operation
+	content api.ModelsOperation
 }
 
 func (l *lastOperationAssertions) WithTxID(txID string) LastOperationAssertions {
@@ -109,7 +109,7 @@ func (l *lastOperationAssertions) WithValue(value int64) LastOperationAssertions
 
 func (l *lastOperationAssertions) WithType(operationType string) LastOperationAssertions {
 	l.t.Helper()
-	l.require.Equal(operationType, l.content.Type)
+	l.require.EqualValues(operationType, l.content.Type)
 	return l
 }
 
@@ -121,6 +121,6 @@ func (l *lastOperationAssertions) WithCounterparty(counterparty string) LastOper
 
 func (l *lastOperationAssertions) WithTxStatus(txStatus string) LastOperationAssertions {
 	l.t.Helper()
-	l.require.Equal(txStatus, l.content.TxStatus)
+	l.require.EqualValues(txStatus, l.content.TxStatus)
 	return l
 }
