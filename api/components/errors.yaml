@@ -206,24 +206,24 @@ components:
               example: "transaction outline requires at least one output"
 
     TxSpecOpReturnDataRequired:
-        allOf:
-            - $ref: '#/components/schemas/Schema'
-            - type: object
-              properties:
-                code:
-                  example: "tx-spec-op-return-data-required"
-                message:
-                  example: "data is required for OP_RETURN output"
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "tx-spec-op-return-data-required"
+            message:
+              example: "data is required for OP_RETURN output"
 
     TxSpecFailedToDecodeHex:
-        allOf:
-            - $ref: '#/components/schemas/Schema'
-            - type: object
-              properties:
-                code:
-                  example: "failed-to-decode-hex"
-                message:
-                  example: "failed to decode hex"
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "failed-to-decode-hex"
+            message:
+              example: "failed to decode hex"
 
     TxSpecInvalidPaymailReceiver:
       allOf:
@@ -236,24 +236,24 @@ components:
               example: "receiver paymail address is invalid"
 
     TxSpecInvalidPaymailSender:
-        allOf:
-            - $ref: '#/components/schemas/Schema'
-            - type: object
-              properties:
-                code:
-                  example: "error-paymail-address-invalid-sender"
-                message:
-                  example: "sender paymail address is invalid"
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-paymail-address-invalid-sender"
+            message:
+              example: "sender paymail address is invalid"
 
     TxOutlineUserHasNotEnoughFunds:
-        allOf:
-            - $ref: '#/components/schemas/Schema'
-            - type: object
-              properties:
-                code:
-                  example: "tx-outline-not-enough-funds"
-                message:
-                  example: "not enough funds to make the transaction"
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "tx-outline-not-enough-funds"
+            message:
+              example: "not enough funds to make the transaction"
 
     TxValidation:
       allOf:

@@ -140,23 +140,23 @@ components:
     CreateTransactionOutlineBadRequest:
       description: Bad request is an error that occurs when the request is malformed.
       content:
-          application/json:
-            schema:
-              oneOf:
-                - $ref: "./errors.yaml#/components/schemas/TxSpecNoDefaultPaymailAddress"
-                - $ref: "./errors.yaml#/components/schemas/TxSpecOutputsRequired"
-                - $ref: "./errors.yaml#/components/schemas/TxSpecOpReturnDataRequired"
-                - $ref: "./errors.yaml#/components/schemas/TxSpecFailedToDecodeHex"
-                - $ref: "./errors.yaml#/components/schemas/TxSpecInvalidPaymailReceiver"
-                - $ref: "./errors.yaml#/components/schemas/TxSpecInvalidPaymailSender"
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "./errors.yaml#/components/schemas/TxSpecNoDefaultPaymailAddress"
+              - $ref: "./errors.yaml#/components/schemas/TxSpecOutputsRequired"
+              - $ref: "./errors.yaml#/components/schemas/TxSpecOpReturnDataRequired"
+              - $ref: "./errors.yaml#/components/schemas/TxSpecFailedToDecodeHex"
+              - $ref: "./errors.yaml#/components/schemas/TxSpecInvalidPaymailReceiver"
+              - $ref: "./errors.yaml#/components/schemas/TxSpecInvalidPaymailSender"
 
     CreateTransactionOutlineUnprocessable:
       description: Unprocessable entity is an error that occurs when the request cannot be fulfilled.
       content:
-          application/json:
-            schema:
-              oneOf:
-                - $ref: "./errors.yaml#/components/schemas/TxOutlineUserHasNotEnoughFunds"
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "./errors.yaml#/components/schemas/TxOutlineUserHasNotEnoughFunds"
 
 
     RecordTransactionSuccess:

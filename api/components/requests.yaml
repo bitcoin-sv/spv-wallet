@@ -131,8 +131,6 @@ components:
         - to
         - satoshis
 
-
-
   parameters:
     PageNumber:
       in: query
