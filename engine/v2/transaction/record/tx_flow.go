@@ -49,10 +49,14 @@ func newTxFlow(ctx context.Context, service *Service, tx *trx.Transaction) (*txF
 }
 
 func (f *txFlow) setTxRowHex() error {
-	txID := f.tx.TxID().String()
-	isRawTx, err := f.service.transactions.HasTransactionInputSources(f.ctx, f.tx.Inputs...)
+	sourceTXIDs := make([]string, 0, len(f.tx.Inputs))
+	for _, input := range f.tx.Inputs {
+		sourceTXIDs = append(sourceTXIDs, input.SourceTXID.String())
+	}
+
+	isRawTx, err := f.service.transactions.HasTransactionInputSources(f.ctx, sourceTXIDs...)
 	if err != nil {
-		return spverrors.Wrapf(err, "database query failed to check input source transactions for transaction %s", txID)
+		return spverrors.Wrapf(err, "database query failed to check input source transactions for transaction %s", f.txID)
 	}
 
 	if isRawTx {
@@ -62,7 +66,7 @@ func (f *txFlow) setTxRowHex() error {
 
 	hex, err := f.tx.BEEFHex()
 	if err != nil {
-		return spverrors.Wrapf(err, "failed to generate BEEF hex for transaction %s", txID)
+		return spverrors.Wrapf(err, "failed to generate BEEF hex for transaction %s", f.txID)
 	}
 	f.txRow.SetBEEFHex(hex)
 

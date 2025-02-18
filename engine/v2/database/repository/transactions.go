@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 
-	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/beef"
@@ -25,12 +24,7 @@ func NewTransactions(db *gorm.DB) *Transactions {
 
 // HasTransactionInputSources checks if any of the given transaction inputs have a source transaction in the database.
 // It queries the database to determine if at least one of the provided input source transaction IDs exists.
-func (t *Transactions) HasTransactionInputSources(ctx context.Context, inputs ...*trx.TransactionInput) (bool, error) {
-	sourceTXIDs := make([]string, 0, len(inputs))
-	for _, input := range inputs {
-		sourceTXIDs = append(sourceTXIDs, input.SourceTXID.String())
-	}
-
+func (t *Transactions) HasTransactionInputSources(ctx context.Context, sourceTXIDs ...string) (bool, error) {
 	var count int64
 	err := t.db.
 		Model(&database.TrackedTransaction{}).

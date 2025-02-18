@@ -26,7 +26,7 @@ type OutputsRepo interface {
 // TransactionsRepo is an interface for transactions repository.
 type TransactionsRepo interface {
 	FindTransactionInputSources(ctx context.Context, sourceTXIDs ...string) (beef.TxQueryResultSlice, error)
-	HasTransactionInputSources(ctx context.Context, inputs ...*trx.TransactionInput) (bool, error)
+	HasTransactionInputSources(ctx context.Context, sourceTXIDs ...string) (bool, error)
 }
 
 // OperationsRepo is an interface for operations repository.
