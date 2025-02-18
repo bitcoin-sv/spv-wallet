@@ -10,8 +10,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type selectedOutpoint struct {
-}
 type selectedUTXO struct {
 	TxID               string
 	Vout               uint32
