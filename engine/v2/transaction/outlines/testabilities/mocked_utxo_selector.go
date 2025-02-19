@@ -14,7 +14,7 @@ import (
 type UTXOSelectorFixture interface {
 	WillReturnNoUTXOs()
 	WillReturnError()
-	WillReturnUTXOs(utxos ...bsv.Satoshis)
+	WillReturnUTXOs(change bsv.Satoshis, utxos ...bsv.Satoshis)
 }
 
 func templatedOutpoint(index uint) bsv.Outpoint {
@@ -32,18 +32,19 @@ var UserFundsTransactionCustomInstructions = bsv.CustomInstructions{
 }
 
 type mockedUTXOSelector struct {
-	returnNothing bool
-	returnError   bool
-	utxosToReturn []bsv.Satoshis
+	returnNothing  bool
+	returnError    bool
+	utxosToReturn  []bsv.Satoshis
+	changeToReturn bsv.Satoshis
 }
 
-func (m *mockedUTXOSelector) Select(ctx context.Context, tx *sdk.Transaction, userID string) ([]*outlines.UTXO, error) {
+func (m *mockedUTXOSelector) Select(ctx context.Context, tx *sdk.Transaction, userID string) ([]*outlines.UTXO, bsv.Satoshis, error) {
 	if m.returnError {
-		return nil, spverrors.Newf("mocked: failed to select utxos for transaction")
+		return nil, 0, spverrors.Newf("mocked: failed to select utxos for transaction")
 	}
 
 	if m.returnNothing {
-		return nil, nil
+		return nil, 0, nil
 	}
 
 	var distribution []bsv.Satoshis
@@ -66,7 +67,7 @@ func (m *mockedUTXOSelector) Select(ctx context.Context, tx *sdk.Transaction, us
 			Satoshis:           satoshis,
 			EstimatedInputSize: 148, // P2PKH input size
 		}
-	}), nil
+	}), m.changeToReturn, nil
 }
 
 func (m *mockedUTXOSelector) WillReturnNoUTXOs() {
@@ -77,6 +78,7 @@ func (m *mockedUTXOSelector) WillReturnError() {
 	m.returnError = true
 }
 
-func (m *mockedUTXOSelector) WillReturnUTXOs(utxos ...bsv.Satoshis) {
+func (m *mockedUTXOSelector) WillReturnUTXOs(change bsv.Satoshis, utxos ...bsv.Satoshis) {
 	m.utxosToReturn = utxos
+	m.changeToReturn = change
 }

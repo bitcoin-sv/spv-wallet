@@ -15,7 +15,6 @@ import (
 // TransactionOutlineFixture is a test fixture - used for establishing environment for test.
 type TransactionOutlineFixture interface {
 	MinimumValidTransactionSpec() *outlines.TransactionSpec
-	TransactionSpecWithDatasize(size uint64) *outlines.TransactionSpec
 	NewTransactionOutlinesService() outlines.Service
 	ExternalRecipientHost() tpaymail.PaymailHostFixture
 	UserHasNotEnoughFunds()
@@ -35,20 +34,6 @@ func (a *transactionOutlineAbility) MinimumValidTransactionSpec() *outlines.Tran
 		UserID: fixtures.Sender.ID(),
 		Outputs: outlines.NewOutputsSpecs(&outlines.OpReturn{
 			Data: []string{"test"},
-		}),
-	}
-}
-
-func (a *transactionOutlineAbility) TransactionSpecWithDatasize(size uint64) *outlines.TransactionSpec {
-	data := make([]byte, size)
-	for i := range data {
-		data[i] = 'a'
-	}
-
-	return &outlines.TransactionSpec{
-		UserID: fixtures.Sender.ID(),
-		Outputs: outlines.NewOutputsSpecs(&outlines.OpReturn{
-			Data: []string{string(data)},
 		}),
 	}
 }

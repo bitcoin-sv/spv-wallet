@@ -13,32 +13,28 @@ import (
 type InputsSpec struct {
 }
 
-func (s *InputsSpec) evaluate(ctx *evaluationContext, outputs annotatedOutputs) (annotatedInputs, error) {
-	outs, _ := outputs.splitIntoTransactionOutputsAndAnnotations()
+func (s *InputsSpec) evaluate(ctx *evaluationContext, outputs annotatedOutputs) (annotatedInputs, bsv.Satoshis, error) {
+	outs := outputs.toTransactionOutputs()
 
 	tx := &sdk.Transaction{
 		Outputs: outs,
-
-		// TODO: creating partial transaction with only outputs makes debugging issue when debugger tries to show it by calling String() method (Inputs was nil which causes panic)
-		// Consider an idea to adjust UTXOSelector().Select to Select(ctx context.Context, outputsTotalValue bsv.Satoshis, byteSizeOfTxToFund uint64, userID string)
-		// Size and total output satoshis can be calculated by (outputsSize(outputs) + txEnvelopeSize) outputs.totalSatoshis()
-		Inputs: make([]*sdk.TransactionInput, 0),
+		Inputs:  make([]*sdk.TransactionInput, 0),
 	}
 
-	utxos, err := ctx.UTXOSelector().Select(ctx, tx, ctx.UserID())
+	utxos, change, err := ctx.UTXOSelector().Select(ctx, tx, ctx.UserID())
 	if err != nil {
-		return nil, spverrors.ErrInternal.Wrap(err)
+		return nil, 0, spverrors.ErrInternal.Wrap(err)
 	}
 
 	if len(utxos) == 0 {
-		return nil, txerrors.ErrTxOutlineInsufficientFunds
+		return nil, 0, txerrors.ErrTxOutlineInsufficientFunds
 	}
 
 	inputs := make(annotatedInputs, len(utxos))
 	for i, utxo := range utxos {
 		txID, err := chainhash.NewHashFromHex(utxo.TxID)
 		if err != nil {
-			return nil, spverrors.Wrapf(err, "failed to parse source transaction ID")
+			return nil, 0, spverrors.Wrapf(err, "failed to parse source transaction ID")
 		}
 		inputs[i] = &annotatedInput{
 			TransactionInput: &sdk.TransactionInput{
@@ -53,7 +49,7 @@ func (s *InputsSpec) evaluate(ctx *evaluationContext, outputs annotatedOutputs) 
 		}
 	}
 
-	return inputs, nil
+	return inputs, change, nil
 }
 
 type annotatedInputs []*annotatedInput
@@ -66,21 +62,23 @@ type annotatedInput struct {
 }
 
 func (a annotatedInputs) splitIntoTransactionInputsAndAnnotations() ([]*sdk.TransactionInput, transaction.InputAnnotations) {
-	inputs := make([]*sdk.TransactionInput, len(a))
-	annotationByInputIndex := make(transaction.InputAnnotations)
-	for index, input := range a {
-		inputs[index] = input.TransactionInput
-		if input.InputAnnotation != nil {
-			annotationByInputIndex[index] = input.InputAnnotation
-		}
-	}
-	return inputs, annotationByInputIndex
+	return a.toTransactionInputs(), a.toAnnotations()
 }
 
-func (a annotatedInputs) totalSatoshis() bsv.Satoshis {
-	var total bsv.Satoshis
-	for _, input := range a {
-		total += input.utxoSatoshis
+func (a annotatedInputs) toTransactionInputs() []*sdk.TransactionInput {
+	inputs := make([]*sdk.TransactionInput, len(a))
+	for i, in := range a {
+		inputs[i] = in.TransactionInput
 	}
-	return total
+	return inputs
+}
+
+func (a annotatedInputs) toAnnotations() transaction.InputAnnotations {
+	annotations := make(transaction.InputAnnotations)
+	for inputIndex, in := range a {
+		if in.InputAnnotation != nil {
+			annotations[inputIndex] = in.InputAnnotation
+		}
+	}
+	return annotations
 }

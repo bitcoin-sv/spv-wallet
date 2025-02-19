@@ -9,32 +9,11 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/keys/type42"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
-	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
 
-func calculateChange(ctx *evaluationContext, inputs annotatedInputs, outputs annotatedOutputs, feeUnit bsv.FeeUnit) (annotatedOutputs, error) {
-	satsIn := inputs.totalSatoshis()
-	satsOut := outputs.totalSatoshis()
-
-	fee := calculateFee(inputs, outputs, feeUnit)
-	if satsIn < satsOut+fee {
-		// this should never happen
-		// UTXO selector should provide enough funds to cover outputs and fee
-		// NOTE: If user doesn't have enough funds to cover transaction the txerrors.ErrTxOutlineInsufficientFunds is returned on another level
-		return nil, spverrors.Wrapf(txerrors.ErrUTXOSelectorInsufficientInputs, "satsIn (%d) are less than satsOut (%d) plus fee (%d)", satsIn, satsOut, fee)
-	}
-
-	// keep in mind that those values are uint64 so be careful with underflow
-	// that's why we're checking if satsIn is less than satsOut + fee before subtracting
-	// don't move this line before the check
-	change := satsIn - satsOut - fee
-
-	if change == 0 {
-		return outputs, nil
-	}
-
+func addChangeOutput(ctx *evaluationContext, outputs annotatedOutputs, change bsv.Satoshis) (annotatedOutputs, error) {
 	userPubKey, err := ctx.UserPubKey()
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "failed to get user public key")
@@ -54,22 +33,8 @@ func calculateChange(ctx *evaluationContext, inputs annotatedInputs, outputs ann
 			Satoshis:      uint64(change),
 		},
 	}
-	outputsWithChange := append(outputs, changeOutput)
 
-	feeForTxWithChange := calculateFee(inputs, outputsWithChange, feeUnit)
-	if feeForTxWithChange > fee {
-		feeDiff := uint64(feeForTxWithChange - fee)
-
-		if feeDiff >= changeOutput.TransactionOutput.Satoshis {
-			// Addition of change output increased fee, and decreases change to 0
-			// returning outputs with higher fee and no change
-			return outputs, nil
-		}
-
-		changeOutput.TransactionOutput.Satoshis -= feeDiff
-	}
-
-	return outputsWithChange, nil
+	return append(outputs, changeOutput), nil
 }
 
 func lockingScriptForChangeOutput(pubKey *primitives.PublicKey) (*script.Script, bsv.CustomInstructions, error) {

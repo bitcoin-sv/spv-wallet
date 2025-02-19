@@ -47,6 +47,11 @@ func (f *userUtxoFixture) OwnedBySender() UserUtxoFixture {
 	return f
 }
 
+func (f *userUtxoFixture) OwnedByRecipient() UserUtxoFixture {
+	f.userID = fixtures.RecipientInternal.ID()
+	return f
+}
+
 func (f *userUtxoFixture) P2PKH() UserUtxoFixture {
 	f.estimatedInputSize = database.EstimatedInputSizeForP2PKH
 	return f

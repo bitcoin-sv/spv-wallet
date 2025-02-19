@@ -5,7 +5,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
-	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 // OutputsSpec are representing a client specification for outputs part of the transaction.
@@ -77,21 +76,23 @@ func singleAnnotatedOutput(txOut *sdk.TransactionOutput, out *transaction.Output
 }
 
 func (a annotatedOutputs) splitIntoTransactionOutputsAndAnnotations() ([]*sdk.TransactionOutput, transaction.OutputsAnnotations) {
-	outputs := make([]*sdk.TransactionOutput, len(a))
-	annotationByOutputIndex := make(transaction.OutputsAnnotations)
-	for outputIndex, out := range a {
-		outputs[outputIndex] = out.TransactionOutput
-		if out.OutputAnnotation != nil {
-			annotationByOutputIndex[outputIndex] = out.OutputAnnotation
-		}
-	}
-	return outputs, annotationByOutputIndex
+	return a.toTransactionOutputs(), a.toAnnotations()
 }
 
-func (a annotatedOutputs) totalSatoshis() bsv.Satoshis {
-	var total bsv.Satoshis
-	for _, out := range a {
-		total += bsv.Satoshis(out.Satoshis)
+func (a annotatedOutputs) toTransactionOutputs() []*sdk.TransactionOutput {
+	outputs := make([]*sdk.TransactionOutput, len(a))
+	for i, out := range a {
+		outputs[i] = out.TransactionOutput
 	}
-	return total
+	return outputs
+}
+
+func (a annotatedOutputs) toAnnotations() transaction.OutputsAnnotations {
+	annotations := make(transaction.OutputsAnnotations)
+	for outputIndex, out := range a {
+		if out.OutputAnnotation != nil {
+			annotations[outputIndex] = out.OutputAnnotation
+		}
+	}
+	return annotations
 }
