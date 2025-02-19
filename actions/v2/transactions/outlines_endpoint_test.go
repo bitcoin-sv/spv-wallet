@@ -2,7 +2,6 @@ package transactions_test
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"testing"
 
@@ -11,6 +10,7 @@ import (
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
 
