@@ -3,7 +3,6 @@ info:
   title: ignored
   version: ignored
 paths:
-
   /api/v2/configs/shared:
     get:
       operationId: sharedConfig
