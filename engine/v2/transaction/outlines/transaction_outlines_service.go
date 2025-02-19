@@ -8,16 +8,17 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/bsv"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
+	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	bsvmodel "github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/rs/zerolog"
 )
 
 type service struct {
-	logger                *zerolog.Logger
-	paymailService        paymail.ServiceClient
-	paymailAddressService PaymailAddressService
-	utxoSelector          UTXOSelector
+	logger                 *zerolog.Logger
+	paymailService         paymail.ServiceClient
+	paymailAddressService  PaymailAddressService
+	transactionBEEFService TransactionBEEFService
+	utxoSelector           UTXOSelector
 	feeUnit               bsvmodel.FeeUnit
 	usersService          UsersService
 }
@@ -26,6 +27,7 @@ type service struct {
 func NewService(
 	paymailService paymail.ServiceClient,
 	paymailAddressService PaymailAddressService,
+	transactionBEEFService TransactionBEEFService,
 	utxoSelector UTXOSelector,
 	feeUnit bsvmodel.FeeUnit,
 	logger zerolog.Logger,
@@ -39,11 +41,20 @@ func NewService(
 		panic("PaymailAddressService is required to create transaction outlines service")
 	}
 
+	if transactionBEEFService == nil {
+		panic("Transaction BEEF service is required to create transaction outlines service")
+	}
+
+	if utxoSelector == nil {
+		panic("UTXO selector is required to create transaction outlines service")
+	}
+
 	return &service{
-		logger:                &logger,
-		paymailService:        paymailService,
-		paymailAddressService: paymailAddressService,
-		utxoSelector:          utxoSelector,
+		logger:                 &logger,
+		paymailService:         paymailService,
+		paymailAddressService:  paymailAddressService,
+		transactionBEEFService: transactionBEEFService,
+		utxoSelector:           utxoSelector,
 		feeUnit:               feeUnit,
 		usersService:          usersService,
 	}
@@ -68,7 +79,7 @@ func (s *service) CreateBEEF(ctx context.Context, spec *TransactionSpec) (*Trans
 		return nil, err
 	}
 
-	beef, err := s.formatAsBEEF(tx)
+	beef, err := s.transactionBEEFService.PrepareBEEF(ctx, tx)
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "failed to make BEEF format for transaction outline")
 	}
@@ -95,14 +106,6 @@ func (s *service) evaluateSpec(ctx context.Context, spec *TransactionSpec) (*sdk
 		return nil, transaction.Annotations{}, err
 	}
 	return tx, annotations, err
-}
-
-func (s *service) formatAsBEEF(tx *sdk.Transaction) (string, error) {
-	// FIXME: [waiting for SPV-1370] temporary solution to not fail on BEEF until we have service for collecting ancestors for inputs.
-	tmpTx := &sdk.Transaction{
-		Outputs: tx.Outputs,
-	}
-	return tmpTx.BEEFHex() //nolint:wrapcheck // temporary solution - will be removed after SPV-1370
 }
 
 func (s *service) createEvaluationContext(ctx context.Context, userID string) *evaluationContext {
