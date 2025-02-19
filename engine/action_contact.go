@@ -273,7 +273,7 @@ func (c *Client) AdminChangeContactStatus(ctx context.Context, id string, status
 
 	if err = contact.Save(ctx); err != nil {
 		c.logContactError(contact.OwnerXpubID, contact.Paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
-		return nil, spverrors.ErrSaveContact
+		return nil, spverrors.ErrUpdateContact
 	}
 	return contact, nil
 }
@@ -294,6 +294,31 @@ func (c *Client) DeleteContactByID(ctx context.Context, id string) error {
 
 	if err = contact.Save(ctx); err != nil {
 		c.logContactError(contact.OwnerXpubID, contact.Paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
+		return spverrors.ErrSaveContact
+	}
+
+	return nil
+}
+
+func (c *Client) AdminUnconfirmContact(ctx context.Context, id string) error {
+	contact, err := getContactByID(ctx, id, c.DefaultModelOptions()...)
+	if err != nil {
+		c.logContactError("", "", fmt.Sprintf("error while getting contact: %s", err.Error()))
+		return err
+	}
+
+	if contact == nil {
+		return spverrors.ErrContactNotFound
+	}
+
+	err = contact.Unconfirm()
+	if err != nil {
+		c.logContactWarining(contact.OwnerXpubID, contact.Paymail, err.Error())
+		return spverrors.ErrContactIncorrectStatus
+	}
+
+	if err = contact.Save(ctx); err != nil {
+		c.logContactError(contact.OwnerXpubID, contact.Paymail, fmt.Sprintf("unexpected error while unconfirming contact: %s", err.Error()))
 		return spverrors.ErrSaveContact
 	}
 
