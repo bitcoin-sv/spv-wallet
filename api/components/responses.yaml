@@ -11,12 +11,6 @@ components:
         application/json:
           schema:
             $ref: "./models.yaml#/components/schemas/SharedConfig"
-    NotAuthorized:
-      description: Security requirements failed
-      content:
-        application/json:
-          schema:
-            $ref: "./errors.yaml#/components/schemas/Unauthorized"
 
     AdminUserBadRequest:
       description: Bad request is an error that occurs when the request is malformed.
@@ -64,3 +58,132 @@ components:
         application/json:
           schema:
             $ref: "./errors.yaml#/components/schemas/GettingUser"
+
+    NotAuthorized:
+      description: Security requirements failed
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/AnyAuthorization"
+
+    NotAuthorizedToAdminEndpoint:
+      description: Security requirements failed
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/AdminAuthorization"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/Internal"
+
+    UserNotAuthorized:
+      description: Security requirements failed
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/UserAuthorization"
+
+    UserBadRequest:
+      description: Bad request is an error that occurs when the request is malformed.
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/InvalidDataID"
+
+    SearchBadRequest:
+      description: Error when search request is malformed and params can not be parsed
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/InvalidDataID"
+
+    GetDataSuccess:
+      description: Data found
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/Data"
+
+    GetDataNotFound:
+      description: Not found is an error that occurs when the requested resource is not found.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "./errors.yaml#/components/schemas/DataNotFound"
+
+    GetCurrentUserSuccess:
+      description: Balance of current authenticated user
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/UserInfo"
+
+    SearchOperationsSuccess:
+      description: Operations found
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/OperationsSearchResult"
+
+    CreateTransactionOutlineSuccess:
+      description: Created transaction outline
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/AnnotatedTransactionOutline"
+
+    CreateTransactionOutlineBadRequest:
+      description: Bad request is an error that occurs when the request is malformed.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "./errors.yaml#/components/schemas/TxSpecNoDefaultPaymailAddress"
+              - $ref: "./errors.yaml#/components/schemas/TxSpecOutputsRequired"
+              - $ref: "./errors.yaml#/components/schemas/TxSpecOpReturnDataRequired"
+              - $ref: "./errors.yaml#/components/schemas/TxSpecFailedToDecodeHex"
+              - $ref: "./errors.yaml#/components/schemas/TxSpecInvalidPaymailReceiver"
+              - $ref: "./errors.yaml#/components/schemas/TxSpecInvalidPaymailSender"
+
+    CreateTransactionOutlineUnprocessable:
+      description: Unprocessable entity is an error that occurs when the request cannot be fulfilled.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "./errors.yaml#/components/schemas/TxOutlineUserHasNotEnoughFunds"
+
+
+    RecordTransactionSuccess:
+      description: Transaction recorded
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/RecordedOutline"
+
+    RecordTransactionBadRequest:
+      description: Bad request is an error that occurs when the request is malformed.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "./errors.yaml#/components/schemas/InvalidDataID"
+              - $ref: "./errors.yaml#/components/schemas/AnnotationIndexOutOfRange"
+              - $ref: "./errors.yaml#/components/schemas/UTXOSpent"
+              - $ref: "./errors.yaml#/components/schemas/AnnotationIndexConversion"
+              - $ref: "./errors.yaml#/components/schemas/NoOperations"
+
+    RecordTransactionInternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "./errors.yaml#/components/schemas/Internal"
+              - $ref: "./errors.yaml#/components/schemas/GettingOutputs"
+              - $ref: "./errors.yaml#/components/schemas/TxBroadcast"
