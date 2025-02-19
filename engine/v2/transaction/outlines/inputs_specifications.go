@@ -14,7 +14,7 @@ type InputsSpec struct {
 }
 
 func (s *InputsSpec) evaluate(ctx *evaluationContext, outputs annotatedOutputs) (annotatedInputs, bsv.Satoshis, error) {
-	outs, _ := outputs.splitIntoTransactionOutputsAndAnnotations()
+	outs := outputs.toTransactionOutputs()
 
 	tx := &sdk.Transaction{
 		Outputs: outs,
@@ -62,13 +62,23 @@ type annotatedInput struct {
 }
 
 func (a annotatedInputs) splitIntoTransactionInputsAndAnnotations() ([]*sdk.TransactionInput, transaction.InputAnnotations) {
+	return a.toTransactionInputs(), a.toAnnotations()
+}
+
+func (a annotatedInputs) toTransactionInputs() []*sdk.TransactionInput {
 	inputs := make([]*sdk.TransactionInput, len(a))
-	annotationByInputIndex := make(transaction.InputAnnotations)
-	for index, input := range a {
-		inputs[index] = input.TransactionInput
-		if input.InputAnnotation != nil {
-			annotationByInputIndex[index] = input.InputAnnotation
+	for i, in := range a {
+		inputs[i] = in.TransactionInput
+	}
+	return inputs
+}
+
+func (a annotatedInputs) toAnnotations() transaction.InputAnnotations {
+	annotations := make(transaction.InputAnnotations)
+	for inputIndex, in := range a {
+		if in.InputAnnotation != nil {
+			annotations[inputIndex] = in.InputAnnotation
 		}
 	}
-	return inputs, annotationByInputIndex
+	return annotations
 }
