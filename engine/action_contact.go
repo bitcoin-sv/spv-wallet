@@ -300,6 +300,7 @@ func (c *Client) DeleteContactByID(ctx context.Context, id string) error {
 	return nil
 }
 
+// AdminUnconfirmContact changes the status of the contact to "unconfirmed".
 func (c *Client) AdminUnconfirmContact(ctx context.Context, id string) error {
 	contact, err := getContactByID(ctx, id, c.DefaultModelOptions()...)
 	if err != nil {
