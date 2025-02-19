@@ -25,7 +25,12 @@ type OutputsRepo interface {
 
 // TransactionsRepo is an interface for transactions repository.
 type TransactionsRepo interface {
+	// FindTransactionInputSources retrieves the full ancestry of input sources for a given transaction.
+	// It recursively traces input sources in batches to minimize database queries.
 	FindTransactionInputSources(ctx context.Context, sourceTXIDs ...string) (beef.TxQueryResultSlice, error)
+	// HasTransactionInputSources checks if all the provided input source transaction IDs exist in the database.
+	// If all of them are found, the transaction data can be serialized into Raw HEX format.
+	// Otherwise, serialization should be done using the BEEFHex format.
 	HasTransactionInputSources(ctx context.Context, sourceTXIDs ...string) (bool, error)
 }
 

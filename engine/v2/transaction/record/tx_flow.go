@@ -41,25 +41,30 @@ func newTxFlow(ctx context.Context, service *Service, tx *trx.Transaction) (*txF
 		operations: map[string]*txmodels.NewOperation{},
 	}
 
-	if err := f.setTxRowHex(); err != nil {
+	if err := f.setHex(); err != nil {
 		return nil, err
 	}
 
 	return f, nil
 }
 
-func (f *txFlow) setTxRowHex() error {
+func (f *txFlow) setHex() error {
 	sourceTXIDs := make([]string, 0, len(f.tx.Inputs))
 	for _, input := range f.tx.Inputs {
 		sourceTXIDs = append(sourceTXIDs, input.SourceTXID.String())
 	}
 
-	isRawTx, err := f.service.transactions.HasTransactionInputSources(f.ctx, sourceTXIDs...)
+	foundAll, err := f.service.transactions.HasTransactionInputSources(f.ctx, sourceTXIDs...)
 	if err != nil {
 		return spverrors.Wrapf(err, "database query failed to check input source transactions for transaction %s", f.txID)
 	}
 
-	if isRawTx {
+	if foundAll {
+		// Optimization: There is no need to serialize the given transaction into BEEFHex format
+		// because all its input source ascendants are already stored in the database and serialized as BEEF.
+		// This approach avoids unnecessary data redundancy, which impacts overall consistency.
+		// All found inputs can be reused when resolving source transaction inputs needed to construct BEEF.
+		// (Check the workflow and usage of the BEEF Service in beef_service.go)
 		f.txRow.SetRawHex(f.tx.Hex())
 		return nil
 	}
