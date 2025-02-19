@@ -38,7 +38,6 @@ type assertion struct {
 	assert          *assert.Assertions
 	actual          []*outlines.UTXO
 	comparingSource []*database.UserUTXO
-	comparingChange uint
 }
 
 func newAssertions(t testing.TB) InputsSelectorAssertions {

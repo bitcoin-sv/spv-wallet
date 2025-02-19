@@ -72,11 +72,3 @@ func (a annotatedInputs) splitIntoTransactionInputsAndAnnotations() ([]*sdk.Tran
 	}
 	return inputs, annotationByInputIndex
 }
-
-func (a annotatedInputs) totalSatoshis() bsv.Satoshis {
-	var total bsv.Satoshis
-	for _, input := range a {
-		total += input.utxoSatoshis
-	}
-	return total
-}
