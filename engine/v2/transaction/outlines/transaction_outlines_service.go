@@ -88,16 +88,7 @@ func (s *service) evaluateSpec(ctx context.Context, spec *TransactionSpec) (*sdk
 		return nil, transaction.Annotations{}, txerrors.ErrTxOutlineSpecificationUserIDRequired
 	}
 
-	evaluationCtx := &evaluationContext{
-		Context:               ctx,
-		userID:                spec.UserID,
-		log:                   s.logger,
-		paymail:               s.paymailService,
-		paymailAddressService: s.paymailAddressService,
-		utxoSelector:          s.utxoSelector,
-		feeUnit:               s.feeUnit,
-		usersService:          s.usersService,
-	}
+	evaluationCtx := s.createEvaluationContext(ctx, spec.UserID)
 
 	tx, annotations, err := spec.evaluate(evaluationCtx)
 	if err != nil {
@@ -112,4 +103,17 @@ func (s *service) formatAsBEEF(tx *sdk.Transaction) (string, error) {
 		Outputs: tx.Outputs,
 	}
 	return tmpTx.BEEFHex() //nolint:wrapcheck // temporary solution - will be removed after SPV-1370
+}
+
+func (s *service) createEvaluationContext(ctx context.Context, userID string) *evaluationContext {
+	return &evaluationContext{
+		Context:               ctx,
+		userID:                userID,
+		log:                   s.logger,
+		paymail:               s.paymailService,
+		paymailAddressService: s.paymailAddressService,
+		utxoSelector:          s.utxoSelector,
+		feeUnit:               s.feeUnit,
+		usersService:          s.usersService,
+	}
 }

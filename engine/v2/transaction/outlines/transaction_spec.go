@@ -4,6 +4,7 @@ import (
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
+	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 )
 
 // TransactionSpec represents client provided specification for a transaction outline.
@@ -27,7 +28,7 @@ func (t *TransactionSpec) evaluate(ctx *evaluationContext) (*sdk.Transaction, tr
 	if change > 0 {
 		outputs, err = addChangeOutput(ctx, outputs, change)
 		if err != nil {
-			return nil, transaction.Annotations{}, spverrors.Wrapf(err, "failed to add change output")
+			return nil, transaction.Annotations{}, txerrors.ErrOutlineAddChangeOutput.Wrap(err)
 		}
 	}
 

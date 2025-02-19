@@ -15,9 +15,7 @@ type Destination struct {
 	DerivationKey string
 }
 
-// NewDestinationWithReference derives a public key using a reference ID.
-// It is intended to be used to derive a public key for paymail destinations.
-func NewDestinationWithReference(pubKey *primitives.PublicKey, referenceID string) (Destination, error) {
+func newDestinationWithReference(pubKey *primitives.PublicKey, referenceID string) (Destination, error) {
 	dst := Destination{
 		ReferenceID: referenceID,
 	}
@@ -41,5 +39,5 @@ func NewDestinationWithRandomReference(pubKey *primitives.PublicKey) (Destinatio
 		return Destination{}, ErrRandomReferenceID.Wrap(err)
 	}
 
-	return NewDestinationWithReference(pubKey, referenceID)
+	return newDestinationWithReference(pubKey, referenceID)
 }

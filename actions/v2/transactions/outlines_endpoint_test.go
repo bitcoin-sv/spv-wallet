@@ -363,7 +363,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 						WithJSONMatching(test.responseTemplate, given.OutlineResponseContext(variation.format, test.responseParams))
 
 					thenResponse.ContainsValidTransaction(variation.format).
-						WithOutValues(test.outValues...)
+						WithOutputValues(test.outValues...)
 				})
 			}
 		})

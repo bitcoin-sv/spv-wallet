@@ -11,7 +11,7 @@ import (
 )
 
 type TransactionDetailsAssertions interface {
-	WithOutValues(values ...bsv.Satoshis) TransactionDetailsAssertions
+	WithOutputValues(values ...bsv.Satoshis) TransactionDetailsAssertions
 	OutputUnlockableBy(vout int, user fixtures.User) TransactionDetailsAssertions
 }
 
@@ -22,10 +22,9 @@ type transactionAssertions struct {
 	annotations transaction.Annotations
 }
 
-func (a *transactionAssertions) WithOutValues(values ...bsv.Satoshis) TransactionDetailsAssertions {
-	if len(values) != len(a.tx.Outputs) {
-		a.t.Fatalf("expected %d outputs, got %d", len(values), len(a.tx.Outputs))
-	}
+func (a *transactionAssertions) WithOutputValues(values ...bsv.Satoshis) TransactionDetailsAssertions {
+	a.t.Helper()
+	a.require.Lenf(a.tx.Outputs, len(values), "Tx has less outputs then expected values")
 	for i, v := range values {
 		a.require.Equal(v, bsv.Satoshis(a.tx.Outputs[i].Satoshis), "output value mismatch")
 	}
@@ -33,6 +32,7 @@ func (a *transactionAssertions) WithOutValues(values ...bsv.Satoshis) Transactio
 }
 
 func (a *transactionAssertions) OutputUnlockableBy(vout int, user fixtures.User) TransactionDetailsAssertions {
+	a.t.Helper()
 	a.require.Less(vout, len(a.tx.Outputs), "output index out of range")
 
 	outputAnnotation, ok := a.annotations.Outputs[vout]
