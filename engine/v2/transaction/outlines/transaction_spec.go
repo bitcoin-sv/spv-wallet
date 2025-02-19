@@ -19,14 +19,16 @@ func (t *TransactionSpec) evaluate(ctx *evaluationContext) (*sdk.Transaction, tr
 		return nil, transaction.Annotations{}, spverrors.Wrapf(err, "failed to evaluate outputs")
 	}
 
-	inputs, err := t.Inputs.evaluate(ctx, outputs)
+	inputs, change, err := t.Inputs.evaluate(ctx, outputs)
 	if err != nil {
 		return nil, transaction.Annotations{}, err
 	}
 
-	outputs, err = calculateChange(ctx, inputs, outputs, ctx.feeUnit)
-	if err != nil {
-		return nil, transaction.Annotations{}, spverrors.Wrapf(err, "failed to calculate change")
+	if change > 0 {
+		outputs, err = addChangeOutput(ctx, outputs, change)
+		if err != nil {
+			return nil, transaction.Annotations{}, spverrors.Wrapf(err, "failed to add change output")
+		}
 	}
 
 	txOuts, outputsAnnotations := outputs.splitIntoTransactionOutputsAndAnnotations()

@@ -13,32 +13,28 @@ import (
 type InputsSpec struct {
 }
 
-func (s *InputsSpec) evaluate(ctx *evaluationContext, outputs annotatedOutputs) (annotatedInputs, error) {
+func (s *InputsSpec) evaluate(ctx *evaluationContext, outputs annotatedOutputs) (annotatedInputs, bsv.Satoshis, error) {
 	outs, _ := outputs.splitIntoTransactionOutputsAndAnnotations()
 
 	tx := &sdk.Transaction{
 		Outputs: outs,
-
-		// TODO: creating partial transaction with only outputs makes debugging issue when debugger tries to show it by calling String() method (Inputs was nil which causes panic)
-		// Consider an idea to adjust UTXOSelector().Select to Select(ctx context.Context, outputsTotalValue bsv.Satoshis, byteSizeOfTxToFund uint64, userID string)
-		// Size and total output satoshis can be calculated by (outputsSize(outputs) + txEnvelopeSize) outputs.totalSatoshis()
-		Inputs: make([]*sdk.TransactionInput, 0),
+		Inputs:  make([]*sdk.TransactionInput, 0),
 	}
 
-	utxos, err := ctx.UTXOSelector().Select(ctx, tx, ctx.UserID())
+	utxos, change, err := ctx.UTXOSelector().Select(ctx, tx, ctx.UserID())
 	if err != nil {
-		return nil, spverrors.ErrInternal.Wrap(err)
+		return nil, 0, spverrors.ErrInternal.Wrap(err)
 	}
 
 	if len(utxos) == 0 {
-		return nil, txerrors.ErrTxOutlineInsufficientFunds
+		return nil, 0, txerrors.ErrTxOutlineInsufficientFunds
 	}
 
 	inputs := make(annotatedInputs, len(utxos))
 	for i, utxo := range utxos {
 		txID, err := chainhash.NewHashFromHex(utxo.TxID)
 		if err != nil {
-			return nil, spverrors.Wrapf(err, "failed to parse source transaction ID")
+			return nil, 0, spverrors.Wrapf(err, "failed to parse source transaction ID")
 		}
 		inputs[i] = &annotatedInput{
 			TransactionInput: &sdk.TransactionInput{
@@ -53,7 +49,7 @@ func (s *InputsSpec) evaluate(ctx *evaluationContext, outputs annotatedOutputs) 
 		}
 	}
 
-	return inputs, nil
+	return inputs, change, nil
 }
 
 type annotatedInputs []*annotatedInput

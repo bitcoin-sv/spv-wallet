@@ -18,7 +18,7 @@ type PaymailAddressService interface {
 
 // UTXOSelector is a component that provides methods for selecting UTXOs of given user to fund a transaction.
 type UTXOSelector interface {
-	Select(ctx context.Context, tx *sdk.Transaction, userID string) ([]*UTXO, error)
+	Select(ctx context.Context, tx *sdk.Transaction, userID string) ([]*UTXO, bsvmodel.Satoshis, error)
 }
 
 // Service is a service for creating transaction outlines.
@@ -39,7 +39,6 @@ type UTXO struct {
 	Satoshis           bsvmodel.Satoshis
 	EstimatedInputSize uint64
 	bsvmodel.CustomInstructions
-	Change uint64
 }
 
 // Transaction represents a transaction outline.

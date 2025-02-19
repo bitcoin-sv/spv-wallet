@@ -16,6 +16,7 @@ type InputsSelectorAssertions interface {
 
 type SuccessfullySelectedInputsAssertions interface {
 	SelectedInputs(inputs []*outlines.UTXO) SelectedInputsAssertions
+	Change(change bsv.Satoshis) ChangeAssertions
 }
 
 type SelectedInputsAssertions interface {
@@ -25,7 +26,10 @@ type SelectedInputsAssertions interface {
 
 type ComparingSelectedInputsAssertions interface {
 	AreEntries(expectedIndexes []int) ComparingSelectedInputsAssertions
-	HasChange(change uint)
+}
+
+type ChangeAssertions interface {
+	EqualsTo(change uint)
 }
 
 type assertion struct {
@@ -34,6 +38,7 @@ type assertion struct {
 	assert          *assert.Assertions
 	actual          []*outlines.UTXO
 	comparingSource []*database.UserUTXO
+	comparingChange uint
 }
 
 func newAssertions(t testing.TB) InputsSelectorAssertions {
@@ -82,8 +87,21 @@ func (a assertion) AreEntries(expectedIndexes []int) ComparingSelectedInputsAsse
 	return a
 }
 
-func (a assertion) HasChange(change uint) {
-	for i, utxo := range a.actual {
-		a.assert.EqualValuesf(change, utxo.Change, "Selected UTXO %d (%s - %d) has different change", i, utxo.TxID, utxo.Vout)
+type changeAssertion struct {
+	t               testing.TB
+	assert          *assert.Assertions
+	comparingChange uint
+}
+
+func (a assertion) Change(change bsv.Satoshis) ChangeAssertions {
+	return changeAssertion{
+		t:               a.t,
+		assert:          a.assert,
+		comparingChange: uint(change),
 	}
+}
+
+func (a changeAssertion) EqualsTo(change uint) {
+	a.t.Helper()
+	a.assert.EqualValues(change, a.comparingChange)
 }

@@ -23,10 +23,14 @@ func TestInputsSelector(t *testing.T) {
 		selector := given.NewInputSelector()
 
 		// when:
-		utxos, err := selector.Select(context.Background(), sdk.NewTransaction(), fixtures.Sender.ID())
+		utxos, change, err := selector.Select(context.Background(), sdk.NewTransaction(), fixtures.Sender.ID())
 
 		// then:
-		then.WithoutError(err).SelectedInputs(utxos).AreEmpty()
+		thenSuccess := then.WithoutError(err)
+
+		thenSuccess.SelectedInputs(utxos).AreEmpty()
+
+		thenSuccess.Change(change).EqualsTo(0)
 	})
 
 	singleSelectTests := map[string]struct {
@@ -102,12 +106,15 @@ func TestInputsSelector(t *testing.T) {
 			selector := given.NewInputSelector()
 
 			// when:
-			utxos, err := selector.Select(context.Background(), bsvTransaction, fixtures.Sender.ID())
+			utxos, change, err := selector.Select(context.Background(), bsvTransaction, fixtures.Sender.ID())
 
 			// then:
-			then.WithoutError(err).SelectedInputs(utxos).
-				ComparingTo(ownedInputs).AreEntries(test.expectToSelectInputs).
-				HasChange(test.expectedChange)
+			thenSuccess := then.WithoutError(err)
+
+			thenSuccess.SelectedInputs(utxos).
+				ComparingTo(ownedInputs).AreEntries(test.expectToSelectInputs)
+
+			thenSuccess.Change(change).EqualsTo(test.expectedChange)
 
 		})
 	}
@@ -154,13 +161,13 @@ func TestInputsSelector(t *testing.T) {
 			selector := given.NewInputSelector()
 
 			// when:
-			_, err := selector.Select(context.Background(), bsvTransaction, fixtures.Sender.ID())
+			_, _, err := selector.Select(context.Background(), bsvTransaction, fixtures.Sender.ID())
 
 			// then:
 			require.NoError(t, err)
 
 			// when:
-			utxos, err := selector.Select(context.Background(), bsvTransaction, fixtures.Sender.ID())
+			utxos, _, err := selector.Select(context.Background(), bsvTransaction, fixtures.Sender.ID())
 
 			// then:
 			then.WithoutError(err).SelectedInputs(utxos).

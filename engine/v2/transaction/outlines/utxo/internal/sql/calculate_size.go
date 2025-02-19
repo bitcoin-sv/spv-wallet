@@ -1,34 +1,22 @@
-package outlines
+package sql
 
 import (
-	"math"
-
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
-	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 const (
 	txEnvelopeSize = 8 // version + locktime
 )
 
-func calculateFee(inputs annotatedInputs, outputs annotatedOutputs, feeUnit bsv.FeeUnit) bsv.Satoshis {
-	size := estimatedSize(inputs, outputs)
-
-	chunks := uint64(math.Ceil(float64(size) / float64(feeUnit.Bytes)))
-	return bsv.Satoshis(chunks) * feeUnit.Satoshis
-}
-
-func estimatedSize(inputs annotatedInputs, outputs annotatedOutputs) uint64 {
+func outputOnlyTxSize(outputs []*sdk.TransactionOutput) uint64 {
 	var size uint64
-
 	size += txEnvelopeSize
-	size += estimatedInputsSize(inputs)
+	size += varIntSize(0) // inputs count
 	size += outputsSize(outputs)
-
 	return size
 }
 
-func outputsSize(outputs annotatedOutputs) uint64 {
+func outputsSize(outputs []*sdk.TransactionOutput) uint64 {
 	var size uint64
 
 	// output count:
@@ -39,20 +27,6 @@ func outputsSize(outputs annotatedOutputs) uint64 {
 		size += 8
 		scriptLen := len(*out.LockingScript)
 		size += varIntSize(scriptLen) + toU64(scriptLen)
-	}
-
-	return size
-}
-
-func estimatedInputsSize(inputs annotatedInputs) uint64 {
-	var size uint64
-
-	// input count:
-	size += varIntSize(len(inputs))
-
-	// inputs:
-	for _, in := range inputs {
-		size += in.estimatedSize
 	}
 
 	return size
