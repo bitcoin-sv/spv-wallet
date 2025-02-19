@@ -26,6 +26,12 @@ type Service interface {
 	CreateRawTx(ctx context.Context, spec *TransactionSpec) (*Transaction, error)
 }
 
+// TransactionBEEFService provides functionality to generate a BEEF-encoded
+// hex string from a given Bitcoin transaction.
+type TransactionBEEFService interface {
+	PrepareBEEF(ctx context.Context, tx *sdk.Transaction) (string, error)
+}
+
 // UTXO represents an unspent transaction output.
 type UTXO struct {
 	TxID string

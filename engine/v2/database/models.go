@@ -5,6 +5,7 @@ func Models() []any {
 	return []any{
 		TrackedTransaction{},
 		TrackedOutput{},
+		TxInput{},
 		Data{},
 		User{},
 		Paymail{},
