@@ -96,7 +96,6 @@ issues:
     # Exclude some linters from running on tests files.
     - path: _test\.go
       linters:
-        - gocyclo
         - errcheck
         - gosec
         - wrapcheck
@@ -104,8 +103,6 @@ issues:
 
     - path: /testabilities/
       linters:
-        - gocyclo
-        - errcheck
         - gosec
         - wrapcheck
         - bodyclose

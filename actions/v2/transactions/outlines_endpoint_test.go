@@ -2,6 +2,7 @@ package transactions_test
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/require"
 	"net/http"
 	"testing"
 
@@ -311,9 +312,14 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			suite.Run(t, newTxOutlineSuite(test, initialSatoshis))
 		})
+
+		t.Run(name, func(t *testing.T) {
+			suite.Run(t, newTxOutlineSuite(test, initialSatoshis))
+		})
 	}
 
-	basicTestCase := successTestCases["create transaction outline for op_return strings as default data"]
+	basicTestCase, ok := successTestCases["create transaction outline for op_return strings as default data"]
+	require.True(t, ok, "Make sure you used exactly the same test case name as the first one from the successTestCases map")
 
 	t.Run("explicit beef as requested format", func(t *testing.T) {
 		suite.Run(t,
