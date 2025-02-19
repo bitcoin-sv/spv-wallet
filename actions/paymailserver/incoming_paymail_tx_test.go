@@ -2,11 +2,11 @@ package paymailserver_test
 
 import (
 	"fmt"
-	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"testing"
 	"time"
 
 	"github.com/bitcoin-sv/go-sdk/script"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"

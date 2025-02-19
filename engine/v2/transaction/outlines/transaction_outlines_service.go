@@ -19,8 +19,8 @@ type service struct {
 	paymailAddressService  PaymailAddressService
 	transactionBEEFService TransactionBEEFService
 	utxoSelector           UTXOSelector
-	feeUnit               bsvmodel.FeeUnit
-	usersService          UsersService
+	feeUnit                bsvmodel.FeeUnit
+	usersService           UsersService
 }
 
 // NewService creates a new transaction outlines service.
@@ -55,8 +55,8 @@ func NewService(
 		paymailAddressService:  paymailAddressService,
 		transactionBEEFService: transactionBEEFService,
 		utxoSelector:           utxoSelector,
-		feeUnit:               feeUnit,
-		usersService:          usersService,
+		feeUnit:                feeUnit,
+		usersService:           usersService,
 	}
 }
 

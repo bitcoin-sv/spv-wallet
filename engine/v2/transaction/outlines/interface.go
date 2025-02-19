@@ -40,10 +40,8 @@ type TransactionBEEFService interface {
 
 // UTXO represents an unspent transaction output.
 type UTXO struct {
-	TxID               string
-	Vout               uint32
-	Satoshis           bsvmodel.Satoshis
-	EstimatedInputSize uint64
+	TxID string
+	Vout uint32
 	bsvmodel.CustomInstructions
 }
 

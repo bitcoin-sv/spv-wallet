@@ -64,8 +64,6 @@ func (m *mockedUTXOSelector) Select(ctx context.Context, tx *sdk.Transaction, us
 			TxID:               outpoint.TxID,
 			Vout:               outpoint.Vout,
 			CustomInstructions: UserFundsTransactionCustomInstructions,
-			Satoshis:           satoshis,
-			EstimatedInputSize: 148, // P2PKH input size
 		}
 	}), m.changeToReturn, nil
 }

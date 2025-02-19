@@ -27,7 +27,7 @@ type transactionOutlineAbility struct {
 	paymailAddressService  outlines.PaymailAddressService
 	transactionBEEFService outlines.TransactionBEEFService
 	utxoSelector           mockedUTXOSelector
-	feeUnit               bsv.FeeUnit
+	feeUnit                bsv.FeeUnit
 }
 
 func (a *transactionOutlineAbility) MinimumValidTransactionSpec() *outlines.TransactionSpec {

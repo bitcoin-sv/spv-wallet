@@ -44,8 +44,6 @@ func (s *InputsSpec) evaluate(ctx *evaluationContext, outputs annotatedOutputs) 
 			InputAnnotation: &transaction.InputAnnotation{
 				CustomInstructions: utxo.CustomInstructions,
 			},
-			utxoSatoshis:  utxo.Satoshis,
-			estimatedSize: utxo.EstimatedInputSize,
 		}
 	}
 
@@ -57,8 +55,6 @@ type annotatedInputs []*annotatedInput
 type annotatedInput struct {
 	*transaction.InputAnnotation
 	*sdk.TransactionInput
-	utxoSatoshis  bsv.Satoshis
-	estimatedSize uint64
 }
 
 func (a annotatedInputs) splitIntoTransactionInputsAndAnnotations() ([]*sdk.TransactionInput, transaction.InputAnnotations) {
