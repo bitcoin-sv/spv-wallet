@@ -30,21 +30,20 @@ func (t *Transactions) HasTransactionInputSources(ctx context.Context, sourceTXI
 	for _, txID := range sourceTXIDs {
 		set[txID] = struct{}{}
 	}
-
 	keys := maps.Keys(set)
-	ids := slices.AppendSeq(make([]string, 0, len(set)), keys)
+	uniqueIds := slices.AppendSeq(make([]string, 0, len(set)), keys)
 
 	var count int64
 	err := t.db.
 		Model(&database.TrackedTransaction{}).
 		WithContext(ctx).
-		Where("id IN (?)", ids).
+		Where("id IN (?)", uniqueIds).
 		Count(&count).Error
 	if err != nil {
 		return false, spverrors.Wrapf(err, "database query failed for source transactions %v", sourceTXIDs)
 	}
 
-	return count == int64(len(ids)), nil
+	return count == int64(len(uniqueIds)), nil
 }
 
 // FindTransactionInputSources retrieves the full ancestry of input sources for a given transaction.
