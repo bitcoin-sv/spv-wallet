@@ -10,6 +10,7 @@ import (
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/stretchr/testify/suite"
 )
 
 const transactionsOutlinesURL = "/api/v2/transactions/outlines"
@@ -17,12 +18,7 @@ const transactionsOutlinesURL = "/api/v2/transactions/outlines"
 func TestPOSTTransactionOutlines(t *testing.T) {
 	initialSatoshis := bsv.Satoshis(1_000_000)
 
-	successTestCases := map[string]struct {
-		request          string
-		responseTemplate string
-		responseParams   map[string]any
-		outValues        []bsv.Satoshis
-	}{
+	successTestCases := map[string]txOutlineTestcase{
 		"create transaction outline for op_return strings as default data": {
 			request: `{
 			  "outputs": [
@@ -311,63 +307,25 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 		},
 	}
 
-	type caseVariation struct {
-		explicitFormat bool
-		format         string
-	}
-
-	variations := map[string]caseVariation{
-		"beef with implicit format": {
-			format: "BEEF",
-		},
-		"beef with explicit format query": {
-			explicitFormat: true,
-			format:         "BEEF",
-		},
-		"raw with explicit format query": {
-			explicitFormat: true,
-			format:         "RAW",
-		},
-	}
-
 	for name, test := range successTestCases {
 		t.Run(name, func(t *testing.T) {
-			for variationName, variation := range variations {
-				t.Run(name+" "+variationName, func(t *testing.T) {
-					// given:
-					given, then := testabilities.New(t)
-					cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
-					defer cleanup()
-
-					// and:
-					given.Faucet(fixtures.Sender).TopUp(initialSatoshis)
-
-					// and:
-					client := given.HttpClient().ForUser()
-
-					// when:
-					req := client.R().
-						SetHeader("Content-Type", "application/json").
-						SetBody(test.request)
-
-					if variation.explicitFormat {
-						req.SetQueryParam("format", variation.format)
-					}
-
-					res, _ := req.Post(transactionsOutlinesURL)
-
-					// then:
-					thenResponse := then.Response(res)
-
-					thenResponse.IsOK().
-						WithJSONMatching(test.responseTemplate, given.OutlineResponseContext(variation.format, test.responseParams))
-
-					thenResponse.ContainsValidTransaction(variation.format).
-						WithOutputValues(test.outValues...)
-				})
-			}
+			suite.Run(t, newTxOutlineSuite(test, initialSatoshis))
 		})
 	}
+
+	basicTestCase := successTestCases["create transaction outline for op_return strings as default data"]
+
+	t.Run("explicit beef as requested format", func(t *testing.T) {
+		suite.Run(t,
+			newTxOutlineSuite(basicTestCase, initialSatoshis).withExplicitFormat("BEEF"),
+		)
+	})
+
+	t.Run("explicit raw as requested format", func(t *testing.T) {
+		suite.Run(t,
+			newTxOutlineSuite(basicTestCase, initialSatoshis).withExplicitFormat("RAW"),
+		)
+	})
 }
 
 func TestPOSTTransactionOutlinesErrors(t *testing.T) {
