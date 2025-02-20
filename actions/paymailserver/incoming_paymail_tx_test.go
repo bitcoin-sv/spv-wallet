@@ -332,6 +332,32 @@ func TestIncomingPaymailBeef(t *testing.T) {
 			"sender": senderPaymail,
 		})
 	})
+
+	t.Run("step 5 - create transaction outline", func(t *testing.T) {
+		// given:
+		recipientClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
+
+		// and:
+		requestBody := `{
+			  "outputs": [
+				{
+				  "type": "op_return",
+				  "data": [ "some", " ", "data" ]
+				}
+			  ]
+			}`
+
+		// when:
+		res, _ := recipientClient.R().
+			SetHeader("Content-Type", "application/json").
+			SetBody(requestBody).
+			Post("/api/v2/transactions/outlines")
+
+		//  then:
+		thenResponse := testabilities.NewTransactionsEndpointAssertions(t, given).Response(res)
+		thenResponse.IsOK()
+		thenResponse.ContainsValidBEEFHexInField("hex")
+	})
 }
 
 func TestAddressResolution(t *testing.T) {

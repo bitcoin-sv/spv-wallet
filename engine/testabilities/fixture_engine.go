@@ -135,12 +135,13 @@ func (f *engineFixture) ConfigForTests(opts ...ConfigOpts) *config.AppConfig {
 
 func (f *engineFixture) Faucet(user fixtures.User) FaucetFixture {
 	return &faucetFixture{
-		engine: f.engine,
-		user:   user,
-		t:      f.t,
-		assert: assert.New(f.t),
-		arc:    f.ARC(),
-		bhs:    f.BHS(),
+		engine:  f.engine,
+		user:    user,
+		t:       f.t,
+		assert:  assert.New(f.t),
+		require: require.New(f.t),
+		arc:     f.ARC(),
+		bhs:     f.BHS(),
 	}
 }
 
