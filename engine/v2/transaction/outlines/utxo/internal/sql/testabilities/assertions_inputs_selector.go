@@ -74,41 +74,17 @@ func (a assertion) ComparingTo(inputs []*database.UserUTXO) ComparingSelectedInp
 
 func (a assertion) AreEntries(expectedIndexes []int) ComparingSelectedInputsAssertions {
 	a.t.Helper()
+	a.assert.Len(a.actual, len(expectedIndexes))
 
-	actualOutpoints := make(map[string]*outlines.UTXO)
-	for _, utxo := range a.actual {
-		actualOutpoints[bsv.Outpoint{TxID: utxo.TxID, Vout: utxo.Vout}.String()] = utxo
-	}
-
-	for i, ownedIdx := range expectedIndexes {
-		expectedUTXO := a.comparingSource[ownedIdx]
-		expectedOutpoint := bsv.Outpoint{TxID: expectedUTXO.TxID, Vout: expectedUTXO.Vout}
-		selectedUTXO, ok := actualOutpoints[expectedOutpoint.String()]
-		if !ok {
-			a.assert.Failf("Didn't find expected UTXO", "Expected outpoint: %s", expectedOutpoint.String())
-		} else {
-			a.assert.Equalf(bsv.CustomInstructions(expectedUTXO.CustomInstructions), selectedUTXO.CustomInstructions, "Selected different custom instructions at index %d", i)
-			delete(actualOutpoints, expectedOutpoint.String())
+	expectedSelected := lo.Map(expectedIndexes, func(item int, index int) *outlines.UTXO {
+		return &outlines.UTXO{
+			TxID:               a.comparingSource[item].TxID,
+			Vout:               a.comparingSource[item].Vout,
+			CustomInstructions: bsv.CustomInstructions(a.comparingSource[item].CustomInstructions),
 		}
-	}
+	})
 
-	a.assert.Empty(actualOutpoints, "Selected not expected UTXOs")
-
-	if a.t.Failed() {
-		expectedSelected := lo.Map(expectedIndexes, func(item int, index int) outlines.UTXO {
-			return outlines.UTXO{
-				TxID:               a.comparingSource[item].TxID,
-				Vout:               a.comparingSource[item].Vout,
-				CustomInstructions: bsv.CustomInstructions(a.comparingSource[item].CustomInstructions),
-			}
-		})
-
-		selectedValues := lo.Map(a.actual, func(item *outlines.UTXO, index int) outlines.UTXO {
-			return *item
-		})
-
-		a.require.EqualValuesf(expectedSelected, selectedValues, "Selected different UTXOs")
-	}
+	a.assert.ElementsMatch(expectedSelected, a.actual)
 	return a
 }
 
