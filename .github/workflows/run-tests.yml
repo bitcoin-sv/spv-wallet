@@ -77,11 +77,6 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Start Redis
-        uses: supercharge/redis-github-action@1.8.0
-        with:
-          redis-version: 6
-
       - name: Cache code
         uses: actions/cache@v4
         with:
