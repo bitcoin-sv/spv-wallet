@@ -38,6 +38,8 @@ type SPVWalletApplicationFixture interface {
 	Faucet(user fixtures.User) testengine.FaucetFixture
 
 	EngineFixture() testengine.EngineFixture
+
+	TransactionScenario(user fixtures.User) TransactionScenario
 }
 
 type BlockHeadersServiceFixture interface {
@@ -156,4 +158,8 @@ func (f *appFixture) Faucet(user fixtures.User) testengine.FaucetFixture {
 
 func (f *appFixture) EngineFixture() testengine.EngineFixture {
 	return f.engineFixture
+}
+
+func (f *appFixture) TransactionScenario(user fixtures.User) TransactionScenario {
+	return NewTransactionScenario(f, user, f.t)
 }
