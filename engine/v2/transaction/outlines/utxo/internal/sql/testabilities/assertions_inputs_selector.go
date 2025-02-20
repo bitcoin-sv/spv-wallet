@@ -74,15 +74,26 @@ func (a assertion) ComparingTo(inputs []*database.UserUTXO) ComparingSelectedInp
 
 func (a assertion) AreEntries(expectedIndexes []int) ComparingSelectedInputsAssertions {
 	a.t.Helper()
-	a.require.Len(a.actual, len(expectedIndexes))
+
+	actualOutpoints := make(map[string]*outlines.UTXO)
+	for _, utxo := range a.actual {
+		actualOutpoints[bsv.Outpoint{TxID: utxo.TxID, Vout: utxo.Vout}.String()] = utxo
+	}
 
 	for i, ownedIdx := range expectedIndexes {
-		selectedUTXO := a.actual[i]
 		expectedUTXO := a.comparingSource[ownedIdx]
-		a.assert.Equalf(expectedUTXO.TxID, selectedUTXO.TxID, "Selected different TxID at index %d", i)
-		a.assert.EqualValuesf(expectedUTXO.Vout, selectedUTXO.Vout, "Selected different vout at index %d", i)
-		a.assert.Equalf(bsv.CustomInstructions(expectedUTXO.CustomInstructions), selectedUTXO.CustomInstructions, "Selected different custom instructions at index %d", i)
+		expectedOutpoint := bsv.Outpoint{TxID: expectedUTXO.TxID, Vout: expectedUTXO.Vout}
+		selectedUTXO, ok := actualOutpoints[expectedOutpoint.String()]
+		if !ok {
+			a.assert.Failf("Didn't find expected UTXO", "Expected outpoint: %s", expectedOutpoint.String())
+		} else {
+			a.assert.Equalf(bsv.CustomInstructions(expectedUTXO.CustomInstructions), selectedUTXO.CustomInstructions, "Selected different custom instructions at index %d", i)
+			delete(actualOutpoints, expectedOutpoint.String())
+		}
 	}
+
+	a.assert.Empty(actualOutpoints, "Selected not expected UTXOs")
+
 	if a.t.Failed() {
 		expectedSelected := lo.Map(expectedIndexes, func(item int, index int) outlines.UTXO {
 			return outlines.UTXO{
