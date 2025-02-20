@@ -6,6 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -82,7 +83,21 @@ func (a assertion) AreEntries(expectedIndexes []int) ComparingSelectedInputsAsse
 		a.assert.EqualValuesf(expectedUTXO.Vout, selectedUTXO.Vout, "Selected different vout at index %d", i)
 		a.assert.Equalf(bsv.CustomInstructions(expectedUTXO.CustomInstructions), selectedUTXO.CustomInstructions, "Selected different custom instructions at index %d", i)
 	}
+	if a.t.Failed() {
+		expectedSelected := lo.Map(expectedIndexes, func(item int, index int) outlines.UTXO {
+			return outlines.UTXO{
+				TxID:               a.comparingSource[item].TxID,
+				Vout:               a.comparingSource[item].Vout,
+				CustomInstructions: bsv.CustomInstructions(a.comparingSource[item].CustomInstructions),
+			}
+		})
 
+		selectedValues := lo.Map(a.actual, func(item *outlines.UTXO, index int) outlines.UTXO {
+			return *item
+		})
+
+		a.require.EqualValuesf(expectedSelected, selectedValues, "Selected different UTXOs")
+	}
 	return a
 }
 
