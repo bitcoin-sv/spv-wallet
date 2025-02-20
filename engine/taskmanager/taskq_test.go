@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/stretchr/testify/require"
 )
 
@@ -143,4 +144,40 @@ func TestNewTaskManager_NotRegistered(t *testing.T) {
 		TaskName: task1Arg,
 	})
 	require.Error(t, err)
+}
+
+func TestNewTaskManager_WithRedis(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping live local redis tests")
+	}
+
+	queueName, _ := utils.RandomHex(8)
+	ctx := context.Background()
+	c, err := NewTaskManager(ctx, WithTaskqConfig(DefaultTaskQConfig(queueName, WithRedis("redis://localhost:6379"))))
+	require.NoError(t, err)
+	require.NotNil(t, c)
+
+	task1Chan := make(chan string, 1)
+	task1Arg := "task redis"
+
+	err = c.RegisterTask(task1Arg, func(name string) error {
+		task1Chan <- name
+		return nil
+	})
+	require.NoError(t, err)
+
+	require.Equal(t, 1, len(c.Tasks()))
+
+	// Run single task
+	err = c.RunTask(ctx, &TaskRunOptions{
+		Arguments: []interface{}{task1Arg},
+		TaskName:  task1Arg,
+	})
+	require.NoError(t, err)
+
+	require.Equal(t, task1Arg, <-task1Chan)
+
+	// Close the client
+	err = c.Close(context.Background())
+	require.NoError(t, err)
 }
