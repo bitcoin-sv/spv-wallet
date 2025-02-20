@@ -19,10 +19,11 @@ type TransactionOutlineFixture interface {
 }
 
 type transactionOutlineAbility struct {
-	t                     testing.TB
-	paymailClientAbility  tpaymail.PaymailClientFixture
-	paymailAddressService outlines.PaymailAddressService
-	utxoSelector          mockedUTXOSelector
+	t                      testing.TB
+	paymailClientAbility   tpaymail.PaymailClientFixture
+	paymailAddressService  outlines.PaymailAddressService
+	transactionBEEFService outlines.TransactionBEEFService
+	utxoSelector           mockedUTXOSelector
 }
 
 func (a *transactionOutlineAbility) MinimumValidTransactionSpec() *outlines.TransactionSpec {
@@ -37,9 +38,10 @@ func (a *transactionOutlineAbility) MinimumValidTransactionSpec() *outlines.Tran
 // Given creates a new test fixture.
 func Given(t testing.TB) (given TransactionOutlineFixture) {
 	ability := &transactionOutlineAbility{
-		t:                     t,
-		paymailClientAbility:  tpaymail.Given(t),
-		paymailAddressService: newPaymailAddressServiceMock(t),
+		t:                      t,
+		paymailClientAbility:   tpaymail.Given(t),
+		paymailAddressService:  newPaymailAddressServiceMock(t),
+		transactionBEEFService: newTransactionBEEFServiceMock(t),
 	}
 	return ability
 }
@@ -54,6 +56,7 @@ func (a *transactionOutlineAbility) NewTransactionOutlinesService() outlines.Ser
 	return outlines.NewService(
 		a.paymailClientAbility.NewPaymailClientService(),
 		a.paymailAddressService,
+		a.transactionBEEFService,
 		&a.utxoSelector,
 		tester.Logger(a.t),
 	)
