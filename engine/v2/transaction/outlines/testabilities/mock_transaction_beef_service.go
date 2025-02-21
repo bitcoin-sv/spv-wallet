@@ -13,7 +13,7 @@ type transactionBEEFService struct {
 
 func (t *transactionBEEFService) PrepareBEEF(ctx context.Context, tx *sdk.Transaction) (string, error) {
 	tmpTx := &sdk.Transaction{Outputs: tx.Outputs}
-	return tmpTx.BEEFHex() //nolint:wrapcheck
+	return tmpTx.BEEFHex()
 }
 
 func newTransactionBEEFServiceMock(t testing.TB) *transactionBEEFService {
