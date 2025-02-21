@@ -1,13 +1,13 @@
 package testabilities
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 

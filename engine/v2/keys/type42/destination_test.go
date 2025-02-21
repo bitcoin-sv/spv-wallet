@@ -1,9 +1,9 @@
 package type42
 
 import (
-	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"testing"
 
+	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/stretchr/testify/assert"
 )
 
