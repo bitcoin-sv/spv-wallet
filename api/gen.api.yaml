@@ -766,6 +766,11 @@ components:
             required:
                 - bucket
             type: object
+        models_ChangeAnnotation:
+            properties:
+                customInstructions:
+                    $ref: '#/components/schemas/models_SPVWalletCustomInstructions'
+            type: object
         models_CustomInstructions:
             oneOf:
                 - $ref: '#/components/schemas/models_SPVWalletCustomInstructions'
@@ -892,6 +897,7 @@ components:
                 - $ref: '#/components/schemas/models_BucketAnnotation'
                 - $ref: '#/components/schemas/models_DataAnnotation'
                 - $ref: '#/components/schemas/models_PaymailAnnotation'
+                - $ref: '#/components/schemas/models_ChangeAnnotation'
         models_OutputsAnnotations:
             properties:
                 outputs:

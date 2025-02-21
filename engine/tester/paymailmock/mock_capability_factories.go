@@ -77,7 +77,7 @@ func capabilityP2PPaymentDestination() *CapabilityMock {
 		value: func(dn paymailDomainName) any {
 			return dn.P2PPaymentDestination()
 		},
-		endpoint: endpointWithStaticResponse(http.MethodPost, P2PDestinationsForSats(1000).response()),
+		endpoint: endpoint(http.MethodPost, P2PDestinationResponse().Responder()),
 	}
 }
 

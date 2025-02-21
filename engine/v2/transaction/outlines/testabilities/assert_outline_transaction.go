@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	testpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -11,6 +12,7 @@ import (
 
 type TransactionOutlineAssertion interface {
 	Created(transaction *outlines.Transaction) CreatedTransactionOutlineAssertion
+	ExternalPaymailHost() testpaymail.PaymailExternalAssertions
 }
 
 type CreatedTransactionOutlineAssertion interface {
@@ -34,17 +36,23 @@ type WithParseableBEEFTransactionOutlineAssertion interface {
 	Output(index int) OutputAssertion
 }
 
-func Then(t testing.TB) TransactionOutlineAssertion {
-	return &assertion{t: t, require: require.New(t), assert: assert.New(t)}
+func Then(t testing.TB, fixture TransactionOutlineFixture) TransactionOutlineAssertion {
+	return &assertion{
+		t:                 t,
+		require:           require.New(t),
+		assert:            assert.New(t),
+		paymailAssertions: testpaymail.Then(t, fixture.ExternalRecipientHost().MockedPaymailClient()),
+	}
 }
 
 type assertion struct {
-	t         testing.TB
-	require   *require.Assertions
-	assert    *assert.Assertions
-	txOutline *outlines.Transaction
-	tx        *sdk.Transaction
-	err       error
+	t                 testing.TB
+	require           *require.Assertions
+	assert            *assert.Assertions
+	txOutline         *outlines.Transaction
+	tx                *sdk.Transaction
+	err               error
+	paymailAssertions testpaymail.PaymailExternalAssertions
 }
 
 func (a *assertion) Created(transaction *outlines.Transaction) CreatedTransactionOutlineAssertion {
@@ -135,4 +143,8 @@ func (a *assertion) Output(index int) OutputAssertion {
 		annotation: a.txOutline.Annotations.Outputs[index],
 		index:      index,
 	}
+}
+
+func (a *assertion) ExternalPaymailHost() testpaymail.PaymailExternalAssertions {
+	return a.paymailAssertions
 }
