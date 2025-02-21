@@ -1,6 +1,3 @@
-//go:build errorx
-// +build errorx
-
 package utils
 
 func ParseQuery(query string) string {

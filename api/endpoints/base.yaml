@@ -21,3 +21,20 @@ paths:
           $ref: "../components/responses.yaml#/components/responses/SharedConfig"
         401:
           $ref: "../components/responses.yaml#/components/responses/NotAuthorized"
+
+  /api/v2/test/errors:
+    get:
+      tags:
+        - Test errors
+      parameters:
+        - name: fail
+          in: query
+          description: Fail
+          required: false
+          schema:
+            $ref: "../components/models.yaml#/components/schemas/FailingPoint"
+      responses:
+        200:
+          description: Success
+        default:
+          $ref: "../components/responses.yaml#/components/responses/ProblemDetails"

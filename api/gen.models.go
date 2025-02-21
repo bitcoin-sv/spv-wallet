@@ -26,6 +26,13 @@ const (
 	Data ModelsDataAnnotationBucket = "data"
 )
 
+// Defines values for ModelsFailingPoint.
+const (
+	DbConnection      ModelsFailingPoint = "db_connection"
+	DbIllegalArgument ModelsFailingPoint = "db_illegal_argument"
+	DbQuery           ModelsFailingPoint = "db_query"
+)
+
 // Defines values for ModelsOperationTxStatus.
 const (
 	BROADCASTED ModelsOperationTxStatus = "BROADCASTED"
@@ -191,6 +198,24 @@ type ErrorsPaymailInconsistent struct {
 	Message interface{} `json:"message"`
 }
 
+// ErrorsProblemDetails defines model for errors_ProblemDetails.
+type ErrorsProblemDetails struct {
+	// Detail A human-readable explanation specific to this occurrence of the problem
+	Detail *string `json:"detail,omitempty"`
+
+	// Instance A URI reference that identifies the specific occurrence of the problem
+	Instance *string `json:"instance,omitempty"`
+
+	// Status The HTTP status code
+	Status *int `json:"status,omitempty"`
+
+	// Title A short, human-readable summary of the problem type
+	Title *string `json:"title,omitempty"`
+
+	// Type A URI reference that identifies the problem type
+	Type *string `json:"type,omitempty"`
+}
+
 // ErrorsSchema defines model for errors_Schema.
 type ErrorsSchema struct {
 	// Code Error code
@@ -312,6 +337,9 @@ type ModelsDataAnnotation struct {
 
 // ModelsDataAnnotationBucket defines model for ModelsDataAnnotation.Bucket.
 type ModelsDataAnnotationBucket string
+
+// ModelsFailingPoint defines model for models_FailingPoint.
+type ModelsFailingPoint string
 
 // ModelsInputAnnotation defines model for models_InputAnnotation.
 type ModelsInputAnnotation struct {
@@ -620,6 +648,9 @@ type ResponsesNotAuthorized = ErrorsAnyAuthorization
 // ResponsesNotAuthorizedToAdminEndpoint defines model for responses_NotAuthorizedToAdminEndpoint.
 type ResponsesNotAuthorizedToAdminEndpoint = ErrorsAdminAuthorization
 
+// ResponsesProblemDetails defines model for responses_ProblemDetails.
+type ResponsesProblemDetails = ErrorsProblemDetails
+
 // ResponsesRecordTransactionBadRequest defines model for responses_RecordTransactionBadRequest.
 type ResponsesRecordTransactionBadRequest struct {
 	union json.RawMessage
@@ -661,6 +692,12 @@ type SearchOperationsParams struct {
 
 	// SortBy Field to sort by
 	SortBy *RequestsSortBy `form:"sortBy,omitempty" json:"sortBy,omitempty"`
+}
+
+// GetApiV2TestErrorsParams defines parameters for GetApiV2TestErrors.
+type GetApiV2TestErrorsParams struct {
+	// Fail Fail
+	Fail *ModelsFailingPoint `form:"fail,omitempty" json:"fail,omitempty"`
 }
 
 // CreateTransactionOutlineParams defines parameters for CreateTransactionOutline.

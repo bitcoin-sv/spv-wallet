@@ -5,6 +5,12 @@ info:
 
 components:
   schemas:
+    FailingPoint:
+      type: string
+      enum:
+        - "db_connection"
+        - "db_query"
+        - "db_illegal_argument"
     SharedConfig:
       description: Shared config
       type: object
