@@ -2,6 +2,7 @@ package jsonrequire
 
 import (
 	"fmt"
+	"strings"
 	"text/template"
 )
 
@@ -16,6 +17,8 @@ var funcsMap = template.FuncMap{
 	"matchAddress":       matchAddress,
 	"matchNumber":        matchNumber,
 	"anything":           anything,
+	"matchTxByFormat":    matchTxByFormat,
+	"matchDestination":   matchDestination,
 }
 
 func anything() string {
@@ -46,6 +49,21 @@ func matchHex() string {
 
 func matchBEEF() string {
 	return regexPlaceholder(`^0100(beef|BEEF)[a-fA-F0-9]+$`)
+}
+
+func matchTxByFormat(format string) string {
+	switch strings.ToLower(format) {
+	case "beef":
+		return matchBEEF()
+	case "raw":
+		return matchHex()
+	default:
+		panic(fmt.Sprintf("unsupported tx format: %s", format))
+	}
+}
+
+func matchDestination() string {
+	return regexPlaceholder("^1-destination-.{32}$")
 }
 
 // matchAddress returns a regex that matches a bitcoin address

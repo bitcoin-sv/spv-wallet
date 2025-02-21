@@ -1,12 +1,15 @@
 package testabilities
 
 import (
+	"context"
 	"testing"
 
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	tpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 // TransactionOutlineFixture is a test fixture - used for establishing environment for test.
@@ -24,6 +27,7 @@ type transactionOutlineAbility struct {
 	paymailAddressService  outlines.PaymailAddressService
 	transactionBEEFService outlines.TransactionBEEFService
 	utxoSelector           mockedUTXOSelector
+	feeUnit                bsv.FeeUnit
 }
 
 func (a *transactionOutlineAbility) MinimumValidTransactionSpec() *outlines.TransactionSpec {
@@ -41,6 +45,7 @@ func Given(t testing.TB) (given TransactionOutlineFixture) {
 		t:                      t,
 		paymailClientAbility:   tpaymail.Given(t),
 		paymailAddressService:  newPaymailAddressServiceMock(t),
+		feeUnit:                bsv.FeeUnit{Satoshis: 1, Bytes: 1000},
 		transactionBEEFService: newTransactionBEEFServiceMock(t),
 	}
 	return ability
@@ -58,7 +63,9 @@ func (a *transactionOutlineAbility) NewTransactionOutlinesService() outlines.Ser
 		a.paymailAddressService,
 		a.transactionBEEFService,
 		&a.utxoSelector,
+		a.feeUnit,
 		tester.Logger(a.t),
+		pubKeyGetter{},
 	)
 }
 
@@ -68,4 +75,10 @@ func (a *transactionOutlineAbility) UTXOSelector() UTXOSelectorFixture {
 
 func (a *transactionOutlineAbility) UserHasNotEnoughFunds() {
 	a.utxoSelector.WillReturnNoUTXOs()
+}
+
+type pubKeyGetter struct{}
+
+func (p pubKeyGetter) GetPubKey(ctx context.Context, _ string) (*ec.PublicKey, error) {
+	return fixtures.Sender.PublicKey(), nil
 }
