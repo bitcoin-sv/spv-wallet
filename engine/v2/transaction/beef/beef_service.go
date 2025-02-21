@@ -24,9 +24,9 @@ func (tx TxQueryResult) IsRawTx() bool { return tx.RawHex != nil }
 // TxRepository defines an interface for querying transaction input sources.
 // It provides a method to retrieve transaction details for a given set of source transaction IDs.
 type TxRepository interface {
-	// QueryInputSources retrieves transaction query results for the provided source transaction IDs.
+	// FindTransactionInputSources retrieves transaction query results for the provided source transaction IDs.
 	// Returns a slice of TxQueryResult and an error if the query fails.
-	QueryInputSources(ctx context.Context, sourceTXIDs ...string) (TxQueryResultSlice, error)
+	FindTransactionInputSources(ctx context.Context, sourceTXIDs ...string) (TxQueryResultSlice, error)
 }
 
 // Service provides transaction processing functionalities, including preparing BEEF-encoded transactions.
@@ -66,7 +66,7 @@ func (s *Service) PrepareBEEF(ctx context.Context, tx *sdk.Transaction) (string,
 	}
 
 	txID := tx.TxID().String()
-	txQueryResult, err := s.repository.QueryInputSources(ctx, sourceTxIDs...)
+	txQueryResult, err := s.repository.FindTransactionInputSources(ctx, sourceTxIDs...)
 	if err != nil {
 		return "", spverrors.Wrapf(err, "database query failed while retrieving input data for transaction %s", txID)
 	}

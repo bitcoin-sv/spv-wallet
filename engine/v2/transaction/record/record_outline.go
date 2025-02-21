@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
+	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"github.com/rs/zerolog"
@@ -33,7 +33,11 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 		}
 	}).Msg("Recording transaction outline")
 
-	flow := newTxFlow(ctx, s, tx)
+	flow, err := newTxFlow(ctx, s, tx)
+	if err != nil {
+		return nil, err
+	}
+
 	if err = flow.verifyScripts(); err != nil {
 		return nil, err
 	}

@@ -48,7 +48,8 @@ func (c *inputsQueryComposer) addChangeValueCalculation(db *gorm.DB, utxoTab *go
 func (c *inputsQueryComposer) chooseInputsToCoverOutputsAndFeesAndHaveMinimalChange(db *gorm.DB, utxoWithMinChange *gorm.DB) *gorm.DB {
 	return db.Select(txIdColumn, voutColumn).
 		Table("(?) as utxoWithMinChange", utxoWithMinChange).
-		Where("change <= min_change", "min_change is not null")
+		Where("change <= min_change").
+		Where("min_change is not null")
 }
 
 func (c *inputsQueryComposer) searchForMinimalChangeValue(db *gorm.DB, utxoWithChange *gorm.DB) *gorm.DB {

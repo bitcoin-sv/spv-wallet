@@ -10,7 +10,10 @@ import (
 
 // RecordPaymailTransaction will validate, broadcast and save paymail transaction
 func (s *Service) RecordPaymailTransaction(ctx context.Context, tx *trx.Transaction, senderPaymail, receiverPaymail string) error {
-	flow := newTxFlow(ctx, s, tx)
+	flow, err := newTxFlow(ctx, s, tx)
+	if err != nil {
+		return err
+	}
 
 	trackedOutputs, err := flow.processInputs()
 	if err != nil {

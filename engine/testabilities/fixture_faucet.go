@@ -10,15 +10,17 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type faucetFixture struct {
-	engine engine.ClientInterface
-	user   fixtures.User
-	t      testing.TB
-	assert *assert.Assertions
-	arc    ARCFixture
-	bhs    BlockHeadersServiceFixture
+	engine  engine.ClientInterface
+	user    fixtures.User
+	t       testing.TB
+	assert  *assert.Assertions
+	require *require.Assertions
+	arc     ARCFixture
+	bhs     BlockHeadersServiceFixture
 }
 
 func (f *faucetFixture) TopUp(satoshis bsv.Satoshis) fixtures.GivenTXSpec {
@@ -30,32 +32,40 @@ func (f *faucetFixture) TopUp(satoshis bsv.Satoshis) fixtures.GivenTXSpec {
 		WithRecipient(f.user).
 		WithP2PKHOutput(uint64(satoshis))
 
+	transaction := &txmodels.NewTransaction{
+		ID:       txSpec.ID(),
+		TxStatus: txmodels.TxStatusMined,
+		Outputs: []txmodels.NewOutput{
+			txmodels.NewOutputForP2PKH(
+				bsv.Outpoint{TxID: txSpec.ID(), Vout: 0},
+				f.user.ID(),
+				satoshis,
+				bsv.CustomInstructions{
+					{
+						Type:        "sign",
+						Instruction: "P2PKH",
+					},
+				},
+			),
+		},
+	}
+
+	beefHex, err := txSpec.TX().BEEFHex()
+	f.require.NoError(err)
+	f.require.NotEmpty(beefHex)
+
+	transaction.SetBEEFHex(beefHex)
+
 	operation := txmodels.NewOperation{
 		UserID: f.user.ID(),
 
 		Type:  "incoming",
 		Value: int64(satoshis), //nolint:gosec // This is a test fixture, values won't exceed int64
 
-		Transaction: &txmodels.NewTransaction{
-			ID:       txSpec.ID(),
-			TxStatus: txmodels.TxStatusMined,
-			Outputs: []txmodels.NewOutput{
-				txmodels.NewOutputForP2PKH(
-					bsv.Outpoint{TxID: txSpec.ID(), Vout: 0},
-					f.user.ID(),
-					satoshis,
-					bsv.CustomInstructions{
-						{
-							Type:        "sign",
-							Instruction: "P2PKH",
-						},
-					},
-				),
-			},
-		},
+		Transaction: transaction,
 	}
 
-	err := f.engine.Repositories().Operations.SaveAll(context.Background(), func(yield func(*txmodels.NewOperation) bool) {
+	err = f.engine.Repositories().Operations.SaveAll(context.Background(), func(yield func(*txmodels.NewOperation) bool) {
 		yield(&operation)
 	})
 	f.assert.NoError(err)
