@@ -1,6 +1,7 @@
 package testabilities
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
@@ -19,6 +20,7 @@ type transactionAssertions struct {
 	t           testing.TB
 	tx          *sdk.Transaction
 	require     *require.Assertions
+	assert      *assert.Assertions
 	annotations transaction.Annotations
 }
 
@@ -26,14 +28,14 @@ func (a *transactionAssertions) WithOutputValues(values ...bsv.Satoshis) Transac
 	a.t.Helper()
 	a.require.Lenf(a.tx.Outputs, len(values), "Tx has less outputs then expected values")
 	for i, v := range values {
-		a.require.Equal(v, bsv.Satoshis(a.tx.Outputs[i].Satoshis), "output value mismatch")
+		a.assert.Equal(v, bsv.Satoshis(a.tx.Outputs[i].Satoshis), "output value mismatch")
 	}
 	return a
 }
 
 func (a *transactionAssertions) OutputUnlockableBy(vout int, user fixtures.User) TransactionDetailsAssertions {
 	a.t.Helper()
-	a.require.Less(vout, len(a.tx.Outputs), "output index out of range")
+	a.assert.Less(vout, len(a.tx.Outputs), "there is no vout to unlock in transaction outputs")
 
 	outputAnnotation, ok := a.annotations.Outputs[vout]
 	if !ok {

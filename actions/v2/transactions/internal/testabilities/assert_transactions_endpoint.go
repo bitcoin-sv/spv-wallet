@@ -66,6 +66,7 @@ func (a *transactionResponseAssertions) ContainsValidTransaction(format string) 
 	return &transactionAssertions{
 		t:       a.t,
 		require: a.require,
+		assert:  a.assert,
 		tx:      tx,
 	}
 }
