@@ -2,16 +2,6 @@ package txmodels
 
 import "github.com/samber/lo"
 
-// TransactionInputSource represents a link between a transaction and its source transaction.
-// It is used to track which transaction inputs originate from which previous transactions.
-type TransactionInputSource struct {
-	// SourceTxID is the ID of the transaction that provided the input.
-	SourceTxID string
-
-	// TxID is the ID of the transaction that consumes the input.
-	TxID string
-}
-
 // NewTransaction is a data for creating a new transaction.
 type NewTransaction struct {
 	ID       string
@@ -20,7 +10,7 @@ type NewTransaction struct {
 	Inputs  []TrackedOutput
 	Outputs []NewOutput
 
-	transactionInputSources []TransactionInputSource
+	transactionInputSources []string
 	beefHex                 string
 	rawHex                  string
 }
@@ -39,19 +29,16 @@ func (t *NewTransaction) RawHex() string { return t.rawHex }
 // SetRawHex sets the raw hexadecimal representation of the transaction.
 func (t *NewTransaction) SetRawHex(hex string) {
 	t.rawHex = hex
-	t.transactionInputSources = lo.Map(t.Outputs, func(item NewOutput, index int) TransactionInputSource {
-		return TransactionInputSource{
-			TxID:       t.ID,
-			SourceTxID: item.TxID,
-		}
+	t.transactionInputSources = lo.Map(t.Outputs, func(item NewOutput, index int) string {
+		return item.TxID
 	})
 }
 
 // SetBEEFHex sets the BEEF-encoded hexadecimal representation of the transaction.
 func (t *NewTransaction) SetBEEFHex(hex string) { t.beefHex = hex }
 
-// TransactionInputSources returns the list of input sources associated with the transaction.
-func (t *NewTransaction) TransactionInputSources() []TransactionInputSource {
+// TransactionInputSources returns the list of input sources IDs associated with the transaction.
+func (t *NewTransaction) TransactionInputSources() []string {
 	return t.transactionInputSources
 }
 

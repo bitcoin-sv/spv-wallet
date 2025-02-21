@@ -10,15 +10,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// TxInput represents a transaction input in the database.
-// This struct is used to store the relationship between a transaction (TxID)
-// and its source transaction (SourceTxID). It helps track transaction ancestry
-// by linking an input to the transaction that created the output it spends.
-type TxInput struct {
-	TxID       string `gorm:"type:char(64);primaryKey"` // ID of the spending transaction
-	SourceTxID string `gorm:"type:char(64);primaryKey"` // ID of the source transaction
-}
-
 // TrackedTransaction represents a transaction in the database.
 type TrackedTransaction struct {
 	ID       string `gorm:"type:char(64);primaryKey"`
@@ -34,9 +25,9 @@ type TrackedTransaction struct {
 
 	newUTXOs []*UserUTXO `gorm:"-"`
 
-	BeefHex        string    `gorm:"column:beef_hex"`
-	RawHex         string    `gorm:"column:raw_hex"`
-	SourceTxInputs []TxInput `gorm:"foreignKey:TxID;constraint:OnDelete:CASCADE;"`
+	BeefHex            string               `gorm:"column:beef_hex"`
+	RawHex             string               `gorm:"column:raw_hex"`
+	SourceTransactions []TrackedTransaction `gorm:"many2many:source_transactions"`
 }
 
 // ToTxQueryResult converts a TrackedTransaction into a TxQueryResult.
