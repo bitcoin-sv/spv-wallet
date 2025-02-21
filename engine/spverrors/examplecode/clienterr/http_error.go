@@ -2,6 +2,7 @@ package clienterr
 
 import (
 	"errors"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors/examplecode/errdef"
 	"github.com/gin-gonic/gin"
 	"github.com/joomcode/errorx"

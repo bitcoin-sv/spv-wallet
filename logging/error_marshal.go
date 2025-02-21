@@ -3,6 +3,7 @@ package logging
 import (
 	"errors"
 	"fmt"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/joomcode/errorx"
 	"github.com/rs/zerolog"

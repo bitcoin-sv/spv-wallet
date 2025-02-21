@@ -2,6 +2,7 @@ package errdef
 
 import (
 	"fmt"
+
 	"github.com/joomcode/errorx"
 )
 

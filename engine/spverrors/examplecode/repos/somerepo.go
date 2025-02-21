@@ -2,6 +2,7 @@ package repos
 
 import (
 	"fmt"
+
 	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors/examplecode/errdef"
 	repoerr "github.com/bitcoin-sv/spv-wallet/engine/spverrors/examplecode/repos/errors"
