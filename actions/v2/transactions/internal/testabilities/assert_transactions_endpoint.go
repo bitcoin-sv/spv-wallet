@@ -62,7 +62,9 @@ func (a *transactionResponseAssertions) ContainsValidTransaction(format string) 
 	default:
 		a.t.Fatalf("unsupported format: %s", format)
 	}
+
 	a.require.NoError(err, "hex is not valid tx in format %s", format)
+	a.assert.NotZero(tx.Version, "tx version is 0 which is not acceptable by nodes")
 	return &transactionAssertions{
 		t:       a.t,
 		require: a.require,

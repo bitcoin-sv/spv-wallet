@@ -35,10 +35,9 @@ func (t *TransactionSpec) evaluate(ctx *evaluationContext) (*sdk.Transaction, tr
 	txOuts, outputsAnnotations := outputs.splitIntoTransactionOutputsAndAnnotations()
 	txIns, inputsAnnotations := inputs.splitIntoTransactionInputsAndAnnotations()
 
-	tx := &sdk.Transaction{
-		Inputs:  txIns,
-		Outputs: txOuts,
-	}
+	tx := sdk.NewTransaction()
+	tx.Inputs = txIns
+	tx.Outputs = txOuts
 
 	annotations := transaction.Annotations{
 		Inputs:  inputsAnnotations,

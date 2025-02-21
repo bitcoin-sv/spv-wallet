@@ -16,10 +16,8 @@ type InputsSpec struct {
 func (s *InputsSpec) evaluate(ctx *evaluationContext, outputs annotatedOutputs) (annotatedInputs, bsv.Satoshis, error) {
 	outs := outputs.toTransactionOutputs()
 
-	tx := &sdk.Transaction{
-		Outputs: outs,
-		Inputs:  make([]*sdk.TransactionInput, 0),
-	}
+	tx := sdk.NewTransaction()
+	tx.Outputs = outs
 
 	utxos, change, err := ctx.UTXOSelector().Select(ctx, tx, ctx.UserID())
 	if err != nil {
