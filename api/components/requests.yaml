@@ -139,8 +139,6 @@ components:
         requesterPaymail:
           type: string
           example: "test@spv-wallet.com"
-        metadata:
-          $ref: '../components/models.yaml#/components/schemas/Metadata'
       required:
         - fullName
         - requesterPaymail

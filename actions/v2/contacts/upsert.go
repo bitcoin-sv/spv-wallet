@@ -1,13 +1,16 @@
 package contacts
 
 import (
+	"errors"
 	"github.com/bitcoin-sv/go-paymail"
+	"github.com/bitcoin-sv/spv-wallet/actions/v2/contacts/internal/mapping"
 	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"net/http"
 )
 
 func (s *APIContacts) UpsertContact(c *gin.Context, paymail string) {
@@ -38,7 +41,14 @@ func (s *APIContacts) UpsertContact(c *gin.Context, paymail string) {
 		UserID:            userID,
 	}
 
-	err = s.engine.ContactService().UpsertContact(c.Request.Context(), newContact)
+	contact, err := s.engine.ContactService().UpsertContact(c.Request.Context(), newContact)
+	if err != nil && !errors.Is(err, spverrors.ErrAddingContactRequest) {
+		spverrors.ErrorResponse(c, err, s.logger)
+		return
+	}
+
+	res := mapping.MapToContactContract(contact)
+	c.JSON(http.StatusOK, res)
 }
 
 func validatePaymail(paymailAddress string) error {

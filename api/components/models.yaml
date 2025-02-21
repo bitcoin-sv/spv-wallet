@@ -372,10 +372,6 @@ components:
       required:
         - txID
 
-    Metadata:
-      type: object
-      additionalProperties: true
-
     UpsertContact:
       allOf:
         - $ref: "#/components/schemas/Contact"
@@ -387,8 +383,9 @@ components:
         - type: object
           properties:
             id:
-              type: string
-              example: "68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a"
+              type: integer
+              example: 1
+              minimum: 0
             fullName:
               type: string
               example: "Test User"
@@ -400,6 +397,12 @@ components:
               example: "xpub661MyMwAqRbcGpZVrSHU..."
             status:
               $ref: '#/components/schemas/ContactStatus'
+          required:
+            - id
+            - fullName
+            - pubKey
+            - status
+            - paymail
 
     ContactStatus:
       type: string
@@ -430,5 +433,6 @@ components:
           type: string
           format: date-time
           example: "2025-01-01T00:00:00Z"
-        metadata:
-          $ref: '#/components/schemas/Metadata'
+      required:
+        - createdAt
+        - updatedAt

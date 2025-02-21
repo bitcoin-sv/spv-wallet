@@ -28,6 +28,9 @@ type ServerInterface interface {
 	// Get shared config
 	// (GET /api/v2/configs/shared)
 	SharedConfig(c *gin.Context)
+	// Remove contact
+	// (DELETE /api/v2/contacts/{paymail})
+	RemoveContact(c *gin.Context, paymail string)
 	// Add contact
 	// (PUT /api/v2/contacts/{paymail})
 	UpsertContact(c *gin.Context, paymail string)
@@ -152,6 +155,32 @@ func (siw *ServerInterfaceWrapper) SharedConfig(c *gin.Context) {
 	}
 
 	siw.Handler.SharedConfig(c)
+}
+
+// RemoveContact operation middleware
+func (siw *ServerInterfaceWrapper) RemoveContact(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "paymail" -------------
+	var paymail string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "paymail", c.Param("paymail"), &paymail, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter paymail: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(XPubAuthScopes, []string{"user"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.RemoveContact(c, paymail)
 }
 
 // UpsertContact operation middleware
@@ -348,6 +377,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/api/v2/admin/users/:id", wrapper.UserById)
 	router.POST(options.BaseURL+"/api/v2/admin/users/:id/paymails", wrapper.AddPaymailToUser)
 	router.GET(options.BaseURL+"/api/v2/configs/shared", wrapper.SharedConfig)
+	router.DELETE(options.BaseURL+"/api/v2/contacts/:paymail", wrapper.RemoveContact)
 	router.PUT(options.BaseURL+"/api/v2/contacts/:paymail", wrapper.UpsertContact)
 	router.GET(options.BaseURL+"/api/v2/data/:id", wrapper.DataById)
 	router.GET(options.BaseURL+"/api/v2/operations/search", wrapper.SearchOperations)

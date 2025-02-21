@@ -301,15 +301,14 @@ type ModelsBucketAnnotation struct {
 
 // ModelsContact defines model for models_Contact.
 type ModelsContact struct {
-	CreatedAt *time.Time           `json:"createdAt,omitempty"`
-	DeletedAt *time.Time           `json:"deletedAt,omitempty"`
-	FullName  *string              `json:"fullName,omitempty"`
-	Id        *string              `json:"id,omitempty"`
-	Metadata  *ModelsMetadata      `json:"metadata,omitempty"`
-	Paymail   *string              `json:"paymail,omitempty"`
-	PubKey    *string              `json:"pubKey,omitempty"`
-	Status    *ModelsContactStatus `json:"status,omitempty"`
-	UpdatedAt *time.Time           `json:"updatedAt,omitempty"`
+	CreatedAt time.Time           `json:"createdAt"`
+	DeletedAt *time.Time          `json:"deletedAt,omitempty"`
+	FullName  string              `json:"fullName"`
+	Id        int                 `json:"id"`
+	Paymail   string              `json:"paymail"`
+	PubKey    string              `json:"pubKey"`
+	Status    ModelsContactStatus `json:"status"`
+	UpdatedAt time.Time           `json:"updatedAt"`
 }
 
 // ModelsContactStatus defines model for models_ContactStatus.
@@ -348,15 +347,11 @@ type ModelsInputsAnnotations struct {
 	Inputs map[string]ModelsInputAnnotation `json:"inputs"`
 }
 
-// ModelsMetadata defines model for models_Metadata.
-type ModelsMetadata map[string]interface{}
-
 // ModelsModel defines model for models_Model.
 type ModelsModel struct {
-	CreatedAt *time.Time      `json:"createdAt,omitempty"`
-	DeletedAt *time.Time      `json:"deletedAt,omitempty"`
-	Metadata  *ModelsMetadata `json:"metadata,omitempty"`
-	UpdatedAt *time.Time      `json:"updatedAt,omitempty"`
+	CreatedAt time.Time  `json:"createdAt"`
+	DeletedAt *time.Time `json:"deletedAt,omitempty"`
+	UpdatedAt time.Time  `json:"updatedAt"`
 }
 
 // ModelsOperation defines model for models_Operation.
@@ -592,9 +587,8 @@ type RequestsTransactionSpecification struct {
 
 // RequestsUpsertContact defines model for requests_UpsertContact.
 type RequestsUpsertContact struct {
-	FullName         string         `json:"fullName"`
-	Metadata         ModelsMetadata `json:"metadata"`
-	RequesterPaymail string         `json:"requesterPaymail"`
+	FullName         string `json:"fullName"`
+	RequesterPaymail string `json:"requesterPaymail"`
 }
 
 // RequestsPageNumber defines model for requests_PageNumber.

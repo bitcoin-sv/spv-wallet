@@ -193,4 +193,5 @@ components:
       content:
         application/json:
           schema:
-            $ref: "./models.yaml#/components/schemas/Contact"
+            allOf:
+              - $ref: "./models.yaml#/components/schemas/Contact"

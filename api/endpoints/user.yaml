@@ -183,3 +183,32 @@ paths:
         500:
           $ref: "../components/responses.yaml#/components/responses/InternalServerError"
 
+    delete:
+      operationId: removeContact
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - Contacts
+      summary: Remove contact
+      description: >-
+        This endpoint allows to remove contact for authenticated user
+      parameters:
+        - name: paymail
+          in: path
+          description: >-
+            Paymail address of the contact that the user would like to remove
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success - contact removed
+#       TODO: update
+#        400:
+#          $ref: "../components/responses.yaml#/components/responses/UpsertContactBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+

@@ -29,41 +29,47 @@ func NewService(repo ContactRepo, paymailAddressService *paymails.Service, payma
 	}
 }
 
-func (s *Service) UpsertContact(ctx context.Context, newContact *contactsmodels.NewContact) error {
+// UpsertContact creates or updates a contact
+func (s *Service) UpsertContact(ctx context.Context, newContact *contactsmodels.NewContact) (*contactsmodels.Contact, error) {
 	rAlias, rDomain, rAddress := goPaymail.SanitizePaymail(newContact.RequesterPaymail)
 	rPaymail, err := s.paymailAddressService.Find(ctx, rAlias, rDomain)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if rPaymail.UserID != newContact.UserID {
-		return spverrors.ErrUserDoNotOwnPaymail
+		return nil, spverrors.ErrUserDoNotOwnPaymail
 	}
 
 	contactPaymail, err := s.paymailService.GetSanitizedPaymail(newContact.NewContactPaymail)
 	if err != nil {
-		return spverrors.ErrContactInvalidPaymail
+		return nil, spverrors.ErrContactInvalidPaymail
 	}
 
 	contact, err := s.Find(ctx, newContact.UserID, newContact.NewContactPaymail)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	contactPKI, err := s.paymailService.GetPkiForPaymail(ctx, contactPaymail)
 	if err != nil {
-		return spverrors.ErrGettingPKIFailed
+		return nil, spverrors.ErrGettingPKIFailed
 	}
 
 	newContact.NewContactPubKey = contactPKI.PubKey
 
 	if contact != nil {
-		return s.contactsRepo.Update(ctx, newContact)
+		c, err := s.contactsRepo.Update(ctx, newContact)
+		if err != nil {
+			return nil, err
+		}
+
+		return c, nil
 	}
 
-	err = s.contactsRepo.Create(ctx, newContact)
+	c, err := s.contactsRepo.Create(ctx, newContact)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	requesterContactRequest := goPaymail.PikeContactRequestPayload{
@@ -76,10 +82,10 @@ func (s *Service) UpsertContact(ctx context.Context, newContact *contactsmodels.
 			Str("requestedContact", newContact.NewContactPaymail).
 			Msgf("adding contact request failed: %s", err.Error())
 
-		return spverrors.ErrAddingContactRequest
+		return c, spverrors.ErrAddingContactRequest
 	}
 
-	return nil
+	return c, nil
 }
 
 // Find returns a paymail by alias and domain
@@ -90,4 +96,9 @@ func (s *Service) Find(ctx context.Context, userID, paymail string) (*contactsmo
 	}
 
 	return contact, nil
+}
+
+// RemoveContact deletes a contact
+func (s *Service) RemoveContact(ctx context.Context, userID, paymail string) error {
+	return s.contactsRepo.Delete(ctx, userID, paymail)
 }

@@ -29,6 +29,7 @@ type Contact struct {
 	ID        uint
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt *time.Time
 
 	FullName string
 	Status   string

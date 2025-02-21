@@ -19,31 +19,40 @@ func NewContactsRepo(db *gorm.DB) *Contacts {
 }
 
 // Create adds a new contact to the database.
-func (r *Contacts) Create(ctx context.Context, newContact *contactsmodels.NewContact) error {
-	row := &database.UserContact{
+func (r *Contacts) Create(ctx context.Context, newContact *contactsmodels.NewContact) (*contactsmodels.Contact, error) {
+	row := database.UserContact{
 		UserID:   newContact.UserID,
 		FullName: newContact.FullName,
 		Paymail:  newContact.NewContactPaymail,
 		PubKey:   newContact.NewContactPubKey,
 		Status:   contactsmodels.ContactNotConfirmed,
 	}
-	if err := r.db.WithContext(ctx).Create(row).Error; err != nil {
-		return spverrors.Wrapf(err, "failed to create contact")
+	if err := r.db.WithContext(ctx).Create(&row).Error; err != nil {
+		return nil, spverrors.Wrapf(err, "failed to create contact")
 	}
 
-	return nil
+	return newContactModel(row), nil
 }
 
 // Update updates contact in database.
-func (r *Contacts) Update(ctx context.Context, contact *contactsmodels.NewContact) error {
-	modelToUpdate := &database.UserContact{
+func (r *Contacts) Update(ctx context.Context, contact *contactsmodels.NewContact) (*contactsmodels.Contact, error) {
+	row := database.UserContact{
 		FullName: contact.FullName,
 		PubKey:   contact.NewContactPubKey,
 	}
 	if err := r.db.WithContext(ctx).
 		Where("user_id = ? AND paymail = ?", contact.UserID, contact.NewContactPaymail).
-		Updates(modelToUpdate).Error; err != nil {
-		return spverrors.Wrapf(err, "failed to update contact")
+		Updates(&row).Error; err != nil {
+		return nil, spverrors.Wrapf(err, "failed to update contact")
+	}
+
+	return newContactModel(row), nil
+}
+
+// Delete removes a contact from the database.
+func (r *Contacts) Delete(ctx context.Context, userID, paymail string) error {
+	if err := r.db.WithContext(ctx).Where("user_id = ? AND paymail = ?", userID, paymail).Delete(&database.UserContact{}).Error; err != nil {
+		return spverrors.Wrapf(err, "failed to delete contact")
 	}
 
 	return nil
@@ -65,4 +74,16 @@ func (r *Contacts) Find(ctx context.Context, userID, paymail string) (*contactsm
 		CreatedAt: row.CreatedAt,
 		UpdatedAt: row.UpdatedAt,
 	}, nil
+}
+
+func newContactModel(row database.UserContact) *contactsmodels.Contact {
+	return &contactsmodels.Contact{
+		ID:        row.ID,
+		UserID:    row.UserID,
+		FullName:  row.FullName,
+		Paymail:   row.Paymail,
+		Status:    row.Status,
+		CreatedAt: row.CreatedAt,
+		UpdatedAt: row.UpdatedAt,
+	}
 }
