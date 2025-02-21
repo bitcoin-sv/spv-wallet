@@ -2,8 +2,6 @@ package errdef
 
 import "github.com/joomcode/errorx"
 
-// INTERNAL ERRORS
-
 var PropSpecificProblemOccurrence = errorx.RegisterPrintableProperty("instance")
 var PropPublicHint = errorx.RegisterPrintableProperty("public_hint")
 

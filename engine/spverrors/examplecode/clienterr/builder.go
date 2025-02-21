@@ -15,8 +15,6 @@ type Builder struct {
 	from           *ClientErrorDefinition
 	problemDetails errdef.ProblemDetails
 	cause          error
-	wrapMsg        string
-	wrapArgs       []any
 }
 
 func (b *Builder) Wrap(cause error, msg string, args ...any) *Builder {
@@ -32,7 +30,7 @@ func (b *Builder) Err() *errorx.Error {
 	t := b.from.errType
 	var err *errorx.Error
 	if b.cause != nil {
-		err = t.Wrap(b.cause, b.wrapMsg, b.wrapArgs...)
+		err = t.Wrap(b.cause, "")
 	} else {
 		err = t.NewWithNoMessage()
 	}
