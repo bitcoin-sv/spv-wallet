@@ -5,8 +5,11 @@ import "github.com/joomcode/errorx"
 // INTERNAL ERRORS
 
 var PropSpecificProblemOccurrence = errorx.RegisterPrintableProperty("instance")
+var PropPublicHint = errorx.RegisterPrintableProperty("public_hint")
 
-var ServerNamespace = errorx.NewNamespace("spv-wallet")
+var RootNamespace = errorx.NewNamespace("spv-wallet")
+var Internal = RootNamespace.NewSubNamespace("5xx")
+var External = RootNamespace.NewSubNamespace("4xx")
 
-var UnsupportedOperation = ServerNamespace.NewType("unsupported_operation")
+var UnsupportedOperation = Internal.NewType("unsupported_operation")
 var NotImplementedYet = UnsupportedOperation.NewSubtype("not_implemented_yet")

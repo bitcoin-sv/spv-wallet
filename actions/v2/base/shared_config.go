@@ -1,9 +1,6 @@
 package base
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors/examplecode/domain/exampledomain"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors/examplecode/errdef"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors/examplecode/repos"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/api"
@@ -22,19 +19,4 @@ func (s *APIBase) SharedConfig(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, sharedConfig)
-}
-
-func (s *APIBase) GetApiV2TestErrors(c *gin.Context, params api.GetApiV2TestErrorsParams) {
-
-	repo := repos.NewRepo()
-	domain := exampledomain.NewService(repo)
-
-	_, err := domain.Search(params.Fail)
-	if err != nil {
-		problemDetails := errdef.NewProblemDetailsFromError(err)
-		c.JSON(problemDetails.Status, problemDetails)
-		return
-	}
-
-	c.JSON(200, "success") // not relevant for the example
 }

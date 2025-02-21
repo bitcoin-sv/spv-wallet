@@ -28,9 +28,14 @@ const (
 
 // Defines values for ModelsFailingPoint.
 const (
-	DbConnection      ModelsFailingPoint = "db_connection"
-	DbIllegalArgument ModelsFailingPoint = "db_illegal_argument"
-	DbQuery           ModelsFailingPoint = "db_query"
+	ArcDoubleSpentAttempt ModelsFailingPoint = "arc_double_spent_attempt"
+	ClientAuthMissing     ModelsFailingPoint = "client_auth_missing"
+	ClientAuthWrong       ModelsFailingPoint = "client_auth_wrong"
+	ClientWrongInput      ModelsFailingPoint = "client_wrong_input"
+	DbConnection          ModelsFailingPoint = "db_connection"
+	DbQuery               ModelsFailingPoint = "db_query"
+	DomainIllegalArgument ModelsFailingPoint = "domain_illegal_argument"
+	InternalDuringAuth    ModelsFailingPoint = "internal_during_auth"
 )
 
 // Defines values for ModelsOperationTxStatus.

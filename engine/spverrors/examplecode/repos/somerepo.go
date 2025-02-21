@@ -23,11 +23,6 @@ func (f *FailingRepo) Search(fail *api.ModelsFailingPoint) ([]string, error) {
 		return nil, repoerr.DbQueryFailed.
 			Wrap(err, "query failed").
 			WithProperty(errdef.PropSpecificProblemOccurrence, "some specific value")
-	case api.DbIllegalArgument:
-		err := fmt.Errorf("illegal argument from external lib")
-		return nil, repoerr.DbIllegalArgument.
-			Wrap(err, "query failed because illegal argument was provided").
-			WithProperty(errdef.PropSpecificProblemOccurrence, "some specific argument which caused the error")
 	default:
 		return nil, errdef.UnsupportedOperation.NewWithNoMessage()
 	}

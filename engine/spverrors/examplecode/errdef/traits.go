@@ -21,3 +21,5 @@ func RegisterTrait(name, title string) errorx.Trait {
 
 var TraitConfig = RegisterTrait("config", "Server may be configured incorrectly")
 var TraitIllegalArgument = RegisterTrait("illegal_argument", "Illegal Argument")
+var TraitAuth = RegisterTrait("auth", "Authentication problem")
+var TraitARC = RegisterTrait("arc", "ARC related problem")

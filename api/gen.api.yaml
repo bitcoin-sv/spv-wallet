@@ -797,7 +797,12 @@ components:
             enum:
                 - db_connection
                 - db_query
-                - db_illegal_argument
+                - domain_illegal_argument
+                - client_wrong_input
+                - client_auth_wrong
+                - client_auth_missing
+                - internal_during_auth
+                - arc_double_spent_attempt
             type: string
         models_InputAnnotation:
             properties:
