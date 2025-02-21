@@ -145,3 +145,41 @@ paths:
           $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
         500:
           $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+
+
+  /api/v2/contacts/{paymail}:
+    put:
+      operationId: upsertContact
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - Contacts
+      summary: Add contact
+      description: >-
+        This endpoint allows to add contact for authenticated user
+      parameters:
+        - name: paymail
+          in: path
+          description: >-
+            Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../components/requests.yaml#/components/schemas/UpsertContact"
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/UpsertContactSuccess"
+#                TODO: update
+#        400:
+#          $ref: "../components/responses.yaml#/components/responses/UpsertContactBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+

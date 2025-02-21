@@ -115,6 +115,36 @@ paths:
             tags:
                 - Admin endpoints
                 - Configurations
+    /api/v2/contacts/{paymail}:
+        put:
+            description: This endpoint allows to add contact for authenticated user
+            operationId: upsertContact
+            parameters:
+                - description: Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
+                  in: path
+                  name: paymail
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/requests_UpsertContact'
+                required: true
+            responses:
+                "200":
+                    $ref: '#/components/responses/responses_UpsertContactSuccess'
+                "401":
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
+                "500":
+                    $ref: '#/components/responses/responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Add contact
+            tags:
+                - Contacts
     /api/v2/data/{id}:
         get:
             description: This endpoint gets data by its id for authenticated user
@@ -425,6 +455,12 @@ components:
                     schema:
                         $ref: '#/components/schemas/models_SharedConfig'
             description: Shared config
+        responses_UpsertContactSuccess:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/models_Contact'
+            description: Contact created
         responses_UserBadRequest:
             content:
                 application/json:
@@ -727,6 +763,33 @@ components:
             required:
                 - bucket
             type: object
+        models_Contact:
+            allOf:
+                - $ref: '#/components/schemas/models_Model'
+                - properties:
+                    fullName:
+                        example: Test User
+                        type: string
+                    id:
+                        example: 68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a
+                        type: string
+                    paymail:
+                        example: alice@spv-wallet.com
+                        type: string
+                    pubKey:
+                        example: xpub661MyMwAqRbcGpZVrSHU...
+                        type: string
+                    status:
+                        $ref: '#/components/schemas/models_ContactStatus'
+                  type: object
+        models_ContactStatus:
+            enum:
+                - unconfirmed
+                - awaiting
+                - confirmed
+                - rejected
+            example: confirmed
+            type: string
         models_CustomInstructions:
             oneOf:
                 - $ref: '#/components/schemas/models_SPVWalletCustomInstructions'
@@ -775,6 +838,26 @@ components:
                     type: object
             required:
                 - inputs
+            type: object
+        models_Metadata:
+            additionalProperties: true
+            type: object
+        models_Model:
+            properties:
+                createdAt:
+                    example: "2025-01-01T00:00:00Z"
+                    format: date-time
+                    type: string
+                deletedAt:
+                    example: "2025-01-01T00:00:00Z"
+                    format: date-time
+                    type: string
+                metadata:
+                    $ref: '#/components/schemas/models_Metadata'
+                updatedAt:
+                    example: "2025-01-01T00:00:00Z"
+                    format: date-time
+                    type: string
             type: object
         models_Operation:
             properties:
@@ -1162,6 +1245,21 @@ components:
                     type: array
             required:
                 - outputs
+            type: object
+        requests_UpsertContact:
+            properties:
+                fullName:
+                    example: Test name
+                    type: string
+                metadata:
+                    $ref: '#/components/schemas/models_Metadata'
+                requesterPaymail:
+                    example: test@spv-wallet.com
+                    type: string
+            required:
+                - fullName
+                - requesterPaymail
+                - metadata
             type: object
     securitySchemes:
         XPubAuth:

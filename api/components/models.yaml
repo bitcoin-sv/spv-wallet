@@ -16,7 +16,7 @@ components:
           type: array
           items:
             type: string
-          example: ["example.com"]
+          example: [ "example.com" ]
         experimentalFeatures:
           type: object
           additionalProperties:
@@ -289,7 +289,7 @@ components:
       properties:
         bucket:
           type: string
-          enum: ["data"]
+          enum: [ "data" ]
           default: "data"
           example: "data"
       required:
@@ -301,7 +301,7 @@ components:
           properties:
             bucket:
               type: string
-              enum: ["bsv"]
+              enum: [ "bsv" ]
               default: "bsv"
               example: "bsv"
             paymail:
@@ -371,3 +371,64 @@ components:
           description: ID of the transaction
       required:
         - txID
+
+    Metadata:
+      type: object
+      additionalProperties: true
+
+    UpsertContact:
+      allOf:
+        - $ref: "#/components/schemas/Contact"
+        - $ref: "#/components/schemas/AdditionalInfo"
+
+    Contact:
+      allOf:
+        - $ref: '#/components/schemas/Model'
+        - type: object
+          properties:
+            id:
+              type: string
+              example: "68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a"
+            fullName:
+              type: string
+              example: "Test User"
+            paymail:
+              type: string
+              example: "alice@spv-wallet.com"
+            pubKey:
+              type: string
+              example: "xpub661MyMwAqRbcGpZVrSHU..."
+            status:
+              $ref: '#/components/schemas/ContactStatus'
+
+    ContactStatus:
+      type: string
+      enum:
+        - unconfirmed
+        - awaiting
+        - confirmed
+        - rejected
+      example: confirmed
+
+    AdditionalInfo:
+      type: object
+      additionalProperties:
+        type: string
+
+    Model:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-01-01T00:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-01-01T00:00:00Z"
+        deletedAt:
+          type: string
+          format: date-time
+          example: "2025-01-01T00:00:00Z"
+        metadata:
+          $ref: '#/components/schemas/Metadata'

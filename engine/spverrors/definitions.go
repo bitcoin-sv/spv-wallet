@@ -179,6 +179,9 @@ var ErrConfirmContact = models.SPVError{Message: "confirming contact failed", St
 // ErrGetContact is when getting contact failed
 var ErrGetContact = models.SPVError{Message: "getting contact failed", StatusCode: 500, Code: "error-contact-getting-contact-failed"}
 
+// ErrContactInvalidPaymail is returned when the paymail is invalid
+var ErrContactInvalidPaymail = models.SPVError{Message: "invalid paymail", StatusCode: 400, Code: "error-contacts-invalid-paymail"}
+
 // ////////////////////////////////// PAYMAIL ERRORS
 
 // ErrCouldNotFindPaymail is when paymail could not be found
@@ -216,6 +219,9 @@ var ErrPaymailInvalidMerkleRoots = models.SPVError{Message: "invalid merkle root
 
 // ErrRetrivePaymailInfo is when error occurred during retrieving paymail info
 var ErrRetrivePaymailInfo = models.SPVError{Message: "error during retrieving paymail info", StatusCode: 500, Code: "error-paymail-retrieve-info"}
+
+// ErrUserDoNotOwnPaymail is when user do not own paymail
+var ErrUserDoNotOwnPaymail = models.SPVError{Message: "user do not own paymail", StatusCode: 400, Code: "error-paymail-user-do-not-own"}
 
 // ////////////////////////////////// CAPABILITIES ERRORS
 

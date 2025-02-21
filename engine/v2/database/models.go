@@ -12,5 +12,6 @@ func Models() []any {
 		Address{},
 		UserUTXO{},
 		Operation{},
+		UserContact{},
 	}
 }

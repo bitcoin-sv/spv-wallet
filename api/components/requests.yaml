@@ -69,7 +69,6 @@ components:
           op_return: '#/components/schemas/OpReturnOutput'
           paymail: '#/components/schemas/PaymailOutput'
 
-
     OpReturnOutputSpecification:
       allOf:
         - type: object
@@ -130,6 +129,22 @@ components:
         - type
         - to
         - satoshis
+
+    UpsertContact:
+      type: object
+      properties:
+        fullName:
+          type: string
+          example: "Test name"
+        requesterPaymail:
+          type: string
+          example: "test@spv-wallet.com"
+        metadata:
+          $ref: '../components/models.yaml#/components/schemas/Metadata'
+      required:
+        - fullName
+        - requesterPaymail
+        - metadata
 
   parameters:
     PageNumber:

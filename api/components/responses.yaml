@@ -187,3 +187,10 @@ components:
               - $ref: "./errors.yaml#/components/schemas/Internal"
               - $ref: "./errors.yaml#/components/schemas/GettingOutputs"
               - $ref: "./errors.yaml#/components/schemas/TxBroadcast"
+
+    UpsertContactSuccess:
+      description: Contact created
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/Contact"

@@ -21,6 +21,14 @@ const (
 	ModelsAnnotatedTransactionOutlineFormatRAW  ModelsAnnotatedTransactionOutlineFormat = "RAW"
 )
 
+// Defines values for ModelsContactStatus.
+const (
+	Awaiting    ModelsContactStatus = "awaiting"
+	Confirmed   ModelsContactStatus = "confirmed"
+	Rejected    ModelsContactStatus = "rejected"
+	Unconfirmed ModelsContactStatus = "unconfirmed"
+)
+
 // Defines values for ModelsDataAnnotationBucket.
 const (
 	Data ModelsDataAnnotationBucket = "data"
@@ -291,6 +299,22 @@ type ModelsBucketAnnotation struct {
 	Bucket string `json:"bucket"`
 }
 
+// ModelsContact defines model for models_Contact.
+type ModelsContact struct {
+	CreatedAt *time.Time           `json:"createdAt,omitempty"`
+	DeletedAt *time.Time           `json:"deletedAt,omitempty"`
+	FullName  *string              `json:"fullName,omitempty"`
+	Id        *string              `json:"id,omitempty"`
+	Metadata  *ModelsMetadata      `json:"metadata,omitempty"`
+	Paymail   *string              `json:"paymail,omitempty"`
+	PubKey    *string              `json:"pubKey,omitempty"`
+	Status    *ModelsContactStatus `json:"status,omitempty"`
+	UpdatedAt *time.Time           `json:"updatedAt,omitempty"`
+}
+
+// ModelsContactStatus defines model for models_ContactStatus.
+type ModelsContactStatus string
+
 // ModelsCustomInstructions defines model for models_CustomInstructions.
 type ModelsCustomInstructions struct {
 	union json.RawMessage
@@ -322,6 +346,17 @@ type ModelsInputAnnotation struct {
 type ModelsInputsAnnotations struct {
 	// Inputs Map of input annotations
 	Inputs map[string]ModelsInputAnnotation `json:"inputs"`
+}
+
+// ModelsMetadata defines model for models_Metadata.
+type ModelsMetadata map[string]interface{}
+
+// ModelsModel defines model for models_Model.
+type ModelsModel struct {
+	CreatedAt *time.Time      `json:"createdAt,omitempty"`
+	DeletedAt *time.Time      `json:"deletedAt,omitempty"`
+	Metadata  *ModelsMetadata `json:"metadata,omitempty"`
+	UpdatedAt *time.Time      `json:"updatedAt,omitempty"`
 }
 
 // ModelsOperation defines model for models_Operation.
@@ -555,6 +590,13 @@ type RequestsTransactionSpecification struct {
 	Outputs []RequestsTransactionOutlineOutputSpecification `json:"outputs"`
 }
 
+// RequestsUpsertContact defines model for requests_UpsertContact.
+type RequestsUpsertContact struct {
+	FullName         string         `json:"fullName"`
+	Metadata         ModelsMetadata `json:"metadata"`
+	RequesterPaymail string         `json:"requesterPaymail"`
+}
+
 // RequestsPageNumber defines model for requests_PageNumber.
 type RequestsPageNumber = int
 
@@ -642,6 +684,9 @@ type ResponsesSearchOperationsSuccess = ModelsOperationsSearchResult
 // ResponsesSharedConfig Shared config
 type ResponsesSharedConfig = ModelsSharedConfig
 
+// ResponsesUpsertContactSuccess defines model for responses_UpsertContactSuccess.
+type ResponsesUpsertContactSuccess = ModelsContact
+
 // ResponsesUserBadRequest defines model for responses_UserBadRequest.
 type ResponsesUserBadRequest = ErrorsInvalidDataID
 
@@ -677,6 +722,9 @@ type CreateUserJSONRequestBody = RequestsCreateUser
 
 // AddPaymailToUserJSONRequestBody defines body for AddPaymailToUser for application/json ContentType.
 type AddPaymailToUserJSONRequestBody = RequestsAddPaymail
+
+// UpsertContactJSONRequestBody defines body for UpsertContact for application/json ContentType.
+type UpsertContactJSONRequestBody = RequestsUpsertContact
 
 // RecordTransactionOutlineJSONRequestBody defines body for RecordTransactionOutline for application/json ContentType.
 type RecordTransactionOutlineJSONRequestBody = RequestsTransactionOutline

@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts"
 	"net/http"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -166,6 +167,7 @@ type V2 interface {
 	AddressesService() *addresses.Service
 	DataService() *data.Service
 	OperationsService() *operations.Service
+	ContactService() *contacts.Service
 }
 
 // ClientInterface is the client (spv wallet engine) interface comprised of all services/actions
