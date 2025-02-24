@@ -93,6 +93,8 @@ func (f *appFixture) NewTest(t testing.TB) SPVWalletApplicationFixture {
 	newFixture.t = t
 	newFixture.logger = tester.Logger(t)
 	newFixture.engineFixture = f.engineFixture.NewTest(t)
+
+	newFixture.engineFixture.PaymailClient().RedirectTransportIfDomain(fixtures.PaymailDomain, f.server)
 	return &newFixture
 }
 

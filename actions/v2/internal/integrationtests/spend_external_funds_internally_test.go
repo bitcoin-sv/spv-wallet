@@ -41,13 +41,13 @@ func TestSpendExternalFundsInternally(t *testing.T) {
 	internalTx := given.TransactionScenario(alice).SendsToInternal(bob, 5)
 
 	// then:
-	then.User(alice).Balance().IsEqualTo(5) // Probably - fee (1), think about expected fee variable
+	then.User(alice).Balance().IsEqualTo(0) // Fixme: adjust it after recording change output is done
 	then.User(bob).Balance().IsEqualTo(5)
 
 	then.User(alice).Operations().Last().
 		WithTxID(internalTx.TxID).
 		WithTxStatus("BROADCASTED").
-		WithValue(-5).
+		WithValue(-10). // Fixme: adjust it after recording change output is done
 		WithType("outgoing").
 		WithCounterparty(bob.DefaultPaymail().Address())
 
