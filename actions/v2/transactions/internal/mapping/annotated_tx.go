@@ -1,15 +1,14 @@
 package mapping
 
 import (
-	bsvmodel "github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"strconv"
-
+	"fmt"
 	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/bsv"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/lox"
+	bsvmodel "github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 	"github.com/samber/lo"
 )
@@ -32,12 +31,14 @@ func RequestsTransactionOutlineToOutline(req *api.RequestsTransactionOutline) (*
 	}, errorCollector.Error()
 }
 
-func mapOutputAnnotationEntry(key string, value api.ModelsOutputAnnotation) (int, *transaction.OutputAnnotation, error) {
-	index, err := strconv.Atoi(key)
-	if err != nil {
+func mapOutputAnnotationEntry(key string, value api.ModelsOutputAnnotation) (uint32, *transaction.OutputAnnotation, error) {
+	var vout uint32
+	if n, err := fmt.Sscanf(key, "%d", &vout); err != nil {
 		return 0, nil, spverrors.ErrCannotMapFromModel.Wrap(err)
+	} else if n != 1 {
+		return 0, nil, spverrors.ErrCannotMapFromModel.Wrap(spverrors.Newf("failed to parse vout from key %s", key))
 	}
-	return index, annotatedOutputToOutline(value), nil
+	return vout, annotatedOutputToOutline(value), nil
 }
 
 func annotatedOutputToOutline(from api.ModelsOutputAnnotation) *transaction.OutputAnnotation {

@@ -2,6 +2,7 @@ package mapping
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/bitcoin-sv/spv-wallet/api"
@@ -73,8 +74,8 @@ func customInstructionsToResponse(instruction bsv.CustomInstruction) api.ModelsS
 	}
 }
 
-func outlineOutputEntryToResponse(index int, value *transaction.OutputAnnotation) (string, api.ModelsOutputAnnotation) {
-	return strconv.Itoa(index), outlineOutputToResponse(value)
+func outlineOutputEntryToResponse(index uint32, value *transaction.OutputAnnotation) (string, api.ModelsOutputAnnotation) {
+	return fmt.Sprintf("%d", index), outlineOutputToResponse(value)
 }
 
 func outlineOutputToResponse(from *transaction.OutputAnnotation) api.ModelsOutputAnnotation {

@@ -34,7 +34,7 @@ type txOutputAssertion struct {
 	require    *require.Assertions
 	txout      *sdk.TransactionOutput
 	annotation *transaction.OutputAnnotation
-	index      int
+	index      uint32
 }
 
 func (a *txOutputAssertion) HasBucket(bucket bucket.Name) OutputAssertion {

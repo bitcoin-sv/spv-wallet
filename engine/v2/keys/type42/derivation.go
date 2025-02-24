@@ -10,6 +10,7 @@ var (
 	anyonePub     = anyonePriv.PubKey()
 )
 
+// Derive creates derived public key based on derivation key (type 42 derivation with "anyone" public key)
 func Derive(pubKey *primitives.PublicKey, derivationKey string) (*primitives.PublicKey, error) {
 	if pubKey == nil {
 		return nil, ErrDeriveKey.Wrap(spverrors.Newf("public key is nil"))

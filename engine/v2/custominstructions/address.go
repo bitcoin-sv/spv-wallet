@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
+// Address will derive an address from a public key and custom instructions
 func Address(publicKey primitives.PublicKey, instructions bsv.CustomInstructions) (*script.Address, error) {
 	pub := &publicKey
 	var err error

@@ -59,7 +59,7 @@ func (c *customOutputsResolver) customOutputs() iter.Seq[txmodels.NewOutput] {
 				break
 			}
 
-			if realVOut != uint32(vout) {
+			if realVOut != vout {
 				c.err = spverrors.Newf("address derived from custom instructions doesn't match the address in the locking script")
 				break
 			}

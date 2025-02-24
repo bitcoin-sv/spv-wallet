@@ -19,6 +19,7 @@ type AddressesService interface {
 	FindByStringAddresses(ctx context.Context, addresses iter.Seq[string]) ([]addressesmodels.Address, error)
 }
 
+// UsersService is an interface for users service.
 type UsersService interface {
 	GetPubKey(ctx context.Context, userID string) (*primitives.PublicKey, error)
 }

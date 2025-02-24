@@ -155,56 +155,6 @@ func (f *txFlow) allP2PKHAddresses() map[string]uint32 {
 }
 
 func (f *txFlow) findRelevantP2PKHOutputs(potentialTrackedUniqueAddresses map[string]uint32) (iter.Seq[txmodels.NewOutput], error) {
-
-	//potentialTrackedUniqueAddresses := map[string]uint32{} // address -> vout
-	//
-	//type customOutputInfo struct {
-	//	vout               uint32
-	//	customInstructions *bsv.CustomInstructions
-	//}
-	//customDefinedUserAddresses := map[string]customOutputInfo{} // address -> customOutputInfo
-	//
-	//for vout, output := range f.tx.Outputs {
-	//	lockingScript := output.LockingScript
-	//	if !lockingScript.IsP2PKH() {
-	//		continue
-	//	}
-	//	address, err := lockingScript.Address()
-	//	if err != nil {
-	//		f.service.logger.Warn().Err(err).Msg("failed to get address from locking script")
-	//		continue
-	//	}
-	//
-	//	voutU32, err := conv.IntToUint32(vout)
-	//	if err != nil {
-	//		f.service.logger.Warn().Err(err).Msg("failed to convert vout to uint32")
-	//		continue
-	//	}
-	//
-	//	if annotation, ok := outputAnnotations[vout]; ok {
-	//		if annotation.Bucket == bucket.BSV && annotation.CustomInstructions != nil {
-	//			userPubKey, err := f.getUserPubKey()
-	//			if err != nil {
-	//				return nil, spverrors.Wrapf(err, "failed to get public key for user %s", f.userID)
-	//			}
-	//			calculatedAddr, err := custominstructions.Address(*userPubKey, *annotation.CustomInstructions)
-	//			if err != nil {
-	//				return nil, spverrors.Wrapf(err, "failed to derive address from custom instructions for user %s", f.userID)
-	//			}
-	//			if address.AddressString != calculatedAddr.AddressString {
-	//				return nil, spverrors.Newf("address derived from custom instructions does not match the address in the locking script")
-	//			}
-	//
-	//			customDefinedUserAddresses[address.AddressString] = customOutputInfo{
-	//				vout:               voutU32,
-	//				customInstructions: annotation.CustomInstructions,
-	//			}
-	//		}
-	//	} else {
-	//		potentialTrackedUniqueAddresses[address.AddressString] = voutU32
-	//	}
-	//}
-
 	trackedAddresses, err := f.service.addresses.FindByStringAddresses(f.ctx, maps.Keys(potentialTrackedUniqueAddresses))
 	if err != nil {
 		return nil, txerrors.ErrGettingAddresses.Wrap(err)
@@ -224,14 +174,6 @@ func (f *txFlow) findRelevantP2PKHOutputs(potentialTrackedUniqueAddresses map[st
 				tracked.CustomInstructions,
 			))
 		}
-		//for _, info := range customDefinedUserAddresses {
-		//	yield(txmodels.NewOutputForP2PKH(
-		//		bsv.Outpoint{TxID: f.txID, Vout: info.vout},
-		//		f.userID,
-		//		bsv.Satoshis(f.tx.Outputs[info.vout].Satoshis),
-		//		*info.customInstructions,
-		//	))
-		//}
 	}, nil
 }
 
