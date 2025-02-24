@@ -55,15 +55,6 @@ func endpoint(method string, defaultResponder httpmock.Responder) func(name paym
 	}
 }
 
-func endpointWithStaticResponse(method string, successResponse obj) func(name paymailDomainName, c *CapabilityMock) (method string, urlMatcher string, responder httpmock.Responder) {
-	r, err := httpmock.NewJsonResponder(http.StatusOK, successResponse)
-	if err != nil {
-		panic(err)
-	}
-
-	return endpoint(method, r)
-}
-
 func dynamicResponder(c *CapabilityMock, defaultResponder httpmock.Responder) httpmock.Responder {
 	return func(request *http.Request) (*http.Response, error) {
 		if c.response != nil {

@@ -6,6 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 )
 
 // ExpectedCustomInstructions represents json array with custom instructions of UTXO created with Faucet().TopUp() method
@@ -18,7 +19,7 @@ const ExpectedCustomInstructions = `[
 
 type TransactionsEndpointFixture interface {
 	testabilities.SPVWalletApplicationFixture
-	OutlineResponseContext(additionalParams map[string]any) map[string]any
+	OutlineResponseContext(format string, additionalParams map[string]any) map[string]any
 }
 
 func Given(t testing.TB) TransactionsEndpointFixture {
@@ -31,11 +32,14 @@ type fixture struct {
 	testabilities.SPVWalletApplicationFixture
 }
 
-func (f *fixture) OutlineResponseContext(paramsOverride map[string]any) map[string]any {
-	params := make(map[string]any)
-	params["ReceiverPaymail"] = fixtures.RecipientExternal.DefaultPaymail()
-	params["SenderPaymail"] = fixtures.Sender.DefaultPaymail()
-	params["CustomInstructions"] = ExpectedCustomInstructions
+func (f *fixture) OutlineResponseContext(format string, paramsOverride map[string]any) map[string]any {
+	params := map[string]any{
+		"Format":             format,
+		"ReceiverPaymail":    fixtures.RecipientExternal.DefaultPaymail(),
+		"SenderPaymail":      fixtures.Sender.DefaultPaymail(),
+		"CustomInstructions": ExpectedCustomInstructions,
+		"Reference":          paymailmock.MockedReferenceID,
+	}
 
 	maps.Copy(params, paramsOverride)
 

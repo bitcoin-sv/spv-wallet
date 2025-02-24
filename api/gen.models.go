@@ -291,6 +291,11 @@ type ModelsBucketAnnotation struct {
 	Bucket string `json:"bucket"`
 }
 
+// ModelsChangeAnnotation defines model for models_ChangeAnnotation.
+type ModelsChangeAnnotation struct {
+	CustomInstructions *ModelsSPVWalletCustomInstructions `json:"customInstructions,omitempty"`
+}
+
 // ModelsCustomInstructions defines model for models_CustomInstructions.
 type ModelsCustomInstructions struct {
 	union json.RawMessage
@@ -368,8 +373,9 @@ type ModelsOutlineAnnotations struct {
 
 // ModelsOutputAnnotation defines model for models_OutputAnnotation.
 type ModelsOutputAnnotation struct {
-	Bucket  ModelsOutputAnnotationBucket    `json:"bucket"`
-	Paymail *ModelsPaymailAnnotationDetails `json:"paymail,omitempty"`
+	Bucket             ModelsOutputAnnotationBucket       `json:"bucket"`
+	CustomInstructions *ModelsSPVWalletCustomInstructions `json:"customInstructions,omitempty"`
+	Paymail            *ModelsPaymailAnnotationDetails    `json:"paymail,omitempty"`
 }
 
 // ModelsOutputAnnotationBucket defines model for ModelsOutputAnnotation.Bucket.
