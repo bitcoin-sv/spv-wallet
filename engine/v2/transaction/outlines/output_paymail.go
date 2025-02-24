@@ -2,6 +2,7 @@ package outlines
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-sdk/script"
@@ -26,6 +27,8 @@ func (p *Paymail) evaluate(ctx *evaluationContext) (annotatedOutputs, error) {
 	paymailClient := ctx.Paymail()
 
 	receiverAddress, err := paymailClient.GetSanitizedPaymail(p.To)
+	fmt.Printf("dupa")
+	fmt.Printf(p.To)
 	if err != nil {
 		return nil, txerrors.ErrReceiverPaymailAddressIsInvalid.Wrap(err)
 	}

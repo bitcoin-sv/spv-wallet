@@ -10,10 +10,12 @@ import (
 func TestSpendExternalFundsInternally(t *testing.T) {
 	// given:
 	given, then := testabilities.New(t)
+	// TODO: started SPV Wallet V2 <- dodatkowa funkcja .StartedSPVWalletV2
 	cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
 	defer cleanup()
 
 	// and:
+	// TODO: add users as aliases (vars) for alice, bob, charlie
 	alice := fixtures.Sender
 	bob := fixtures.RecipientInternal
 
@@ -21,10 +23,11 @@ func TestSpendExternalFundsInternally(t *testing.T) {
 	given.Paymail().ExternalPaymailHost().WillRespondWithP2PWithBEEFCapabilities()
 
 	// and:
-	externalTxReference := "z1cde5fa-7b29-403e-8a16-d92f7304b8c2"
+	// fix it -> take a look at incoming_paymail_tx_test.go, we need to go through all steps
 
 	// when:
-	receiveTx := given.TransactionScenario(alice).ReceivesFromExternal(10, externalTxReference)
+	// wrap "Alice" in testabilities wrapped with methods
+	receiveTx := given.TransactionScenario(alice).ReceivesFromExternal(10)
 
 	// then:
 	then.User(alice).Balance().IsEqualTo(10)
@@ -38,7 +41,7 @@ func TestSpendExternalFundsInternally(t *testing.T) {
 	internalTx := given.TransactionScenario(alice).SendsToInternal(bob, 5)
 
 	// then:
-	then.User(alice).Balance().IsEqualTo(5)
+	then.User(alice).Balance().IsEqualTo(5) // Probably - fee (1), think about expected fee variable
 	then.User(bob).Balance().IsEqualTo(5)
 
 	then.User(alice).Operations().Last().
@@ -47,4 +50,6 @@ func TestSpendExternalFundsInternally(t *testing.T) {
 		WithValue(-5).
 		WithType("outgoing").
 		WithCounterparty(bob.DefaultPaymail().Address())
+
+	// TODO: Check op for BOB
 }
