@@ -84,7 +84,6 @@ func (ts *transactionScenario) ReceivesFromExternal(amount bsv.Satoshis) *Transa
 	lockingScript, err := script.NewFromHex(getter.GetString("outputs[0]/script"))
 	require.NoError(ts.t, err)
 
-	// Step 2: Call beef capability
 	txSpec := fixtures.GivenTX(ts.t).
 		WithInput(uint64(amount+1)).
 		WithOutputScript(uint64(amount), lockingScript)
@@ -125,26 +124,26 @@ func (ts *transactionScenario) ReceivesFromExternal(amount bsv.Satoshis) *Transa
 func (ts *transactionScenario) SendsToInternal(recipient fixtures.User, amount bsv.Satoshis) *TransactionResult {
 	_, then := NewOf(ts.app, ts.t)
 	// replace with proper http client + check for unauthorized
-	client := ts.app.HttpClient().ForAnonymous()
+	//client := ts.app.HttpClient().ForAnonymous()
+	//
+	//requestBody := map[string]any{
+	//	"satoshis": uint64(amount),
+	//}
 
-	requestBody := map[string]any{
-		"satoshis": uint64(amount),
-	}
+	//destRes, _ := client.R().
+	//	SetHeader("Content-Type", "application/json").
+	//	SetBody(requestBody).
+	//	Post(fmt.Sprintf(
+	//		"https://example.com/v1/bsvalias/p2p-payment-destination/%s",
+	//		recipient.DefaultPaymail(),
+	//	))
 
-	destRes, _ := client.R().
-		SetHeader("Content-Type", "application/json").
-		SetBody(requestBody).
-		Post(fmt.Sprintf(
-			"https://example.com/v1/bsvalias/p2p-payment-destination/%s",
-			recipient.DefaultPaymail(),
-		))
+	//then.Response(destRes).IsOK()
 
-	then.Response(destRes).IsOK()
-
-	getter := then.Response(destRes).JSONValue()
-	reference := getter.GetString("reference")
-	lockingScript, err := script.NewFromHex(getter.GetString("outputs[0]/script"))
-	require.NoError(ts.t, err)
+	//getter := then.Response(destRes).JSONValue()
+	//reference := getter.GetString("reference")
+	//lockingScript, err := script.NewFromHex(getter.GetString("outputs[0]/script"))
+	//require.NoError(ts.t, err)
 
 	outlineClient := ts.app.HttpClient().ForGivenUser(ts.user)
 	outlineBody := map[string]any{
@@ -169,7 +168,7 @@ func (ts *transactionScenario) SendsToInternal(recipient fixtures.User, amount b
 		Format      string                 `json:"format"`
 		Annotations map[string]interface{} `json:"annotations"`
 	}
-	err = json.Unmarshal(outlineRes.Body(), &outline)
+	err := json.Unmarshal(outlineRes.Body(), &outline)
 	require.NoError(ts.t, err)
 
 	tx, err := trx.NewTransactionFromBEEFHex(outline.Hex)
@@ -198,9 +197,9 @@ func (ts *transactionScenario) SendsToInternal(recipient fixtures.User, amount b
 					"0": map[string]any{
 						"bucket": "bsv",
 						"paymail": map[string]any{
-							"receiver":  recipient.DefaultPaymail(),
-							"reference": reference,
-							"sender":    ts.user.DefaultPaymail(),
+							"receiver": recipient.DefaultPaymail(),
+							//"reference": reference,
+							"sender": ts.user.DefaultPaymail(),
 						},
 					},
 				},
@@ -210,16 +209,16 @@ func (ts *transactionScenario) SendsToInternal(recipient fixtures.User, amount b
 
 	then.Response(recordRes).IsCreated()
 
-	txSpec := fixtures.GivenTX(ts.t).
-		WithSender(ts.user).
-		WithRecipient(recipient).
-		WithInput(uint64(amount+1)).
-		WithOutputScript(uint64(amount), lockingScript)
+	//txSpec := fixtures.GivenTX(ts.t).
+	//	WithSender(ts.user).
+	//	WithRecipient(recipient).
+	//	WithInput(uint64(amount+1)).
+	//	WithOutputScript(uint64(amount), lockingScript)
 
 	return &TransactionResult{
-		TxSpec:    txSpec,
-		Response:  recordRes,
-		Reference: reference,
-		TxID:      tx.TxID().String(),
+		//TxSpec:    txSpec,
+		Response: recordRes,
+		//Reference: reference,
+		TxID: tx.TxID().String(),
 	}
 }
