@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/bsv"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
+	bsvmodel "github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/rs/zerolog"
 )
 
@@ -18,6 +19,8 @@ type service struct {
 	paymailAddressService  PaymailAddressService
 	transactionBEEFService TransactionBEEFService
 	utxoSelector           UTXOSelector
+	feeUnit                bsvmodel.FeeUnit
+	usersService           UsersService
 }
 
 // NewService creates a new transaction outlines service.
@@ -26,7 +29,10 @@ func NewService(
 	paymailAddressService PaymailAddressService,
 	transactionBEEFService TransactionBEEFService,
 	utxoSelector UTXOSelector,
-	logger zerolog.Logger) Service {
+	feeUnit bsvmodel.FeeUnit,
+	logger zerolog.Logger,
+	usersService UsersService,
+) Service {
 	if paymailService == nil {
 		panic("paymail.ServiceClient is required to create transaction outlines service")
 	}
@@ -49,6 +55,8 @@ func NewService(
 		paymailAddressService:  paymailAddressService,
 		transactionBEEFService: transactionBEEFService,
 		utxoSelector:           utxoSelector,
+		feeUnit:                feeUnit,
+		usersService:           usersService,
 	}
 }
 
@@ -91,18 +99,24 @@ func (s *service) evaluateSpec(ctx context.Context, spec *TransactionSpec) (*sdk
 		return nil, transaction.Annotations{}, txerrors.ErrTxOutlineSpecificationUserIDRequired
 	}
 
-	c := newOutlineEvaluationContext(
-		ctx,
-		spec.UserID,
-		s.logger,
-		s.paymailService,
-		s.paymailAddressService,
-		s.utxoSelector,
-	)
+	evaluationCtx := s.createEvaluationContext(ctx, spec.UserID)
 
-	tx, annotations, err := spec.evaluate(c)
+	tx, annotations, err := spec.evaluate(evaluationCtx)
 	if err != nil {
 		return nil, transaction.Annotations{}, err
 	}
 	return tx, annotations, err
+}
+
+func (s *service) createEvaluationContext(ctx context.Context, userID string) *evaluationContext {
+	return &evaluationContext{
+		Context:               ctx,
+		userID:                userID,
+		log:                   s.logger,
+		paymail:               s.paymailService,
+		paymailAddressService: s.paymailAddressService,
+		utxoSelector:          s.utxoSelector,
+		feeUnit:               s.feeUnit,
+		usersService:          s.usersService,
+	}
 }

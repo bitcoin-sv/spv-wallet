@@ -118,4 +118,7 @@ var (
 
 	// ErrInvalidRawHexInQueryResult is returned when the raw transaction hex data retrieved from the query result is invalid or corrupted.
 	ErrInvalidRawHexInQueryResult = models.SPVError{Code: "error-source-txs-initialization", Message: "Invalid raw hex data in transaction query result", StatusCode: 500}
+
+	// ErrOutlineAddChangeOutput is returned when adding a change output to the transaction outline fails.
+	ErrOutlineAddChangeOutput = models.SPVError{Code: "error-outline-add-change-output", Message: "failed to add change output to the transaction outline", StatusCode: 500}
 )

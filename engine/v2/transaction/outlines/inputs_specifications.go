@@ -6,33 +6,33 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 // InputsSpec are representing a client specification for inputs part of the transaction.
 type InputsSpec struct {
 }
 
-func (s *InputsSpec) evaluate(ctx *evaluationContext, outputs annotatedOutputs) (annotatedInputs, error) {
-	outs, _ := outputs.splitIntoTransactionOutputsAndAnnotations()
+func (s *InputsSpec) evaluate(ctx *evaluationContext, outputs annotatedOutputs) (annotatedInputs, bsv.Satoshis, error) {
+	outs := outputs.toTransactionOutputs()
 
-	tx := &sdk.Transaction{
-		Outputs: outs,
-	}
+	tx := sdk.NewTransaction()
+	tx.Outputs = outs
 
-	utxos, err := ctx.UTXOSelector().Select(ctx, tx, ctx.UserID())
+	utxos, change, err := ctx.UTXOSelector().Select(ctx, tx, ctx.UserID())
 	if err != nil {
-		return nil, spverrors.ErrInternal.Wrap(err)
+		return nil, 0, spverrors.ErrInternal.Wrap(err)
 	}
 
 	if len(utxos) == 0 {
-		return nil, txerrors.ErrTxOutlineInsufficientFunds
+		return nil, 0, txerrors.ErrTxOutlineInsufficientFunds
 	}
 
 	inputs := make(annotatedInputs, len(utxos))
 	for i, utxo := range utxos {
 		txID, err := chainhash.NewHashFromHex(utxo.TxID)
 		if err != nil {
-			return nil, spverrors.Wrapf(err, "failed to parse source transaction ID")
+			return nil, 0, spverrors.Wrapf(err, "failed to parse source transaction ID")
 		}
 		inputs[i] = &annotatedInput{
 			TransactionInput: &sdk.TransactionInput{
@@ -45,7 +45,7 @@ func (s *InputsSpec) evaluate(ctx *evaluationContext, outputs annotatedOutputs) 
 		}
 	}
 
-	return inputs, nil
+	return inputs, change, nil
 }
 
 type annotatedInputs []*annotatedInput
@@ -56,13 +56,23 @@ type annotatedInput struct {
 }
 
 func (a annotatedInputs) splitIntoTransactionInputsAndAnnotations() ([]*sdk.TransactionInput, transaction.InputAnnotations) {
+	return a.toTransactionInputs(), a.toAnnotations()
+}
+
+func (a annotatedInputs) toTransactionInputs() []*sdk.TransactionInput {
 	inputs := make([]*sdk.TransactionInput, len(a))
-	annotationByInputIndex := make(transaction.InputAnnotations)
-	for index, input := range a {
-		inputs[index] = input.TransactionInput
-		if input.InputAnnotation != nil {
-			annotationByInputIndex[index] = input.InputAnnotation
+	for i, in := range a {
+		inputs[i] = in.TransactionInput
+	}
+	return inputs
+}
+
+func (a annotatedInputs) toAnnotations() transaction.InputAnnotations {
+	annotations := make(transaction.InputAnnotations)
+	for inputIndex, in := range a {
+		if in.InputAnnotation != nil {
+			annotations[inputIndex] = in.InputAnnotation
 		}
 	}
-	return inputs, annotationByInputIndex
+	return annotations
 }

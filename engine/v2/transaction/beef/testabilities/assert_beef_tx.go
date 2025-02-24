@@ -74,6 +74,7 @@ func (a *assertion) WithParseableBEEFHEX() BEEFTransactionAssertion {
 	tx, err := sdk.NewTransactionFromBEEFHex(a.beefHex)
 	a.require.Nil(err, "Failed to create BEEF transaction from the given hex")
 	a.require.NotNil(tx, "Build transaction from BEEF hex should not be nil")
+	a.assert.NotZero(tx.Version, "tx version is 0 which is not acceptable by nodes")
 	a.tx = tx
 	return a
 }
