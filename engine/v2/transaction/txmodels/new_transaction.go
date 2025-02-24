@@ -36,13 +36,13 @@ func (t *NewTransaction) BEEFHex() string { return t.beefHex }
 // RawHex returns the raw hexadecimal representation of the transaction.
 func (t *NewTransaction) RawHex() string { return t.rawHex }
 
-// SetRawHex sets the raw hexadecimal representation of the transaction.
-func (t *NewTransaction) SetRawHex(hex string) {
+// SetRawHex sets the raw hexadecimal representation of the transaction and source transaction IDs.
+func (t *NewTransaction) SetRawHex(hex string, sourceTXIDs ...string) {
 	t.rawHex = hex
-	t.transactionInputSources = lo.Map(t.Outputs, func(item NewOutput, index int) TransactionInputSource {
+	t.transactionInputSources = lo.Map(sourceTXIDs, func(sourceTxID string, index int) TransactionInputSource {
 		return TransactionInputSource{
+			SourceTxID: sourceTxID,
 			TxID:       t.ID,
-			SourceTxID: item.TxID,
 		}
 	})
 }
