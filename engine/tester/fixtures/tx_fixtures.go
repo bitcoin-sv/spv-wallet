@@ -34,7 +34,7 @@ type GivenTXSpec interface {
 	WithRecipient(recipient User) GivenTXSpec
 	WithoutSigning() GivenTXSpec
 	WithInput(satoshis uint64) GivenTXSpec
-	WithInputFromUTXO(tx *trx.Transaction, vout uint32) GivenTXSpec
+	WithInputFromUTXO(tx *trx.Transaction, vout uint32, customInstructions ...bsv.CustomInstruction) GivenTXSpec
 	WithSingleSourceInputs(satoshis ...uint64) GivenTXSpec
 	WithOPReturn(dataStr string) GivenTXSpec
 	WithOutputScriptParts(parts ...ScriptPart) GivenTXSpec
@@ -99,12 +99,12 @@ func (spec *txSpec) WithInput(satoshis uint64) GivenTXSpec {
 	return spec.WithSingleSourceInputs(satoshis)
 }
 
-func (spec *txSpec) WithInputFromUTXO(tx *trx.Transaction, vout uint32) GivenTXSpec {
+func (spec *txSpec) WithInputFromUTXO(tx *trx.Transaction, vout uint32, customInstructions ...bsv.CustomInstruction) GivenTXSpec {
 	output := tx.Outputs[vout]
 	utxo, err := trx.NewUTXO(tx.TxID().String(), vout, output.LockingScript.String(), output.Satoshis)
 	require.NoError(spec.t, err, "creating utxo for input")
 
-	utxo.UnlockingScriptTemplate = spec.sender.P2PKHUnlockingScriptTemplate()
+	utxo.UnlockingScriptTemplate = spec.sender.P2PKHUnlockingScriptTemplate(customInstructions...)
 
 	spec.utxos = append(spec.utxos, utxo)
 	spec.sourceTransactions[tx.TxID().String()] = tx

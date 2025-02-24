@@ -5,7 +5,6 @@ import (
 	"time"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
-	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
@@ -14,8 +13,12 @@ import (
 	"gorm.io/gorm"
 )
 
-const txIdColumn = "tx_id"
-const voutColumn = "vout"
+const (
+	txIdColumn               = "tx_id"
+	voutColumn               = "vout"
+	minChange                = "min_change"
+	customInstructionsColumn = "custom_instructions"
+)
 
 const (
 	// estimatedChangeOutputSize is the estimated size of a change output
@@ -39,31 +42,34 @@ func NewUTXOSelector(db *gorm.DB, feeUnit bsv.FeeUnit) *UTXOSelector {
 }
 
 // Select selects UTXOs of user to fund a transaction.
-func (r *UTXOSelector) Select(ctx context.Context, tx *sdk.Transaction, userID string) ([]*outlines.UTXO, error) {
+func (r *UTXOSelector) Select(ctx context.Context, tx *sdk.Transaction, userID string) (utxos []*outlines.UTXO, change bsv.Satoshis, err error) {
+	// NOTE: this approach assumes that tx doesn't contain any predefined inputs and all should be selected to cover outputs
 	outputsTotalValue := tx.TotalOutputSatoshis()
-	byteSizeOfTxToFund, err := conv.IntToUint64(tx.Size())
+	byteSizeOfTxToFund := outputOnlyTxSize(tx.Outputs)
+
+	var selected []*selectedUTXO
+	selected, err = r.selectInputsForTransaction(ctx, userID, bsv.Satoshis(outputsTotalValue), byteSizeOfTxToFund)
 	if err != nil {
-		return nil, spverrors.ErrInternal.Wrap(err)
+		return nil, bsv.Satoshis(0), err
 	}
 
-	utxos, err := r.selectInputsForTransaction(ctx, userID, bsv.Satoshis(outputsTotalValue), byteSizeOfTxToFund)
-	if err != nil {
-		return nil, err
+	if len(selected) > 0 {
+		// final change value, calculated by SQL, is present in all rows
+		change = bsv.Satoshis(selected[0].Change)
 	}
 
-	result := make([]*outlines.UTXO, 0, len(utxos))
-	for _, utxo := range utxos {
-		result = append(result, &outlines.UTXO{
+	utxos = make([]*outlines.UTXO, len(selected))
+	for i, utxo := range selected {
+		utxos[i] = &outlines.UTXO{
 			TxID:               utxo.TxID,
 			Vout:               utxo.Vout,
 			CustomInstructions: bsv.CustomInstructions(utxo.CustomInstructions),
-		})
+		}
 	}
-
-	return result, nil
+	return
 }
 
-func (r *UTXOSelector) selectInputsForTransaction(ctx context.Context, userID string, outputsTotalValue bsv.Satoshis, byteSizeOfTxWithoutInputs uint64) (utxos []*database.UserUTXO, err error) {
+func (r *UTXOSelector) selectInputsForTransaction(ctx context.Context, userID string, outputsTotalValue bsv.Satoshis, byteSizeOfTxWithoutInputs uint64) (utxos []*selectedUTXO, err error) {
 	err = r.db.WithContext(ctx).Transaction(func(db *gorm.DB) error {
 		inputsQuery := r.buildQueryForInputs(db, userID, outputsTotalValue, byteSizeOfTxWithoutInputs)
 
@@ -102,7 +108,7 @@ func (r *UTXOSelector) buildQueryForInputs(db *gorm.DB, userID string, outputsTo
 	return composer.build(db)
 }
 
-func (r *UTXOSelector) buildUpdateTouchedAtQuery(db *gorm.DB, utxos []*database.UserUTXO) *gorm.DB {
+func (r *UTXOSelector) buildUpdateTouchedAtQuery(db *gorm.DB, utxos []*selectedUTXO) *gorm.DB {
 	outpoints := make([][]any, 0, len(utxos))
 	for _, utxo := range utxos {
 		outpoints = append(outpoints, []any{utxo.TxID, utxo.Vout})
