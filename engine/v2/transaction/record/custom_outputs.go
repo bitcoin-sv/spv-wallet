@@ -1,6 +1,8 @@
 package record
 
 import (
+	"iter"
+
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/custominstructions"
@@ -8,7 +10,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
-	"iter"
 )
 
 type customOutputsResolver struct {

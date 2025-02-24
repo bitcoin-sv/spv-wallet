@@ -3,6 +3,7 @@ package record
 import (
 	"context"
 	"fmt"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"

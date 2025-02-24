@@ -2,6 +2,7 @@ package mapping
 
 import (
 	"fmt"
+
 	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/bsv"

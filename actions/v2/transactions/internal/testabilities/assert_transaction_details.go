@@ -45,7 +45,7 @@ func (a *transactionAssertions) OutputUnlockableBy(vout uint32, user fixtures.Us
 
 	fixtures.GivenTX(a.t).
 		WithSender(user).
-		WithInputFromUTXO(a.tx, uint32(vout), *outputAnnotation.CustomInstructions...).
+		WithInputFromUTXO(a.tx, vout, *outputAnnotation.CustomInstructions...).
 		WithOPReturn("dummy data").
 		TX() // during TX call, the transaction is signed. Should fail if the UTXO cannot be unlocked by the user.
 

@@ -93,7 +93,7 @@ func (a *txOutputAssertion) UnlockableBySender() TransactionOutlinePaymailOutput
 
 	fixtures.GivenTX(a.t).
 		WithSender(fixtures.Sender).
-		WithInputFromUTXO(a.parent.tx, uint32(a.index), *a.annotation.CustomInstructions...).
+		WithInputFromUTXO(a.parent.tx, a.index, *a.annotation.CustomInstructions...).
 		WithOPReturn("dummy data").
 		TX() // during TX call, the transaction is signed. Should fail if the UTXO cannot be unlocked by the user.
 
