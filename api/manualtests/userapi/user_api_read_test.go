@@ -9,42 +9,35 @@ import (
 	"github.com/samber/lo"
 )
 
-func TestUserAPIRead(t *testing.T) {
-	var calls = map[string]struct {
-		call manualtests.CallWithState
-	}{
-		"currentUser": {
-			call: func(_ manualtests.StateForCall, c *client.ClientWithResponses) (manualtests.Result, error) {
-				return c.CurrentUserWithResponse(context.Background())
-			},
-		},
-		"searchOperations": {
-			call: func(_ manualtests.StateForCall, c *client.ClientWithResponses) (manualtests.Result, error) {
-				return c.SearchOperationsWithResponse(context.Background(), nil)
-			},
-		},
-		"searchOperationsWithQueryParams": {
-			call: func(_ manualtests.StateForCall, c *client.ClientWithResponses) (manualtests.Result, error) {
-				return c.SearchOperationsWithResponse(context.Background(), &client.SearchOperationsParams{
-					Page:   lo.ToPtr(1),
-					Size:   lo.ToPtr(10),
-					Sort:   lo.ToPtr("asc"),
-					SortBy: lo.ToPtr("tx_id"),
-				})
-			},
-		},
-		"dataById": {
-			call: func(state manualtests.StateForCall, c *client.ClientWithResponses) (manualtests.Result, error) {
-				if state.DataID == "" {
-					state.T.Skip("no data id")
-				}
-				return c.DataByIdWithResponse(context.Background(), state.DataID)
-			},
-		},
-	}
-	for name, endpoint := range calls {
-		t.Run(name, func(t *testing.T) {
-			manualtests.APICallForUser(t).CallWithState(endpoint.call).RequireSuccess()
+func TestCurrentUser(t *testing.T) {
+	manualtests.APICallForCurrentUser(t).Call(func(c *client.ClientWithResponses) (manualtests.Result, error) {
+		return c.CurrentUserWithResponse(context.Background())
+	}).RequireSuccess()
+}
+
+func TestSearchOperations(t *testing.T) {
+	manualtests.APICallForCurrentUser(t).Call(func(c *client.ClientWithResponses) (manualtests.Result, error) {
+		return c.SearchOperationsWithResponse(context.Background(), nil)
+	}).RequireSuccess()
+}
+
+func TestSearchOperationsWithQueryParams(t *testing.T) {
+	manualtests.APICallForCurrentUser(t).Call(func(c *client.ClientWithResponses) (manualtests.Result, error) {
+		return c.SearchOperationsWithResponse(context.Background(), &client.SearchOperationsParams{
+			Page:   lo.ToPtr(1),
+			Size:   lo.ToPtr(10),
+			Sort:   lo.ToPtr("asc"),
+			SortBy: lo.ToPtr("tx_id"),
 		})
-	}
+	}).RequireSuccess()
+}
+
+func TestDataById(t *testing.T) {
+	manualtests.APICallForCurrentUser(t).CallWithState(func(state manualtests.StateForCall, c *client.ClientWithResponses) (manualtests.Result, error) {
+		dataId := state.LatestDataID()
+		if dataId == "" {
+			state.T.Skip("no data id")
+		}
+		return c.DataByIdWithResponse(context.Background(), dataId)
+	}).RequireSuccess()
 }

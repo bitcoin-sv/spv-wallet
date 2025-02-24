@@ -18,6 +18,9 @@ import (
 const stateFileName = "state.yaml"
 const notConfiguredPaymailDomain = "replace_me"
 const notConfiguredFaucetURL = "https://replace_me.localhost"
+const notConfiguredXprv = "xprvreplaceme"
+const notConfiguredRecipientID = "replace_me"
+const notConfiguredExternalPaymail = "replace.me@locahost"
 
 var StateError = errorx.NewType(errorx.CommonErrors, "state_error")
 
@@ -27,8 +30,8 @@ type State struct {
 	Faucet                Faucet `mapstructure:"faucet"     yaml:"faucet"`
 	AdminXpub             string `mapstructure:"admin"      yaml:"admin"`
 	User                  User
-	OldUsers              []User `mapstructure:"zzz_old_users" yaml:"zzz_old_users"`
-	DataID                string `mapstructure:"data_id" yaml:"data_id"`
+	Payment               Payment `mapstructure:"payment" yaml:"payment"`
+	OldUsers              []User  `mapstructure:"zzz_old_users" yaml:"zzz_old_users"`
 	configFilePath        string
 	configFileJustCreated bool
 }
@@ -46,13 +49,21 @@ func NewState() *State {
 
 	faucet := Faucet{
 		URL:                notConfiguredFaucetURL,
-		Xpriv:              "xprv9s21ZrQH143K2aQjoTAQcitxmER3gqNbcpoFSRdJS73r13KWDyqeBoVk22Sdce1oPVFrUUpfxvhDziRhVbtKbuquFRe8pq5feXEe8NpfNrj",
+		Xpriv:              notConfiguredXprv,
 		DefaultTopUpAmount: 11,
 		state:              state,
 	}
 
+	payment := Payment{
+		Amount:          10,
+		RecipientID:     notConfiguredRecipientID,
+		ExternalPaymail: notConfiguredExternalPaymail,
+		state:           state,
+	}
+
 	state.User = user
 	state.Faucet = faucet
+	state.Payment = payment
 
 	return state
 }
@@ -121,7 +132,7 @@ func (s *State) NewUser(xpriv string, xpub string) (*User, error) {
 }
 
 func (s *State) envConfig() {
-	viper.SetEnvPrefix("REG_TEST")
+	viper.SetEnvPrefix("MAN_TEST")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 }
@@ -212,6 +223,7 @@ func (s *State) init() error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -238,12 +250,41 @@ func (s *State) UseUserWithID(userID string) error {
 	if s.User.ID == userID {
 		return nil
 	}
+	founded, err := s.GetOldUserById(userID)
+	if err != nil {
+		return errorx.Decorate(err, "failed to get user to switch to")
+	}
+
+	err = founded.init()
+	if err != nil {
+		return err
+	}
+
+	s.OldUsers = append(s.OldUsers, s.User)
+	s.OldUsers = lo.UniqBy(s.OldUsers, func(user User) string {
+		return user.ID
+	})
+
+	s.User = *founded
+
+	return nil
+}
+
+func (s *State) GetUserById(userID string) (*User, error) {
+	if s.User.ID == userID {
+		return &s.User, nil
+	}
+
+	return s.GetOldUserById(userID)
+}
+
+func (s *State) GetOldUserById(userID string) (*User, error) {
 	if userID == "" {
-		return StateError.New("You must provide ID to switch to")
+		return nil, StateError.New("You must provide ID to search for")
 	}
 
 	if len(s.OldUsers) == 0 {
-		return StateError.New("no old users to switch to")
+		return nil, StateError.New("no old users to search for user")
 	}
 
 	founded, success := lo.Find(s.OldUsers, func(user User) bool {
@@ -251,18 +292,11 @@ func (s *State) UseUserWithID(userID string) error {
 	})
 
 	if !success {
-		return StateError.New("user with ID %s not found", userID)
+		return nil, StateError.New("user with ID %s not found", userID)
 	}
 
-	err := founded.init()
-	if err != nil {
-		return err
-	}
+	return &founded, nil
 
-	s.OldUsers = append(s.OldUsers, s.User)
-	s.User = founded
-
-	return nil
 }
 
 func (s *State) UnlockOutlineHex(outline *client.ResponsesCreateTransactionOutlineSuccess) (string, error) {

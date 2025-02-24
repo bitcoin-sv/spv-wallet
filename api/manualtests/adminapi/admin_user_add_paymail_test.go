@@ -1,4 +1,4 @@
-package create
+package adminapi
 
 import (
 	"context"
@@ -27,5 +27,6 @@ func TestAddPaymail(t *testing.T) {
 					PublicName: additionalAlias.PublicName(),
 				},
 			)
-		})
+		}).
+		RequireSuccess()
 }

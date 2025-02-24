@@ -1,4 +1,4 @@
-package userapi
+package errorcases
 
 import (
 	"context"
@@ -35,10 +35,10 @@ func TestUnauthorized(t *testing.T) {
 		},
 		"dataById": {
 			call: func(state manualtests.StateForCall, c *client.ClientWithResponses) (manualtests.Result, error) {
-				if state.DataID == "" {
+				if state.LatestDataID() == "" {
 					state.T.Skip("no data id")
 				}
-				return c.DataByIdWithResponse(context.Background(), state.DataID)
+				return c.DataByIdWithResponse(context.Background(), state.LatestDataID())
 			},
 		},
 	}

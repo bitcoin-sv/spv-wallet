@@ -1,5 +1,5 @@
 //nolint:nolintlint,revive
-package adminapi
+package errorcases
 
 import (
 	"context"
@@ -51,7 +51,7 @@ func TestUnauthorized(t *testing.T) {
 	}
 	for name, endpoint := range calls {
 		t.Run(name+"_user", func(t *testing.T) {
-			manualtests.APICallForUser(t).
+			manualtests.APICallForCurrentUser(t).
 				Call(endpoint.call).
 				RequireUnauthorizedForUserOnAdminAPI()
 		})

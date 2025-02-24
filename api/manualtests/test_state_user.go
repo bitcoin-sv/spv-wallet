@@ -79,6 +79,27 @@ func (u *User) PaymailAddress() string {
 	return u.Alias + "@" + u.Domain
 }
 
+func (u *User) ShouldGetPaymailAddress() (*string, error) {
+	if u.IsEmpty() {
+		return nil, StateError.New("there is no current user, before using this method create a user as admin first.")
+	}
+
+	return lo.ToPtr(u.PaymailAddress()), nil
+}
+
+func (u *User) ShouldGetAdditionalPaymailAddress() (*string, error) {
+	if u.IsEmpty() {
+		return nil, StateError.New("there is no current user, before using this method create a user as admin first.")
+	}
+
+	if len(u.AdditionalAliases) == 0 {
+		return nil, StateError.New("there is no additional paymail address, before using this method add an additional paymail address first with admin API.")
+	}
+
+	additionalAddress := u.AdditionalAliases[0].String() + "@" + u.Domain
+	return lo.ToPtr(additionalAddress), nil
+}
+
 func (u *User) PublicName() string {
 	return lo.Capitalize(u.Alias)
 }

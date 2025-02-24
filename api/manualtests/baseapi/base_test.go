@@ -25,7 +25,7 @@ func TestBaseAPIRead(t *testing.T) {
 			},
 		},
 		"sharedConfig[user]": {
-			client: manualtests.UserClientFactory,
+			client: manualtests.CurrentUserClientFactory,
 			call: func(c *client.ClientWithResponses) (manualtests.Result, error) {
 				return c.SharedConfigWithResponse(context.Background())
 			},

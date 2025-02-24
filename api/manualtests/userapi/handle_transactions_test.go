@@ -1,4 +1,4 @@
-package transactions
+package userapi
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 )
 
 func TestTopUp(t *testing.T) {
-	// t.Skip("don't run yet")
+	t.Skip("don't run yet")
 
 	state := manualtests.NewState()
 	err := state.Load()
@@ -22,10 +22,8 @@ func TestTopUp(t *testing.T) {
 	err = state.Faucet.TopUp()
 	require.NoError(t, err)
 
-	api := manualtests.APICallForUser(t)
-
-	api.CallForSuccess(RequestCurrentUser)
-	api.CallForSuccess(RequestOperations)
+	TestCurrentUser(t)
+	TestSearchOperations(t)
 }
 
 func TestTransactionWithStringsData(t *testing.T) {
@@ -33,7 +31,7 @@ func TestTransactionWithStringsData(t *testing.T) {
 
 	logger := manualtests.Logger()
 
-	api := manualtests.APICallForUser(t)
+	api := manualtests.APICallForCurrentUser(t)
 
 	logger.Info().Msg("step 1: Create Transaction Outline with Strings OpReturn")
 	storedOutline, callForStringsOpReturnTransactionOutline := manualtests.StoreResponse(RequestStringsOpReturnTransactionOutline)
@@ -54,10 +52,10 @@ func TestTransactionWithStringsData(t *testing.T) {
 	require.NoError(t, err)
 
 	logger.Info().Msg("step 5: Additional Calls for checking state")
-	api.CallForSuccess(RequestCurrentUser)
-	api.CallForSuccess(RequestOperations)
+	TestCurrentUser(t)
+	TestSearchOperations(t)
 
-	api.CallWithStateForSuccess(RequestData)
+	TestDataById(t)
 }
 
 func TestTransactionWithBytesData(t *testing.T) {
@@ -65,9 +63,9 @@ func TestTransactionWithBytesData(t *testing.T) {
 
 	logger := manualtests.Logger()
 
-	api := manualtests.APICallForUser(t)
+	api := manualtests.APICallForCurrentUser(t)
 
-	logger.Info().Msg("step 1: Create Transaction Outline with Strings OpReturn")
+	logger.Info().Msg("step 1: Create Transaction Outline with Hexes OpReturn")
 	storedOutline, callForStringsOpReturnTransactionOutline := manualtests.StoreResponse(RequestBytesOpReturnTransactionOutline)
 	api.CallWithStateForSuccess(callForStringsOpReturnTransactionOutline)
 	outline := storedOutline.MustGetResponse().JSON200
@@ -86,10 +84,67 @@ func TestTransactionWithBytesData(t *testing.T) {
 	require.NoError(t, err)
 
 	logger.Info().Msg("step 5: Additional Calls for checking state")
-	api.CallForSuccess(RequestCurrentUser)
-	api.CallForSuccess(RequestOperations)
+	TestCurrentUser(t)
+	TestSearchOperations(t)
 
-	api.CallWithStateForSuccess(RequestData)
+	TestDataById(t)
+}
+
+func TestTransactionWithInternalPaymailTransfer(t *testing.T) {
+	t.Skip("don't run yet")
+
+	logger := manualtests.Logger()
+
+	api := manualtests.APICallForCurrentUser(t)
+
+	logger.Info().Msg("step 1: Create Transaction Outline with Internal paymail")
+	storedOutline, callForOutline := manualtests.StoreResponse(RequestInternalPaymailPaymentTransactionOutline())
+	api.CallWithStateForSuccess(callForOutline)
+	outline := storedOutline.MustGetResponse().JSON200
+
+	logger.Info().Msg("step 2: Unlock Outline")
+	hex, err := UnlockOutline(outline, api.State())
+	require.NoError(t, err)
+
+	logger.Info().Msg("step 3: Record Outline")
+	api.CallForSuccess(RequestRecordOutlineAsCall(hex, outline))
+
+	logger.Info().Msg("step 4: State of Sender")
+	TestCurrentUser(t)
+	TestSearchOperations(t)
+
+	logger.Info().Msg("step 5: State of Recipient")
+	recipientAPI := manualtests.APICallForRecipient(t)
+	recipientAPI.CallForSuccess(func(c *client.ClientWithResponses) (manualtests.Result, error) {
+		return c.CurrentUserWithResponse(context.Background())
+	})
+	recipientAPI.CallForSuccess(func(c *client.ClientWithResponses) (manualtests.Result, error) {
+		return c.SearchOperationsWithResponse(context.Background(), nil)
+	})
+}
+
+func TestTransactionWithExternalPaymailTransfer(t *testing.T) {
+	t.Skip("don't run yet")
+
+	logger := manualtests.Logger()
+
+	api := manualtests.APICallForCurrentUser(t)
+
+	logger.Info().Msg("step 1: Create Transaction Outline with External paymail")
+	storedOutline, callForOutline := manualtests.StoreResponse(RequestExternalPaymailPaymentTransactionOutline())
+	api.CallWithStateForSuccess(callForOutline)
+	outline := storedOutline.MustGetResponse().JSON200
+
+	logger.Info().Msg("step 2: Unlock Outline")
+	hex, err := UnlockOutline(outline, api.State())
+	require.NoError(t, err)
+
+	logger.Info().Msg("step 3: Record Outline")
+	api.CallForSuccess(RequestRecordOutlineAsCall(hex, outline))
+
+	logger.Info().Msg("step 4: State of Sender")
+	TestCurrentUser(t)
+	TestSearchOperations(t)
 }
 
 func UnlockOutline(outline *client.ResponsesCreateTransactionOutlineSuccess, state *manualtests.State) (string, error) {
@@ -158,6 +213,57 @@ func RequestBytesOpReturnTransactionOutline(state manualtests.StateForCall, c *c
 	}, body)
 }
 
+func RequestInternalPaymailPaymentTransactionOutline() manualtests.GenericCallWithState[*client.CreateTransactionOutlineResponse] {
+	return func(state manualtests.StateForCall, c *client.ClientWithResponses) (*client.CreateTransactionOutlineResponse, error) {
+		recipient, err := state.Payment.ShouldGetInternalRecipientPaymail()
+		require.NoError(state.T, err)
+		req := RequestPaymailPaymentTransactionOutlineTo(recipient)
+		return req(state, c)
+	}
+}
+
+func RequestExternalPaymailPaymentTransactionOutline() manualtests.GenericCallWithState[*client.CreateTransactionOutlineResponse] {
+	return func(state manualtests.StateForCall, c *client.ClientWithResponses) (*client.CreateTransactionOutlineResponse, error) {
+		recipient, err := state.Payment.ShouldGetExternalRecipientPaymail()
+		require.NoError(state.T, err)
+		req := RequestPaymailPaymentTransactionOutlineTo(recipient)
+		return req(state, c)
+	}
+}
+
+func RequestPaymailPaymentTransactionOutlineTo(paymailAddresses ...string) manualtests.GenericCallWithState[*client.CreateTransactionOutlineResponse] {
+	return func(state manualtests.StateForCall, c *client.ClientWithResponses) (*client.CreateTransactionOutlineResponse, error) {
+
+		pmOutputs := lo.Map(paymailAddresses, func(recipient string, _ int) client.RequestsPaymailOutputSpecification {
+			paymailOutput := client.RequestsPaymailOutputSpecification{
+				To:       recipient,
+				Satoshis: state.Payment.Amount,
+			}
+
+			// INFO: Uncomment lines below if you want to specify sender address explicitly
+			// sender, err := state.CurrentUser().ShouldGetAdditionalPaymailAddress()
+			// require.NoError(state.T, err)
+			// paymailOutput.From = sender
+
+			return paymailOutput
+		})
+
+		outputs := lo.Map(pmOutputs, func(paymailOutput client.RequestsPaymailOutputSpecification, _ int) client.RequestsTransactionOutlineOutputSpecification {
+			var output client.RequestsTransactionOutlineOutputSpecification
+			err := output.FromRequestsPaymailOutputSpecification(paymailOutput)
+			require.NoError(state.T, err)
+			return output
+		})
+
+		var body client.CreateTransactionOutlineJSONRequestBody
+		body.Outputs = outputs
+
+		return c.CreateTransactionOutlineWithResponse(context.Background(), &client.CreateTransactionOutlineParams{
+			Format: lo.ToPtr(client.Beef),
+		}, body)
+	}
+}
+
 func RequestRecordOutline(hex string, outline *client.ResponsesCreateTransactionOutlineSuccess) manualtests.GenericCall[*client.RecordTransactionOutlineResponse] {
 	return func(c *client.ClientWithResponses) (*client.RecordTransactionOutlineResponse, error) {
 		body := client.RecordTransactionOutlineJSONRequestBody{
@@ -172,16 +278,6 @@ func RequestRecordOutline(hex string, outline *client.ResponsesCreateTransaction
 	}
 }
 
-func RequestCurrentUser(c *client.ClientWithResponses) (manualtests.Result, error) {
-	return c.CurrentUserWithResponse(context.Background())
-}
-
-func RequestOperations(c *client.ClientWithResponses) (manualtests.Result, error) {
-	return c.SearchOperationsWithResponse(context.Background(), nil)
-}
-
-func RequestData(state manualtests.StateForCall, c *client.ClientWithResponses) (manualtests.Result, error) {
-	id := state.LatestDataID()
-	require.NotEmpty(state.T, id, "there should be some data id after this test")
-	return c.DataByIdWithResponse(context.Background(), id)
+func RequestRecordOutlineAsCall(hex string, outline *client.ResponsesCreateTransactionOutlineSuccess) manualtests.Call {
+	return manualtests.ToCall[*client.RecordTransactionOutlineResponse](RequestRecordOutline(hex, outline))
 }

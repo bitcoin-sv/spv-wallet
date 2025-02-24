@@ -11,7 +11,16 @@ import (
 type GenericCall[R Result] = func(c *client.ClientWithResponses) (R, error)
 type Call = GenericCall[Result]
 type CallWithT = func(t testing.TB, c *client.ClientWithResponses) (Result, error)
-type CallWithState = func(state StateForCall, c *client.ClientWithResponses) (Result, error)
+type GenericCallWithState[R Result] = func(state StateForCall, c *client.ClientWithResponses) (R, error)
+type CallWithState = GenericCallWithState[Result]
+
+// ToCall because go generics are stupid, we need to have this wrapping.
+func ToCall[R Result](f GenericCall[R]) Call {
+	return func(c *client.ClientWithResponses) (Result, error) {
+		result, err := f(c)
+		return result, err
+	}
+}
 
 type APICall struct {
 	t      testing.TB
@@ -28,8 +37,16 @@ func APICallForAdmin(t testing.TB) *APICall {
 	return APICallFor(t, AdminClientFactory)
 }
 
-func APICallForUser(t testing.TB) *APICall {
-	return APICallFor(t, UserClientFactory)
+func APICallForCurrentUser(t testing.TB) *APICall {
+	return APICallFor(t, CurrentUserClientFactory)
+}
+
+func APICallForRecipient(t testing.TB) *APICall {
+	return APICallFor(t, RecipientClientFactory)
+}
+
+func APICallForUserWithID(t testing.TB, userID string) *APICall {
+	return APICallFor(t, UserClientFactoryWithID(userID))
 }
 
 func APICallForAnonymous(t testing.TB) *APICall {
