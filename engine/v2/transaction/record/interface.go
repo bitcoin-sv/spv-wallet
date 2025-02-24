@@ -2,6 +2,7 @@ package record
 
 import (
 	"context"
+	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"iter"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -16,6 +17,10 @@ import (
 // AddressesService is an interface for addresses service.
 type AddressesService interface {
 	FindByStringAddresses(ctx context.Context, addresses iter.Seq[string]) ([]addressesmodels.Address, error)
+}
+
+type UsersService interface {
+	GetPubKey(ctx context.Context, userID string) (*primitives.PublicKey, error)
 }
 
 // OutputsRepo is an interface for outputs repository.

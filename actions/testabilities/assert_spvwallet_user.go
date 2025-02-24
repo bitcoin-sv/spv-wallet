@@ -29,6 +29,7 @@ type LastOperationAssertions interface {
 	WithValue(value int64) LastOperationAssertions
 	WithType(operationType string) LastOperationAssertions
 	WithCounterparty(counterparty string) LastOperationAssertions
+	WithNoCounterparty() LastOperationAssertions
 	WithTxStatus(txStatus string) LastOperationAssertions
 }
 
@@ -116,6 +117,12 @@ func (l *lastOperationAssertions) WithType(operationType string) LastOperationAs
 func (l *lastOperationAssertions) WithCounterparty(counterparty string) LastOperationAssertions {
 	l.t.Helper()
 	l.require.Equal(counterparty, l.content.Counterparty)
+	return l
+}
+
+func (l *lastOperationAssertions) WithNoCounterparty() LastOperationAssertions {
+	l.t.Helper()
+	l.require.Empty(l.content.Counterparty)
 	return l
 }
 

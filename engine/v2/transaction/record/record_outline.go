@@ -3,7 +3,6 @@ package record
 import (
 	"context"
 	"fmt"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
@@ -60,7 +59,15 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 	}
 
 	// getting all outputs that matches user's addresses from the database
-	p2pkhOutputs, err := flow.findRelevantP2PKHOutputs()
+	resolver := flow.resolveCustomOutputs(userID, outline.Annotations.Outputs)
+
+	for outputData := range resolver.customOutputs() {
+		operation := flow.operationOfUser(outputData.UserID, "incoming", sender)
+		operation.Add(outputData.Satoshis)
+		flow.addOutputs(outputData)
+	}
+
+	p2pkhOutputs, err := flow.findRelevantP2PKHOutputs(resolver.remainingAddresses())
 	if err != nil {
 		return nil, err
 	}

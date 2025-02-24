@@ -132,8 +132,8 @@ func (f *txFlow) addOutputs(outputs ...txmodels.NewOutput) {
 	f.txRow.AddOutputs(outputs...)
 }
 
-func (f *txFlow) findRelevantP2PKHOutputs() (iter.Seq[txmodels.NewOutput], error) {
-	relevantOutputs := map[string]uint32{} // address -> vout
+func (f *txFlow) allP2PKHAddresses() map[string]uint32 {
+	addresses := map[string]uint32{}
 	for vout, output := range f.tx.Outputs {
 		lockingScript := output.LockingScript
 		if !lockingScript.IsP2PKH() {
@@ -144,35 +144,94 @@ func (f *txFlow) findRelevantP2PKHOutputs() (iter.Seq[txmodels.NewOutput], error
 			f.service.logger.Warn().Err(err).Msg("failed to get address from locking script")
 			continue
 		}
-
 		voutU32, err := conv.IntToUint32(vout)
 		if err != nil {
 			f.service.logger.Warn().Err(err).Msg("failed to convert vout to uint32")
 			continue
 		}
-
-		relevantOutputs[address.AddressString] = voutU32
+		addresses[address.AddressString] = voutU32
 	}
+	return addresses
+}
 
-	rows, err := f.service.addresses.FindByStringAddresses(f.ctx, maps.Keys(relevantOutputs))
+func (f *txFlow) findRelevantP2PKHOutputs(potentialTrackedUniqueAddresses map[string]uint32) (iter.Seq[txmodels.NewOutput], error) {
+
+	//potentialTrackedUniqueAddresses := map[string]uint32{} // address -> vout
+	//
+	//type customOutputInfo struct {
+	//	vout               uint32
+	//	customInstructions *bsv.CustomInstructions
+	//}
+	//customDefinedUserAddresses := map[string]customOutputInfo{} // address -> customOutputInfo
+	//
+	//for vout, output := range f.tx.Outputs {
+	//	lockingScript := output.LockingScript
+	//	if !lockingScript.IsP2PKH() {
+	//		continue
+	//	}
+	//	address, err := lockingScript.Address()
+	//	if err != nil {
+	//		f.service.logger.Warn().Err(err).Msg("failed to get address from locking script")
+	//		continue
+	//	}
+	//
+	//	voutU32, err := conv.IntToUint32(vout)
+	//	if err != nil {
+	//		f.service.logger.Warn().Err(err).Msg("failed to convert vout to uint32")
+	//		continue
+	//	}
+	//
+	//	if annotation, ok := outputAnnotations[vout]; ok {
+	//		if annotation.Bucket == bucket.BSV && annotation.CustomInstructions != nil {
+	//			userPubKey, err := f.getUserPubKey()
+	//			if err != nil {
+	//				return nil, spverrors.Wrapf(err, "failed to get public key for user %s", f.userID)
+	//			}
+	//			calculatedAddr, err := custominstructions.Address(*userPubKey, *annotation.CustomInstructions)
+	//			if err != nil {
+	//				return nil, spverrors.Wrapf(err, "failed to derive address from custom instructions for user %s", f.userID)
+	//			}
+	//			if address.AddressString != calculatedAddr.AddressString {
+	//				return nil, spverrors.Newf("address derived from custom instructions does not match the address in the locking script")
+	//			}
+	//
+	//			customDefinedUserAddresses[address.AddressString] = customOutputInfo{
+	//				vout:               voutU32,
+	//				customInstructions: annotation.CustomInstructions,
+	//			}
+	//		}
+	//	} else {
+	//		potentialTrackedUniqueAddresses[address.AddressString] = voutU32
+	//	}
+	//}
+
+	trackedAddresses, err := f.service.addresses.FindByStringAddresses(f.ctx, maps.Keys(potentialTrackedUniqueAddresses))
 	if err != nil {
 		return nil, txerrors.ErrGettingAddresses.Wrap(err)
 	}
 
 	return func(yield func(output txmodels.NewOutput) bool) {
-		for _, row := range rows {
-			vout, ok := relevantOutputs[row.Address]
+		for _, tracked := range trackedAddresses {
+			vout, ok := potentialTrackedUniqueAddresses[tracked.Address]
 			if !ok {
-				f.service.logger.Warn().Str("address", row.Address).Msg("Got not relevant address from database")
+				f.service.logger.Warn().Str("address", tracked.Address).Msg("Got not relevant address from database")
 				continue
 			}
 			yield(txmodels.NewOutputForP2PKH(
 				bsv.Outpoint{TxID: f.txID, Vout: vout},
-				row.UserID,
+				tracked.UserID,
 				bsv.Satoshis(f.tx.Outputs[vout].Satoshis),
-				row.CustomInstructions,
+				tracked.CustomInstructions,
 			))
 		}
+		//for _, info := range customDefinedUserAddresses {
+		//	yield(txmodels.NewOutputForP2PKH(
+		//		bsv.Outpoint{TxID: f.txID, Vout: info.vout},
+		//		f.userID,
+		//		bsv.Satoshis(f.tx.Outputs[info.vout].Satoshis),
+		//		*info.customInstructions,
+		//	))
+		//}
 	}, nil
 }
 

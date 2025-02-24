@@ -25,7 +25,7 @@ func newDestinationWithReference(pubKey *primitives.PublicKey, referenceID strin
 	}
 
 	dst.DerivationKey = fmt.Sprintf("1-destination-%s", referenceID)
-	dst.PubKey, err = derive(pubKey, dst.DerivationKey)
+	dst.PubKey, err = Derive(pubKey, dst.DerivationKey)
 	if err != nil {
 		return dst, err
 	}

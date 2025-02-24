@@ -185,7 +185,8 @@ func (c *Client) loadTransactionRecordService() error {
 		logger := c.Logger().With().Str("subservice", "transactionRecord").Logger()
 		c.options.transactionRecordService = record.NewService(
 			logger,
-			c.Repositories().Addresses,
+			c.AddressesService(),
+			c.UsersService(),
 			c.Repositories().Outputs,
 			c.Repositories().Operations,
 			c.Repositories().Transactions,

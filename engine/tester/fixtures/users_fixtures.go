@@ -183,11 +183,7 @@ func (f *User) PublicKey() *ec.PublicKey {
 
 // Address returns the address of this user.
 func (f *User) Address() *script.Address {
-	addr, err := script.NewAddressFromPublicKey(f.PublicKey(), true)
-	if err != nil {
-		panic("Invalid setup of user fixture, cannot restore address: " + err.Error())
-	}
-	return addr
+	return addressFromPubKey(f.PublicKey())
 }
 
 // ID returns the id of the user.
@@ -197,8 +193,21 @@ func (f *User) ID() string {
 }
 
 // P2PKHLockingScript returns the locking script of this user.
-func (f *User) P2PKHLockingScript() *script.Script {
-	lockingScript, err := p2pkh.Lock(f.Address())
+func (f *User) P2PKHLockingScript(instructions ...bsv.CustomInstruction) *script.Script {
+	pub := f.PublicKey()
+	var err error
+	for _, instruction := range instructions {
+		switch instruction.Type {
+		case "type42":
+			pub, err = type42.Derive(pub, instruction.Instruction)
+			if err != nil {
+				panic("Invalid setup of user fixture, cannot restore type42 instruction: " + err.Error())
+			}
+		default:
+			panic("Invalid setup of user fixture, unknown instruction type: " + instruction.Type)
+		}
+	}
+	lockingScript, err := p2pkh.Lock(addressFromPubKey(pub))
 	if err != nil {
 		panic("Invalid setup of user fixture, cannot restore locking script: " + err.Error())
 	}
@@ -226,6 +235,14 @@ func (f *User) P2PKHUnlockingScriptTemplate(instructions ...bsv.CustomInstructio
 		panic("Invalid setup of user fixture, cannot restore unlocking script: " + err.Error())
 	}
 	return unlockingScript
+}
+
+func addressFromPubKey(pubKey *ec.PublicKey) *script.Address {
+	addr, err := script.NewAddressFromPublicKey(pubKey, true)
+	if err != nil {
+		panic("Invalid setup of user fixture, cannot restore address: " + err.Error())
+	}
+	return addr
 }
 
 // AllUsers returns all users fixtures despite it's internal or external user.

@@ -1,6 +1,7 @@
 package mapping
 
 import (
+	bsvmodel "github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"strconv"
 
 	"github.com/bitcoin-sv/spv-wallet/api"
@@ -52,5 +53,20 @@ func annotatedOutputToOutline(from api.ModelsOutputAnnotation) *transaction.Outp
 				}
 			},
 		).Else(nil),
+		CustomInstructions: lo.IfF(
+			from.CustomInstructions != nil,
+			func() *bsvmodel.CustomInstructions {
+				return lo.ToPtr(
+					bsvmodel.CustomInstructions(lo.Map(*from.CustomInstructions, lox.MappingFn(requestToCustomResponse))),
+				)
+			},
+		).Else(nil),
+	}
+}
+
+func requestToCustomResponse(instruction api.ModelsSPVWalletCustomInstruction) bsvmodel.CustomInstruction {
+	return bsvmodel.CustomInstruction{
+		Type:        instruction.Type,
+		Instruction: instruction.Instruction,
 	}
 }

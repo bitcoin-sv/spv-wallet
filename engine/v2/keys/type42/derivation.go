@@ -10,7 +10,7 @@ var (
 	anyonePub     = anyonePriv.PubKey()
 )
 
-func derive(pubKey *primitives.PublicKey, derivationKey string) (*primitives.PublicKey, error) {
+func Derive(pubKey *primitives.PublicKey, derivationKey string) (*primitives.PublicKey, error) {
 	if pubKey == nil {
 		return nil, ErrDeriveKey.Wrap(spverrors.Newf("public key is nil"))
 	}
