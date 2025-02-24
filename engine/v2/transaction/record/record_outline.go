@@ -59,30 +59,35 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 		operation.Subtract(utxo.Satoshis)
 	}
 
-	// getting all outputs that matches user's addresses from the database
-	resolver := flow.resolveCustomOutputs(userID, outline.Annotations.Outputs)
+	// resolve custom outputs which user knows how to unlock and provided customInstructions in the annotation
+	customOuts := flow.resolveCustomOutputs(userID, outline.Annotations.Outputs)
+	for address, utxo := range customOuts.annotatedOutputs() {
+		operation := flow.operationOfUser(utxo.UserID, "incoming", sender)
+		operation.Add(utxo.Satoshis)
+		flow.addOutputs(utxo)
 
-	for outputData := range resolver.customOutputs() {
-		operation := flow.operationOfUser(outputData.UserID, "incoming", sender)
-		operation.Add(outputData.Satoshis)
-		flow.addOutputs(outputData)
+		customOuts.resolveAddress(address, utxo.Vout)
+	}
+	if customOuts.err != nil {
+		return nil, spverrors.Wrapf(customOuts.err, "failed to resolve custom outputs")
 	}
 
-	p2pkhOutputs, err := flow.findRelevantP2PKHOutputs(resolver.remainingAddresses())
+	// getting all outputs that matches user's addresses from the database
+	p2pkhOutputs, err := flow.createUTXOsForTrackedAddresses(customOuts.remainingAddresses())
 	if err != nil {
 		return nil, err
 	}
 
-	for outputData := range p2pkhOutputs {
-		if pmInfo.hasVOut(outputData.Vout) {
+	for utxo := range p2pkhOutputs {
+		if pmInfo.hasVOut(utxo.Vout) {
 			// If the output which matches an address obtained from our database,
 			// is marked as paymail output in the annotation,
 			// it means that we don't have to make paymail-p2p-notification because it is internal.
 			pmInfo.skipNotification = true
 		}
-		operation := flow.operationOfUser(outputData.UserID, "incoming", sender)
-		operation.Add(outputData.Satoshis)
-		flow.addOutputs(outputData)
+		operation := flow.operationOfUser(utxo.UserID, "incoming", sender)
+		operation.Add(utxo.Satoshis)
+		flow.addOutputs(utxo)
 	}
 
 	newDataRecords, err := processDataOutputs(tx, userID, &outline.Annotations)

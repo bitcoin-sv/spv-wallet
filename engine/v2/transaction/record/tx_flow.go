@@ -132,8 +132,8 @@ func (f *txFlow) addOutputs(outputs ...txmodels.NewOutput) {
 	f.txRow.AddOutputs(outputs...)
 }
 
-func (f *txFlow) allP2PKHAddresses() map[string]uint32 {
-	addresses := map[string]uint32{}
+func (f *txFlow) allP2PKHAddresses() addresses {
+	addrs := make(addresses)
 	for vout, output := range f.tx.Outputs {
 		lockingScript := output.LockingScript
 		if !lockingScript.IsP2PKH() {
@@ -149,12 +149,13 @@ func (f *txFlow) allP2PKHAddresses() map[string]uint32 {
 			f.service.logger.Warn().Err(err).Msg("failed to convert vout to uint32")
 			continue
 		}
-		addresses[address.AddressString] = voutU32
+
+		addrs.append(address.AddressString, voutU32)
 	}
-	return addresses
+	return addrs
 }
 
-func (f *txFlow) findRelevantP2PKHOutputs(potentialTrackedUniqueAddresses map[string]uint32) (iter.Seq[txmodels.NewOutput], error) {
+func (f *txFlow) createUTXOsForTrackedAddresses(potentialTrackedUniqueAddresses addresses) (iter.Seq[txmodels.NewOutput], error) {
 	trackedAddresses, err := f.service.addresses.FindByStringAddresses(f.ctx, maps.Keys(potentialTrackedUniqueAddresses))
 	if err != nil {
 		return nil, txerrors.ErrGettingAddresses.Wrap(err)
@@ -162,17 +163,19 @@ func (f *txFlow) findRelevantP2PKHOutputs(potentialTrackedUniqueAddresses map[st
 
 	return func(yield func(output txmodels.NewOutput) bool) {
 		for _, tracked := range trackedAddresses {
-			vout, ok := potentialTrackedUniqueAddresses[tracked.Address]
+			addrInfo, ok := potentialTrackedUniqueAddresses[tracked.Address]
 			if !ok {
 				f.service.logger.Warn().Str("address", tracked.Address).Msg("Got not relevant address from database")
 				continue
 			}
-			yield(txmodels.NewOutputForP2PKH(
-				bsv.Outpoint{TxID: f.txID, Vout: vout},
-				tracked.UserID,
-				bsv.Satoshis(f.tx.Outputs[vout].Satoshis),
-				tracked.CustomInstructions,
-			))
+			for voutsContainingAddress := range addrInfo.vouts {
+				yield(txmodels.NewOutputForP2PKH(
+					bsv.Outpoint{TxID: f.txID, Vout: voutsContainingAddress},
+					tracked.UserID,
+					bsv.Satoshis(f.tx.Outputs[voutsContainingAddress].Satoshis),
+					tracked.CustomInstructions,
+				))
+			}
 		}
 	}, nil
 }

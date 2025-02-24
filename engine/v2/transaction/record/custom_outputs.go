@@ -17,7 +17,7 @@ type customOutputsResolver struct {
 	userID      string
 	userPubKey  *primitives.PublicKey
 	annotations transaction.OutputsAnnotations
-	txAddresses map[string]uint32
+	txAddresses addresses
 	err         error
 }
 
@@ -32,12 +32,16 @@ func (c *customOutputsResolver) getUserPubKey() (*primitives.PublicKey, error) {
 	return c.userPubKey, nil
 }
 
-func (c *customOutputsResolver) remainingAddresses() map[string]uint32 {
+func (c *customOutputsResolver) remainingAddresses() addresses {
 	return c.txAddresses
 }
 
-func (c *customOutputsResolver) customOutputs() iter.Seq[txmodels.NewOutput] {
-	return func(yield func(output txmodels.NewOutput) bool) {
+func (c *customOutputsResolver) resolveAddress(address string, vout uint32) {
+	c.txAddresses.remove(address, vout)
+}
+
+func (c *customOutputsResolver) annotatedOutputs() iter.Seq2[string, txmodels.NewOutput] {
+	return func(yield func(address string, output txmodels.NewOutput) bool) {
 		for vout, annotation := range c.annotations {
 			if annotation.Bucket != bucket.BSV || annotation.CustomInstructions == nil {
 				continue
@@ -54,25 +58,23 @@ func (c *customOutputsResolver) customOutputs() iter.Seq[txmodels.NewOutput] {
 				break
 			}
 
-			realVOut, ok := c.txAddresses[calculatedAddr.AddressString]
+			_, ok := c.txAddresses[calculatedAddr.AddressString]
 			if !ok {
 				c.err = spverrors.Newf("address derived from custom instructions doesn't match any of the addresses in the locking scripts")
 				break
 			}
 
-			if realVOut != vout {
-				c.err = spverrors.Newf("address derived from custom instructions doesn't match the address in the locking script")
+			if ok := c.txAddresses.contains(calculatedAddr.AddressString, vout); !ok {
+				c.err = spverrors.Newf("address derived from custom instructions doesn't match the locking script of the output")
 				break
 			}
 
-			yield(txmodels.NewOutputForP2PKH(
-				bsv.Outpoint{TxID: c.flow.txID, Vout: realVOut},
+			yield(calculatedAddr.AddressString, txmodels.NewOutputForP2PKH(
+				bsv.Outpoint{TxID: c.flow.txID, Vout: vout},
 				c.userID,
 				bsv.Satoshis(c.flow.tx.Outputs[vout].Satoshis),
 				*annotation.CustomInstructions,
 			))
-
-			delete(c.txAddresses, calculatedAddr.AddressString)
 		}
 	}
 }
