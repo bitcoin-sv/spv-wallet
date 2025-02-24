@@ -5,18 +5,39 @@ import (
 
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 
-// Destination derives a public key using a reference ID.
-// It is intended to be used to derive a public key for paymail destinations.
-func Destination(pubKey *primitives.PublicKey, referenceID string) (*primitives.PublicKey, string, error) {
-	if referenceID == "" {
-		return nil, "", ErrDeriveKey.Wrap(spverrors.Newf("reference ID is empty"))
+// Destination represents a destination for a transaction output.
+type Destination struct {
+	PubKey        *primitives.PublicKey
+	ReferenceID   string
+	DerivationKey string
+}
+
+func newDestinationWithReference(pubKey *primitives.PublicKey, referenceID string) (Destination, error) {
+	dst := Destination{
+		ReferenceID: referenceID,
 	}
-	derivationKey := fmt.Sprintf("1-destination-%s", referenceID)
-	derivedPubByRef, err := derive(pubKey, derivationKey)
+	var err error
+	if dst.ReferenceID == "" {
+		return dst, ErrDeriveKey.Wrap(spverrors.Newf("reference ID is empty"))
+	}
+
+	dst.DerivationKey = fmt.Sprintf("1-destination-%s", referenceID)
+	dst.PubKey, err = derive(pubKey, dst.DerivationKey)
 	if err != nil {
-		return nil, derivationKey, err
+		return dst, err
 	}
-	return derivedPubByRef, derivationKey, nil
+	return dst, nil
+}
+
+// NewDestinationWithRandomReference helps to generate a destination with a random reference ID.
+func NewDestinationWithRandomReference(pubKey *primitives.PublicKey) (Destination, error) {
+	referenceID, err := utils.RandomHex(16)
+	if err != nil {
+		return Destination{}, ErrRandomReferenceID.Wrap(err)
+	}
+
+	return newDestinationWithReference(pubKey, referenceID)
 }

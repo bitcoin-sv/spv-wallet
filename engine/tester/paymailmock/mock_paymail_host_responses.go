@@ -1,18 +1,19 @@
 package paymailmock
 
 import (
+	"encoding/json"
 	"net/http"
 
+	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/jarcoal/httpmock"
+	"github.com/samber/lo"
 )
 
-// MockedP2PDestinationResponse is a mocked response for the P2P destinations endpoint
-type MockedP2PDestinationResponse struct {
-	Reference string
-	Scripts   []string
-	Satoshis  []bsv.Satoshis
+// MockedP2PDestination is a mocked response for the P2P destinations endpoint
+type MockedP2PDestination struct {
+	CustomDistribution []bsv.Satoshis
 }
 
 var mockedLockingScripts = []string{
@@ -23,40 +24,64 @@ var mockedLockingScripts = []string{
 	"76a9145537ff4d8658ac8f8da4346e7e7abc64484a03d488ac",
 }
 
-// Responder returns a httpmock responder for the mocked P2P destinations response
-func (m *MockedP2PDestinationResponse) Responder() httpmock.Responder {
-	r, err := httpmock.NewJsonResponder(http.StatusOK, m.response())
-	if err != nil {
-		panic(spverrors.Wrapf(err, "cannot create mocked responder for P2P destinations"))
-	}
-	return r
+// MockedReferenceID is returned always by the mocked P2P destinations response
+const MockedReferenceID = "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7"
+
+// MockedP2PDestinationOutput is a part of the mocked P2P destinations response
+type MockedP2PDestinationOutput struct {
+	Script   string       `json:"script"`
+	Satoshis bsv.Satoshis `json:"satoshis"`
 }
 
-func (m *MockedP2PDestinationResponse) response() obj {
-	outs := make([]obj, len(m.Satoshis))
-	for i, s := range m.Satoshis {
-		outs[i] = obj{
-			"script":   m.Scripts[i],
-			"satoshis": s,
+// MockedP2PDestinationResponse is a model for the mocked P2P destinations response
+type MockedP2PDestinationResponse struct {
+	Reference string                       `json:"reference"`
+	Outputs   []MockedP2PDestinationOutput `json:"outputs"`
+}
+
+// Responder returns a httpmock responder for the mocked P2P destinations response
+func (m *MockedP2PDestination) Responder() httpmock.Responder {
+	return func(request *http.Request) (*http.Response, error) {
+		var payload paymail.PaymentRequest
+		err := json.NewDecoder(request.Body).Decode(&payload)
+		if err != nil {
+			return httpmock.NewStringResponse(http.StatusBadRequest, "invalid json"), nil
 		}
+
+		var distribution []bsv.Satoshis
+		if len(m.CustomDistribution) == 0 {
+			distribution = []bsv.Satoshis{bsv.Satoshis(payload.Satoshis)}
+		} else {
+			distribution = m.CustomDistribution
+		}
+
+		outputs := lo.Map(distribution, func(sats bsv.Satoshis, i int) MockedP2PDestinationOutput {
+			return MockedP2PDestinationOutput{
+				Script:   mockedLockingScripts[i%len(mockedLockingScripts)],
+				Satoshis: sats,
+			}
+		})
+
+		r, err := httpmock.NewJsonResponse(http.StatusOK, MockedP2PDestinationResponse{
+			Outputs:   outputs,
+			Reference: MockedReferenceID,
+		})
+		if err != nil {
+			panic(spverrors.Wrapf(err, "cannot create mocked responder for record tx response"))
+		}
+
+		return r, nil
 	}
-	return obj{
-		"outputs":   outs,
-		"reference": m.Reference,
-	}
+}
+
+// P2PDestinationResponse returns a new mocked response for the P2P destinations endpoint
+func P2PDestinationResponse() *MockedP2PDestination {
+	return &MockedP2PDestination{}
 }
 
 // P2PDestinationsForSats returns a mocked response for the P2P destinations endpoint
-func P2PDestinationsForSats(satoshis bsv.Satoshis, moreSatoshis ...bsv.Satoshis) *MockedP2PDestinationResponse {
-	outputSats := append([]bsv.Satoshis{satoshis}, moreSatoshis...)
-	scripts := make([]string, len(outputSats))
-	for i := range scripts {
-		scripts[i] = mockedLockingScripts[i%len(mockedLockingScripts)]
-	}
-
-	return &MockedP2PDestinationResponse{
-		Reference: "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
-		Scripts:   scripts,
-		Satoshis:  outputSats,
+func P2PDestinationsForSats(satoshis bsv.Satoshis, moreSatoshis ...bsv.Satoshis) *MockedP2PDestination {
+	return &MockedP2PDestination{
+		CustomDistribution: append([]bsv.Satoshis{satoshis}, moreSatoshis...),
 	}
 }

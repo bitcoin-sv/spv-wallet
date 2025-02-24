@@ -291,6 +291,11 @@ type ModelsBucketAnnotation struct {
 	Bucket string `json:"bucket"`
 }
 
+// ModelsChangeAnnotation defines model for models_ChangeAnnotation.
+type ModelsChangeAnnotation struct {
+	CustomInstructions *ModelsSPVWalletCustomInstructions `json:"customInstructions,omitempty"`
+}
+
 // ModelsCustomInstructions defines model for models_CustomInstructions.
 type ModelsCustomInstructions struct {
 	union json.RawMessage
@@ -368,8 +373,9 @@ type ModelsOutlineAnnotations struct {
 
 // ModelsOutputAnnotation defines model for models_OutputAnnotation.
 type ModelsOutputAnnotation struct {
-	Bucket  ModelsOutputAnnotationBucket    `json:"bucket"`
-	Paymail *ModelsPaymailAnnotationDetails `json:"paymail,omitempty"`
+	Bucket             ModelsOutputAnnotationBucket       `json:"bucket"`
+	CustomInstructions *ModelsSPVWalletCustomInstructions `json:"customInstructions,omitempty"`
+	Paymail            *ModelsPaymailAnnotationDetails    `json:"paymail,omitempty"`
 }
 
 // ModelsOutputAnnotationBucket defines model for ModelsOutputAnnotation.Bucket.
@@ -501,7 +507,7 @@ type RequestsOpReturnHexesOutput = []string
 
 // RequestsOpReturnOutputSpecification defines model for requests_OpReturnOutputSpecification.
 type RequestsOpReturnOutputSpecification struct {
-	Data     *RequestsOpReturnOutputSpecification_Data    `json:"data,omitempty"`
+	Data     RequestsOpReturnOutputSpecification_Data     `json:"data"`
 	DataType *RequestsOpReturnOutputSpecificationDataType `json:"dataType,omitempty"`
 	Type     RequestsOpReturnOutputSpecificationType      `json:"type"`
 }
@@ -1029,7 +1035,7 @@ func (t RequestsTransactionOutlineOutputSpecification) AsRequestsOpReturnOutputS
 
 // FromRequestsOpReturnOutputSpecification overwrites any union data inside the RequestsTransactionOutlineOutputSpecification as the provided RequestsOpReturnOutputSpecification
 func (t *RequestsTransactionOutlineOutputSpecification) FromRequestsOpReturnOutputSpecification(v RequestsOpReturnOutputSpecification) error {
-	v.Type = "requests_OpReturnOutputSpecification"
+	v.Type = "op_return"
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
@@ -1037,7 +1043,7 @@ func (t *RequestsTransactionOutlineOutputSpecification) FromRequestsOpReturnOutp
 
 // MergeRequestsOpReturnOutputSpecification performs a merge with any union data inside the RequestsTransactionOutlineOutputSpecification, using the provided RequestsOpReturnOutputSpecification
 func (t *RequestsTransactionOutlineOutputSpecification) MergeRequestsOpReturnOutputSpecification(v RequestsOpReturnOutputSpecification) error {
-	v.Type = "requests_OpReturnOutputSpecification"
+	v.Type = "op_return"
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -1057,7 +1063,7 @@ func (t RequestsTransactionOutlineOutputSpecification) AsRequestsPaymailOutputSp
 
 // FromRequestsPaymailOutputSpecification overwrites any union data inside the RequestsTransactionOutlineOutputSpecification as the provided RequestsPaymailOutputSpecification
 func (t *RequestsTransactionOutlineOutputSpecification) FromRequestsPaymailOutputSpecification(v RequestsPaymailOutputSpecification) error {
-	v.Type = "requests_PaymailOutputSpecification"
+	v.Type = "paymail"
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
@@ -1065,7 +1071,7 @@ func (t *RequestsTransactionOutlineOutputSpecification) FromRequestsPaymailOutpu
 
 // MergeRequestsPaymailOutputSpecification performs a merge with any union data inside the RequestsTransactionOutlineOutputSpecification, using the provided RequestsPaymailOutputSpecification
 func (t *RequestsTransactionOutlineOutputSpecification) MergeRequestsPaymailOutputSpecification(v RequestsPaymailOutputSpecification) error {
-	v.Type = "requests_PaymailOutputSpecification"
+	v.Type = "paymail"
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -1090,9 +1096,9 @@ func (t RequestsTransactionOutlineOutputSpecification) ValueByDiscriminator() (i
 		return nil, err
 	}
 	switch discriminator {
-	case "requests_OpReturnOutputSpecification":
+	case "op_return":
 		return t.AsRequestsOpReturnOutputSpecification()
-	case "requests_PaymailOutputSpecification":
+	case "paymail":
 		return t.AsRequestsPaymailOutputSpecification()
 	default:
 		return nil, errors.New("unknown discriminator value: " + discriminator)

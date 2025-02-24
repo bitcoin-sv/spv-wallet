@@ -727,6 +727,11 @@ components:
             required:
                 - bucket
             type: object
+        models_ChangeAnnotation:
+            properties:
+                customInstructions:
+                    $ref: '#/components/schemas/models_SPVWalletCustomInstructions'
+            type: object
         models_CustomInstructions:
             oneOf:
                 - $ref: '#/components/schemas/models_SPVWalletCustomInstructions'
@@ -842,6 +847,7 @@ components:
                 - $ref: '#/components/schemas/models_BucketAnnotation'
                 - $ref: '#/components/schemas/models_DataAnnotation'
                 - $ref: '#/components/schemas/models_PaymailAnnotation'
+                - $ref: '#/components/schemas/models_ChangeAnnotation'
         models_OutputsAnnotations:
             properties:
                 outputs:
@@ -1083,32 +1089,27 @@ components:
                 type: string
             type: array
         requests_OpReturnOutputSpecification:
-            allOf:
-                - discriminator:
-                    mapping:
-                        hexes: '#/components/schemas/OpReturnHexesOutput'
-                        strings: '#/components/schemas/OpReturnStringsOutput'
-                    propertyName: dataType
-                  properties:
-                    data:
-                        oneOf:
-                            - $ref: '#/components/schemas/requests_OpReturnHexesOutput'
-                            - $ref: '#/components/schemas/requests_OpReturnStringsOutput'
-                    dataType:
-                        default: strings
-                        enum:
-                            - hexes
-                            - strings
-                        example: strings
-                        type: string
-                    type:
-                        enum:
-                            - op_return
-                        example: op_return
-                        type: string
-                  required:
-                    - type
-                  type: object
+            properties:
+                data:
+                    oneOf:
+                        - $ref: '#/components/schemas/requests_OpReturnHexesOutput'
+                        - $ref: '#/components/schemas/requests_OpReturnStringsOutput'
+                dataType:
+                    default: strings
+                    enum:
+                        - hexes
+                        - strings
+                    example: strings
+                    type: string
+                type:
+                    enum:
+                        - op_return
+                    example: op_return
+                    type: string
+            required:
+                - type
+                - data
+            type: object
         requests_OpReturnStringsOutput:
             items:
                 example: hello world
@@ -1148,8 +1149,8 @@ components:
         requests_TransactionOutlineOutputSpecification:
             discriminator:
                 mapping:
-                    op_return: '#/components/schemas/OpReturnOutput'
-                    paymail: '#/components/schemas/PaymailOutput'
+                    op_return: '#/components/schemas/requests_OpReturnOutputSpecification'
+                    paymail: '#/components/schemas/requests_PaymailOutputSpecification'
                 propertyName: type
             oneOf:
                 - $ref: '#/components/schemas/requests_OpReturnOutputSpecification'
