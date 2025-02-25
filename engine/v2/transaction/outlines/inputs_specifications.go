@@ -38,6 +38,7 @@ func (s *InputsSpec) evaluate(ctx *evaluationContext, outputs annotatedOutputs) 
 			TransactionInput: &sdk.TransactionInput{
 				SourceTXID:       txID,
 				SourceTxOutIndex: utxo.Vout,
+				SequenceNumber:   sdk.DefaultSequenceNumber,
 			},
 			InputAnnotation: &transaction.InputAnnotation{
 				CustomInstructions: utxo.CustomInstructions,
