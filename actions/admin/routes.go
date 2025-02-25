@@ -22,6 +22,7 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 	adminGroup.PUT("/contacts/:id", handlers.AsAdmin(contactsUpdate))
 	adminGroup.POST("/contacts/:paymail", handlers.AsAdmin(contactsCreate))
 	adminGroup.POST("/contacts/confirmations", handlers.AsAdmin(contactsConfirm))
+	adminGroup.PATCH("/contacts/unconfirm/:id", handlers.AsAdmin(contactUnconfirm))
 
 	// access keys
 	adminGroup.GET("/users/keys", handlers.AsAdmin(accessKeysSearch))

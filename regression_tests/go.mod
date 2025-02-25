@@ -4,8 +4,8 @@ go 1.24.0
 
 require (
 	github.com/bitcoin-sv/spv-wallet v1.0.0-beta.42
-	github.com/bitcoin-sv/spv-wallet-go-client v1.0.0-beta.23
-	github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.43
+	github.com/bitcoin-sv/spv-wallet-go-client v1.0.0-beta.25
+	github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.42
 	github.com/joho/godotenv v1.5.1
 )
 

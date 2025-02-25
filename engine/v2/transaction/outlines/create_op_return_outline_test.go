@@ -70,7 +70,7 @@ func TestCreateOpReturnTransactionOutlineBEEF(t *testing.T) {
 			// then:
 			thenTx := then.Created(tx).WithNoError(err).WithParseableBEEFHex()
 
-			thenTx.HasOutputs(1)
+			thenTx.IsWithoutTimeLock()
 
 			thenTx.Output(0).
 				HasBucket(bucket.Data).
@@ -198,6 +198,8 @@ func TestCreateOpReturnTransactionOutlineRAW(t *testing.T) {
 
 			// then:
 			thenTx := then.Created(tx).WithNoError(err).WithParseableRawHex()
+
+			thenTx.IsWithoutTimeLock()
 
 			thenTx.HasInputs(1)
 

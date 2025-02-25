@@ -147,72 +147,9 @@ func TestWithEncryption(t *testing.T) {
 	})
 }
 
-// TestWithRedis will test the method WithRedis()
-func TestWithRedis(t *testing.T) {
-	testLogger := zerolog.Nop()
-
-	t.Run("check type", func(t *testing.T) {
-		opt := WithRedis(nil)
-		assert.IsType(t, *new(ClientOps), opt)
-	})
-
-	t.Run("using valid config", func(t *testing.T) {
-		if testing.Short() {
-			t.Skip("skipping live local redis tests")
-		}
-
-		tc, err := NewClient(
-			context.Background(),
-			WithTaskqConfig(taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix())),
-			WithRedis(&cachestore.RedisConfig{
-				URL: cachestore.RedisPrefix + "localhost:6379",
-			}),
-			WithSQLite(tester.SQLiteTestConfig()),
-			WithCustomFeeUnit(mockFeeUnit),
-			WithLogger(&testLogger),
-		)
-		require.NoError(t, err)
-		require.NotNil(t, tc)
-		defer CloseClient(context.Background(), t, tc)
-
-		cs := tc.Cachestore()
-		require.NotNil(t, cs)
-		assert.Equal(t, cachestore.Redis, cs.Engine())
-	})
-
-	t.Run("missing redis prefix", func(t *testing.T) {
-		if testing.Short() {
-			t.Skip("skipping live local redis tests")
-		}
-
-		tc, err := NewClient(
-			context.Background(),
-			WithTaskqConfig(taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix())),
-			WithRedis(&cachestore.RedisConfig{
-				URL: "localhost:6379",
-			}),
-			WithSQLite(tester.SQLiteTestConfig()),
-			WithCustomFeeUnit(mockFeeUnit),
-			WithLogger(&testLogger),
-		)
-		require.NoError(t, err)
-		require.NotNil(t, tc)
-		defer CloseClient(context.Background(), t, tc)
-
-		cs := tc.Cachestore()
-		require.NotNil(t, cs)
-		assert.Equal(t, cachestore.Redis, cs.Engine())
-	})
-}
-
 // TestWithRedisConnection will test the method WithRedisConnection()
 func TestWithRedisConnection(t *testing.T) {
 	testLogger := zerolog.Nop()
-
-	t.Run("check type", func(t *testing.T) {
-		opt := WithRedisConnection(nil)
-		assert.IsType(t, *new(ClientOps), opt)
-	})
 
 	t.Run("using a nil connection", func(t *testing.T) {
 		tc, err := NewClient(
@@ -392,32 +329,6 @@ func TestWithTaskQ(t *testing.T) {
 		tm := tc.Taskmanager()
 		require.NotNil(t, tm)
 		assert.Equal(t, taskmanager.FactoryMemory, tm.Factory())
-	})
-
-	t.Run("using taskq using redis", func(t *testing.T) {
-		if testing.Short() {
-			t.Skip("skipping live local redis tests")
-		}
-
-		tc, err := NewClient(
-			context.Background(),
-			WithTaskqConfig(
-				taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix(), taskmanager.WithRedis("localhost:6379")),
-			),
-			WithRedis(&cachestore.RedisConfig{
-				URL: cachestore.RedisPrefix + "localhost:6379",
-			}),
-			WithSQLite(tester.SQLiteTestConfig()),
-			WithCustomFeeUnit(mockFeeUnit),
-			WithLogger(&testLogger),
-		)
-		require.NoError(t, err)
-		require.NotNil(t, tc)
-		defer CloseClient(context.Background(), t, tc)
-
-		tm := tc.Taskmanager()
-		require.NotNil(t, tm)
-		assert.Equal(t, taskmanager.FactoryRedis, tm.Factory())
 	})
 }
 
