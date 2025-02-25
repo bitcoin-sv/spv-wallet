@@ -4,6 +4,7 @@ import (
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/custominstructions/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/keys/type42"
 )
@@ -49,7 +50,7 @@ func (ar *AddressResolver) Finalize(acc *Accumulator[primitives.PublicKey]) erro
 		// this is implicit "Sign" if there was no "Sign" instruction in provided custom instructions
 		_, err := ar.Sign(acc, "P2PKH")
 		if err != nil {
-			return err
+			return spverrors.Wrapf(err, "failed to finalize and derive address")
 		}
 	}
 	return nil

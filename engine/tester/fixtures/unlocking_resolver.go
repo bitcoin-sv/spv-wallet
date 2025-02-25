@@ -34,10 +34,7 @@ func (un *UnlockingTemplateResolver) Sign(acc *custominstructions.Accumulator[pr
 func (un *UnlockingTemplateResolver) Finalize(acc *custominstructions.Accumulator[primitives.PrivateKey]) error {
 	if un.Template == nil {
 		// this is implicit "Sign" if there was no "Sign" instruction in provided custom instructions
-		_, err := un.Sign(acc, "P2PKH")
-		if err != nil {
-			return err
-		}
+		_, _ = un.Sign(acc, "P2PKH")
 	}
 	return nil
 }

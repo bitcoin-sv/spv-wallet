@@ -72,8 +72,6 @@ func TestLockingScriptInterpreter(t *testing.T) {
 func makePubKey(t *testing.T, pubDERHex string) *primitives.PublicKey {
 	t.Helper()
 	pk, err := primitives.PublicKeyFromString(pubDERHex)
-	if err != nil {
-		t.Fatalf("failed to create public key: %s", err)
-	}
+	require.NoError(t, err)
 	return pk
 }
