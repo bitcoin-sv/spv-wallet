@@ -65,7 +65,7 @@ func (f *txFlow) setHex() error {
 		// This approach avoids unnecessary data redundancy, which impacts overall consistency.
 		// All found inputs can be reused when resolving source transaction inputs needed to construct BEEF.
 		// (Check the workflow and usage of the BEEF Service in beef_service.go)
-		f.txRow.SetRawHex(f.tx.Hex())
+		f.txRow.SetRawHex(f.tx.Hex(), sourceTXIDs...)
 		return nil
 	}
 

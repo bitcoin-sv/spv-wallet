@@ -99,11 +99,13 @@ func mapOperations(operations iter.Seq[*txmodels.NewOperation]) []database.Opera
 }
 
 func mapTransaction(operation *txmodels.NewOperation) *database.TrackedTransaction {
+	beefHex := operation.Transaction.BEEFHex()
+	rawHex := operation.Transaction.RawHex()
 	tx := &database.TrackedTransaction{
 		ID:       operation.Transaction.ID,
 		TxStatus: string(operation.Transaction.TxStatus),
-		BeefHex:  operation.Transaction.BEEFHex(),
-		RawHex:   operation.Transaction.RawHex(),
+		BeefHex:  &beefHex,
+		RawHex:   &rawHex,
 	}
 
 	for _, input := range operation.Transaction.TransactionInputSources() {
