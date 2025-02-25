@@ -25,8 +25,8 @@ type TrackedTransaction struct {
 
 	newUTXOs []*UserUTXO `gorm:"-"`
 
-	BeefHex            string               `gorm:"column:beef_hex"`
-	RawHex             string               `gorm:"column:raw_hex"`
+	BeefHex            *string              `gorm:"column:beef_hex"`
+	RawHex             *string              `gorm:"column:raw_hex"`
 	SourceTransactions []TrackedTransaction `gorm:"many2many:source_transactions"`
 }
 
@@ -34,13 +34,13 @@ type TrackedTransaction struct {
 func (t *TrackedTransaction) ToTxQueryResult() *beef.TxQueryResult {
 	return &beef.TxQueryResult{
 		SourceTXID: t.ID,
-		RawHex:     &t.RawHex,
-		BeefHex:    &t.BeefHex,
+		RawHex:     t.RawHex,
+		BeefHex:    t.BeefHex,
 	}
 }
 
 // HasBeefHex checks if the tracked transaction record contains a non-empty BeefHex attribute.
-func (t *TrackedTransaction) HasBeefHex() bool { return t.BeefHex != "" }
+func (t *TrackedTransaction) HasBeefHex() bool { return t.BeefHex != nil }
 
 // HasRawHex checks if the tracked transaction record does not contain a BeefHex attribute.
 func (t *TrackedTransaction) HasRawHex() bool { return !t.HasBeefHex() }
