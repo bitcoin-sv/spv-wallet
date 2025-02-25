@@ -53,7 +53,7 @@ func (c *customOutputsResolver) annotatedOutputs() iter.Seq2[string, txmodels.Ne
 				break
 			}
 
-			interpreted, err := custominstructions.NewLockingScriptInterpreter().
+			interpreted, err := custominstructions.NewAddressInterpreter().
 				Process(userPubKey, *annotation.CustomInstructions)
 			if err != nil {
 				c.err = spverrors.Wrapf(err, "failed to derive address from custom instructions for user %s", c.userID)

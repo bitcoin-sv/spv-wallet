@@ -36,7 +36,7 @@ func TestLockingScriptInterpreter(t *testing.T) {
 			pubKey := makePubKey(t, "033014c226b8fe8260e21e75479a47a654e7b631b3bd13484d85c484f7791aa75b")
 
 			// and:
-			processor := NewLockingScriptInterpreter()
+			processor := NewAddressInterpreter()
 
 			// when:
 			res, err := processor.Process(pubKey, test.customInstructions)
