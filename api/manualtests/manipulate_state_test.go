@@ -7,6 +7,8 @@ import (
 )
 
 func TestRefreshState_SoItWillAddNewFieldsIfAdded_SoYouCanJustSetupThoseMissingValues(t *testing.T) {
+	t.Skip("Don't run it yet")
+
 	state := NewState()
 	err := state.Load()
 	require.NoError(t, err)
@@ -15,6 +17,8 @@ func TestRefreshState_SoItWillAddNewFieldsIfAdded_SoYouCanJustSetupThoseMissingV
 }
 
 func TestSwitchCurrentUserInState_ToUserWithID(t *testing.T) {
+	t.Skip("Don't run it yet")
+
 	state := NewState()
 	err := state.Load()
 	require.NoError(t, err)
