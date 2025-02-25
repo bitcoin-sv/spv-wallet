@@ -149,9 +149,18 @@ func (u *user) SendsTo(recipient *fixtures.User, amount bsv.Satoshis) string {
 	tx, err := trx.NewTransactionFromBEEFHex(getter.GetString("hex"))
 	require.NoError(u.t, err)
 
-	var customInstr bsv.CustomInstructions
-	getter.GetAsType("annotations/inputs/0/customInstructions", &customInstr)
-	tx.Inputs[0].UnlockingScriptTemplate = u.P2PKHUnlockingScriptTemplate(customInstr...)
+	inputAnnotations := map[string]struct {
+		CustomInstructions bsv.CustomInstructions `json:"customInstructions"`
+	}{}
+	getter.GetAsType("annotations/inputs", &inputAnnotations)
+
+	for i, input := range tx.Inputs {
+		var customInstr bsv.CustomInstructions
+		if annotation, ok := inputAnnotations[fmt.Sprintf("%d", i)]; ok {
+			customInstr = annotation.CustomInstructions
+		}
+		input.UnlockingScriptTemplate = u.P2PKHUnlockingScriptTemplate(customInstr...)
+	}
 
 	err = tx.Sign()
 	require.NoError(u.t, err)
