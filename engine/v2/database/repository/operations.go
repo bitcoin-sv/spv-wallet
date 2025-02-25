@@ -104,8 +104,8 @@ func mapTransaction(operation *txmodels.NewOperation) *database.TrackedTransacti
 	tx := &database.TrackedTransaction{
 		ID:       operation.Transaction.ID,
 		TxStatus: string(operation.Transaction.TxStatus),
-		BeefHex:  &beefHex,
-		RawHex:   &rawHex,
+		BeefHex:  lo.If(beefHex != "", &beefHex).Else(nil),
+		RawHex:   lo.If(rawHex != "", &rawHex).Else(nil),
 	}
 
 	for _, input := range operation.Transaction.TransactionInputSources() {
