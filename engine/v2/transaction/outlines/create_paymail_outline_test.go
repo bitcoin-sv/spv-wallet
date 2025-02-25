@@ -392,6 +392,8 @@ func TestCreatePaymailTransactionOutlineRAW(t *testing.T) {
 		// and:
 		thenTx := then.Created(tx).WithNoError(err).WithParseableRawHex()
 
+		thenTx.IsWithoutTimeLock()
+
 		thenTx.HasInputs(1)
 
 		thenTx.Input(0).
@@ -443,6 +445,8 @@ func TestCreatePaymailTransactionOutlineRAW(t *testing.T) {
 		// and:
 		thenTx := then.Created(tx).WithNoError(err).WithParseableRawHex()
 
+		thenTx.IsWithoutTimeLock()
+
 		thenTx.HasInputs(1)
 
 		thenTx.Input(0).
@@ -493,6 +497,8 @@ func TestCreatePaymailTransactionOutlineRAW(t *testing.T) {
 
 		// then:
 		thenTx := then.Created(tx).WithNoError(err).WithParseableRawHex()
+
+		thenTx.IsWithoutTimeLock()
 
 		thenTx.HasInputs(1)
 
