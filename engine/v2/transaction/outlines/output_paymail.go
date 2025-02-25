@@ -2,6 +2,7 @@ package outlines
 
 import (
 	"errors"
+
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-sdk/script"
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"

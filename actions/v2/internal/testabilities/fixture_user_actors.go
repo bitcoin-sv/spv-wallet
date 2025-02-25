@@ -1,9 +1,9 @@
 package testabilities
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 )
 

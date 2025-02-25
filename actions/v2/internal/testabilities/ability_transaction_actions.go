@@ -2,6 +2,7 @@ package testabilities
 
 import (
 	"fmt"
+
 	"github.com/bitcoin-sv/go-sdk/script"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
