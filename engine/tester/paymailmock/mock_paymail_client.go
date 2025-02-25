@@ -90,6 +90,7 @@ func MockClient(mockTransport *httpmock.MockTransport, domain string, moreDomain
 	}
 }
 
+// RedirectTransportIfDomain is configuring a client to redirect all requests to a given domain to a custom transport.
 func (c *PaymailClientMock) RedirectTransportIfDomain(domain string, transport http.RoundTripper) {
 	c.localDomain = domain
 	c.localTransport = transport

@@ -37,17 +37,20 @@ func (g *Getter) GetString(xpath string) string {
 	return strValue
 }
 
+// GetAsType gets a value from the data and unmarshals it into the target.
 func (g *Getter) GetAsType(xpath string, target any) {
 	g.t.Helper()
 
 	value := getByXPath(g.t, g.data, xpath)
 
-	marshalled, err := json.Marshal(value)
+	marshaled, err := json.Marshal(value)
 	require.NoError(g.t, err)
 
-	err = json.Unmarshal(marshalled, target)
+	err = json.Unmarshal(marshaled, target)
+	require.NoError(g.t, err)
 }
 
+// GetField returns a value from the data.
 func (g *Getter) GetField(xpath string) any {
 	g.t.Helper()
 
