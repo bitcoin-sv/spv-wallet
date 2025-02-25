@@ -81,6 +81,19 @@ func (r *Contacts) UpdateByID(ctx context.Context, contactID uint, fullName stri
 	return newContactModel(row), nil
 }
 
+// UpdateStatusByID updates contact status using its ID.
+func (r *Contacts) UpdateStatusByID(ctx context.Context, contactID uint, status string) (*contactsmodels.Contact, error) {
+	row := database.UserContact{Status: status}
+	if err := r.db.WithContext(ctx).
+		Model(&database.UserContact{}).
+		Where("id = ?", contactID).
+		Updates(row).Error; err != nil {
+		return nil, spverrors.Wrapf(err, "failed to update contact")
+	}
+
+	return newContactModel(row), nil
+}
+
 // Delete removes a contact from the database.
 func (r *Contacts) Delete(ctx context.Context, userID, paymail string) error {
 	if err := r.db.WithContext(ctx).Where("user_id = ? AND paymail = ?", userID, paymail).Delete(&database.UserContact{}).Error; err != nil {

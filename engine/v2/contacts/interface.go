@@ -13,6 +13,7 @@ type ContactRepo interface {
 	Create(ctx context.Context, newContact contactsmodels.NewContact) (*contactsmodels.Contact, error)
 	Update(ctx context.Context, contact contactsmodels.NewContact) (*contactsmodels.Contact, error)
 	UpdateStatus(ctx context.Context, userID, paymail, status string) error
+	UpdateStatusByID(ctx context.Context, contactID uint, status string) (*contactsmodels.Contact, error)
 	UpdateByID(ctx context.Context, contactID uint, fullName string) (*contactsmodels.Contact, error)
 	Delete(ctx context.Context, userID, paymail string) error
 	DeleteByID(ctx context.Context, contactID uint) error

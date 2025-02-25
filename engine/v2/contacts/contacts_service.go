@@ -223,6 +223,16 @@ func (s *Service) AcceptContact(ctx context.Context, userID, paymail string) err
 	return s.contactsRepo.UpdateStatus(ctx, userID, paymail, contactsmodels.ContactNotConfirmed)
 }
 
+// AcceptContactByID accept a contact by ID
+func (s *Service) AcceptContactByID(ctx context.Context, id uint) (*contactsmodels.Contact, error) {
+	contact, err := s.contactsRepo.UpdateStatusByID(ctx, id, contactsmodels.ContactNotConfirmed)
+	if err != nil {
+		return nil, err
+	}
+
+	return contact, nil
+}
+
 // RejectContact reject a contact
 func (s *Service) RejectContact(ctx context.Context, userID, paymail string) error {
 	contact, err := s.Find(ctx, userID, paymail)
@@ -235,6 +245,16 @@ func (s *Service) RejectContact(ctx context.Context, userID, paymail string) err
 	}
 
 	return s.contactsRepo.Delete(ctx, userID, paymail)
+}
+
+// RejectContactByID reject a contact by ID
+func (s *Service) RejectContactByID(ctx context.Context, id uint) (*contactsmodels.Contact, error) {
+	contact, err := s.contactsRepo.UpdateStatusByID(ctx, id, contactsmodels.ContactRejected)
+	if err != nil {
+		return nil, err
+	}
+
+	return contact, nil
 }
 
 // AdminCreateContact creates a new contact for the provided paymail

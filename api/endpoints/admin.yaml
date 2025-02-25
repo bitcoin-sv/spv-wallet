@@ -260,3 +260,60 @@ paths:
           $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
         500:
           $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+
+  /api/v2/admin/invitations/{id}:
+    post:
+      operationId: acceptInvitation
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - Admin endpoints
+      summary: Accept invitation
+      description: >-
+        This endpoint allows to accept invitation for selected ID
+      parameters:
+        - name: id
+          in: path
+          description: >-
+            ID of the contact that the admin would like to accept
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/ContactSuccess"
+        400:
+          $ref: "../components/responses.yaml#/components/responses/AdminUserBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+
+    delete:
+      operationId: rejectInvitation
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - Admin endpoints
+      summary: Reject invitation
+      description: >-
+        This endpoint allows to reject invitation for selected ID
+      parameters:
+        - name: id
+          in: path
+          description: >-
+            ID of the contact that the admin would like to reject
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Invitation rejected
+        400:
+          $ref: "../components/responses.yaml#/components/responses/AdminUserBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/InternalServerError"

@@ -6,54 +6,6 @@ info:
     title: SPV Wallet API
     version: development
 paths:
-    /api/contacts/invitations/{paymail}:
-        delete:
-            description: This endpoint allows to reject invitation for authenticated user
-            operationId: rejectInvitation
-            parameters:
-                - description: Paymail address of the contact that the user would like to reject
-                  in: path
-                  name: paymail
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: Success - invitation removed
-                "401":
-                    $ref: '#/components/responses/responses_UserNotAuthorized'
-                "500":
-                    $ref: '#/components/responses/responses_InternalServerError'
-            security:
-                - XPubAuth:
-                    - user
-            summary: Reject invitation
-            tags:
-                - Contacts
-    /api/contacts/invitations/{paymail}/contacts:
-        post:
-            description: This endpoint allows to accept invitation for authenticated user
-            operationId: acceptInvitation
-            parameters:
-                - description: Paymail address of the contact that the user would like to accept
-                  in: path
-                  name: paymail
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: Success - invitation accepted
-                "401":
-                    $ref: '#/components/responses/responses_UserNotAuthorized'
-                "500":
-                    $ref: '#/components/responses/responses_InternalServerError'
-            security:
-                - XPubAuth:
-                    - user
-            summary: Accept invitation
-            tags:
-                - Contacts
     /api/v2/admin/contacts:
         get:
             description: This endpoint returns all contacts.
@@ -195,6 +147,57 @@ paths:
                 - XPubAuth:
                     - admin
             summary: Confirm contact
+            tags:
+                - Admin endpoints
+    /api/v2/admin/invitations/{id}:
+        delete:
+            description: This endpoint allows to reject invitation for selected ID
+            operationId: rejectInvitation
+            parameters:
+                - description: ID of the contact that the admin would like to reject
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: integer
+            responses:
+                "200":
+                    description: Invitation rejected
+                "400":
+                    $ref: '#/components/responses/responses_AdminUserBadRequest'
+                "401":
+                    $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
+                "500":
+                    $ref: '#/components/responses/responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Reject invitation
+            tags:
+                - Admin endpoints
+        post:
+            description: This endpoint allows to accept invitation for selected ID
+            operationId: acceptInvitation
+            parameters:
+                - description: ID of the contact that the admin would like to accept
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: integer
+            responses:
+                "200":
+                    $ref: '#/components/responses/responses_ContactSuccess'
+                "400":
+                    $ref: '#/components/responses/responses_AdminUserBadRequest'
+                "401":
+                    $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
+                "500":
+                    $ref: '#/components/responses/responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Accept invitation
             tags:
                 - Admin endpoints
     /api/v2/admin/status:
@@ -454,6 +457,54 @@ paths:
                 - XPubAuth:
                     - user
             summary: Confirm contact
+            tags:
+                - Contacts
+    /api/v2/contacts/invitations/{paymail}:
+        delete:
+            description: This endpoint allows to reject invitation for authenticated user
+            operationId: rejectInvitation
+            parameters:
+                - description: Paymail address of the contact that the user would like to reject
+                  in: path
+                  name: paymail
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: Success - invitation removed
+                "401":
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
+                "500":
+                    $ref: '#/components/responses/responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Reject invitation
+            tags:
+                - Contacts
+    /api/v2/contacts/invitations/{paymail}/contacts:
+        post:
+            description: This endpoint allows to accept invitation for authenticated user
+            operationId: acceptInvitation
+            parameters:
+                - description: Paymail address of the contact that the user would like to accept
+                  in: path
+                  name: paymail
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: Success - invitation accepted
+                "401":
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
+                "500":
+                    $ref: '#/components/responses/responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Accept invitation
             tags:
                 - Contacts
     /api/v2/data/{id}:
