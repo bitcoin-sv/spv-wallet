@@ -52,24 +52,26 @@ func (c *customOutputsResolver) annotatedOutputs() iter.Seq2[string, txmodels.Ne
 				c.err = spverrors.Wrapf(err, "failed to get public key for user %s", c.userID)
 				break
 			}
-			calculatedAddr, err := custominstructions.Address(*userPubKey, *annotation.CustomInstructions)
+
+			interpreted, err := custominstructions.NewLockingScriptInterpreter().
+				Process(userPubKey, *annotation.CustomInstructions)
 			if err != nil {
 				c.err = spverrors.Wrapf(err, "failed to derive address from custom instructions for user %s", c.userID)
 				break
 			}
 
-			_, ok := c.txAddresses[calculatedAddr.AddressString]
+			_, ok := c.txAddresses[interpreted.Address.AddressString]
 			if !ok {
 				c.err = spverrors.Newf("address derived from custom instructions doesn't match any of the addresses in the locking scripts")
 				break
 			}
 
-			if ok := c.txAddresses.contains(calculatedAddr.AddressString, vout); !ok {
+			if ok := c.txAddresses.contains(interpreted.Address.AddressString, vout); !ok {
 				c.err = spverrors.Newf("address derived from custom instructions doesn't match the locking script of the output")
 				break
 			}
 
-			yield(calculatedAddr.AddressString, txmodels.NewOutputForP2PKH(
+			yield(interpreted.Address.AddressString, txmodels.NewOutputForP2PKH(
 				bsv.Outpoint{TxID: c.flow.txID, Vout: vout},
 				c.userID,
 				bsv.Satoshis(c.flow.tx.Outputs[vout].Satoshis),

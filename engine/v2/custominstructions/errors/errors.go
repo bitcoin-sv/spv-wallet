@@ -2,6 +2,20 @@ package errors
 
 import "github.com/bitcoin-sv/spv-wallet/models"
 
+// ErrProcessingCustomInstructions is returned when custom instructions cannot be processed
+var ErrProcessingCustomInstructions = models.SPVError{
+	Code:       "error-custom-instructions-processing",
+	Message:    "Failed to process custom instructions",
+	StatusCode: 500,
+}
+
+// ErrFinalizingCustomInstructions is returned when custom instructions cannot be finalized
+var ErrFinalizingCustomInstructions = models.SPVError{
+	Code:       "error-custom-instructions-finalize",
+	Message:    "Failed to finalize processing custom instructions",
+	StatusCode: 500,
+}
+
 // ErrType42DerivationFailed is returned when a type42 public key cannot be derived
 var ErrType42DerivationFailed = models.SPVError{
 	Code:       "error-custom-instructions-derivation-failed",
@@ -20,5 +34,12 @@ var ErrUnknownInstructionType = models.SPVError{
 var ErrGettingAddressFromPublicKey = models.SPVError{
 	Code:       "error-getting-address-from-public-key",
 	Message:    "Failed to get address from public key",
+	StatusCode: 500,
+}
+
+// ErrGettingLockingScript is returned when a locking script cannot be derived from an address
+var ErrGettingLockingScript = models.SPVError{
+	Code:       "error-getting-locking-script",
+	Message:    "Failed to get locking script from address",
 	StatusCode: 500,
 }

@@ -1,16 +1,15 @@
 package fixtures
 
 import (
+	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/custominstructions"
 	"strings"
 
 	"github.com/bitcoin-sv/go-paymail"
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/go-sdk/script"
-	sighash "github.com/bitcoin-sv/go-sdk/transaction/sighash"
-	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/keys/type42"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
@@ -183,7 +182,11 @@ func (f *User) PublicKey() *ec.PublicKey {
 
 // Address returns the address of this user.
 func (f *User) Address() *script.Address {
-	return addressFromPubKey(f.PublicKey())
+	addr, err := script.NewAddressFromPublicKey(f.PublicKey(), true)
+	if err != nil {
+		panic("Invalid setup of user fixture, cannot restore address: " + err.Error())
+	}
+	return addr
 }
 
 // ID returns the id of the user.
@@ -194,55 +197,26 @@ func (f *User) ID() string {
 
 // P2PKHLockingScript returns the locking script of this user.
 func (f *User) P2PKHLockingScript(instructions ...bsv.CustomInstruction) *script.Script {
-	pub := f.PublicKey()
-	var err error
-	for _, instruction := range instructions {
-		switch instruction.Type {
-		case "type42":
-			pub, err = type42.Derive(pub, instruction.Instruction)
-			if err != nil {
-				panic("Invalid setup of user fixture, cannot restore type42 instruction: " + err.Error())
-			}
-		default:
-			panic("Invalid setup of user fixture, unknown instruction type: " + instruction.Type)
-		}
-	}
-	lockingScript, err := p2pkh.Lock(addressFromPubKey(pub))
+	res, err := custominstructions.NewLockingScriptInterpreter().
+		Process(f.PublicKey(), instructions)
+
 	if err != nil {
-		panic("Invalid setup of user fixture, cannot restore locking script: " + err.Error())
+		panic("Err returned from LockingScriptInterpreter: " + err.Error())
 	}
-	return lockingScript
+
+	return res.LockingScript
 }
 
 // P2PKHUnlockingScriptTemplate returns the unlocking script template of this user.
-func (f *User) P2PKHUnlockingScriptTemplate(instructions ...bsv.CustomInstruction) *p2pkh.P2PKH {
-	priv := f.PrivateKey()
-	var err error
-	for _, instruction := range instructions {
-		switch instruction.Type {
-		case "type42":
-			priv, err = type42.DerivePrivateKey(priv, instruction.Instruction)
-			if err != nil {
-				panic("Invalid setup of user fixture, cannot restore type42 instruction: " + err.Error())
-			}
-		default:
-			panic("Invalid setup of user fixture, unknown instruction type: " + instruction.Type)
-		}
+func (f *User) P2PKHUnlockingScriptTemplate(instructions ...bsv.CustomInstruction) sdk.UnlockingScriptTemplate {
+	res, err := custominstructions.NewInterpreter(&UnlockingTemplateResolver{}).
+		Process(f.PrivateKey(), instructions)
+
+	if err != nil {
+		panic("Err returned from UnlockingTemplateResolver: " + err.Error())
 	}
 
-	unlockingScript, err := p2pkh.Unlock(priv, ptr(sighash.AllForkID))
-	if err != nil {
-		panic("Invalid setup of user fixture, cannot restore unlocking script: " + err.Error())
-	}
-	return unlockingScript
-}
-
-func addressFromPubKey(pubKey *ec.PublicKey) *script.Address {
-	addr, err := script.NewAddressFromPublicKey(pubKey, true)
-	if err != nil {
-		panic("Invalid setup of user fixture, cannot restore address: " + err.Error())
-	}
-	return addr
+	return res.Template
 }
 
 // AllUsers returns all users fixtures despite it's internal or external user.
