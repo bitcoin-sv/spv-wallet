@@ -22,20 +22,27 @@ import (
 	"github.com/rs/zerolog"
 )
 
+type ServiceProvider interface {
+	server.PaymailServiceProvider
+	server.PikeContactServiceProvider
+}
+
 // NewServiceProvider create a new paymail service server which handlers incoming paymail requests
 func NewServiceProvider(
 	logger *zerolog.Logger,
 	paymails paymail.PaymailsService,
 	users paymail.UsersService,
 	addresses paymail.AddressesService,
+	contacts paymail.ContactsService,
 	spv paymail.MerkleRootsVerifier,
 	recorder paymail.TxRecorder,
-) server.PaymailServiceProvider {
+) ServiceProvider {
 	return &serviceProvider{
 		logger:    logger,
 		paymails:  paymails,
 		users:     users,
 		addresses: addresses,
+		contacts:  contacts,
 		spv:       spv,
 		recorder:  recorder,
 	}
@@ -46,6 +53,7 @@ type serviceProvider struct {
 	paymails  paymail.PaymailsService
 	users     paymail.UsersService
 	addresses paymail.AddressesService
+	contacts  paymail.ContactsService
 	spv       paymail.MerkleRootsVerifier
 	recorder  paymail.TxRecorder
 }
@@ -155,6 +163,21 @@ func (s *serviceProvider) VerifyMerkleRoots(ctx context.Context, merkleProofs []
 		return pmerrors.ErrPaymailInvalidMerkleRoots
 	}
 
+	return nil
+}
+
+// AddContact is a method to add a new contact to the pike contact list
+func (s *serviceProvider) AddContact(ctx context.Context, requesterPaymail string, contact *paymailserver.PikeContactRequestPayload) error {
+	rAlias, rDomain, _ := paymailserver.SanitizePaymail(requesterPaymail)
+	pAddress, err := s.paymails.Find(ctx, rAlias, rDomain)
+	if err != nil {
+		return err
+	}
+	if pAddress == nil {
+		return spverrors.ErrCouldNotFindPaymail
+	}
+
+	_, err = s.contacts.AddContactRequest(ctx, contact.FullName, contact.Paymail, pAddress.UserID)
 	return nil
 }
 

@@ -3,12 +3,13 @@ package contacts
 import (
 	"net/http"
 
+	"github.com/bitcoin-sv/spv-wallet/actions/v2/contacts/internal/mapping"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
-func (s *APIContacts) RemoveContact(c *gin.Context, paymail string) {
+func (s *APIContacts) GetContact(c *gin.Context, paymail string) {
 	userContext := reqctx.GetUserContext(c)
 	userID, err := userContext.ShouldGetUserID()
 	if err != nil {
@@ -16,11 +17,13 @@ func (s *APIContacts) RemoveContact(c *gin.Context, paymail string) {
 		return
 	}
 
-	err = s.engine.ContactService().RemoveContact(c.Request.Context(), userID, paymail)
+	contact, err := s.engine.ContactService().Find(c.Request.Context(), userID, paymail)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return
 	}
 
-	c.Status(http.StatusOK)
+	res := mapping.MapToContactContract(contact)
+
+	c.JSON(http.StatusOK, res)
 }

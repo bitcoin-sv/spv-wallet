@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *APIContacts) RemoveContact(c *gin.Context, paymail string) {
+func (s *APIContacts) UnconfirmContact(c *gin.Context, paymail string) {
 	userContext := reqctx.GetUserContext(c)
 	userID, err := userContext.ShouldGetUserID()
 	if err != nil {
@@ -16,7 +16,7 @@ func (s *APIContacts) RemoveContact(c *gin.Context, paymail string) {
 		return
 	}
 
-	err = s.engine.ContactService().RemoveContact(c.Request.Context(), userID, paymail)
+	err = s.engine.ContactService().UnconfirmContact(c.Request.Context(), userID, paymail)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return

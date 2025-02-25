@@ -21,6 +21,7 @@ type NewContact struct {
 	RequesterPaymail  string
 	NewContactPaymail string
 	NewContactPubKey  string
+	Status            string
 	UserID            string
 }
 

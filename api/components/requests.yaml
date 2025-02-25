@@ -77,11 +77,11 @@ components:
           properties:
             type:
               type: string
-              enum: [op_return]
+              enum: [ op_return ]
               example: op_return
             dataType:
               type: string
-              enum: [hexes, strings]
+              enum: [ hexes, strings ]
               default: strings
               example: strings
             data:
@@ -111,7 +111,7 @@ components:
       properties:
         type:
           type: string
-          enum: [paymail]
+          enum: [ paymail ]
           example: paymail
         to:
           type: string
@@ -180,3 +180,48 @@ components:
       schema:
         type: string
       example: "name"
+
+    FullName:
+      in: query
+      name: fullName
+      description: Full name of the contact
+      required: false
+      schema:
+        type: string
+      example: "Test name"
+
+    Paymail:
+      in: query
+      name: paymail
+      description: Paymail of the contact
+      required: false
+      schema:
+        type: string
+      example: "test@spv-wallet.com"
+
+    ID:
+      in: query
+      name: id
+      description: ID of the contact
+      required: false
+      schema:
+        type: integer
+      example: "1"
+
+    PubKey:
+      in: query
+      name: pubKey
+      description: Public key of the contact
+      required: false
+      schema:
+        type: string
+      example: "76a914e069bd2e2fe3ea702c40d5e65b491b734c01686788ac"
+
+    Status:
+      in: query
+      name: status
+      description: Status of the contact
+      required: false
+      schema:
+        $ref: "../components/models.yaml#/components/schemas/ContactStatus"
+      example: "confirmed"

@@ -188,10 +188,19 @@ components:
               - $ref: "./errors.yaml#/components/schemas/GettingOutputs"
               - $ref: "./errors.yaml#/components/schemas/TxBroadcast"
 
-    UpsertContactSuccess:
-      description: Contact created
+    ContactSuccess:
+      description: Contact success
       content:
         application/json:
           schema:
             allOf:
               - $ref: "./models.yaml#/components/schemas/Contact"
+
+    SearchContactsSuccess:
+      description: Contacts success
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "./models.yaml#/components/schemas/ContactsSearchResult"

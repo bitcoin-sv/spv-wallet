@@ -2,6 +2,8 @@ package contacts
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/contacts/internal/mapping"
 	"github.com/bitcoin-sv/spv-wallet/api"
@@ -10,7 +12,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"net/http"
 )
 
 func (s *APIContacts) UpsertContact(c *gin.Context, paymail string) {

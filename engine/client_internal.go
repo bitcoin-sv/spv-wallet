@@ -297,7 +297,8 @@ func (c *Client) loadPaymailServer() (err error) {
 	// Create the paymail configuration using the client and default service provider
 	paymailLocator := &paymailserver.PaymailServiceLocator{}
 
-	var serviceProvider paymailserver.PaymailServiceProvider
+	var serviceProvider paymailprovider.ServiceProvider
+	var pikeContactProvider paymailserver.PikeContactServiceProvider
 	if c.options.paymail.serverConfig.ExperimentalProvider {
 		paymailServiceLogger := c.Logger().With().Str("subservice", "paymail-service-provider").Logger()
 		serviceProvider = paymailprovider.NewServiceProvider(
@@ -305,15 +306,19 @@ func (c *Client) loadPaymailServer() (err error) {
 			c.PaymailsService(),
 			c.UsersService(),
 			c.AddressesService(),
+			c.ContactService(),
 			c.Chain(),
 			c.TransactionRecordService(),
 		)
+
+		pikeContactProvider = serviceProvider
 	} else {
 		serviceProvider = &PaymailDefaultServiceProvider{client: c}
+		pikeContactProvider = &PikeContactServiceProvider{client: c}
 	}
 
 	paymailLocator.RegisterPaymailService(serviceProvider)
-	paymailLocator.RegisterPikeContactService(&PikeContactServiceProvider{client: c})
+	paymailLocator.RegisterPikeContactService(pikeContactProvider)
 	paymailLocator.RegisterPikePaymentService(&PikePaymentServiceProvider{client: c})
 
 	c.options.paymail.serverConfig.Configuration, err = paymailserver.NewConfig(
@@ -321,6 +326,7 @@ func (c *Client) loadPaymailServer() (err error) {
 		c.options.paymail.serverConfig.options...,
 	)
 	return
+
 }
 
 func (c *Client) askForFeeUnit(ctx context.Context) error {

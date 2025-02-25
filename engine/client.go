@@ -165,12 +165,14 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	client.loadAddressesService()
 	client.loadDataService()
 	client.loadOperationsService()
-	client.loadContactsService()
 
 	// Load the Paymail client and service (if does not exist)
 	if err = client.loadPaymailComponents(); err != nil {
 		return nil, err
 	}
+
+	// Load the Contacts service after the Paymail service
+	client.loadContactsService()
 
 	// Load the Notification client (if client does not exist)
 	if err = client.loadNotificationClient(ctx); err != nil {

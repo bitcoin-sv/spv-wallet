@@ -6,6 +6,54 @@ info:
     title: SPV Wallet API
     version: development
 paths:
+    /api/contacts/invitations/{paymail}:
+        delete:
+            description: This endpoint allows to reject invitation for authenticated user
+            operationId: rejectInvitation
+            parameters:
+                - description: Paymail address of the contact that the user would like to reject
+                  in: path
+                  name: paymail
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: Success - invitation removed
+                "401":
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
+                "500":
+                    $ref: '#/components/responses/responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Reject invitation
+            tags:
+                - Contacts
+    /api/contacts/invitations/{paymail}/contacts:
+        post:
+            description: This endpoint allows to accept invitation for authenticated user
+            operationId: acceptInvitation
+            parameters:
+                - description: Paymail address of the contact that the user would like to accept
+                  in: path
+                  name: paymail
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: Success - invitation accepted
+                "401":
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
+                "500":
+                    $ref: '#/components/responses/responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Accept invitation
+            tags:
+                - Contacts
     /api/v2/admin/status:
         get:
             description: This endpoint returns admin status. It is used to check if authorization header contain admin xpub.
@@ -115,6 +163,33 @@ paths:
             tags:
                 - Admin endpoints
                 - Configurations
+    /api/v2/contacts:
+        get:
+            description: This endpoint allows to get contacts for authenticated user
+            operationId: getContacts
+            parameters:
+                - $ref: '#/components/parameters/requests_PageNumber'
+                - $ref: '#/components/parameters/requests_PageSize'
+                - $ref: '#/components/parameters/requests_Sort'
+                - $ref: '#/components/parameters/requests_SortBy'
+                - $ref: '#/components/parameters/requests_FullName'
+                - $ref: '#/components/parameters/requests_Paymail'
+                - $ref: '#/components/parameters/requests_ID'
+                - $ref: '#/components/parameters/requests_PubKey'
+                - $ref: '#/components/parameters/requests_Status'
+            responses:
+                "200":
+                    $ref: '#/components/responses/responses_SearchContactsSuccess'
+                "401":
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
+                "500":
+                    $ref: '#/components/responses/responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Get contacts
+            tags:
+                - Contacts
     /api/v2/contacts/{paymail}:
         delete:
             description: This endpoint allows to remove contact for authenticated user
@@ -139,11 +214,34 @@ paths:
             summary: Remove contact
             tags:
                 - Contacts
+        get:
+            description: This endpoint allows to get contact for authenticated user
+            operationId: getContact
+            parameters:
+                - description: Paymail address of the contact that the user would like to get
+                  in: path
+                  name: paymail
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    $ref: '#/components/responses/responses_ContactSuccess'
+                "401":
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
+                "500":
+                    $ref: '#/components/responses/responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Get contact
+            tags:
+                - Contacts
         put:
-            description: This endpoint allows to add contact for authenticated user
+            description: Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
             operationId: upsertContact
             parameters:
-                - description: Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
+                - description: Paymail address of the contact that the user would like to add/modify
                   in: path
                   name: paymail
                   required: true
@@ -157,7 +255,7 @@ paths:
                 required: true
             responses:
                 "200":
-                    $ref: '#/components/responses/responses_UpsertContactSuccess'
+                    $ref: '#/components/responses/responses_ContactSuccess'
                 "401":
                     $ref: '#/components/responses/responses_UserNotAuthorized'
                 "500":
@@ -166,6 +264,53 @@ paths:
                 - XPubAuth:
                     - user
             summary: Add contact
+            tags:
+                - Contacts
+    /api/v2/contacts/{paymail}/confirmation:
+        delete:
+            description: Unconfirm contact. For contact with status "confirmed" change status to "unconfirmed"
+            operationId: unconfirmContact
+            parameters:
+                - description: Paymail address of the contact that the user would like to unconfirm
+                  in: path
+                  name: paymail
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: Success - contact removed
+                "401":
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
+                "500":
+                    $ref: '#/components/responses/responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Unconfirm contact
+            tags:
+                - Contacts
+        post:
+            description: This endpoint allows to confirm contact for authenticated user
+            operationId: confirmContact
+            parameters:
+                - description: Paymail address of the contact that the user would like to confirm
+                  in: path
+                  name: paymail
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: Success - contact confirmed
+                "401":
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
+                "500":
+                    $ref: '#/components/responses/responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Confirm contact
             tags:
                 - Contacts
     /api/v2/data/{id}:
@@ -302,6 +447,20 @@ paths:
                 - User
 components:
     parameters:
+        requests_FullName:
+            description: Full name of the contact
+            example: Test name
+            in: query
+            name: fullName
+            schema:
+                type: string
+        requests_ID:
+            description: ID of the contact
+            example: "1"
+            in: query
+            name: id
+            schema:
+                type: integer
         requests_PageNumber:
             description: Page number for pagination
             example: 1
@@ -316,6 +475,20 @@ components:
             name: size
             schema:
                 type: integer
+        requests_Paymail:
+            description: Paymail of the contact
+            example: test@spv-wallet.com
+            in: query
+            name: paymail
+            schema:
+                type: string
+        requests_PubKey:
+            description: Public key of the contact
+            example: 76a914e069bd2e2fe3ea702c40d5e65b491b734c01686788ac
+            in: query
+            name: pubKey
+            schema:
+                type: string
         requests_Sort:
             description: Sorting order (asc or desc)
             example: asc
@@ -330,6 +503,13 @@ components:
             name: sortBy
             schema:
                 type: string
+        requests_Status:
+            description: Status of the contact
+            example: active
+            in: query
+            name: status
+            schema:
+                $ref: '#/components/schemas/models_ContactStatus'
     responses:
         responses_AdminAddPaymailSuccess:
             content:
@@ -372,6 +552,13 @@ components:
                             - $ref: '#/components/schemas/errors_PaymailInconsistent'
                             - $ref: '#/components/schemas/errors_InvalidDomain'
             description: Bad request is an error that occurs when the request is malformed.
+        responses_ContactSuccess:
+            content:
+                application/json:
+                    schema:
+                        allOf:
+                            - $ref: '#/components/schemas/models_Contact'
+            description: Contact success
         responses_CreateTransactionOutlineBadRequest:
             content:
                 application/json:
@@ -466,6 +653,14 @@ components:
                     schema:
                         $ref: '#/components/schemas/errors_InvalidDataID'
             description: Error when search request is malformed and params can not be parsed
+        responses_SearchContactsSuccess:
+            content:
+                application/json:
+                    schema:
+                        items:
+                            $ref: '#/components/schemas/models_ContactsSearchResult'
+                        type: array
+            description: Contacts success
         responses_SearchOperationsSuccess:
             content:
                 application/json:
@@ -478,13 +673,6 @@ components:
                     schema:
                         $ref: '#/components/schemas/models_SharedConfig'
             description: Shared config
-        responses_UpsertContactSuccess:
-            content:
-                application/json:
-                    schema:
-                        allOf:
-                            - $ref: '#/components/schemas/models_Contact'
-            description: Contact created
         responses_UserBadRequest:
             content:
                 application/json:
@@ -821,6 +1009,18 @@ components:
                 - rejected
             example: confirmed
             type: string
+        models_ContactsSearchResult:
+            properties:
+                content:
+                    items:
+                        $ref: '#/components/schemas/models_Contact'
+                    type: array
+                page:
+                    $ref: '#/components/schemas/models_SearchPage'
+            required:
+                - content
+                - page
+            type: object
         models_CustomInstructions:
             oneOf:
                 - $ref: '#/components/schemas/models_SPVWalletCustomInstructions'

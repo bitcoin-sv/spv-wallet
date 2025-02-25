@@ -314,6 +314,12 @@ type ModelsContact struct {
 // ModelsContactStatus defines model for models_ContactStatus.
 type ModelsContactStatus string
 
+// ModelsContactsSearchResult defines model for models_ContactsSearchResult.
+type ModelsContactsSearchResult struct {
+	Content []ModelsContact  `json:"content"`
+	Page    ModelsSearchPage `json:"page"`
+}
+
 // ModelsCustomInstructions defines model for models_CustomInstructions.
 type ModelsCustomInstructions struct {
 	union json.RawMessage
@@ -591,17 +597,32 @@ type RequestsUpsertContact struct {
 	RequesterPaymail string `json:"requesterPaymail"`
 }
 
+// RequestsFullName defines model for requests_FullName.
+type RequestsFullName = string
+
+// RequestsID defines model for requests_ID.
+type RequestsID = int
+
 // RequestsPageNumber defines model for requests_PageNumber.
 type RequestsPageNumber = int
 
 // RequestsPageSize defines model for requests_PageSize.
 type RequestsPageSize = int
 
+// RequestsPaymail defines model for requests_Paymail.
+type RequestsPaymail = string
+
+// RequestsPubKey defines model for requests_PubKey.
+type RequestsPubKey = string
+
 // RequestsSort defines model for requests_Sort.
 type RequestsSort = string
 
 // RequestsSortBy defines model for requests_SortBy.
 type RequestsSortBy = string
+
+// RequestsStatus defines model for requests_Status.
+type RequestsStatus = ModelsContactStatus
 
 // ResponsesAdminAddPaymailSuccess defines model for responses_AdminAddPaymailSuccess.
 type ResponsesAdminAddPaymailSuccess = ModelsPaymail
@@ -622,6 +643,9 @@ type ResponsesAdminGetUserInternalServerError = ErrorsGettingUser
 type ResponsesAdminUserBadRequest struct {
 	union json.RawMessage
 }
+
+// ResponsesContactSuccess defines model for responses_ContactSuccess.
+type ResponsesContactSuccess = ModelsContact
 
 // ResponsesCreateTransactionOutlineBadRequest defines model for responses_CreateTransactionOutlineBadRequest.
 type ResponsesCreateTransactionOutlineBadRequest struct {
@@ -672,20 +696,50 @@ type ResponsesRecordTransactionSuccess = ModelsRecordedOutline
 // ResponsesSearchBadRequest defines model for responses_SearchBadRequest.
 type ResponsesSearchBadRequest = ErrorsInvalidDataID
 
+// ResponsesSearchContactsSuccess defines model for responses_SearchContactsSuccess.
+type ResponsesSearchContactsSuccess = []ModelsContactsSearchResult
+
 // ResponsesSearchOperationsSuccess defines model for responses_SearchOperationsSuccess.
 type ResponsesSearchOperationsSuccess = ModelsOperationsSearchResult
 
 // ResponsesSharedConfig Shared config
 type ResponsesSharedConfig = ModelsSharedConfig
 
-// ResponsesUpsertContactSuccess defines model for responses_UpsertContactSuccess.
-type ResponsesUpsertContactSuccess = ModelsContact
-
 // ResponsesUserBadRequest defines model for responses_UserBadRequest.
 type ResponsesUserBadRequest = ErrorsInvalidDataID
 
 // ResponsesUserNotAuthorized defines model for responses_UserNotAuthorized.
 type ResponsesUserNotAuthorized = ErrorsUserAuthorization
+
+// GetContactsParams defines parameters for GetContacts.
+type GetContactsParams struct {
+	// Page Page number for pagination
+	Page *RequestsPageNumber `form:"page,omitempty" json:"page,omitempty"`
+
+	// Size Number of items per page
+	Size *RequestsPageSize `form:"size,omitempty" json:"size,omitempty"`
+
+	// Sort Sorting order (asc or desc)
+	Sort *RequestsSort `form:"sort,omitempty" json:"sort,omitempty"`
+
+	// SortBy Field to sort by
+	SortBy *RequestsSortBy `form:"sortBy,omitempty" json:"sortBy,omitempty"`
+
+	// FullName Full name of the contact
+	FullName *RequestsFullName `form:"fullName,omitempty" json:"fullName,omitempty"`
+
+	// Paymail Paymail of the contact
+	Paymail *RequestsPaymail `form:"paymail,omitempty" json:"paymail,omitempty"`
+
+	// Id ID of the contact
+	Id *RequestsID `form:"id,omitempty" json:"id,omitempty"`
+
+	// PubKey Public key of the contact
+	PubKey *RequestsPubKey `form:"pubKey,omitempty" json:"pubKey,omitempty"`
+
+	// Status Status of the contact
+	Status *RequestsStatus `form:"status,omitempty" json:"status,omitempty"`
+}
 
 // SearchOperationsParams defines parameters for SearchOperations.
 type SearchOperationsParams struct {

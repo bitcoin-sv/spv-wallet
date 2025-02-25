@@ -130,7 +130,6 @@ components:
       required:
         - currentBalance
 
-
     OperationsSearchResult:
       type: object
       required:
@@ -376,6 +375,19 @@ components:
       allOf:
         - $ref: "#/components/schemas/Contact"
         - $ref: "#/components/schemas/AdditionalInfo"
+
+    ContactsSearchResult:
+      type: object
+      required:
+        - content
+        - page
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+        page:
+          $ref: '#/components/schemas/SearchPage'
 
     Contact:
       allOf:

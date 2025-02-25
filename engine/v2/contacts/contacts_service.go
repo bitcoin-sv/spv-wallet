@@ -2,13 +2,15 @@ package contacts
 
 import (
 	"context"
+
+	goPaymail "github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
+	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/rs/zerolog"
-
-	goPaymail "github.com/bitcoin-sv/go-paymail"
 )
 
 // Service for contacts
@@ -59,6 +61,7 @@ func (s *Service) UpsertContact(ctx context.Context, newContact *contactsmodels.
 	newContact.NewContactPubKey = contactPKI.PubKey
 
 	if contact != nil {
+		newContact.Status = contact.Status
 		c, err := s.contactsRepo.Update(ctx, newContact)
 		if err != nil {
 			return nil, err
@@ -66,6 +69,8 @@ func (s *Service) UpsertContact(ctx context.Context, newContact *contactsmodels.
 
 		return c, nil
 	}
+
+	newContact.Status = contactsmodels.ContactNotConfirmed
 
 	c, err := s.contactsRepo.Create(ctx, newContact)
 	if err != nil {
@@ -88,6 +93,44 @@ func (s *Service) UpsertContact(ctx context.Context, newContact *contactsmodels.
 	return c, nil
 }
 
+func (s *Service) AddContactRequest(ctx context.Context, fullName, paymail, userID string) (*contactsmodels.Contact, error) {
+	contactPaymail, err := s.paymailService.GetSanitizedPaymail(paymail)
+	if err != nil {
+		return nil, spverrors.ErrRequestedContactInvalid
+	}
+
+	contactPki, err := s.paymailService.GetPkiForPaymail(ctx, contactPaymail)
+	if err != nil {
+		return nil, spverrors.ErrGettingPKIFailed
+	}
+
+	contact, err := s.Find(ctx, userID, contactPaymail.Address)
+	if err != nil {
+		return nil, err
+	}
+
+	if contact != nil {
+		contact, err = s.updateContactPubKey(ctx, contact, contactPki.PubKey)
+		if err != nil {
+			return nil, err
+		}
+		return contact, nil
+	}
+
+	contact, err = s.contactsRepo.Create(ctx, &contactsmodels.NewContact{
+		UserID:            userID,
+		FullName:          fullName,
+		NewContactPaymail: paymail,
+		NewContactPubKey:  contactPki.PubKey,
+		Status:            contactsmodels.ContactNotConfirmed,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return contact, nil
+}
+
 // Find returns a paymail by alias and domain
 func (s *Service) Find(ctx context.Context, userID, paymail string) (*contactsmodels.Contact, error) {
 	contact, err := s.contactsRepo.Find(ctx, userID, paymail)
@@ -98,7 +141,92 @@ func (s *Service) Find(ctx context.Context, userID, paymail string) (*contactsmo
 	return contact, nil
 }
 
+// PaginatedForUser returns contacts for a user based on userID and the provided paging options and db conditions.
+func (s *Service) PaginatedForUser(ctx context.Context, userID string, page filter.Page, conditions map[string]interface{}) (*models.PagedResult[contactsmodels.Contact], error) {
+	entities, err := s.contactsRepo.PaginatedForUser(ctx, userID, page, conditions)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to get contacts for user")
+	}
+
+	return entities, nil
+}
+
 // RemoveContact deletes a contact
 func (s *Service) RemoveContact(ctx context.Context, userID, paymail string) error {
 	return s.contactsRepo.Delete(ctx, userID, paymail)
+}
+
+// ConfirmContact confirms a contact
+func (s *Service) ConfirmContact(ctx context.Context, userID, paymail string) error {
+	contact, err := s.Find(ctx, userID, paymail)
+	if err != nil {
+		return err
+	}
+
+	if contact.Status != contactsmodels.ContactNotConfirmed {
+		return spverrors.Newf("cannot confirm contact. Reason: status: %s, expected: %s", contact.Status, contactsmodels.ContactNotConfirmed)
+	}
+
+	return s.contactsRepo.UpdateStatus(ctx, userID, paymail, contactsmodels.ContactConfirmed)
+}
+
+// UnconfirmContact unconfirms a contact
+func (s *Service) UnconfirmContact(ctx context.Context, userID, paymail string) error {
+	contact, err := s.Find(ctx, userID, paymail)
+	if err != nil {
+		return err
+	}
+
+	if contact.Status != contactsmodels.ContactConfirmed {
+		return spverrors.Newf("cannot unconfirm contact. Reason: status: %s, expected: %s", contact.Status, contactsmodels.ContactConfirmed)
+	}
+
+	return s.contactsRepo.UpdateStatus(ctx, userID, paymail, contactsmodels.ContactNotConfirmed)
+}
+
+// AcceptContact accept a contact
+func (s *Service) AcceptContact(ctx context.Context, userID, paymail string) error {
+	contact, err := s.Find(ctx, userID, paymail)
+	if err != nil {
+		return err
+	}
+
+	if contact.Status != contactsmodels.ContactAwaitAccept {
+		return spverrors.Newf("cannot accept contact. Reason: status: %s, expected: %s", contact.Status, contactsmodels.ContactAwaitAccept)
+	}
+
+	return s.contactsRepo.UpdateStatus(ctx, userID, paymail, contactsmodels.ContactNotConfirmed)
+}
+
+// RejectContact reject a contact
+func (s *Service) RejectContact(ctx context.Context, userID, paymail string) error {
+	contact, err := s.Find(ctx, userID, paymail)
+	if err != nil {
+		return err
+	}
+
+	if contact.Status != contactsmodels.ContactAwaitAccept {
+		return spverrors.Newf("cannot reject contact. Reason: status: %s, expected: %s", contact.Status, contactsmodels.ContactConfirmed)
+	}
+
+	return s.contactsRepo.Delete(ctx, userID, paymail)
+}
+
+func (s *Service) updateContactPubKey(ctx context.Context, contact *contactsmodels.Contact, pubKey string) (*contactsmodels.Contact, error) {
+	contactToUpdate := contactsmodels.NewContact{}
+	if contact.PubKey != pubKey {
+		contactToUpdate.NewContactPubKey = pubKey
+
+		if contact.Status == contactsmodels.ContactConfirmed {
+			contactToUpdate.Status = contactsmodels.ContactNotConfirmed
+		}
+
+		c, err := s.contactsRepo.Update(ctx, &contactToUpdate)
+		if err != nil {
+			return nil, err
+		}
+		return c, nil
+	}
+
+	return contact, nil
 }
