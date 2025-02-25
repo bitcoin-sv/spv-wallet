@@ -1,11 +1,11 @@
 package database
 
 import (
-	"gorm.io/gorm"
 	"strings"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"gorm.io/gorm"
 )
 
 // TrackedOutput represents an output of a transaction.
