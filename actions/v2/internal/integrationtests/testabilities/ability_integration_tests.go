@@ -3,8 +3,6 @@ package testabilities
 import "testing"
 import "github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 
-// TODO: move this testabilities package into integrationtests/testabilities
-
 func New(t testing.TB) (given IntegrationTestFixtures, when IntegrationTestAction, then IntegrationTestAssertion) {
 	appFixture, appAssertions := testabilities.New(t)
 

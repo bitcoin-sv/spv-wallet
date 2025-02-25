@@ -1,9 +1,8 @@
 package integrationtests
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/integrationtests/testabilities"
 	"testing"
-
-	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/testabilities"
 )
 
 func TestSpendExternalFundsInternally(t *testing.T) {
