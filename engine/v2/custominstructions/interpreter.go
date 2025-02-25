@@ -5,19 +5,22 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
+// Interpreter is a struct that is used to interpret custom instructions.
 type Interpreter[R Resolver[TKey], TKey InputKeys] struct {
 	resolver R
 }
 
+// NewInterpreter creates a new interpreter for custom instructions with a given resolver.
 func NewInterpreter[R Resolver[TKey], TKey InputKeys](resolver R) *Interpreter[R, TKey] {
 	return &Interpreter[R, TKey]{
 		resolver: resolver,
 	}
 }
 
-func (p *Interpreter[I, TKey]) Process(publicKey *TKey, instructions bsv.CustomInstructions) (I, error) {
+// Process processes custom instructions for a given key.
+func (p *Interpreter[I, TKey]) Process(key *TKey, instructions bsv.CustomInstructions) (I, error) {
 	acc := &Accumulator[TKey]{
-		Key: publicKey,
+		Key: key,
 	}
 	var err error
 	var proceed bool

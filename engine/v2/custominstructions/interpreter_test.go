@@ -1,10 +1,11 @@
 package custominstructions
 
 import (
+	"testing"
+
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestLockingScriptInterpreter(t *testing.T) {

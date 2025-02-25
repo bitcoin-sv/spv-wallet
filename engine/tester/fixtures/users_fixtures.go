@@ -1,15 +1,15 @@
 package fixtures
 
 import (
-	sdk "github.com/bitcoin-sv/go-sdk/transaction"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/custominstructions"
 	"strings"
 
 	"github.com/bitcoin-sv/go-paymail"
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/go-sdk/script"
+	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/custominstructions"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 

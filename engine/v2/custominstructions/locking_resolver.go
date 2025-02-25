@@ -8,18 +8,22 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/keys/type42"
 )
 
+// NewAddressInterpreter creates a new custom instructions interpreter that resolves a public key to an address.
 func NewAddressInterpreter() *Interpreter[*AddressResolver, primitives.PublicKey] {
 	return NewInterpreter(&AddressResolver{})
 }
 
+// NewLockingScriptInterpreter creates a new custom instructions interpreter that resolves a public key to a locking script (and address).
 func NewLockingScriptInterpreter() *Interpreter[*LockingScriptResolver, primitives.PublicKey] {
 	return NewInterpreter(&LockingScriptResolver{})
 }
 
+// AddressResolver implements resolver for custom instructions that resolve a public key to an address.
 type AddressResolver struct {
 	Address *script.Address
 }
 
+// Type42 derives a new public key from the current public key using a type42 method.
 func (ar *AddressResolver) Type42(acc *Accumulator[primitives.PublicKey], instruction string) (bool, error) {
 	pub, err := type42.Derive(acc.Key, instruction)
 	if err != nil {
@@ -29,6 +33,7 @@ func (ar *AddressResolver) Type42(acc *Accumulator[primitives.PublicKey], instru
 	return true, nil
 }
 
+// Sign derives an address from the current public key.
 func (ar *AddressResolver) Sign(acc *Accumulator[primitives.PublicKey], _ string) (bool, error) {
 	addr, err := script.NewAddressFromPublicKey(acc.Key, true)
 	if err != nil {
@@ -38,6 +43,7 @@ func (ar *AddressResolver) Sign(acc *Accumulator[primitives.PublicKey], _ string
 	return false, nil
 }
 
+// Finalize ensures that the address is resolved.
 func (ar *AddressResolver) Finalize(acc *Accumulator[primitives.PublicKey]) error {
 	if ar.Address == nil {
 		// this is implicit "Sign" if there was no "Sign" instruction in provided custom instructions
@@ -49,11 +55,14 @@ func (ar *AddressResolver) Finalize(acc *Accumulator[primitives.PublicKey]) erro
 	return nil
 }
 
+// LockingScriptResolver implements resolver for custom instructions that resolve a public key to a locking script (and address).
+// Uses the AddressResolver because a locking script is easily derived from an address.
 type LockingScriptResolver struct {
 	AddressResolver
 	LockingScript *script.Script
 }
 
+// Finalize ensures that the address is resolved and derives the locking script from the address.
 func (lr *LockingScriptResolver) Finalize(acc *Accumulator[primitives.PublicKey]) error {
 	err := lr.AddressResolver.Finalize(acc)
 	if err != nil {
