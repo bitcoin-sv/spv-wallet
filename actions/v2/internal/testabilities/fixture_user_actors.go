@@ -4,59 +4,60 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
+	testpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
+	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 )
 
-// ActorTestContext provides a simplified test context with actor support
-type ActorTestContext struct {
-	Given          testabilities.SPVWalletApplicationFixture
-	baseAssertions testabilities.SPVWalletApplicationAssertions
-	t              testing.TB
-
-	Alice   *User
-	Bob     *User
-	Charlie *User
+type IntegrationTestFixtures interface {
+	StartedSPVWalletV2() (cleanup func())
+	Paymail() testpaymail.PaymailClientFixture
+	Alice() *fixtures.User
+	Bob() *fixtures.User
 }
 
-// User represents either an internal or external wallet user
-type User struct {
-	fixtures.User
-	app testabilities.SPVWalletApplicationFixture
-	t   testing.TB
+type fixture struct {
+	testabilities.SPVWalletApplicationFixture
+	t       testing.TB
+	alice   *user
+	bob     *user
+	charlie *user
 }
 
-// ActorAssertions wraps assertions for a specific actor
-type ActorAssertions struct {
-	userAssertions testabilities.SPVWalletAppUserAssertions
+func newFixture(t testing.TB, appFixture testabilities.SPVWalletApplicationFixture) *fixture {
+	return &fixture{
+		t:                           t,
+		SPVWalletApplicationFixture: appFixture,
+		alice: &user{
+			User: fixtures.Sender,
+			app:  appFixture,
+			t:    t,
+		},
+		bob: &user{
+			User: fixtures.RecipientInternal,
+			app:  appFixture,
+			t:    t,
+		},
+		charlie: &user{
+			User: fixtures.RecipientExternal,
+			app:  appFixture,
+			t:    t,
+		},
+	}
 }
 
-// NewActorTests creates a new test context with actor support
-func NewActorTests(t testing.TB) *ActorTestContext {
-	given, then := testabilities.New(t)
+func (f *fixture) StartedSPVWalletV2() (cleanup func()) {
+	cleanup = f.StartedSPVWalletWithConfiguration(testengine.WithV2())
+	f.Paymail().ExternalPaymailHost().WillRespondWithP2PWithBEEFCapabilities()
+	return
+}
 
-	ctx := &ActorTestContext{
-		Given:          given,
-		baseAssertions: then,
-		t:              t,
-	}
+func (f *fixture) Alice() *fixtures.User {
+	alice := f.alice.User
+	return &alice
+}
 
-	ctx.Alice = &User{
-		User: fixtures.Sender,
-		app:  given,
-		t:    t,
-	}
-
-	ctx.Bob = &User{
-		User: fixtures.RecipientInternal,
-		app:  given,
-		t:    t,
-	}
-
-	ctx.Charlie = &User{
-		User: fixtures.RecipientExternal,
-		app:  given,
-		t:    t,
-	}
-
-	return ctx
+func (f *fixture) Bob() *fixtures.User {
+	bob := f.bob.User
+	return &bob
 }

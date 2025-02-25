@@ -2,6 +2,7 @@ package testabilities
 
 import (
 	"fmt"
+	"testing"
 
 	"github.com/bitcoin-sv/go-sdk/script"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
@@ -17,8 +18,39 @@ const (
 	newOutlineURL        = "/api/v2/transactions/outlines"
 )
 
+type IntegrationTestAction interface {
+	Alice() ActorsActions
+}
+
+type ActorsActions interface {
+	ReceivesFromExternal(amount bsv.Satoshis) (txID string)
+	SendsTo(recipient *fixtures.User, amount bsv.Satoshis) (txID string)
+}
+
+type actions struct {
+	t       testing.TB
+	fixture *fixture
+}
+
+func newActions(t testing.TB, given *fixture) IntegrationTestAction {
+	return &actions{
+		t:       t,
+		fixture: given,
+	}
+}
+
+func (a *actions) Alice() ActorsActions {
+	return a.fixture.alice
+}
+
+type user struct {
+	fixtures.User
+	app testabilities.SPVWalletApplicationFixture
+	t   testing.TB
+}
+
 // ReceivesFromExternal simulates receiving funds from an external source
-func (u *User) ReceivesFromExternal(amount bsv.Satoshis) string {
+func (u *user) ReceivesFromExternal(amount bsv.Satoshis) string {
 	client := u.app.HttpClient().ForAnonymous()
 	_, then := testabilities.NewOf(u.app, u.t)
 
@@ -85,7 +117,7 @@ func (u *User) ReceivesFromExternal(amount bsv.Satoshis) string {
 }
 
 // SendsTo simulates sending funds to another user
-func (u *User) SendsTo(recipient *User, amount bsv.Satoshis) string {
+func (u *user) SendsTo(recipient *fixtures.User, amount bsv.Satoshis) string {
 	_, then := testabilities.NewOf(u.app, u.t)
 
 	outlineClient := u.app.HttpClient().ForGivenUser(u.User)

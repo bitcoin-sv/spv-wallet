@@ -3,48 +3,44 @@ package integrationtests
 import (
 	"testing"
 
-	internaltestabilities "github.com/bitcoin-sv/spv-wallet/actions/v2/internal/testabilities"
-	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/testabilities"
 )
 
 func TestSpendExternalFundsInternally(t *testing.T) {
 	// given:
-	tc := internaltestabilities.NewActorTests(t)
-	cleanup := tc.Given.StartedSPVWalletWithConfiguration(testengine.WithV2())
+	given, when, then := testabilities.New(t)
+	cleanup := given.StartedSPVWalletV2()
 	defer cleanup()
 
 	// and:
-	tc.Given.Paymail().ExternalPaymailHost().WillRespondWithP2PWithBEEFCapabilities()
-
-	// when:
-	receiveTxID := tc.Alice.ReceivesFromExternal(10)
+	receiveTxID := when.Alice().ReceivesFromExternal(10)
 
 	// then:
-	tc.Then(tc.Alice).Balance().IsEqualTo(10)
-	tc.Then(tc.Alice).Operations().Last().
+	then.Alice().Balance().IsEqualTo(10)
+	then.Alice().Operations().Last().
 		WithTxID(receiveTxID).
 		WithTxStatus("BROADCASTED").
 		WithValue(10).
 		WithType("incoming")
 
 	// when:
-	internalTxID := tc.Alice.SendsTo(tc.Bob, 5)
+	internalTxID := when.Alice().SendsTo(given.Bob(), 5)
 
 	// then:
-	tc.Then(tc.Alice).Balance().IsEqualTo(0)
-	tc.Then(tc.Bob).Balance().IsEqualTo(5)
+	then.Alice().Balance().IsEqualTo(0)
+	then.Bob().Balance().IsEqualTo(5)
 
-	tc.Then(tc.Alice).Operations().Last().
+	then.Alice().Operations().Last().
 		WithTxID(internalTxID).
 		WithTxStatus("BROADCASTED").
 		WithValue(-10).
 		WithType("outgoing").
-		WithCounterparty(tc.Bob.DefaultPaymail().Address())
+		WithCounterparty(given.Bob().DefaultPaymail().Address())
 
-	tc.Then(tc.Bob).Operations().Last().
+	then.Bob().Operations().Last().
 		WithTxID(internalTxID).
 		WithTxStatus("BROADCASTED").
 		WithValue(5).
 		WithType("incoming").
-		WithCounterparty(tc.Alice.DefaultPaymail().Address())
+		WithCounterparty(given.Alice().DefaultPaymail().Address())
 }
