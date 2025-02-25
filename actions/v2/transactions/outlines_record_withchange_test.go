@@ -71,6 +71,28 @@ func TestTransactionWithChange(t *testing.T) {
 				},
 			},
 		},
+		"two outputs with the same address": {
+			changeOutputs: changeOutputSpecs{
+				{
+					customInstructions: bsv.CustomInstructions{
+						{
+							Type:        "type42",
+							Instruction: "1-destination-1output4d06387d3be7bd26cfe2b5996",
+						},
+					},
+					satoshis: 600,
+				},
+				{
+					customInstructions: bsv.CustomInstructions{
+						{
+							Type:        "type42",
+							Instruction: "1-destination-1output4d06387d3be7bd26cfe2b5996",
+						},
+					},
+					satoshis: 400,
+				},
+			},
+		},
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
