@@ -72,7 +72,7 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 		return nil, spverrors.Wrapf(customOuts.err, "failed to resolve custom outputs")
 	}
 
-	// getting all outputs that matches user's addresses from the database
+	// getting all outputs that matches tracked addresses from the database
 	p2pkhOutputs, err := flow.createUTXOsForTrackedAddresses(customOuts.remainingAddresses())
 	if err != nil {
 		return nil, err
