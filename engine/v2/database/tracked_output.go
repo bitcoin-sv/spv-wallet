@@ -19,16 +19,3 @@ type TrackedOutput struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
-
-// IsSpent returns true if the output is spent.
-func (o *TrackedOutput) IsSpent() bool {
-	return o.SpendingTX != ""
-}
-
-// Outpoint returns bsv.Outpoint object which identifies the output.
-func (o *TrackedOutput) Outpoint() *bsv.Outpoint {
-	return &bsv.Outpoint{
-		TxID: o.TxID,
-		Vout: o.Vout,
-	}
-}

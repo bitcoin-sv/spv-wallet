@@ -4,6 +4,7 @@ import (
 	"context"
 	"iter"
 	"slices"
+	"strings"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
@@ -42,9 +43,12 @@ func (o *Outputs) FindByOutpoints(ctx context.Context, outpoints iter.Seq[bsv.Ou
 
 	return lo.Map(outputs, func(output *database.TrackedOutput, _ int) txmodels.TrackedOutput {
 		return txmodels.TrackedOutput{
-			TxID:       output.TxID,
-			Vout:       output.Vout,
-			SpendingTX: output.SpendingTX,
+			TxID: output.TxID,
+			Vout: output.Vout,
+			// Because the field is char(64) in the database, it will be padded with spaces.
+			// For some reason the value is padded only on postgres,
+			// so if changing, make sure to check it on all databases.
+			SpendingTX: strings.TrimLeft(output.SpendingTX, " "),
 			UserID:     output.UserID,
 			Satoshis:   output.Satoshis,
 			CreatedAt:  output.CreatedAt,
