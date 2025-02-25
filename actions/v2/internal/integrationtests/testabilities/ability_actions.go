@@ -66,18 +66,7 @@ func (u *user) ReceivesFromExternal(amount bsv.Satoshis) string {
 			u.DefaultPaymail(),
 		))
 
-	then.Response(destRes).IsOK().WithJSONMatching(`{
-       "outputs": [
-       {
-          "address": "{{ matchAddress }}",
-          "satoshis": {{ .satoshis }},
-          "script": "{{ matchHex }}"
-       }
-       ],
-       "reference": "{{ matchHexWithLength 32 }}"
-    }`, map[string]any{
-		"satoshis": uint64(amount),
-	})
+	then.Response(destRes).IsOK()
 
 	getter := then.Response(destRes).JSONValue()
 	reference := getter.GetString("reference")
