@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/oapi-codegen/oapi-codegen/HEAD/configuration-schema.json
+
+package: client
+generate:
+  models: true
+  client: true
+# the output here is relational to the tools/apigen.go file with go generate commands.
+output: ../api/manualtests/client/client.gen.go
+output-options:
+  user-templates:
+    client-with-responses.tmpl: ../api/manualtests/client-with-responses.tmpl
