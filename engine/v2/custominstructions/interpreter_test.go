@@ -30,6 +30,23 @@ func TestLockingScriptInterpreter(t *testing.T) {
 			},
 			expectAddress: "18RAjvMrT1HMzejGn9qyP4zb1c5BgHidRa",
 		},
+		"with no explicit sign method": {
+			customInstructions: bsv.CustomInstructions{
+				{
+					Type:        Type42,
+					Instruction: "1-paymail_pki-test@example.com_0",
+				},
+				{
+					Type:        Type42,
+					Instruction: "1-destination-6a5dbb7df22a265de809c35dd8d703c1",
+				},
+			},
+			expectAddress: "18RAjvMrT1HMzejGn9qyP4zb1c5BgHidRa",
+		},
+		"with empty instructions": {
+			customInstructions: bsv.CustomInstructions{},
+			expectAddress:      "1GtetpoX4eraGj7FgMhwdRhrd13Xn96USN",
+		},
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
