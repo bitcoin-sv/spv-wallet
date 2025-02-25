@@ -32,7 +32,7 @@ func NewService(repo ContactRepo, paymailAddressService *paymails.Service, payma
 }
 
 // UpsertContact creates or updates a contact
-func (s *Service) UpsertContact(ctx context.Context, newContact *contactsmodels.NewContact) (*contactsmodels.Contact, error) {
+func (s *Service) UpsertContact(ctx context.Context, newContact contactsmodels.NewContact) (*contactsmodels.Contact, error) {
 	rAlias, rDomain, rAddress := goPaymail.SanitizePaymail(newContact.RequesterPaymail)
 	rPaymail, err := s.paymailAddressService.Find(ctx, rAlias, rDomain)
 	if err != nil {
@@ -93,6 +93,7 @@ func (s *Service) UpsertContact(ctx context.Context, newContact *contactsmodels.
 	return c, nil
 }
 
+// AddContactRequest adds a new contact based on request data
 func (s *Service) AddContactRequest(ctx context.Context, fullName, paymail, userID string) (*contactsmodels.Contact, error) {
 	contactPaymail, err := s.paymailService.GetSanitizedPaymail(paymail)
 	if err != nil {
@@ -117,7 +118,7 @@ func (s *Service) AddContactRequest(ctx context.Context, fullName, paymail, user
 		return contact, nil
 	}
 
-	contact, err = s.contactsRepo.Create(ctx, &contactsmodels.NewContact{
+	contact, err = s.contactsRepo.Create(ctx, contactsmodels.NewContact{
 		UserID:            userID,
 		FullName:          fullName,
 		NewContactPaymail: paymail,
@@ -151,9 +152,33 @@ func (s *Service) PaginatedForUser(ctx context.Context, userID string, page filt
 	return entities, nil
 }
 
+// PaginatedForAdmin returns all contacts based on the provided paging options and db conditions.
+func (s *Service) PaginatedForAdmin(ctx context.Context, page filter.Page, conditions map[string]interface{}) (*models.PagedResult[contactsmodels.Contact], error) {
+	entities, err := s.contactsRepo.PaginatedForAdmin(ctx, page, conditions)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to get contacts for user")
+	}
+
+	return entities, nil
+}
+
+func (s *Service) UpdateFullNameByID(ctx context.Context, contactID uint, fullName string) (*contactsmodels.Contact, error) {
+	c, err := s.contactsRepo.UpdateByID(ctx, contactID, fullName)
+	if err != nil {
+		return nil, err
+	}
+
+	return c, nil
+}
+
 // RemoveContact deletes a contact
 func (s *Service) RemoveContact(ctx context.Context, userID, paymail string) error {
 	return s.contactsRepo.Delete(ctx, userID, paymail)
+}
+
+// RemoveContactByID deletes a contact by ID
+func (s *Service) RemoveContactByID(ctx context.Context, contactID uint) error {
+	return s.contactsRepo.DeleteByID(ctx, contactID)
 }
 
 // ConfirmContact confirms a contact
@@ -212,6 +237,65 @@ func (s *Service) RejectContact(ctx context.Context, userID, paymail string) err
 	return s.contactsRepo.Delete(ctx, userID, paymail)
 }
 
+// AdminCreateContact creates a new contact for the provided paymail
+func (s *Service) AdminCreateContact(ctx context.Context, newContact contactsmodels.NewContact) (*contactsmodels.Contact, error) {
+	err := validateNewContact(newContact)
+
+	rAlias, rDomain, _ := goPaymail.SanitizePaymail(newContact.RequesterPaymail)
+	rPaymailAddr, err := s.paymailAddressService.Find(ctx, rAlias, rDomain)
+	if err != nil {
+		return nil, spverrors.ErrCouldNotFindPaymail.Wrap(err)
+	} else if rPaymailAddr == nil {
+		return nil, spverrors.ErrCouldNotFindPaymail
+	}
+
+	contact, err := s.Find(ctx, rPaymailAddr.UserID, newContact.NewContactPaymail)
+	if err != nil {
+		return nil, err
+	} else if contact != nil {
+		return nil, spverrors.ErrContactAlreadyExists
+	}
+
+	contactPaymail, err := s.paymailService.GetSanitizedPaymail(newContact.NewContactPaymail)
+	if err != nil {
+		return nil, spverrors.ErrRequestedContactInvalid
+	}
+
+	contactPKI, err := s.paymailService.GetPkiForPaymail(ctx, contactPaymail)
+	if err != nil {
+		return nil, spverrors.ErrGettingPKIFailed
+	}
+
+	newContact.NewContactPubKey = contactPKI.PubKey
+
+	contact, err = s.contactsRepo.Create(ctx, newContact)
+	if err != nil {
+		return nil, spverrors.ErrSaveContact.Wrap(err)
+	}
+
+	return contact, nil
+}
+
+// AdminConfirmContacts confirms provided contacts.
+func (s *Service) AdminConfirmContacts(ctx context.Context, paymailA, paymailB string) error {
+	contactA, contactB, err := s.retrieveContacts(ctx, paymailA, paymailB)
+	if err != nil {
+		return spverrors.ErrGetContact.Wrap(err)
+	}
+
+	err = s.contactsRepo.UpdateStatus(ctx, contactA.UserID, contactA.Paymail, contactsmodels.ContactConfirmed)
+	if err != nil {
+		return spverrors.ErrUpdateContactStatus.Wrap(err)
+	}
+
+	err = s.contactsRepo.UpdateStatus(ctx, contactB.UserID, contactB.Paymail, contactsmodels.ContactConfirmed)
+	if err != nil {
+		return spverrors.ErrUpdateContactStatus.Wrap(err)
+	}
+
+	return nil
+}
+
 func (s *Service) updateContactPubKey(ctx context.Context, contact *contactsmodels.Contact, pubKey string) (*contactsmodels.Contact, error) {
 	contactToUpdate := contactsmodels.NewContact{}
 	if contact.PubKey != pubKey {
@@ -221,7 +305,7 @@ func (s *Service) updateContactPubKey(ctx context.Context, contact *contactsmode
 			contactToUpdate.Status = contactsmodels.ContactNotConfirmed
 		}
 
-		c, err := s.contactsRepo.Update(ctx, &contactToUpdate)
+		c, err := s.contactsRepo.Update(ctx, contactToUpdate)
 		if err != nil {
 			return nil, err
 		}
@@ -229,4 +313,50 @@ func (s *Service) updateContactPubKey(ctx context.Context, contact *contactsmode
 	}
 
 	return contact, nil
+}
+
+func (s *Service) retrieveContacts(ctx context.Context, paymailA, paymailB string) (*contactsmodels.Contact, *contactsmodels.Contact, error) {
+	aAlias, aDomain, _ := goPaymail.SanitizePaymail(paymailA)
+	aPaymail, err := s.paymailAddressService.Find(ctx, aAlias, aDomain)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	bAlias, bDomain, _ := goPaymail.SanitizePaymail(paymailB)
+	bPaymail, err := s.paymailAddressService.Find(ctx, bAlias, bDomain)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	contactA, err := s.Find(ctx, aPaymail.UserID, paymailB)
+	if err != nil {
+		return nil, nil, err
+	} else if contactA == nil {
+		return nil, nil, spverrors.ErrContactNotFound
+	}
+
+	contactB, err := s.Find(ctx, bPaymail.UserID, paymailA)
+	if err != nil {
+		return nil, nil, err
+	} else if contactB == nil {
+		return nil, nil, spverrors.ErrContactNotFound
+	}
+
+	return contactA, contactB, nil
+}
+
+func validateNewContact(newContact contactsmodels.NewContact) error {
+	if newContact.FullName == "" {
+		return spverrors.ErrMissingContactFullName
+	}
+
+	if newContact.NewContactPaymail == "" {
+		return spverrors.ErrMissingContactPaymailParam
+	}
+
+	if newContact.RequesterPaymail == "" {
+		return spverrors.ErrMissingContactCreatorPaymail
+	}
+
+	return nil
 }

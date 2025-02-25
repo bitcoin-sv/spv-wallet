@@ -182,6 +182,9 @@ var ErrGetContact = models.SPVError{Message: "getting contact failed", StatusCod
 // ErrContactInvalidPaymail is returned when the paymail is invalid
 var ErrContactInvalidPaymail = models.SPVError{Message: "invalid paymail", StatusCode: 400, Code: "error-contacts-invalid-paymail"}
 
+// ErrUpdateContactStatus is when updating contact status failed
+var ErrUpdateContactStatus = models.SPVError{Message: "updating contact status failed", StatusCode: 500, Code: "error-contact-updating-status-failed"}
+
 // ////////////////////////////////// PAYMAIL ERRORS
 
 // ErrCouldNotFindPaymail is when paymail could not be found

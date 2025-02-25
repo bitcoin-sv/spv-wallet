@@ -1,4 +1,4 @@
-package search_mapping
+package mapping
 
 import (
 	"reflect"

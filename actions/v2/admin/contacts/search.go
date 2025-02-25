@@ -1,27 +1,18 @@
 package contacts
 
 import (
-	"net/http"
-
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/mapping"
 	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
-func (s *APIContacts) GetContacts(c *gin.Context, params api.GetContactsParams) {
-	userContext := reqctx.GetUserContext(c)
-	userID, err := userContext.ShouldGetUserID()
-	if err != nil {
-		spverrors.ErrorResponse(c, err, s.logger)
-		return
-	}
-
+func (s *APIAdminContacts) GetContacts(c *gin.Context, params api.GetContactsParams) {
 	page := mapping.MapContactsParamToFilterPage(params)
 	conditions := mapping.MapToDBConditions(params)
 
-	pagedResult, err := s.engine.ContactService().PaginatedForUser(c.Request.Context(), userID, page, conditions)
+	pagedResult, err := s.engine.ContactService().PaginatedForAdmin(c.Request.Context(), page, conditions)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return

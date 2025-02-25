@@ -144,6 +144,42 @@ components:
         - requesterPaymail
         - metadata
 
+    UpdateContact:
+      type: object
+      properties:
+        fullName:
+          type: string
+          example: "Test name"
+      required:
+        - fullName
+
+    AdminCreateContact:
+      type: object
+      properties:
+        creatorPaymail:
+          type: string
+          example: "example@spv-wallet.com"
+        fullName:
+          type: string
+          example: "Test name"
+      required:
+        - fullName
+        - creatorPaymail
+
+    AdminConfirmContact:
+      type: object
+      properties:
+        paymailA:
+          type: string
+          example: "alice@spv-wallet.com"
+        paymailB:
+          type: string
+          example: "bob@spv-wallet.com"
+      required:
+        - paymailA
+        - paymailB
+
+
   parameters:
     PageNumber:
       in: query

@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/go-paymail"
-	"github.com/bitcoin-sv/spv-wallet/actions/v2/contacts/internal/mapping"
+	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/mapping"
 	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
@@ -35,7 +35,7 @@ func (s *APIContacts) UpsertContact(c *gin.Context, paymail string) {
 		return
 	}
 
-	newContact := &contactsmodels.NewContact{
+	newContact := contactsmodels.NewContact{
 		FullName:          requestBody.FullName,
 		NewContactPaymail: paymail,
 		RequesterPaymail:  requestBody.RequesterPaymail,

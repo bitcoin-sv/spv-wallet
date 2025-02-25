@@ -106,3 +106,157 @@ paths:
           $ref: "../components/responses.yaml#/components/responses/AdminUserBadRequest"
         401:
           $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
+
+  /api/v2/admin/contacts:
+    get:
+      operationId: getContacts
+      security:
+        - XPubAuth:
+            - "admin"
+      tags:
+        - Admin endpoints
+      summary: Get contacts
+      description: >-
+        This endpoint returns all contacts.
+      parameters:
+        - $ref: "../components/requests.yaml#/components/parameters/PageNumber"
+        - $ref: "../components/requests.yaml#/components/parameters/PageSize"
+        - $ref: "../components/requests.yaml#/components/parameters/Sort"
+        - $ref: "../components/requests.yaml#/components/parameters/SortBy"
+        - $ref: "../components/requests.yaml#/components/parameters/FullName"
+        - $ref: "../components/requests.yaml#/components/parameters/Paymail"
+        - $ref: "../components/requests.yaml#/components/parameters/ID"
+        - $ref: "../components/requests.yaml#/components/parameters/PubKey"
+        - $ref: "../components/requests.yaml#/components/parameters/Status"
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/SearchContactsSuccess"
+        400:
+          $ref: "../components/responses.yaml#/components/responses/AdminUserBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+
+  /api/v2/admin/contacts/{id}:
+    post:
+      operationId: updateContact
+      security:
+        - XPubAuth:
+            - "admin"
+      tags:
+        - Admin endpoints
+      summary: Update contact
+      description: >-
+        This endpoint updates contact.
+      parameters:
+        - name: id
+          in: path
+          description: Contact ID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../components/requests.yaml#/components/schemas/UpdateContact"
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/ContactSuccess"
+        400:
+          $ref: "../components/responses.yaml#/components/responses/AdminUserBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+
+    delete:
+      operationId: deleteContact
+      security:
+        - XPubAuth:
+            - "admin"
+      tags:
+        - Admin endpoints
+      summary: Delete contact
+      description: >-
+        This endpoint deletes contact.
+      parameters:
+        - name: id
+          in: path
+          description: Contact ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Contact deleted
+        400:
+          $ref: "../components/responses.yaml#/components/responses/AdminUserBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+
+
+  /api/v2/admin/contacts/{paymail}:
+    post:
+      operationId: createContact
+      security:
+        - XPubAuth:
+            - "admin"
+      tags:
+        - Admin endpoints
+      summary: Create contact
+      description: >-
+        This endpoint creates contact.
+      parameters:
+        - name: paymail
+          in: path
+          description: Contact paymail
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../components/requests.yaml#/components/schemas/AdminCreateContact"
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/ContactSuccess"
+        400:
+          $ref: "../components/responses.yaml#/components/responses/AdminUserBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+
+  /api/v2/admin/contacts/confirmations:
+    post:
+      operationId: confirmContact
+      security:
+        - XPubAuth:
+            - "admin"
+      tags:
+        - Admin endpoints
+      summary: Confirm contact
+      description: >-
+        This endpoint confirms contact.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../components/requests.yaml#/components/schemas/AdminConfirmContact"
+      responses:
+        200:
+          description: Contact confirmed
+        400:
+          $ref: "../components/responses.yaml#/components/responses/AdminUserBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/InternalServerError"

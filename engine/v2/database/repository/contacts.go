@@ -68,9 +68,31 @@ func (r *Contacts) UpdateStatus(ctx context.Context, userID, paymail, status str
 	return nil
 }
 
+// UpdateByID updates contact full name using its ID.
+func (r *Contacts) UpdateByID(ctx context.Context, contactID uint, fullName string) (*contactsmodels.Contact, error) {
+	row := database.UserContact{FullName: fullName}
+	if err := r.db.WithContext(ctx).
+		Model(&database.UserContact{}).
+		Where("id = ?", contactID).
+		Updates(row).Error; err != nil {
+		return nil, spverrors.Wrapf(err, "failed to update contact")
+	}
+
+	return newContactModel(row), nil
+}
+
 // Delete removes a contact from the database.
 func (r *Contacts) Delete(ctx context.Context, userID, paymail string) error {
 	if err := r.db.WithContext(ctx).Where("user_id = ? AND paymail = ?", userID, paymail).Delete(&database.UserContact{}).Error; err != nil {
+		return spverrors.Wrapf(err, "failed to delete contact")
+	}
+
+	return nil
+}
+
+// DeleteByID removes a contact from the database by its ID.
+func (r *Contacts) DeleteByID(ctx context.Context, contactID uint) error {
+	if err := r.db.WithContext(ctx).Where("id = ?", contactID).Delete(&database.UserContact{}).Error; err != nil {
 		return spverrors.Wrapf(err, "failed to delete contact")
 	}
 
@@ -119,7 +141,45 @@ func (r *Contacts) PaginatedForUser(ctx context.Context, userID string, page fil
 			return &contactsmodels.Contact{
 				ID:        contact.ID,
 				UserID:    contact.UserID,
+				FullName:  contact.FullName,
+				Paymail:   contact.Paymail,
+				PubKey:    contact.PubKey,
+				Status:    contact.Status,
 				CreatedAt: contact.CreatedAt,
+				UpdatedAt: contact.UpdatedAt,
+				DeletedAt: &contact.DeletedAt.Time,
+			}
+		}),
+	}, nil
+}
+
+func (r *Contacts) PaginatedForAdmin(ctx context.Context, page filter.Page, conditions map[string]interface{}) (*models.PagedResult[contactsmodels.Contact], error) {
+	scopes := mapConditionsToScopes(conditions)
+	scopes = append(scopes, dbquery.Preload("User"))
+
+	rows, err := dbquery.PaginatedQuery[database.UserContact](
+		ctx,
+		page,
+		r.db,
+		scopes...,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+	return &models.PagedResult[contactsmodels.Contact]{
+		PageDescription: rows.PageDescription,
+		Content: lo.Map(rows.Content, func(contact *database.UserContact, _ int) *contactsmodels.Contact {
+			return &contactsmodels.Contact{
+				ID:        contact.ID,
+				UserID:    contact.UserID,
+				FullName:  contact.FullName,
+				Paymail:   contact.Paymail,
+				PubKey:    contact.PubKey,
+				Status:    contact.Status,
+				CreatedAt: contact.CreatedAt,
+				UpdatedAt: contact.UpdatedAt,
+				DeletedAt: &contact.DeletedAt.Time,
 			}
 		}),
 	}, nil

@@ -19,6 +19,21 @@ type ServerInterface interface {
 	// Accept invitation
 	// (POST /api/contacts/invitations/{paymail}/contacts)
 	AcceptInvitation(c *gin.Context, paymail string)
+	// Get contacts
+	// (GET /api/v2/admin/contacts)
+	GetContacts(c *gin.Context, params GetContactsParams)
+	// Confirm contact
+	// (POST /api/v2/admin/contacts/confirmations)
+	ConfirmContact(c *gin.Context)
+	// Delete contact
+	// (DELETE /api/v2/admin/contacts/{id})
+	DeleteContact(c *gin.Context, id int)
+	// Update contact
+	// (POST /api/v2/admin/contacts/{id})
+	UpdateContact(c *gin.Context, id int)
+	// Create contact
+	// (POST /api/v2/admin/contacts/{paymail})
+	CreateContact(c *gin.Context, paymail string)
 	// Get admin status
 	// (GET /api/v2/admin/status)
 	AdminStatus(c *gin.Context)
@@ -128,6 +143,191 @@ func (siw *ServerInterfaceWrapper) AcceptInvitation(c *gin.Context) {
 	}
 
 	siw.Handler.AcceptInvitation(c, paymail)
+}
+
+// GetContacts operation middleware
+func (siw *ServerInterfaceWrapper) GetContacts(c *gin.Context) {
+
+	var err error
+
+	c.Set(XPubAuthScopes, []string{"admin"})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetContactsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", c.Request.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter page: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "size" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "size", c.Request.URL.Query(), &params.Size)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter size: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "sort" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sort", c.Request.URL.Query(), &params.Sort)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter sort: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "sortBy" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sortBy", c.Request.URL.Query(), &params.SortBy)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter sortBy: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "fullName" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "fullName", c.Request.URL.Query(), &params.FullName)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter fullName: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "paymail" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "paymail", c.Request.URL.Query(), &params.Paymail)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter paymail: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "id" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "id", c.Request.URL.Query(), &params.Id)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "pubKey" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "pubKey", c.Request.URL.Query(), &params.PubKey)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter pubKey: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "status", c.Request.URL.Query(), &params.Status)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter status: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetContacts(c, params)
+}
+
+// ConfirmContact operation middleware
+func (siw *ServerInterfaceWrapper) ConfirmContact(c *gin.Context) {
+
+	c.Set(XPubAuthScopes, []string{"admin"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.ConfirmContact(c)
+}
+
+// DeleteContact operation middleware
+func (siw *ServerInterfaceWrapper) DeleteContact(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(XPubAuthScopes, []string{"admin"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.DeleteContact(c, id)
+}
+
+// UpdateContact operation middleware
+func (siw *ServerInterfaceWrapper) UpdateContact(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(XPubAuthScopes, []string{"admin"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.UpdateContact(c, id)
+}
+
+// CreateContact operation middleware
+func (siw *ServerInterfaceWrapper) CreateContact(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "paymail" -------------
+	var paymail string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "paymail", c.Param("paymail"), &paymail, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter paymail: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(XPubAuthScopes, []string{"admin"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.CreateContact(c, paymail)
 }
 
 // AdminStatus operation middleware
@@ -614,6 +814,11 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.DELETE(options.BaseURL+"/api/contacts/invitations/:paymail", wrapper.RejectInvitation)
 	router.POST(options.BaseURL+"/api/contacts/invitations/:paymail/contacts", wrapper.AcceptInvitation)
+	router.GET(options.BaseURL+"/api/v2/admin/contacts", wrapper.GetContacts)
+	router.POST(options.BaseURL+"/api/v2/admin/contacts/confirmations", wrapper.ConfirmContact)
+	router.DELETE(options.BaseURL+"/api/v2/admin/contacts/:id", wrapper.DeleteContact)
+	router.POST(options.BaseURL+"/api/v2/admin/contacts/:id", wrapper.UpdateContact)
+	router.POST(options.BaseURL+"/api/v2/admin/contacts/:paymail", wrapper.CreateContact)
 	router.GET(options.BaseURL+"/api/v2/admin/status", wrapper.AdminStatus)
 	router.POST(options.BaseURL+"/api/v2/admin/users", wrapper.CreateUser)
 	router.GET(options.BaseURL+"/api/v2/admin/users/:id", wrapper.UserById)

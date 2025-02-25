@@ -526,6 +526,18 @@ type RequestsAddPaymail struct {
 	PublicName string `json:"publicName"`
 }
 
+// RequestsAdminConfirmContact defines model for requests_AdminConfirmContact.
+type RequestsAdminConfirmContact struct {
+	PaymailA string `json:"paymailA"`
+	PaymailB string `json:"paymailB"`
+}
+
+// RequestsAdminCreateContact defines model for requests_AdminCreateContact.
+type RequestsAdminCreateContact struct {
+	CreatorPaymail string `json:"creatorPaymail"`
+	FullName       string `json:"fullName"`
+}
+
 // RequestsCreateUser defines model for requests_CreateUser.
 type RequestsCreateUser struct {
 	Paymail   *RequestsAddPaymail `json:"paymail,omitempty"`
@@ -589,6 +601,11 @@ type RequestsTransactionOutlineOutputSpecification struct {
 // RequestsTransactionSpecification defines model for requests_TransactionSpecification.
 type RequestsTransactionSpecification struct {
 	Outputs []RequestsTransactionOutlineOutputSpecification `json:"outputs"`
+}
+
+// RequestsUpdateContact defines model for requests_UpdateContact.
+type RequestsUpdateContact struct {
+	FullName string `json:"fullName"`
 }
 
 // RequestsUpsertContact defines model for requests_UpsertContact.
@@ -741,6 +758,36 @@ type GetContactsParams struct {
 	Status *RequestsStatus `form:"status,omitempty" json:"status,omitempty"`
 }
 
+// GetContactsParams defines parameters for GetContacts.
+type GetContactsParams struct {
+	// Page Page number for pagination
+	Page *RequestsPageNumber `form:"page,omitempty" json:"page,omitempty"`
+
+	// Size Number of items per page
+	Size *RequestsPageSize `form:"size,omitempty" json:"size,omitempty"`
+
+	// Sort Sorting order (asc or desc)
+	Sort *RequestsSort `form:"sort,omitempty" json:"sort,omitempty"`
+
+	// SortBy Field to sort by
+	SortBy *RequestsSortBy `form:"sortBy,omitempty" json:"sortBy,omitempty"`
+
+	// FullName Full name of the contact
+	FullName *RequestsFullName `form:"fullName,omitempty" json:"fullName,omitempty"`
+
+	// Paymail Paymail of the contact
+	Paymail *RequestsPaymail `form:"paymail,omitempty" json:"paymail,omitempty"`
+
+	// Id ID of the contact
+	Id *RequestsID `form:"id,omitempty" json:"id,omitempty"`
+
+	// PubKey Public key of the contact
+	PubKey *RequestsPubKey `form:"pubKey,omitempty" json:"pubKey,omitempty"`
+
+	// Status Status of the contact
+	Status *RequestsStatus `form:"status,omitempty" json:"status,omitempty"`
+}
+
 // SearchOperationsParams defines parameters for SearchOperations.
 type SearchOperationsParams struct {
 	// Page Page number for pagination
@@ -764,6 +811,15 @@ type CreateTransactionOutlineParams struct {
 
 // CreateTransactionOutlineParamsFormat defines parameters for CreateTransactionOutline.
 type CreateTransactionOutlineParamsFormat string
+
+// ConfirmContactJSONRequestBody defines body for ConfirmContact for application/json ContentType.
+type ConfirmContactJSONRequestBody = RequestsAdminConfirmContact
+
+// UpdateContactJSONRequestBody defines body for UpdateContact for application/json ContentType.
+type UpdateContactJSONRequestBody = RequestsUpdateContact
+
+// CreateContactJSONRequestBody defines body for CreateContact for application/json ContentType.
+type CreateContactJSONRequestBody = RequestsAdminCreateContact
 
 // CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
 type CreateUserJSONRequestBody = RequestsCreateUser
