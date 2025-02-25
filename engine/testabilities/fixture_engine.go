@@ -135,12 +135,13 @@ func (f *engineFixture) ConfigForTests(opts ...ConfigOpts) *config.AppConfig {
 
 func (f *engineFixture) Faucet(user fixtures.User) FaucetFixture {
 	return &faucetFixture{
-		engine: f.engine,
-		user:   user,
-		t:      f.t,
-		assert: assert.New(f.t),
-		arc:    f.ARC(),
-		bhs:    f.BHS(),
+		engine:  f.engine,
+		user:    user,
+		t:       f.t,
+		assert:  assert.New(f.t),
+		require: require.New(f.t),
+		arc:     f.ARC(),
+		bhs:     f.BHS(),
 	}
 }
 
@@ -174,35 +175,10 @@ func (f *engineFixture) initialiseFixtures() {
 	opts := f.engine.DefaultModelOptions(engine.WithMetadata("source", "fixture"))
 
 	for _, user := range fixtures.InternalUsers() {
-		_, err := f.engine.NewXpub(context.Background(), user.XPub(), opts...)
-		if !errors.Is(err, spverrors.ErrXPubAlreadyExists) {
-			require.NoError(f.t, err)
-		}
-
-		for _, pm := range user.Paymails {
-			_, err := f.engine.NewPaymailAddress(context.Background(), user.XPub(), pm.Address(), pm.PublicName(), "", opts...)
-			if !errors.Is(err, spverrors.ErrPaymailAlreadyExists) {
-				require.NoError(f.t, err)
-			}
-		}
-
 		if f.config.ExperimentalFeatures.V2 {
-			pubKeyHex := user.PublicKey().ToDERHex()
-			createdUser, err := f.engine.UsersService().Create(context.Background(), &usersmodels.NewUser{
-				PublicKey: pubKeyHex,
-			})
-			require.NoError(f.t, err)
-			for _, pm := range user.Paymails {
-				_, err = f.engine.PaymailsService().Create(context.Background(), &paymailsmodels.NewPaymail{
-					Alias:  pm.Alias(),
-					Domain: pm.Domain(),
-
-					PublicName: pm.PublicName(),
-					Avatar:     "",
-					UserID:     createdUser.ID,
-				})
-			}
-			require.NoError(f.t, err)
+			f.createV2User(user, opts)
+		} else {
+			f.createV1User(user, opts)
 		}
 	}
 
@@ -220,6 +196,46 @@ func (f *engineFixture) httpClientWithMockedTransport() *resty.Client {
 	client := resty.New()
 	client.SetTransport(f.externalTransport)
 	return client
+}
+
+func (f *engineFixture) createV1User(user fixtures.User, opts []engine.ModelOps) {
+	_, err := f.engine.NewXpub(context.Background(), user.XPub(), opts...)
+	if !errors.Is(err, spverrors.ErrXPubAlreadyExists) {
+		require.NoError(f.t, err)
+	}
+
+	for _, pm := range user.Paymails {
+		_, err := f.engine.NewPaymailAddress(context.Background(), user.XPub(), pm.Address(), pm.PublicName(), "", opts...)
+		if !errors.Is(err, spverrors.ErrPaymailAlreadyExists) {
+			require.NoError(f.t, err)
+		}
+	}
+}
+
+func (f *engineFixture) createV2User(user fixtures.User, opts []engine.ModelOps) {
+	exists, err := f.engine.UsersService().Exists(context.Background(), user.ID())
+	require.NoError(f.t, err)
+	if exists {
+		return
+	}
+
+	pubKeyHex := user.PublicKey().ToDERHex()
+
+	createdUser, err := f.engine.UsersService().Create(context.Background(), &usersmodels.NewUser{
+		PublicKey: pubKeyHex,
+	})
+	require.NoError(f.t, err)
+	for _, pm := range user.Paymails {
+		_, err = f.engine.PaymailsService().Create(context.Background(), &paymailsmodels.NewPaymail{
+			Alias:  pm.Alias(),
+			Domain: pm.Domain(),
+
+			PublicName: pm.PublicName(),
+			Avatar:     "",
+			UserID:     createdUser.ID,
+		})
+	}
+	require.NoError(f.t, err)
 }
 
 func getConfigForTests() *config.AppConfig {

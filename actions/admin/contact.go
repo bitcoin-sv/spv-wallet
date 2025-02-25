@@ -193,7 +193,7 @@ func contactsReject(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure		422	"Unprocessable entity - Incorrect status of contact"
 // @Failure 	500	"Internal server error - Error while updating contact"
 // @Failure 	500	"Internal server error - Error while changing contact status"
-// @Router		/api/v1/admin/contact/invitations/{id} [post]
+// @Router		/api/v1/admin/invitations/{id} [post]
 // @Security	x-auth-xpub
 func contactsAccept(c *gin.Context, _ *reqctx.AdminContext) {
 	id := c.Param("id")
@@ -278,6 +278,30 @@ func contactsConfirm(c *gin.Context, _ *reqctx.AdminContext) {
 		reqParams.PaymailA,
 		reqParams.PaymailB,
 	)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
+// contactUnconfirm will perform Unconfirm action on contact with the given id
+// @Summary		Unconfirm contact
+// @Description Marks the contact entry as unconfirmed
+// @Tags		Admin
+// @Produce		json
+// @Param		id path string false "Contact id"
+// @Success		200
+// @Failure		400	"Bad request - Error contact is in incorrect status to proceed"
+// @Failure		404	"Not found - Error, contacts not found"
+// @Failure 	500	"Internal server error - Error, updating contact failed"
+// @Router		/api/v1/admin/contacts/unconfirm/{id} [patch]
+// @Security	x-auth-xpub
+func contactUnconfirm(c *gin.Context, _ *reqctx.AdminContext) {
+	contactId := c.Param("id")
+
+	err := reqctx.Engine(c).AdminUnconfirmContact(c, contactId)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return

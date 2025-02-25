@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/go-sdk/script"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
@@ -331,6 +332,34 @@ func TestIncomingPaymailBeef(t *testing.T) {
 			"txID":   testState.txID,
 			"sender": senderPaymail,
 		})
+	})
+
+	t.Run("step 5 - create transaction outline", func(t *testing.T) {
+		// given:
+		recipientClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
+
+		// and:
+		requestBody := `{
+			  "outputs": [
+				{
+				  "type": "op_return",
+				  "data": [ "some", " ", "data" ]
+				}
+			  ]
+			}`
+
+		// when:
+		res, _ := recipientClient.R().
+			SetHeader("Content-Type", "application/json").
+			SetBody(requestBody).
+			Post("/api/v2/transactions/outlines")
+
+		//  then:
+		then.Response(res).IsOK()
+
+		// and:
+		_, err := trx.NewTransactionFromBEEFHex(then.Response(res).JSONValue().GetString("hex"))
+		require.NoError(t, err)
 	})
 }
 

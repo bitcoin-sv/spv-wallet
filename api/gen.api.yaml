@@ -14,7 +14,7 @@ paths:
                 "200":
                     description: Success
                 "401":
-                    $ref: '#/components/responses/responses_NotAuthorized'
+                    $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
             security:
                 - XPubAuth:
                     - admin
@@ -37,7 +37,7 @@ paths:
                 "400":
                     $ref: '#/components/responses/responses_AdminUserBadRequest'
                 "401":
-                    $ref: '#/components/responses/responses_NotAuthorized'
+                    $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
                 "500":
                     $ref: '#/components/responses/responses_AdminCreateUserInternalServerError'
             security:
@@ -91,7 +91,7 @@ paths:
                 "400":
                     $ref: '#/components/responses/responses_AdminUserBadRequest'
                 "401":
-                    $ref: '#/components/responses/responses_NotAuthorized'
+                    $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
             security:
                 - XPubAuth:
                     - admin
@@ -115,7 +115,168 @@ paths:
             tags:
                 - Admin endpoints
                 - Configurations
+    /api/v2/data/{id}:
+        get:
+            description: This endpoint gets data by its id for authenticated user
+            operationId: dataById
+            parameters:
+                - description: Data ID
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    $ref: '#/components/responses/responses_GetDataSuccess'
+                "400":
+                    $ref: '#/components/responses/responses_UserBadRequest'
+                "401":
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
+                "404":
+                    $ref: '#/components/responses/responses_GetDataNotFound'
+                "500":
+                    $ref: '#/components/responses/responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Get data for user
+            tags:
+                - Data
+    /api/v2/operations/search:
+        get:
+            description: This endpoint allows to search operations for authenticated user
+            operationId: searchOperations
+            parameters:
+                - $ref: '#/components/parameters/requests_PageNumber'
+                - $ref: '#/components/parameters/requests_PageSize'
+                - $ref: '#/components/parameters/requests_Sort'
+                - $ref: '#/components/parameters/requests_SortBy'
+            responses:
+                "200":
+                    $ref: '#/components/responses/responses_SearchOperationsSuccess'
+                "400":
+                    $ref: '#/components/responses/responses_SearchBadRequest'
+                "401":
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
+                "500":
+                    $ref: '#/components/responses/responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Get operations for user
+            tags:
+                - Operations
+    /api/v2/transactions:
+        post:
+            description: This endpoint allows to record transaction outline for authenticated user
+            operationId: recordTransactionOutline
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/requests_TransactionOutline'
+                required: true
+            responses:
+                "201":
+                    $ref: '#/components/responses/responses_RecordTransactionSuccess'
+                "400":
+                    $ref: '#/components/responses/responses_RecordTransactionBadRequest'
+                "401":
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
+                "500":
+                    $ref: '#/components/responses/responses_RecordTransactionInternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Record transaction outline
+            tags:
+                - Transactions
+    /api/v2/transactions/outlines:
+        post:
+            description: This endpoint allows to create transaction outline for authenticated user
+            operationId: createTransactionOutline
+            parameters:
+                - description: Required format of transaction hex
+                  example: beef
+                  in: query
+                  name: format
+                  schema:
+                    default: beef
+                    enum:
+                        - beef
+                        - raw
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/requests_TransactionSpecification'
+                required: true
+            responses:
+                "200":
+                    $ref: '#/components/responses/responses_CreateTransactionOutlineSuccess'
+                "400":
+                    $ref: '#/components/responses/responses_CreateTransactionOutlineBadRequest'
+                "401":
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
+                "422":
+                    $ref: '#/components/responses/responses_CreateTransactionOutlineUnprocessable'
+                "500":
+                    $ref: '#/components/responses/responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Create transaction outline
+            tags:
+                - Transactions
+    /api/v2/users/current:
+        get:
+            description: This endpoint return balance of current authenticated user
+            operationId: currentUser
+            responses:
+                "200":
+                    $ref: '#/components/responses/responses_GetCurrentUserSuccess'
+                "401":
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
+                "500":
+                    $ref: '#/components/responses/responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Get current user
+            tags:
+                - User
 components:
+    parameters:
+        requests_PageNumber:
+            description: Page number for pagination
+            example: 1
+            in: query
+            name: page
+            schema:
+                type: integer
+        requests_PageSize:
+            description: Number of items per page
+            example: 10
+            in: query
+            name: size
+            schema:
+                type: integer
+        requests_Sort:
+            description: Sorting order (asc or desc)
+            example: asc
+            in: query
+            name: sort
+            schema:
+                type: string
+        requests_SortBy:
+            description: Field to sort by
+            example: name
+            in: query
+            name: sortBy
+            schema:
+                type: string
     responses:
         responses_AdminAddPaymailSuccess:
             content:
@@ -158,18 +319,124 @@ components:
                             - $ref: '#/components/schemas/errors_PaymailInconsistent'
                             - $ref: '#/components/schemas/errors_InvalidDomain'
             description: Bad request is an error that occurs when the request is malformed.
+        responses_CreateTransactionOutlineBadRequest:
+            content:
+                application/json:
+                    schema:
+                        oneOf:
+                            - $ref: '#/components/schemas/errors_TxSpecNoDefaultPaymailAddress'
+                            - $ref: '#/components/schemas/errors_TxSpecOutputsRequired'
+                            - $ref: '#/components/schemas/errors_TxSpecOpReturnDataRequired'
+                            - $ref: '#/components/schemas/errors_TxSpecFailedToDecodeHex'
+                            - $ref: '#/components/schemas/errors_TxSpecInvalidPaymailReceiver'
+                            - $ref: '#/components/schemas/errors_TxSpecInvalidPaymailSender'
+            description: Bad request is an error that occurs when the request is malformed.
+        responses_CreateTransactionOutlineSuccess:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/models_AnnotatedTransactionOutline'
+            description: Created transaction outline
+        responses_CreateTransactionOutlineUnprocessable:
+            content:
+                application/json:
+                    schema:
+                        oneOf:
+                            - $ref: '#/components/schemas/errors_TxOutlineUserHasNotEnoughFunds'
+            description: Unprocessable entity is an error that occurs when the request cannot be fulfilled.
+        responses_GetCurrentUserSuccess:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/models_UserInfo'
+            description: Balance of current authenticated user
+        responses_GetDataNotFound:
+            content:
+                application/json:
+                    schema:
+                        oneOf:
+                            - $ref: '#/components/schemas/errors_DataNotFound'
+            description: Not found is an error that occurs when the requested resource is not found.
+        responses_GetDataSuccess:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/models_Data'
+            description: Data found
+        responses_InternalServerError:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/errors_Internal'
+            description: Internal server error
         responses_NotAuthorized:
             content:
                 application/json:
                     schema:
-                        $ref: '#/components/schemas/errors_Unauthorized'
+                        $ref: '#/components/schemas/errors_AnyAuthorization'
             description: Security requirements failed
+        responses_NotAuthorizedToAdminEndpoint:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/errors_AdminAuthorization'
+            description: Security requirements failed
+        responses_RecordTransactionBadRequest:
+            content:
+                application/json:
+                    schema:
+                        oneOf:
+                            - $ref: '#/components/schemas/errors_InvalidDataID'
+                            - $ref: '#/components/schemas/errors_AnnotationIndexOutOfRange'
+                            - $ref: '#/components/schemas/errors_UTXOSpent'
+                            - $ref: '#/components/schemas/errors_AnnotationIndexConversion'
+                            - $ref: '#/components/schemas/errors_NoOperations'
+            description: Bad request is an error that occurs when the request is malformed.
+        responses_RecordTransactionInternalServerError:
+            content:
+                application/json:
+                    schema:
+                        oneOf:
+                            - $ref: '#/components/schemas/errors_Internal'
+                            - $ref: '#/components/schemas/errors_GettingOutputs'
+                            - $ref: '#/components/schemas/errors_TxBroadcast'
+            description: Internal server error
+        responses_RecordTransactionSuccess:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/models_RecordedOutline'
+            description: Transaction recorded
+        responses_SearchBadRequest:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/errors_InvalidDataID'
+            description: Error when search request is malformed and params can not be parsed
+        responses_SearchOperationsSuccess:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/models_OperationsSearchResult'
+            description: Operations found
         responses_SharedConfig:
             content:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/models_SharedConfig'
             description: Shared config
+        responses_UserBadRequest:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/errors_InvalidDataID'
+            description: Bad request is an error that occurs when the request is malformed.
+        responses_UserNotAuthorized:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/errors_UserAuthorization'
+            description: Security requirements failed
     schemas:
         errors_AdminAuthOnNonAdminEndpoint:
             allOf:
@@ -180,14 +447,40 @@ components:
                     message:
                         example: cannot call non-admin endpoints with admin authorization
                   type: object
-        errors_Authorization:
+        errors_AdminAuthorization:
+            oneOf:
+                - $ref: '#/components/schemas/errors_UserAuthOnNonUserEndpoint'
+                - $ref: '#/components/schemas/errors_AuthXPubRequired'
+        errors_AnnotationIndexConversion:
             allOf:
                 - $ref: '#/components/schemas/errors_Schema'
                 - properties:
                     code:
-                        example: error-unauthorized
+                        example: error-annotation-index-conversion
                     message:
-                        example: unauthorized
+                        example: failed to convert annotation index
+                  type: object
+        errors_AnnotationIndexOutOfRange:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-annotation-index-out-of-range
+                    message:
+                        example: annotation index out of range
+                  type: object
+        errors_AnyAuthorization:
+            oneOf:
+                - $ref: '#/components/schemas/errors_Unauthorized'
+                - $ref: '#/components/schemas/errors_AuthXPubRequired'
+        errors_AuthXPubRequired:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-xpub-authorization-required
+                    message:
+                        example: xpub authorization required
                   type: object
         errors_CannotBindRequest:
             allOf:
@@ -207,6 +500,24 @@ components:
                     message:
                         example: error creating user
                   type: object
+        errors_DataNotFound:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-data-not-found
+                    message:
+                        example: data not found
+                  type: object
+        errors_GettingOutputs:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-getting-outputs
+                    message:
+                        example: failed to get outputs
+                  type: object
         errors_GettingUser:
             allOf:
                 - $ref: '#/components/schemas/errors_Schema'
@@ -215,6 +526,24 @@ components:
                         example: error-unknown
                     message:
                         example: Internal server error
+                  type: object
+        errors_Internal:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-internal-server-error
+                    message:
+                        example: internal server error
+                  type: object
+        errors_InvalidDataID:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-invalid-data-id
+                    message:
+                        example: invalid data id
                   type: object
         errors_InvalidDomain:
             allOf:
@@ -243,6 +572,15 @@ components:
                     message:
                         example: invalid public key
                   type: object
+        errors_NoOperations:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-no-operations
+                    message:
+                        example: no operations to save
+                  type: object
         errors_PaymailInconsistent:
             allOf:
                 - $ref: '#/components/schemas/errors_Schema'
@@ -265,12 +603,100 @@ components:
                 - code
                 - message
             type: object
+        errors_TxBroadcast:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-tx-broadcast
+                    message:
+                        example: failed to broadcast transaction
+                  type: object
+        errors_TxOutlineUserHasNotEnoughFunds:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: tx-outline-not-enough-funds
+                    message:
+                        example: not enough funds to make the transaction
+                  type: object
+        errors_TxSpecFailedToDecodeHex:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: failed-to-decode-hex
+                    message:
+                        example: failed to decode hex
+                  type: object
+        errors_TxSpecInvalidPaymailReceiver:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-paymail-address-invalid-receiver
+                    message:
+                        example: receiver paymail address is invalid
+                  type: object
+        errors_TxSpecInvalidPaymailSender:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-paymail-address-invalid-sender
+                    message:
+                        example: sender paymail address is invalid
+                  type: object
+        errors_TxSpecNoDefaultPaymailAddress:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-tx-spec-no-default-paymail-address
+                    message:
+                        example: no default paymail address
+                  type: object
+        errors_TxSpecOpReturnDataRequired:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: tx-spec-op-return-data-required
+                    message:
+                        example: data is required for OP_RETURN output
+                  type: object
+        errors_TxSpecOutputsRequired:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: tx-spec-output-required
+                    message:
+                        example: transaction outline requires at least one output
+                  type: object
+        errors_UTXOSpent:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        enum:
+                            - error-utxo-spent
+                        example: error-utxo-spent
+                    message:
+                        enum:
+                            - UTXO is already spent
+                        example: UTXO is already spent
+                  type: object
         errors_Unauthorized:
-            oneOf:
-                - $ref: '#/components/schemas/errors_Authorization'
-                - $ref: '#/components/schemas/errors_WrongAuthScopeFormat'
-                - $ref: '#/components/schemas/errors_AdminAuthOnNonAdminEndpoint'
-                - $ref: '#/components/schemas/errors_UserAuthOnNonUserEndpoint'
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-unauthorized
+                    message:
+                        example: unauthorized
+                  type: object
         errors_UserAuthOnNonUserEndpoint:
             allOf:
                 - $ref: '#/components/schemas/errors_Schema'
@@ -280,15 +706,165 @@ components:
                     message:
                         example: cannot call non-user endpoints with user authorization
                   type: object
-        errors_WrongAuthScopeFormat:
+        errors_UserAuthorization:
+            oneOf:
+                - $ref: '#/components/schemas/errors_Unauthorized'
+                - $ref: '#/components/schemas/errors_AdminAuthOnNonAdminEndpoint'
+                - $ref: '#/components/schemas/errors_AuthXPubRequired'
+        models_AnnotatedTransactionOutline:
             allOf:
-                - $ref: '#/components/schemas/errors_Schema'
+                - $ref: '#/components/schemas/models_TransactionHex'
                 - properties:
-                    code:
-                        example: error-wrong-auth-scope-format
-                    message:
-                        example: wrong auth scope format
+                    annotations:
+                        $ref: '#/components/schemas/models_OutlineAnnotations'
                   type: object
+        models_BucketAnnotation:
+            properties:
+                bucket:
+                    description: Type of bucket where this output should be stored.
+                    example: bsv
+                    type: string
+            required:
+                - bucket
+            type: object
+        models_ChangeAnnotation:
+            properties:
+                customInstructions:
+                    $ref: '#/components/schemas/models_SPVWalletCustomInstructions'
+            type: object
+        models_CustomInstructions:
+            oneOf:
+                - $ref: '#/components/schemas/models_SPVWalletCustomInstructions'
+                - $ref: '#/components/schemas/models_UserDefinedCustomInstructions'
+        models_Data:
+            properties:
+                blob:
+                    description: Data blob
+                    type: string
+                id:
+                    description: User ID
+                    type: string
+            required:
+                - id
+                - blob
+            type: object
+        models_DataAnnotation:
+            properties:
+                bucket:
+                    default: data
+                    enum:
+                        - data
+                    example: data
+                    type: string
+            required:
+                - bucket
+            type: object
+        models_InputAnnotation:
+            properties:
+                customInstructions:
+                    $ref: '#/components/schemas/models_CustomInstructions'
+            required:
+                - customInstructions
+            type: object
+        models_InputsAnnotations:
+            properties:
+                inputs:
+                    additionalProperties:
+                        $ref: '#/components/schemas/models_InputAnnotation'
+                    description: Map of input annotations
+                    example:
+                        "0":
+                            customInstructions:
+                                - instruction: P2PKH
+                                  type: sign
+                    type: object
+            required:
+                - inputs
+            type: object
+        models_Operation:
+            properties:
+                counterparty:
+                    description: Counterparty of operation
+                    example: alice@example.com
+                    type: string
+                createdAt:
+                    description: Creation date of operation
+                    example: "2020-01-23T04:05:06Z"
+                    format: date-time
+                    type: string
+                txID:
+                    description: Transaction ID
+                    example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
+                    type: string
+                txStatus:
+                    description: Status of transaction
+                    enum:
+                        - CREATED
+                        - BROADCASTED
+                        - MINED
+                        - REVERTED
+                        - PROBLEMATIC
+                    example: BROADCASTED
+                    type: string
+                type:
+                    description: Type of operation
+                    enum:
+                        - incoming
+                        - outgoing
+                    example: incoming
+                    type: string
+                value:
+                    description: Value of operation
+                    example: 1234
+                    format: int64
+                    type: integer
+            required:
+                - value
+                - txID
+                - type
+                - counterparty
+                - txStatus
+                - createdAt
+            type: object
+        models_OperationsSearchResult:
+            properties:
+                content:
+                    items:
+                        $ref: '#/components/schemas/models_Operation'
+                    type: array
+                page:
+                    $ref: '#/components/schemas/models_SearchPage'
+            required:
+                - content
+                - page
+            type: object
+        models_OutlineAnnotations:
+            allOf:
+                - $ref: '#/components/schemas/models_InputsAnnotations'
+                - $ref: '#/components/schemas/models_OutputsAnnotations'
+        models_OutputAnnotation:
+            allOf:
+                - $ref: '#/components/schemas/models_BucketAnnotation'
+                - $ref: '#/components/schemas/models_DataAnnotation'
+                - $ref: '#/components/schemas/models_PaymailAnnotation'
+                - $ref: '#/components/schemas/models_ChangeAnnotation'
+        models_OutputsAnnotations:
+            properties:
+                outputs:
+                    additionalProperties:
+                        $ref: '#/components/schemas/models_OutputAnnotation'
+                    description: Map of output annotations
+                    example:
+                        "0":
+                            bucket: bsv
+                            paymail:
+                                receiver: bob@example.com
+                                reference: "1234"
+                                sender: alice@example.com
+                    type: object
+            required:
+                - outputs
+            type: object
         models_Paymail:
             properties:
                 alias:
@@ -318,6 +894,85 @@ components:
                 - publicName
                 - avatar
             type: object
+        models_PaymailAnnotation:
+            allOf:
+                - properties:
+                    bucket:
+                        default: bsv
+                        enum:
+                            - bsv
+                        example: bsv
+                        type: string
+                    paymail:
+                        $ref: '#/components/schemas/models_PaymailAnnotationDetails'
+                  type: object
+        models_PaymailAnnotationDetails:
+            properties:
+                receiver:
+                    description: Paymail address of the receiver
+                    example: bob@example.com
+                    type: string
+                reference:
+                    description: Reference number used for paymail transaction
+                    type: string
+                sender:
+                    description: Paymail address of the sender
+                    example: alice@example.com
+                    type: string
+            required:
+                - receiver
+                - reference
+                - sender
+            type: object
+        models_RecordedOutline:
+            properties:
+                txID:
+                    description: ID of the transaction
+                    type: string
+            required:
+                - txID
+            type: object
+        models_SPVWalletCustomInstruction:
+            properties:
+                instruction:
+                    description: Custom instruction
+                    example: P2PKH
+                    type: string
+                type:
+                    description: Type of custom instructions
+                    example: sign
+                    type: string
+            required:
+                - type
+                - instruction
+        models_SPVWalletCustomInstructions:
+            items:
+                $ref: '#/components/schemas/models_SPVWalletCustomInstruction'
+            type: array
+        models_SearchPage:
+            properties:
+                number:
+                    description: Page number for pagination
+                    example: 1
+                    type: integer
+                size:
+                    description: Number of items per page
+                    example: 50
+                    type: integer
+                totalElements:
+                    description: Total number of items
+                    example: 456
+                    type: integer
+                totalPages:
+                    description: Total number of pages
+                    example: 10
+                    type: integer
+            required:
+                - number
+                - size
+                - totalElements
+                - totalPages
+            type: object
         models_SharedConfig:
             description: Shared config
             properties:
@@ -337,10 +992,27 @@ components:
                 - paymailDomains
                 - experimentalFeatures
             type: object
+        models_TransactionHex:
+            properties:
+                format:
+                    description: Transaction format
+                    enum:
+                        - BEEF
+                        - RAW
+                    example: BEEF
+                    type: string
+                hex:
+                    description: Transaction hex
+                    example: 0100beef01fe9e7e0d0008020100a141b8f978b56bf196419e919b3618ac4add5914df17d777d5728c015c44032500027d1a1bab8063f41989381290074b9d5479ef1262f607962f4c8ed18f84e453be010100460ab7b19ec220bb3de54214ce6a9c0105ed44b37d1ad96f577946c6a6f3485801010012e7fb521e97454ede308ed8999016d2d696d807c999f88538d763bbbfa558da01010031af9a4d321dd4791f7b63b13a4953acbbb9fade017b8266d20140f317a43e770101007caf53cfef98f927d53639f308e46f2f2cf29049a41f5004a159d4b83eeddccf010100784dd8ea43f9565b01c6258ed8761d719675533c3c4e7d7d149b3223eb279daf0101003b6c05d7861cc67f31da3916ad8d7e52a85c25e024083f3fa3037ee5ec4fb1c801010057b6c381218bf7f2208a0c41a65daa583d4b725ed1b8023affb69d07e287d2490101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff1a039e7e0d2f7461616c2e636f6d2f6ef8040de1bd70c6856e2000ffffffff01f283a012000000001976a914522cf9e7626d9bd8729e5a1398ece40dad1b6a2f88ac000000000100
+                    type: string
+            required:
+                - hex
+                - format
+            type: object
         models_User:
             properties:
                 createdAt:
-                    example: "2021-01-01T00:00:00Z"
+                    example: "2020-01-23T04:05:06Z"
                     format: date-time
                     type: string
                 id:
@@ -354,7 +1026,7 @@ components:
                     example: 76a914e069bd2e2fe3ea702c40d5e65b491b734c01686788ac
                     type: string
                 updatedAt:
-                    example: "2021-01-01T00:00:00Z"
+                    example: "2020-01-23T04:05:06Z"
                     format: date-time
                     type: string
             required:
@@ -363,6 +1035,19 @@ components:
                 - paymails
                 - createdAt
                 - updatedAt
+            type: object
+        models_UserDefinedCustomInstructions:
+            description: Instructions about how to unlock this input.
+            example: Your custom script to unlock
+            type: string
+        models_UserInfo:
+            properties:
+                currentBalance:
+                    description: Current balance of user
+                    type: number
+                    x-go-type: uint64
+            required:
+                - currentBalance
             type: object
         requests_AddPaymail:
             properties:
@@ -397,6 +1082,87 @@ components:
                     type: string
             required:
                 - publicKey
+            type: object
+        requests_OpReturnHexesOutput:
+            items:
+                example: 68656c6c6f20776f726c64
+                type: string
+            type: array
+        requests_OpReturnOutputSpecification:
+            properties:
+                data:
+                    oneOf:
+                        - $ref: '#/components/schemas/requests_OpReturnHexesOutput'
+                        - $ref: '#/components/schemas/requests_OpReturnStringsOutput'
+                dataType:
+                    default: strings
+                    enum:
+                        - hexes
+                        - strings
+                    example: strings
+                    type: string
+                type:
+                    enum:
+                        - op_return
+                    example: op_return
+                    type: string
+            required:
+                - type
+                - data
+            type: object
+        requests_OpReturnStringsOutput:
+            items:
+                example: hello world
+                type: string
+            type: array
+        requests_PaymailOutputSpecification:
+            properties:
+                from:
+                    example: bob@example.com
+                    nullable: true
+                    type: string
+                satoshis:
+                    example: 1000
+                    format: int64
+                    type: integer
+                    x-go-type: uint64
+                to:
+                    example: bob@example.com
+                    type: string
+                type:
+                    enum:
+                        - paymail
+                    example: paymail
+                    type: string
+            required:
+                - type
+                - to
+                - satoshis
+            type: object
+        requests_TransactionOutline:
+            allOf:
+                - $ref: '#/components/schemas/models_TransactionHex'
+                - properties:
+                    annotations:
+                        $ref: '#/components/schemas/models_OutputsAnnotations'
+                  type: object
+        requests_TransactionOutlineOutputSpecification:
+            discriminator:
+                mapping:
+                    op_return: '#/components/schemas/requests_OpReturnOutputSpecification'
+                    paymail: '#/components/schemas/requests_PaymailOutputSpecification'
+                propertyName: type
+            oneOf:
+                - $ref: '#/components/schemas/requests_OpReturnOutputSpecification'
+                - $ref: '#/components/schemas/requests_PaymailOutputSpecification'
+        requests_TransactionSpecification:
+            properties:
+                outputs:
+                    items:
+                        $ref: '#/components/schemas/requests_TransactionOutlineOutputSpecification'
+                    type: array
+            required:
+                - outputs
             type: object
     securitySchemes:
         XPubAuth:

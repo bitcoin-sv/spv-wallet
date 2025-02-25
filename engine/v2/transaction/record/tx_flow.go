@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/go-sdk/spv"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/conv"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
@@ -24,9 +25,9 @@ type txFlow struct {
 	operations map[string]*txmodels.NewOperation
 }
 
-func newTxFlow(ctx context.Context, service *Service, tx *trx.Transaction) *txFlow {
+func newTxFlow(ctx context.Context, service *Service, tx *trx.Transaction) (*txFlow, error) {
 	txID := tx.TxID().String()
-	return &txFlow{
+	f := &txFlow{
 		ctx:     ctx,
 		service: service,
 
@@ -39,6 +40,42 @@ func newTxFlow(ctx context.Context, service *Service, tx *trx.Transaction) *txFl
 
 		operations: map[string]*txmodels.NewOperation{},
 	}
+
+	if err := f.setHex(); err != nil {
+		return nil, err
+	}
+
+	return f, nil
+}
+
+func (f *txFlow) setHex() error {
+	sourceTXIDs := make([]string, 0, len(f.tx.Inputs))
+	for _, input := range f.tx.Inputs {
+		sourceTXIDs = append(sourceTXIDs, input.SourceTXID.String())
+	}
+
+	foundAll, err := f.service.transactions.HasTransactionInputSources(f.ctx, sourceTXIDs...)
+	if err != nil {
+		return spverrors.Wrapf(err, "database query failed to check input source transactions for transaction %s", f.txID)
+	}
+
+	if foundAll {
+		// Optimization: There is no need to serialize the given transaction into BEEFHex format
+		// because all its input source ascendants are already stored in the database and serialized as BEEF.
+		// This approach avoids unnecessary data redundancy, which impacts overall consistency.
+		// All found inputs can be reused when resolving source transaction inputs needed to construct BEEF.
+		// (Check the workflow and usage of the BEEF Service in beef_service.go)
+		f.txRow.SetRawHex(f.tx.Hex(), sourceTXIDs...)
+		return nil
+	}
+
+	hex, err := f.tx.BEEFHex()
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to generate BEEF hex for transaction %s", f.txID)
+	}
+	f.txRow.SetBEEFHex(hex)
+
+	return nil
 }
 
 func (f *txFlow) verifyScripts() error {

@@ -6,8 +6,16 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
+
+type selectedUTXO struct {
+	TxID               string
+	Vout               uint32
+	CustomInstructions datatypes.JSONSlice[bsv.CustomInstruction] `gorm:"column:custom_instructions"`
+	Change             uint64
+}
 
 type inputsQueryComposer struct {
 	userID              string
@@ -22,7 +30,12 @@ func (c *inputsQueryComposer) build(db *gorm.DB) *gorm.DB {
 	utxoWithMinChange := c.searchForMinimalChangeValue(db, utxoWithChange)
 	selectedOutpoints := c.chooseInputsToCoverOutputsAndFeesAndHaveMinimalChange(db, utxoWithMinChange)
 
-	res := db.Model(&database.UserUTXO{}).Select("tx_id", "vout", "custom_instructions").Where("(tx_id, vout) in (?)", selectedOutpoints)
+	res := db.Model(&database.UserUTXO{}).Select(
+		"ux."+txIdColumn,
+		"ux."+voutColumn,
+		"ux."+customInstructionsColumn,
+		"sel."+minChange+" as change",
+	).InnerJoins("ux join (?) sel ON sel.tx_id = ux.tx_id AND sel.vout = ux.vout", selectedOutpoints)
 	return res
 }
 
@@ -46,15 +59,16 @@ func (c *inputsQueryComposer) addChangeValueCalculation(db *gorm.DB, utxoTab *go
 }
 
 func (c *inputsQueryComposer) chooseInputsToCoverOutputsAndFeesAndHaveMinimalChange(db *gorm.DB, utxoWithMinChange *gorm.DB) *gorm.DB {
-	return db.Select(txIdColumn, voutColumn).
+	return db.Select(txIdColumn, voutColumn, minChange).
 		Table("(?) as utxoWithMinChange", utxoWithMinChange).
-		Where("change <= min_change", "min_change is not null")
+		Where("change <= " + minChange).
+		Where("min_change is not null")
 }
 
 func (c *inputsQueryComposer) searchForMinimalChangeValue(db *gorm.DB, utxoWithChange *gorm.DB) *gorm.DB {
 	return db.Select(txIdColumn, voutColumn,
 		"change",
-		"min(case when change >= 0 then change end) over () as min_change",
+		"min(case when change >= 0 then change end) over () as "+minChange,
 	).
 		Table("(?) as utxoWithChange", utxoWithChange)
 }

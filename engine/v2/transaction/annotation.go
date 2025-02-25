@@ -1,8 +1,8 @@
 package transaction
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"github.com/bitcoin-sv/spv-wallet/models/transaction"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
 
@@ -30,10 +30,12 @@ type OutputAnnotation struct {
 	Bucket bucket.Name
 	// Paymail is available if the output is the paymail output.
 	Paymail *PaymailAnnotation
+	// CustomInstructions has instructions about how to unlock this output.
+	CustomInstructions *bsv.CustomInstructions
 }
 
 // PaymailAnnotation is the metadata for the paymail output.
-type PaymailAnnotation transaction.PaymailAnnotation
+type PaymailAnnotation api.ModelsPaymailAnnotationDetails
 
 // NewDataOutputAnnotation constructs a new OutputAnnotation for the data output.
 func NewDataOutputAnnotation() *OutputAnnotation {

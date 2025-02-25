@@ -1,16 +1,20 @@
 package testabilities
 
 import (
+	"math"
 	"testing"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	testpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 type TransactionOutlineAssertion interface {
 	Created(transaction *outlines.Transaction) CreatedTransactionOutlineAssertion
+	ExternalPaymailHost() testpaymail.PaymailExternalAssertions
 }
 
 type CreatedTransactionOutlineAssertion interface {
@@ -28,23 +32,33 @@ type SuccessfullyCreatedTransactionOutlineAssertion interface {
 }
 
 type WithParseableBEEFTransactionOutlineAssertion interface {
+	// IsWithoutTimeLock asserts that transaction is final,
+	// what means that it has all inputs with nSequence max
+	// and nLockTime in past (actually we're assuming it's 0)
+	IsWithoutTimeLock() WithParseableBEEFTransactionOutlineAssertion
 	HasInputs(count int) WithParseableBEEFTransactionOutlineAssertion
 	Input(index int) InputAssertion
 	HasOutputs(count int) WithParseableBEEFTransactionOutlineAssertion
 	Output(index int) OutputAssertion
 }
 
-func Then(t testing.TB) TransactionOutlineAssertion {
-	return &assertion{t: t, require: require.New(t), assert: assert.New(t)}
+func Then(t testing.TB, fixture TransactionOutlineFixture) TransactionOutlineAssertion {
+	return &assertion{
+		t:                 t,
+		require:           require.New(t),
+		assert:            assert.New(t),
+		paymailAssertions: testpaymail.Then(t, fixture.ExternalRecipientHost().MockedPaymailClient()),
+	}
 }
 
 type assertion struct {
-	t         testing.TB
-	require   *require.Assertions
-	assert    *assert.Assertions
-	txOutline *outlines.Transaction
-	tx        *sdk.Transaction
-	err       error
+	t                 testing.TB
+	require           *require.Assertions
+	assert            *assert.Assertions
+	txOutline         *outlines.Transaction
+	tx                *sdk.Transaction
+	err               error
+	paymailAssertions testpaymail.PaymailExternalAssertions
 }
 
 func (a *assertion) Created(transaction *outlines.Transaction) CreatedTransactionOutlineAssertion {
@@ -81,6 +95,16 @@ func (a *assertion) WithParseableBEEFHex() WithParseableBEEFTransactionOutlineAs
 	var err error
 	a.tx, err = a.txOutline.Hex.ToBEEFTransaction()
 	a.require.NoErrorf(err, "Invalid BEEF hex: %s", a.txOutline.Hex)
+	return a
+}
+
+func (a *assertion) IsWithoutTimeLock() WithParseableBEEFTransactionOutlineAssertion {
+	a.assert.Zero(a.tx.LockTime, "Unexpected lock time on transaction")
+
+	lo.ForEach(a.tx.Inputs, func(input *sdk.TransactionInput, index int) {
+		a.assert.EqualValuesf(math.MaxUint32, input.SequenceNumber, "Unexpected sequence number value on input %d", index)
+	})
+
 	return a
 }
 
@@ -135,4 +159,8 @@ func (a *assertion) Output(index int) OutputAssertion {
 		annotation: a.txOutline.Annotations.Outputs[index],
 		index:      index,
 	}
+}
+
+func (a *assertion) ExternalPaymailHost() testpaymail.PaymailExternalAssertions {
+	return a.paymailAssertions
 }

@@ -21,7 +21,9 @@ components:
           type: object
           additionalProperties:
             type: boolean
-          example: {"pikeEnabled": true}
+          example:
+            pikeEnabled: true
+
     User:
       type: object
       properties:
@@ -38,11 +40,11 @@ components:
         createdAt:
           type: string
           format: date-time
-          example: "2021-01-01T00:00:00Z"
+          example: "2020-01-23T04:05:06Z"
         updatedAt:
           type: string
           format: date-time
-          example: "2021-01-01T00:00:00Z"
+          example: "2020-01-23T04:05:06Z"
       required:
         - id
         - publicKey
@@ -79,3 +81,300 @@ components:
         - paymail
         - publicName
         - avatar
+
+    SearchPage:
+      type: object
+      required:
+        - number
+        - size
+        - totalElements
+        - totalPages
+      properties:
+        number:
+          type: integer
+          description: Page number for pagination
+          example: 1
+        size:
+          type: integer
+          description: Number of items per page
+          example: 50
+        totalElements:
+          type: integer
+          description: Total number of items
+          example: 456
+        totalPages:
+          type: integer
+          description: Total number of pages
+          example: 10
+
+    Data:
+      type: object
+      properties:
+        id:
+          type: string
+          description: User ID
+        blob:
+          type: string
+          description: Data blob
+      required:
+        - id
+        - blob
+
+    UserInfo:
+      type: object
+      properties:
+        currentBalance:
+          type: number
+          x-go-type: uint64
+          description: Current balance of user
+      required:
+        - currentBalance
+
+
+    OperationsSearchResult:
+      type: object
+      required:
+        - content
+        - page
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Operation'
+        page:
+          $ref: '#/components/schemas/SearchPage'
+
+    Operation:
+      type: object
+      required:
+        - value
+        - txID
+        - type
+        - counterparty
+        - txStatus
+        - createdAt
+      properties:
+        value:
+          type: integer
+          format: int64
+          description: Value of operation
+          example: 1234
+        txID:
+          type: string
+          description: Transaction ID
+          example: "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
+        type:
+          type: string
+          description: Type of operation
+          enum:
+            - incoming
+            - outgoing
+          example: "incoming"
+        counterparty:
+          type: string
+          description: Counterparty of operation
+          example: "alice@example.com"
+        txStatus:
+          type: string
+          description: Status of transaction
+          enum:
+            - CREATED
+            - BROADCASTED
+            - MINED
+            - REVERTED
+            - PROBLEMATIC
+          example: "BROADCASTED"
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation date of operation
+          example: "2020-01-23T04:05:06Z"
+
+    Operations:
+      type: array
+      items:
+        $ref: "#/components/schemas/Operation"
+
+    AnnotatedTransactionOutline:
+      allOf:
+        - $ref: '#/components/schemas/TransactionHex'
+        - type: object
+          properties:
+            annotations:
+              $ref: '#/components/schemas/OutlineAnnotations'
+
+    TransactionHex:
+      type: object
+      properties:
+        hex:
+          type: string
+          description: Transaction hex
+          example: "0100beef01fe9e7e0d0008020100a141b8f978b56bf196419e919b3618ac4add5914df17d777d5728c015c44032500027d1a1bab8063f41989381290074b9d5479ef1262f607962f4c8ed18f84e453be010100460ab7b19ec220bb3de54214ce6a9c0105ed44b37d1ad96f577946c6a6f3485801010012e7fb521e97454ede308ed8999016d2d696d807c999f88538d763bbbfa558da01010031af9a4d321dd4791f7b63b13a4953acbbb9fade017b8266d20140f317a43e770101007caf53cfef98f927d53639f308e46f2f2cf29049a41f5004a159d4b83eeddccf010100784dd8ea43f9565b01c6258ed8761d719675533c3c4e7d7d149b3223eb279daf0101003b6c05d7861cc67f31da3916ad8d7e52a85c25e024083f3fa3037ee5ec4fb1c801010057b6c381218bf7f2208a0c41a65daa583d4b725ed1b8023affb69d07e287d2490101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff1a039e7e0d2f7461616c2e636f6d2f6ef8040de1bd70c6856e2000ffffffff01f283a012000000001976a914522cf9e7626d9bd8729e5a1398ece40dad1b6a2f88ac000000000100"
+        format:
+          type: string
+          description: Transaction format
+          enum:
+            - "BEEF"
+            - "RAW"
+          example: "BEEF"
+      required:
+        - hex
+        - format
+
+    OutlineAnnotations:
+      allOf:
+        - $ref: "#/components/schemas/InputsAnnotations"
+        - $ref: "#/components/schemas/OutputsAnnotations"
+
+    OutputsAnnotations:
+      type: object
+      required:
+        - outputs
+      properties:
+        outputs:
+          type: object
+          description: Map of output annotations
+          additionalProperties:
+            $ref: "#/components/schemas/OutputAnnotation"
+          example: {
+            "0": {
+              "bucket": "bsv",
+              "paymail": {
+                "receiver": "bob@example.com",
+                "reference": "1234",
+                "sender": "alice@example.com",
+              }
+            }
+          }
+
+    InputsAnnotations:
+      type: object
+      required:
+        - inputs
+      properties:
+        inputs:
+          type: object
+          description: Map of input annotations
+          additionalProperties:
+            $ref: "#/components/schemas/InputAnnotation"
+          example: {
+            "0": {
+              "customInstructions": [
+                {
+                  "type": "sign",
+                  "instruction": "P2PKH"
+                }
+              ]
+            }
+          }
+
+    OutputAnnotation:
+      allOf:
+        - $ref: "#/components/schemas/BucketAnnotation"
+        - $ref: "#/components/schemas/DataAnnotation"
+        - $ref: "#/components/schemas/PaymailAnnotation"
+        - $ref: "#/components/schemas/ChangeAnnotation"
+
+    BucketAnnotation:
+      type: object
+      properties:
+        bucket:
+          type: string
+          description: Type of bucket where this output should be stored.
+          example: "bsv"
+      required:
+        - bucket
+
+    DataAnnotation:
+      type: object
+      properties:
+        bucket:
+          type: string
+          enum: ["data"]
+          default: "data"
+          example: "data"
+      required:
+        - bucket
+
+    PaymailAnnotation:
+      allOf:
+        - type: object
+          properties:
+            bucket:
+              type: string
+              enum: ["bsv"]
+              default: "bsv"
+              example: "bsv"
+            paymail:
+              $ref: "#/components/schemas/PaymailAnnotationDetails"
+
+    ChangeAnnotation:
+      type: object
+      properties:
+        customInstructions:
+          $ref: "#/components/schemas/SPVWalletCustomInstructions"
+
+    PaymailAnnotationDetails:
+      type: object
+      properties:
+        receiver:
+          type: string
+          description: Paymail address of the receiver
+          example: "bob@example.com"
+        reference:
+          type: string
+          description: Reference number used for paymail transaction
+        sender:
+          type: string
+          description: Paymail address of the sender
+          example: "alice@example.com"
+      required:
+        - receiver
+        - reference
+        - sender
+
+    InputAnnotation:
+      type: object
+      properties:
+        customInstructions:
+          $ref: "#/components/schemas/CustomInstructions"
+      required:
+        - customInstructions
+
+    CustomInstructions:
+      oneOf:
+        - $ref: "#/components/schemas/SPVWalletCustomInstructions"
+        - $ref: "#/components/schemas/UserDefinedCustomInstructions"
+
+    UserDefinedCustomInstructions:
+      type: string
+      description: Instructions about how to unlock this input.
+      example: "Your custom script to unlock"
+
+    SPVWalletCustomInstructions:
+      type: array
+      items:
+        $ref: "#/components/schemas/SPVWalletCustomInstruction"
+
+    SPVWalletCustomInstruction:
+      properties:
+        type:
+          type: string
+          description: Type of custom instructions
+          example: "sign"
+        instruction:
+          type: string
+          description: Custom instruction
+          example: "P2PKH"
+      required:
+        - type
+        - instruction
+
+    RecordedOutline:
+      type: object
+      properties:
+        txID:
+          type: string
+          description: ID of the transaction
+      required:
+        - txID
