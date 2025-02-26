@@ -19,9 +19,9 @@ func RegisterRoutes(handlersManager *routes.Manager) {
 	root.GET("v2/swagger", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "v2/swagger/index.html")
 	})
-	root.StaticFile("/api/gen.api.yaml", "./api/gen.api.yaml")
-	root.GET("v2/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler, ginSwagger.URL("/api/gen.api.yaml")))
 
+	api.Yaml = strings.Replace(api.Yaml, "version: main", fmt.Sprintf("version: '%s'", handlersManager.APIVersion()), 1)
+	api.Yaml = strings.Replace(api.Yaml, "https://github.com/bitcoin-sv/spv-wallet/blob/main", fmt.Sprintf("https://github.com/bitcoin-sv/spv-wallet/blob/%s", handlersManager.APIVersion()), 1)
 
 	root.GET("/api/gen.api.yaml", func(c *gin.Context) {
 		c.Header("Content-Type", "application/yaml")
