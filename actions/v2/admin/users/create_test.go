@@ -122,7 +122,7 @@ func TestCreateUserWithPaymail(t *testing.T) {
 			"second@" + fixtures.PaymailDomain,
 		},
 	}
-	secondPublicKey := userCandidate.PublicKey().ToDERHex()
+	secondPublicKey := secondUserCandidate.PublicKey().ToDERHex()
 
 	// and:
 	avatarURL := "https://address-to-avatar.com"
@@ -175,6 +175,41 @@ func TestCreateUserWithPaymail(t *testing.T) {
 		// update:
 		getter := then.Response(res).JSONValue()
 		testState.userID = getter.GetString("id")
+	})
+
+	t.Run("Get new user by id as admin", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(givenForAllTests, t)
+		client := given.HttpClient().ForAdmin()
+
+		// when:
+		res, _ := client.R().
+			SetPathParam("id", testState.userID).
+			Get("/api/v2/admin/users/{id}")
+
+		then.Response(res).
+			IsOK().
+			WithJSONMatching(`{
+				"id": "{{ matchAddress }}",
+				"createdAt": "{{ matchTimestamp }}",
+				"updatedAt": "{{ matchTimestamp }}",
+				"publicKey": "{{ .publicKey }}",
+				"paymails": [
+					{
+						"alias": "{{ .alias }}",
+						"avatar": "",
+						"domain": "example.com",
+						"id": "{{ matchNumber }}",
+						"paymail": "{{ .paymail }}",
+						"publicName": "{{ .publicName }}"
+					}
+				]
+			}`, map[string]any{
+				"publicKey":  publicKey,
+				"paymail":    userCandidate.DefaultPaymail(),
+				"publicName": publicName,
+				"alias":      userCandidate.DefaultPaymail().Alias(),
+			})
 	})
 
 	t.Run("Try to create a user as admin with bad url avatar", func(t *testing.T) {
@@ -239,45 +274,6 @@ func TestCreateUserWithPaymail(t *testing.T) {
 				"paymail":   secondUserCandidate.DefaultPaymail(),
 				"alias":     secondUserCandidate.DefaultPaymail().Alias(),
 				"avatar":    avatarURL,
-			})
-
-		// update:
-		getter := then.Response(res).JSONValue()
-		testState.userID = getter.GetString("id")
-	})
-
-	t.Run("Get new user by id as admin", func(t *testing.T) {
-		// given:
-		given, then := testabilities.NewOf(givenForAllTests, t)
-		client := given.HttpClient().ForAdmin()
-
-		// when:
-		res, _ := client.R().
-			SetPathParam("id", testState.userID).
-			Get("/api/v2/admin/users/{id}")
-
-		then.Response(res).
-			IsOK().
-			WithJSONMatching(`{
-				"id": "{{ matchAddress }}",
-				"createdAt": "{{ matchTimestamp }}",
-				"updatedAt": "{{ matchTimestamp }}",
-				"publicKey": "{{ .publicKey }}",
-				"paymails": [
-					{
-						"alias": "{{ .alias }}",
-						"avatar": "",
-						"domain": "example.com",
-						"id": "{{ matchNumber }}",
-						"paymail": "{{ .paymail }}",
-						"publicName": "{{ .publicName }}"
-					}
-				]
-			}`, map[string]any{
-				"publicKey":  publicKey,
-				"paymail":    userCandidate.DefaultPaymail(),
-				"publicName": publicName,
-				"alias":      userCandidate.DefaultPaymail().Alias(),
 			})
 	})
 }

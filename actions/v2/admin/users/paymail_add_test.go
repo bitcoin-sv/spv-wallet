@@ -66,14 +66,14 @@ func TestAddPaymail(t *testing.T) {
 		// given:
 		given, then := testabilities.NewOf(givenForAllTests, t)
 		client := given.HttpClient().ForAdmin()
-		avatarURL = "/User/path/to/avatar"
+		wrongAvatarURL := "/User/path/to/avatar"
 
 		// when:
 		res, _ := client.R().
 			SetBody(map[string]any{
 				"address":    secondPaymail,
 				"publicName": secondPaymail.PublicName(),
-				"avatarURL":  avatarURL,
+				"avatarURL":  wrongAvatarURL,
 			}).
 			SetPathParam("id", user.ID()).
 			Post("/api/v2/admin/users/{id}/paymails")
