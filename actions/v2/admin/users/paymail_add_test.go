@@ -26,6 +26,9 @@ func TestAddPaymail(t *testing.T) {
 	// and:
 	thirdPaymail := fixtures.Paymail("third" + "@" + fixtures.PaymailDomain)
 
+	// and:
+	avatarURL := "https://address-to-avatar.com"
+
 	t.Run("Add a paymail to a user as admin using whole paymail address", func(t *testing.T) {
 		// given:
 		given, then := testabilities.NewOf(givenForAllTests, t)
@@ -36,7 +39,7 @@ func TestAddPaymail(t *testing.T) {
 			SetBody(map[string]any{
 				"address":    secondPaymail,
 				"publicName": secondPaymail.PublicName(),
-				"avatar":     "",
+				"avatarURL":  avatarURL,
 			}).
 			SetPathParam("id", user.ID()).
 			Post("/api/v2/admin/users/{id}/paymails")
@@ -46,7 +49,7 @@ func TestAddPaymail(t *testing.T) {
 			HasStatus(201).
 			WithJSONMatching(`{
 			  "alias": "{{ .alias }}",
-			  "avatar": "",
+			  "avatar": "{{ .avatar }}",
 			  "domain": "example.com",
 			  "id": "{{ matchNumber }}",
 			  "paymail": "{{ .paymail }}",
@@ -55,7 +58,30 @@ func TestAddPaymail(t *testing.T) {
 				"paymail":    secondPaymail,
 				"publicName": secondPaymail.PublicName(),
 				"alias":      secondPaymail.Alias(),
+				"avatar":     avatarURL,
 			})
+	})
+
+	t.Run("Try to add a paymail to a user as admin using whole paymail address and wrong url avatar", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(givenForAllTests, t)
+		client := given.HttpClient().ForAdmin()
+		avatarURL = "/User/path/to/avatar"
+
+		// when:
+		res, _ := client.R().
+			SetBody(map[string]any{
+				"address":    secondPaymail,
+				"publicName": secondPaymail.PublicName(),
+				"avatarURL":  avatarURL,
+			}).
+			SetPathParam("id", user.ID()).
+			Post("/api/v2/admin/users/{id}/paymails")
+
+		// then:
+		then.Response(res).
+			HasStatus(500).
+			WithJSONf(apierror.ExpectedJSON("error-user-adding-paymail", "error adding paymail"))
 	})
 
 	t.Run("Add a paymail to a user as admin using alias and domain as address", func(t *testing.T) {
@@ -66,10 +92,8 @@ func TestAddPaymail(t *testing.T) {
 		// when:
 		res, _ := client.R().
 			SetBody(map[string]any{
-				"alias":      thirdPaymail.Alias(),
-				"domain":     thirdPaymail.Domain(),
-				"publicName": thirdPaymail.PublicName(),
-				"avatar":     "",
+				"alias":  thirdPaymail.Alias(),
+				"domain": thirdPaymail.Domain(),
 			}).
 			SetPathParam("id", user.ID()).
 			Post("/api/v2/admin/users/{id}/paymails")
@@ -83,11 +107,10 @@ func TestAddPaymail(t *testing.T) {
 			  "domain": "example.com",
 			  "id": "{{ matchNumber }}",
 			  "paymail": "{{ .paymail }}",
-			  "publicName": "{{ .publicName }}"
+			  "publicName": "{{ .alias }}"
 			}`, map[string]any{
-				"paymail":    thirdPaymail,
-				"publicName": thirdPaymail.PublicName(),
-				"alias":      thirdPaymail.Alias(),
+				"paymail": thirdPaymail,
+				"alias":   thirdPaymail.Alias(),
 			})
 	})
 
@@ -119,7 +142,7 @@ func TestAddPaymail(t *testing.T) {
 					},
 					{
 						"alias": "{{ .secondAlias }}",
-						"avatar": "",
+						"avatar": "{{ .secondAvatar }}",
 						"domain": "example.com",
 						"id": "{{ matchNumber }}",
 						"paymail": "{{ .secondPaymail }}",
@@ -131,7 +154,7 @@ func TestAddPaymail(t *testing.T) {
 						"domain": "example.com",
 						"id": "{{ matchNumber }}",
 						"paymail": "{{ .thirdPaymail }}",
-						"publicName": "{{ .thirdPublicName }}"
+						"publicName": "{{ .thirdAlias }}"
 					}
 				]
 			}`, map[string]any{
@@ -144,10 +167,10 @@ func TestAddPaymail(t *testing.T) {
 				"secondPaymail":    secondPaymail,
 				"secondPublicName": secondPaymail.PublicName(),
 				"secondAlias":      secondPaymail.Alias(),
+				"secondAvatar":     avatarURL,
 
-				"thirdPaymail":    thirdPaymail,
-				"thirdPublicName": thirdPaymail.PublicName(),
-				"thirdAlias":      thirdPaymail.Alias(),
+				"thirdPaymail": thirdPaymail,
+				"thirdAlias":   thirdPaymail.Alias(),
 			})
 	})
 }
@@ -175,7 +198,7 @@ func TestAddPaymailWithWrongDomain(t *testing.T) {
 			SetBody(map[string]any{
 				"address":    unsupportedPaymail,
 				"publicName": publicName,
-				"avatar":     "",
+				"avatarURL":  "",
 			}).
 			SetPathParam("id", fixtures.Sender.ID()).
 			Post("/api/v2/admin/users/{id}/paymails")
@@ -231,7 +254,7 @@ func TestAddPaymailWithBothPaymailAndAliasDomainPair(t *testing.T) {
 				"alias":      alias,
 				"domain":     domain,
 				"publicName": publicName,
-				"avatar":     "",
+				"avatarURL":  "",
 			}).
 			SetPathParam("id", fixtures.Sender.ID()).
 			Post("/api/v2/admin/users/{id}/paymails")
@@ -255,7 +278,7 @@ func TestAddPaymailWithBothPaymailAndAliasDomainPair(t *testing.T) {
 				"domain":     domain,
 				"address":    paymail,
 				"publicName": publicName,
-				"avatar":     "",
+				"avatarURL":  "",
 			}).
 			SetPathParam("id", fixtures.Sender.ID()).
 			Post("/api/v2/admin/users/{id}/paymails")
@@ -265,5 +288,4 @@ func TestAddPaymailWithBothPaymailAndAliasDomainPair(t *testing.T) {
 			HasStatus(400).
 			WithJSONf(apierror.ExpectedJSON("error-user-inconsistent-paymail", "inconsistent paymail address and alias/domain"))
 	})
-
 }

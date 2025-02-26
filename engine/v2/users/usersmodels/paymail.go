@@ -1,6 +1,11 @@
 package usersmodels
 
-import "time"
+import (
+	"regexp"
+	"time"
+)
+
+var explicitHTTPURLRegex = regexp.MustCompile(`^https?://`)
 
 // Paymail is a domain model for existing paymail
 type Paymail struct {
@@ -25,4 +30,8 @@ type NewPaymail struct {
 	PublicName string
 	Avatar     string
 	UserID     string
+}
+
+func (np *NewPaymail) CheckAvatarURL() bool {
+	return np.Avatar == "" || explicitHTTPURLRegex.MatchString(np.Avatar)
 }

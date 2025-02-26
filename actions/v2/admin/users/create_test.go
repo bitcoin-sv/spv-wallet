@@ -115,6 +115,18 @@ func TestCreateUserWithPaymail(t *testing.T) {
 	publicKey := userCandidate.PublicKey().ToDERHex()
 	publicName := "Test User"
 
+	// and:
+	secondUserCandidate := fixtures.User{
+		PrivKey: "xprv9s21ZrQH143K4Tf1hf7ouMiagMH4JKvE6E2SY8Su55Y6aFi9AfQibzx7i79g1NJkLQbRY4FjKgvpddtYXoD7dA2KbGjHdHcxXVqtd687KrK",
+		Paymails: []fixtures.Paymail{
+			"second@" + fixtures.PaymailDomain,
+		},
+	}
+	secondPublicKey := userCandidate.PublicKey().ToDERHex()
+
+	// and:
+	avatarURL := "https://address-to-avatar.com"
+
 	var testState struct {
 		userID string
 	}
@@ -131,7 +143,6 @@ func TestCreateUserWithPaymail(t *testing.T) {
 				"paymail": map[string]any{
 					"address":    userCandidate.DefaultPaymail(),
 					"publicName": publicName,
-					"avatar":     "",
 				},
 			}).
 			Post("/api/v2/admin/users")
@@ -159,6 +170,75 @@ func TestCreateUserWithPaymail(t *testing.T) {
 				"paymail":    userCandidate.DefaultPaymail(),
 				"publicName": publicName,
 				"alias":      userCandidate.DefaultPaymail().Alias(),
+			})
+
+		// update:
+		getter := then.Response(res).JSONValue()
+		testState.userID = getter.GetString("id")
+	})
+
+	t.Run("Try to create a user as admin with bad url avatar", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(givenForAllTests, t)
+		client := given.HttpClient().ForAdmin()
+		avatarURL := "User/Path/To/Avatar"
+
+		// when:
+		res, _ := client.R().
+			SetBody(map[string]any{
+				"publicKey": publicKey,
+				"paymail": map[string]any{
+					"address":   userCandidate.DefaultPaymail(),
+					"avatarURL": avatarURL,
+				},
+			}).
+			Post("/api/v2/admin/users")
+
+		// then:
+		then.Response(res).
+			HasStatus(500).
+			WithJSONf(apierror.ExpectedJSON("error-user-creating", "error creating user"))
+	})
+
+	t.Run("Create a user as admin without specifying publicName in paymail and proper url avatar", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(givenForAllTests, t)
+		client := given.HttpClient().ForAdmin()
+
+		// when:
+		res, _ := client.R().
+			SetBody(map[string]any{
+				"publicKey": secondPublicKey,
+				"paymail": map[string]any{
+					"address":   secondUserCandidate.DefaultPaymail(),
+					"avatarURL": avatarURL,
+				},
+			}).
+			Post("/api/v2/admin/users")
+
+		// then:
+		then.Response(res).
+			HasStatus(201).
+			WithJSONMatching(`{
+				"id": "{{ matchAddress }}",
+				"createdAt": "{{ matchTimestamp }}",
+				"updatedAt": "{{ matchTimestamp }}",
+				"publicKey": "{{ .publicKey }}",
+				"paymails": [
+					{
+						"alias": "{{ .alias }}",
+						"avatar": "{{ .avatar }}",
+						"domain": "example.com",
+						"id": "{{ matchNumber }}",
+						"paymail": "{{ .paymail }}",
+						"publicName": "{{ .alias }}"
+					}
+				]
+			}`, map[string]any{
+				"publicKey": secondPublicKey,
+				"paymail":   secondUserCandidate.DefaultPaymail(),
+				"alias":     secondUserCandidate.DefaultPaymail().Alias(),
+				"avatar":    avatarURL,
 			})
 
 		// update:
@@ -237,7 +317,7 @@ func TestCreateUserWithAliasAndDomain(t *testing.T) {
 					"alias":      userCandidate.DefaultPaymail().Alias(),
 					"domain":     fixtures.PaymailDomain,
 					"publicName": publicName,
-					"avatar":     "",
+					"avatarURL":  "",
 				},
 			}).
 			Post("/api/v2/admin/users")
@@ -339,7 +419,7 @@ func TestAddUserWithWrongPaymailDomain(t *testing.T) {
 				"paymail": map[string]any{
 					"address":    unsupportedPaymail,
 					"publicName": publicName,
-					"avatar":     "",
+					"avatarURL":  "",
 				},
 			}).
 			Post("/api/v2/admin/users")
@@ -359,7 +439,7 @@ func TestAddUserWithWrongPaymailDomain(t *testing.T) {
 					"alias":      alias,
 					"domain":     unsupportedDomain,
 					"publicName": publicName,
-					"avatar":     "",
+					"avatarURL":  "",
 				},
 			}).
 			Post("/api/v2/admin/users")
