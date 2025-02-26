@@ -23,7 +23,7 @@ type ServerInterface interface {
 	// (DELETE /api/v2/admin/contacts/{id})
 	AdminDeleteContact(c *gin.Context, id int)
 	// Update contact
-	// (POST /api/v2/admin/contacts/{id})
+	// (PUT /api/v2/admin/contacts/{id})
 	AdminUpdateContact(c *gin.Context, id int)
 	// Create contact
 	// (POST /api/v2/admin/contacts/{paymail})
@@ -873,7 +873,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/api/v2/admin/contacts", wrapper.AdminGetContacts)
 	router.POST(options.BaseURL+"/api/v2/admin/contacts/confirmations", wrapper.AdminConfirmContact)
 	router.DELETE(options.BaseURL+"/api/v2/admin/contacts/:id", wrapper.AdminDeleteContact)
-	router.POST(options.BaseURL+"/api/v2/admin/contacts/:id", wrapper.AdminUpdateContact)
+	router.PUT(options.BaseURL+"/api/v2/admin/contacts/:id", wrapper.AdminUpdateContact)
 	router.POST(options.BaseURL+"/api/v2/admin/contacts/:paymail", wrapper.AdminCreateContact)
 	router.DELETE(options.BaseURL+"/api/v2/admin/invitations/:id", wrapper.AdminRejectInvitation)
 	router.POST(options.BaseURL+"/api/v2/admin/invitations/:id", wrapper.AdminAcceptInvitation)

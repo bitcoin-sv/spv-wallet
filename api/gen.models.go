@@ -133,6 +133,42 @@ type ErrorsCannotBindRequest struct {
 	Message interface{} `json:"message"`
 }
 
+// ErrorsContactAlreadyExists defines model for errors_ContactAlreadyExists.
+type ErrorsContactAlreadyExists struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsContactFailedToUpdate defines model for errors_ContactFailedToUpdate.
+type ErrorsContactFailedToUpdate struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsContactInWrongStatus defines model for errors_ContactInWrongStatus.
+type ErrorsContactInWrongStatus struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsContactInvalidPaymail defines model for errors_ContactInvalidPaymail.
+type ErrorsContactInvalidPaymail struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsContactNotFound defines model for errors_ContactNotFound.
+type ErrorsContactNotFound struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsCouldNotFindPaymail defines model for errors_CouldNotFindPaymail.
+type ErrorsCouldNotFindPaymail struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ErrorsCreatingUser defines model for errors_CreatingUser.
 type ErrorsCreatingUser struct {
 	Code    interface{} `json:"code"`
@@ -145,8 +181,38 @@ type ErrorsDataNotFound struct {
 	Message interface{} `json:"message"`
 }
 
+// ErrorsDeleteContact defines model for errors_DeleteContact.
+type ErrorsDeleteContact struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsFailedToGetPaginatedResults defines model for errors_FailedToGetPaginatedResults.
+type ErrorsFailedToGetPaginatedResults struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsGetContact defines model for errors_GetContact.
+type ErrorsGetContact struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsGetPKIFailed defines model for errors_GetPKIFailed.
+type ErrorsGetPKIFailed struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ErrorsGettingOutputs defines model for errors_GettingOutputs.
 type ErrorsGettingOutputs struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsGettingPKIFailed defines model for errors_GettingPKIFailed.
+type ErrorsGettingPKIFailed struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
@@ -187,6 +253,24 @@ type ErrorsInvalidPubKey struct {
 	Message interface{} `json:"message"`
 }
 
+// ErrorsMissingContactCreatorPaymailParam defines model for errors_MissingContactCreatorPaymailParam.
+type ErrorsMissingContactCreatorPaymailParam struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsMissingContactFullName defines model for errors_MissingContactFullName.
+type ErrorsMissingContactFullName struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsMissingContactPaymailParam defines model for errors_MissingContactPaymailParam.
+type ErrorsMissingContactPaymailParam struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ErrorsNoOperations defines model for errors_NoOperations.
 type ErrorsNoOperations struct {
 	Code    interface{} `json:"code"`
@@ -195,6 +279,18 @@ type ErrorsNoOperations struct {
 
 // ErrorsPaymailInconsistent defines model for errors_PaymailInconsistent.
 type ErrorsPaymailInconsistent struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsRequesterContactInvalid defines model for errors_RequesterContactInvalid.
+type ErrorsRequesterContactInvalid struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsSaveContact defines model for errors_SaveContact.
+type ErrorsSaveContact struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
@@ -268,6 +364,12 @@ type ErrorsUnauthorized struct {
 	Message interface{} `json:"message"`
 }
 
+// ErrorsUpdateContactStatus defines model for errors_UpdateContactStatus.
+type ErrorsUpdateContactStatus struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ErrorsUserAuthOnNonUserEndpoint defines model for errors_UserAuthOnNonUserEndpoint.
 type ErrorsUserAuthOnNonUserEndpoint struct {
 	Code    interface{} `json:"code"`
@@ -277,6 +379,12 @@ type ErrorsUserAuthOnNonUserEndpoint struct {
 // ErrorsUserAuthorization defines model for errors_UserAuthorization.
 type ErrorsUserAuthorization struct {
 	union json.RawMessage
+}
+
+// ErrorsUserDoNotOwnPaymail defines model for errors_UserDoNotOwnPaymail.
+type ErrorsUserDoNotOwnPaymail struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
 }
 
 // ModelsAnnotatedTransactionOutline defines model for models_AnnotatedTransactionOutline.
@@ -644,6 +752,31 @@ type RequestsStatus = ModelsContactStatus
 // ResponsesAdminAddPaymailSuccess defines model for responses_AdminAddPaymailSuccess.
 type ResponsesAdminAddPaymailSuccess = ModelsPaymail
 
+// ResponsesAdminConfirmContactInternalServerError defines model for responses_AdminConfirmContactInternalServerError.
+type ResponsesAdminConfirmContactInternalServerError struct {
+	union json.RawMessage
+}
+
+// ResponsesAdminCreateContactBadRequest defines model for responses_AdminCreateContactBadRequest.
+type ResponsesAdminCreateContactBadRequest struct {
+	union json.RawMessage
+}
+
+// ResponsesAdminCreateContactConflict defines model for responses_AdminCreateContactConflict.
+type ResponsesAdminCreateContactConflict struct {
+	union json.RawMessage
+}
+
+// ResponsesAdminCreateContactInternalServerError defines model for responses_AdminCreateContactInternalServerError.
+type ResponsesAdminCreateContactInternalServerError struct {
+	union json.RawMessage
+}
+
+// ResponsesAdminCreateContactNotFound defines model for responses_AdminCreateContactNotFound.
+type ResponsesAdminCreateContactNotFound struct {
+	union json.RawMessage
+}
+
 // ResponsesAdminCreateUserInternalServerError defines model for responses_AdminCreateUserInternalServerError.
 type ResponsesAdminCreateUserInternalServerError = ErrorsCreatingUser
 
@@ -656,13 +789,31 @@ type ResponsesAdminGetUser = ModelsUser
 // ResponsesAdminGetUserInternalServerError defines model for responses_AdminGetUserInternalServerError.
 type ResponsesAdminGetUserInternalServerError = ErrorsGettingUser
 
+// ResponsesAdminUpdateContactStatusInternalServerError defines model for responses_AdminUpdateContactStatusInternalServerError.
+type ResponsesAdminUpdateContactStatusInternalServerError struct {
+	union json.RawMessage
+}
+
 // ResponsesAdminUserBadRequest defines model for responses_AdminUserBadRequest.
 type ResponsesAdminUserBadRequest struct {
 	union json.RawMessage
 }
 
+// ResponsesContactNotFound defines model for responses_ContactNotFound.
+type ResponsesContactNotFound = ErrorsContactNotFound
+
+// ResponsesContactSearchInternalServerError defines model for responses_ContactSearchInternalServerError.
+type ResponsesContactSearchInternalServerError struct {
+	union json.RawMessage
+}
+
 // ResponsesContactSuccess defines model for responses_ContactSuccess.
 type ResponsesContactSuccess = ModelsContact
+
+// ResponsesContactUpsertInternalServerError defines model for responses_ContactUpsertInternalServerError.
+type ResponsesContactUpsertInternalServerError struct {
+	union json.RawMessage
+}
 
 // ResponsesCreateTransactionOutlineBadRequest defines model for responses_CreateTransactionOutlineBadRequest.
 type ResponsesCreateTransactionOutlineBadRequest struct {
@@ -674,6 +825,16 @@ type ResponsesCreateTransactionOutlineSuccess = ModelsAnnotatedTransactionOutlin
 
 // ResponsesCreateTransactionOutlineUnprocessable defines model for responses_CreateTransactionOutlineUnprocessable.
 type ResponsesCreateTransactionOutlineUnprocessable struct {
+	union json.RawMessage
+}
+
+// ResponsesDeleteContactInternalServerError defines model for responses_DeleteContactInternalServerError.
+type ResponsesDeleteContactInternalServerError struct {
+	union json.RawMessage
+}
+
+// ResponsesGetContactInternalServerError defines model for responses_GetContactInternalServerError.
+type ResponsesGetContactInternalServerError struct {
 	union json.RawMessage
 }
 
@@ -721,6 +882,21 @@ type ResponsesSearchOperationsSuccess = ModelsOperationsSearchResult
 
 // ResponsesSharedConfig Shared config
 type ResponsesSharedConfig = ModelsSharedConfig
+
+// ResponsesUpdateContactBadRequest defines model for responses_UpdateContactBadRequest.
+type ResponsesUpdateContactBadRequest struct {
+	union json.RawMessage
+}
+
+// ResponsesUpsertContactBadRequest defines model for responses_UpsertContactBadRequest.
+type ResponsesUpsertContactBadRequest struct {
+	union json.RawMessage
+}
+
+// ResponsesUpsertContactNotFound defines model for responses_UpsertContactNotFound.
+type ResponsesUpsertContactNotFound struct {
+	union json.RawMessage
+}
 
 // ResponsesUserBadRequest defines model for responses_UserBadRequest.
 type ResponsesUserBadRequest = ErrorsInvalidDataID
@@ -1261,6 +1437,482 @@ func (t *RequestsTransactionOutlineOutputSpecification) UnmarshalJSON(b []byte) 
 	return err
 }
 
+// AsErrorsInternal returns the union data inside the ResponsesAdminConfirmContactInternalServerError as a ErrorsInternal
+func (t ResponsesAdminConfirmContactInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
+	var body ErrorsInternal
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInternal overwrites any union data inside the ResponsesAdminConfirmContactInternalServerError as the provided ErrorsInternal
+func (t *ResponsesAdminConfirmContactInternalServerError) FromErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInternal performs a merge with any union data inside the ResponsesAdminConfirmContactInternalServerError, using the provided ErrorsInternal
+func (t *ResponsesAdminConfirmContactInternalServerError) MergeErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsGetContact returns the union data inside the ResponsesAdminConfirmContactInternalServerError as a ErrorsGetContact
+func (t ResponsesAdminConfirmContactInternalServerError) AsErrorsGetContact() (ErrorsGetContact, error) {
+	var body ErrorsGetContact
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsGetContact overwrites any union data inside the ResponsesAdminConfirmContactInternalServerError as the provided ErrorsGetContact
+func (t *ResponsesAdminConfirmContactInternalServerError) FromErrorsGetContact(v ErrorsGetContact) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsGetContact performs a merge with any union data inside the ResponsesAdminConfirmContactInternalServerError, using the provided ErrorsGetContact
+func (t *ResponsesAdminConfirmContactInternalServerError) MergeErrorsGetContact(v ErrorsGetContact) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsUpdateContactStatus returns the union data inside the ResponsesAdminConfirmContactInternalServerError as a ErrorsUpdateContactStatus
+func (t ResponsesAdminConfirmContactInternalServerError) AsErrorsUpdateContactStatus() (ErrorsUpdateContactStatus, error) {
+	var body ErrorsUpdateContactStatus
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsUpdateContactStatus overwrites any union data inside the ResponsesAdminConfirmContactInternalServerError as the provided ErrorsUpdateContactStatus
+func (t *ResponsesAdminConfirmContactInternalServerError) FromErrorsUpdateContactStatus(v ErrorsUpdateContactStatus) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsUpdateContactStatus performs a merge with any union data inside the ResponsesAdminConfirmContactInternalServerError, using the provided ErrorsUpdateContactStatus
+func (t *ResponsesAdminConfirmContactInternalServerError) MergeErrorsUpdateContactStatus(v ErrorsUpdateContactStatus) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesAdminConfirmContactInternalServerError) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesAdminConfirmContactInternalServerError) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsCannotBindRequest returns the union data inside the ResponsesAdminCreateContactBadRequest as a ErrorsCannotBindRequest
+func (t ResponsesAdminCreateContactBadRequest) AsErrorsCannotBindRequest() (ErrorsCannotBindRequest, error) {
+	var body ErrorsCannotBindRequest
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsCannotBindRequest overwrites any union data inside the ResponsesAdminCreateContactBadRequest as the provided ErrorsCannotBindRequest
+func (t *ResponsesAdminCreateContactBadRequest) FromErrorsCannotBindRequest(v ErrorsCannotBindRequest) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsCannotBindRequest performs a merge with any union data inside the ResponsesAdminCreateContactBadRequest, using the provided ErrorsCannotBindRequest
+func (t *ResponsesAdminCreateContactBadRequest) MergeErrorsCannotBindRequest(v ErrorsCannotBindRequest) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsMissingContactFullName returns the union data inside the ResponsesAdminCreateContactBadRequest as a ErrorsMissingContactFullName
+func (t ResponsesAdminCreateContactBadRequest) AsErrorsMissingContactFullName() (ErrorsMissingContactFullName, error) {
+	var body ErrorsMissingContactFullName
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsMissingContactFullName overwrites any union data inside the ResponsesAdminCreateContactBadRequest as the provided ErrorsMissingContactFullName
+func (t *ResponsesAdminCreateContactBadRequest) FromErrorsMissingContactFullName(v ErrorsMissingContactFullName) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsMissingContactFullName performs a merge with any union data inside the ResponsesAdminCreateContactBadRequest, using the provided ErrorsMissingContactFullName
+func (t *ResponsesAdminCreateContactBadRequest) MergeErrorsMissingContactFullName(v ErrorsMissingContactFullName) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsMissingContactPaymailParam returns the union data inside the ResponsesAdminCreateContactBadRequest as a ErrorsMissingContactPaymailParam
+func (t ResponsesAdminCreateContactBadRequest) AsErrorsMissingContactPaymailParam() (ErrorsMissingContactPaymailParam, error) {
+	var body ErrorsMissingContactPaymailParam
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsMissingContactPaymailParam overwrites any union data inside the ResponsesAdminCreateContactBadRequest as the provided ErrorsMissingContactPaymailParam
+func (t *ResponsesAdminCreateContactBadRequest) FromErrorsMissingContactPaymailParam(v ErrorsMissingContactPaymailParam) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsMissingContactPaymailParam performs a merge with any union data inside the ResponsesAdminCreateContactBadRequest, using the provided ErrorsMissingContactPaymailParam
+func (t *ResponsesAdminCreateContactBadRequest) MergeErrorsMissingContactPaymailParam(v ErrorsMissingContactPaymailParam) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsMissingContactCreatorPaymailParam returns the union data inside the ResponsesAdminCreateContactBadRequest as a ErrorsMissingContactCreatorPaymailParam
+func (t ResponsesAdminCreateContactBadRequest) AsErrorsMissingContactCreatorPaymailParam() (ErrorsMissingContactCreatorPaymailParam, error) {
+	var body ErrorsMissingContactCreatorPaymailParam
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsMissingContactCreatorPaymailParam overwrites any union data inside the ResponsesAdminCreateContactBadRequest as the provided ErrorsMissingContactCreatorPaymailParam
+func (t *ResponsesAdminCreateContactBadRequest) FromErrorsMissingContactCreatorPaymailParam(v ErrorsMissingContactCreatorPaymailParam) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsMissingContactCreatorPaymailParam performs a merge with any union data inside the ResponsesAdminCreateContactBadRequest, using the provided ErrorsMissingContactCreatorPaymailParam
+func (t *ResponsesAdminCreateContactBadRequest) MergeErrorsMissingContactCreatorPaymailParam(v ErrorsMissingContactCreatorPaymailParam) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsRequesterContactInvalid returns the union data inside the ResponsesAdminCreateContactBadRequest as a ErrorsRequesterContactInvalid
+func (t ResponsesAdminCreateContactBadRequest) AsErrorsRequesterContactInvalid() (ErrorsRequesterContactInvalid, error) {
+	var body ErrorsRequesterContactInvalid
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsRequesterContactInvalid overwrites any union data inside the ResponsesAdminCreateContactBadRequest as the provided ErrorsRequesterContactInvalid
+func (t *ResponsesAdminCreateContactBadRequest) FromErrorsRequesterContactInvalid(v ErrorsRequesterContactInvalid) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsRequesterContactInvalid performs a merge with any union data inside the ResponsesAdminCreateContactBadRequest, using the provided ErrorsRequesterContactInvalid
+func (t *ResponsesAdminCreateContactBadRequest) MergeErrorsRequesterContactInvalid(v ErrorsRequesterContactInvalid) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsGetPKIFailed returns the union data inside the ResponsesAdminCreateContactBadRequest as a ErrorsGetPKIFailed
+func (t ResponsesAdminCreateContactBadRequest) AsErrorsGetPKIFailed() (ErrorsGetPKIFailed, error) {
+	var body ErrorsGetPKIFailed
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsGetPKIFailed overwrites any union data inside the ResponsesAdminCreateContactBadRequest as the provided ErrorsGetPKIFailed
+func (t *ResponsesAdminCreateContactBadRequest) FromErrorsGetPKIFailed(v ErrorsGetPKIFailed) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsGetPKIFailed performs a merge with any union data inside the ResponsesAdminCreateContactBadRequest, using the provided ErrorsGetPKIFailed
+func (t *ResponsesAdminCreateContactBadRequest) MergeErrorsGetPKIFailed(v ErrorsGetPKIFailed) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsSaveContact returns the union data inside the ResponsesAdminCreateContactBadRequest as a ErrorsSaveContact
+func (t ResponsesAdminCreateContactBadRequest) AsErrorsSaveContact() (ErrorsSaveContact, error) {
+	var body ErrorsSaveContact
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsSaveContact overwrites any union data inside the ResponsesAdminCreateContactBadRequest as the provided ErrorsSaveContact
+func (t *ResponsesAdminCreateContactBadRequest) FromErrorsSaveContact(v ErrorsSaveContact) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsSaveContact performs a merge with any union data inside the ResponsesAdminCreateContactBadRequest, using the provided ErrorsSaveContact
+func (t *ResponsesAdminCreateContactBadRequest) MergeErrorsSaveContact(v ErrorsSaveContact) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesAdminCreateContactBadRequest) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesAdminCreateContactBadRequest) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsContactAlreadyExists returns the union data inside the ResponsesAdminCreateContactConflict as a ErrorsContactAlreadyExists
+func (t ResponsesAdminCreateContactConflict) AsErrorsContactAlreadyExists() (ErrorsContactAlreadyExists, error) {
+	var body ErrorsContactAlreadyExists
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsContactAlreadyExists overwrites any union data inside the ResponsesAdminCreateContactConflict as the provided ErrorsContactAlreadyExists
+func (t *ResponsesAdminCreateContactConflict) FromErrorsContactAlreadyExists(v ErrorsContactAlreadyExists) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsContactAlreadyExists performs a merge with any union data inside the ResponsesAdminCreateContactConflict, using the provided ErrorsContactAlreadyExists
+func (t *ResponsesAdminCreateContactConflict) MergeErrorsContactAlreadyExists(v ErrorsContactAlreadyExists) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesAdminCreateContactConflict) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesAdminCreateContactConflict) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsInternal returns the union data inside the ResponsesAdminCreateContactInternalServerError as a ErrorsInternal
+func (t ResponsesAdminCreateContactInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
+	var body ErrorsInternal
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInternal overwrites any union data inside the ResponsesAdminCreateContactInternalServerError as the provided ErrorsInternal
+func (t *ResponsesAdminCreateContactInternalServerError) FromErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInternal performs a merge with any union data inside the ResponsesAdminCreateContactInternalServerError, using the provided ErrorsInternal
+func (t *ResponsesAdminCreateContactInternalServerError) MergeErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsGetContact returns the union data inside the ResponsesAdminCreateContactInternalServerError as a ErrorsGetContact
+func (t ResponsesAdminCreateContactInternalServerError) AsErrorsGetContact() (ErrorsGetContact, error) {
+	var body ErrorsGetContact
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsGetContact overwrites any union data inside the ResponsesAdminCreateContactInternalServerError as the provided ErrorsGetContact
+func (t *ResponsesAdminCreateContactInternalServerError) FromErrorsGetContact(v ErrorsGetContact) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsGetContact performs a merge with any union data inside the ResponsesAdminCreateContactInternalServerError, using the provided ErrorsGetContact
+func (t *ResponsesAdminCreateContactInternalServerError) MergeErrorsGetContact(v ErrorsGetContact) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesAdminCreateContactInternalServerError) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesAdminCreateContactInternalServerError) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsCouldNotFindPaymail returns the union data inside the ResponsesAdminCreateContactNotFound as a ErrorsCouldNotFindPaymail
+func (t ResponsesAdminCreateContactNotFound) AsErrorsCouldNotFindPaymail() (ErrorsCouldNotFindPaymail, error) {
+	var body ErrorsCouldNotFindPaymail
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsCouldNotFindPaymail overwrites any union data inside the ResponsesAdminCreateContactNotFound as the provided ErrorsCouldNotFindPaymail
+func (t *ResponsesAdminCreateContactNotFound) FromErrorsCouldNotFindPaymail(v ErrorsCouldNotFindPaymail) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsCouldNotFindPaymail performs a merge with any union data inside the ResponsesAdminCreateContactNotFound, using the provided ErrorsCouldNotFindPaymail
+func (t *ResponsesAdminCreateContactNotFound) MergeErrorsCouldNotFindPaymail(v ErrorsCouldNotFindPaymail) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesAdminCreateContactNotFound) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesAdminCreateContactNotFound) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsInternal returns the union data inside the ResponsesAdminUpdateContactStatusInternalServerError as a ErrorsInternal
+func (t ResponsesAdminUpdateContactStatusInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
+	var body ErrorsInternal
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInternal overwrites any union data inside the ResponsesAdminUpdateContactStatusInternalServerError as the provided ErrorsInternal
+func (t *ResponsesAdminUpdateContactStatusInternalServerError) FromErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInternal performs a merge with any union data inside the ResponsesAdminUpdateContactStatusInternalServerError, using the provided ErrorsInternal
+func (t *ResponsesAdminUpdateContactStatusInternalServerError) MergeErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsUpdateContactStatus returns the union data inside the ResponsesAdminUpdateContactStatusInternalServerError as a ErrorsUpdateContactStatus
+func (t ResponsesAdminUpdateContactStatusInternalServerError) AsErrorsUpdateContactStatus() (ErrorsUpdateContactStatus, error) {
+	var body ErrorsUpdateContactStatus
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsUpdateContactStatus overwrites any union data inside the ResponsesAdminUpdateContactStatusInternalServerError as the provided ErrorsUpdateContactStatus
+func (t *ResponsesAdminUpdateContactStatusInternalServerError) FromErrorsUpdateContactStatus(v ErrorsUpdateContactStatus) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsUpdateContactStatus performs a merge with any union data inside the ResponsesAdminUpdateContactStatusInternalServerError, using the provided ErrorsUpdateContactStatus
+func (t *ResponsesAdminUpdateContactStatusInternalServerError) MergeErrorsUpdateContactStatus(v ErrorsUpdateContactStatus) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesAdminUpdateContactStatusInternalServerError) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesAdminUpdateContactStatusInternalServerError) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
 // AsErrorsCannotBindRequest returns the union data inside the ResponsesAdminUserBadRequest as a ErrorsCannotBindRequest
 func (t ResponsesAdminUserBadRequest) AsErrorsCannotBindRequest() (ErrorsCannotBindRequest, error) {
 	var body ErrorsCannotBindRequest
@@ -1397,6 +2049,156 @@ func (t ResponsesAdminUserBadRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (t *ResponsesAdminUserBadRequest) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsInternal returns the union data inside the ResponsesContactSearchInternalServerError as a ErrorsInternal
+func (t ResponsesContactSearchInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
+	var body ErrorsInternal
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInternal overwrites any union data inside the ResponsesContactSearchInternalServerError as the provided ErrorsInternal
+func (t *ResponsesContactSearchInternalServerError) FromErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInternal performs a merge with any union data inside the ResponsesContactSearchInternalServerError, using the provided ErrorsInternal
+func (t *ResponsesContactSearchInternalServerError) MergeErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsFailedToGetPaginatedResults returns the union data inside the ResponsesContactSearchInternalServerError as a ErrorsFailedToGetPaginatedResults
+func (t ResponsesContactSearchInternalServerError) AsErrorsFailedToGetPaginatedResults() (ErrorsFailedToGetPaginatedResults, error) {
+	var body ErrorsFailedToGetPaginatedResults
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsFailedToGetPaginatedResults overwrites any union data inside the ResponsesContactSearchInternalServerError as the provided ErrorsFailedToGetPaginatedResults
+func (t *ResponsesContactSearchInternalServerError) FromErrorsFailedToGetPaginatedResults(v ErrorsFailedToGetPaginatedResults) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsFailedToGetPaginatedResults performs a merge with any union data inside the ResponsesContactSearchInternalServerError, using the provided ErrorsFailedToGetPaginatedResults
+func (t *ResponsesContactSearchInternalServerError) MergeErrorsFailedToGetPaginatedResults(v ErrorsFailedToGetPaginatedResults) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesContactSearchInternalServerError) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesContactSearchInternalServerError) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsInternal returns the union data inside the ResponsesContactUpsertInternalServerError as a ErrorsInternal
+func (t ResponsesContactUpsertInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
+	var body ErrorsInternal
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInternal overwrites any union data inside the ResponsesContactUpsertInternalServerError as the provided ErrorsInternal
+func (t *ResponsesContactUpsertInternalServerError) FromErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInternal performs a merge with any union data inside the ResponsesContactUpsertInternalServerError, using the provided ErrorsInternal
+func (t *ResponsesContactUpsertInternalServerError) MergeErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsGetContact returns the union data inside the ResponsesContactUpsertInternalServerError as a ErrorsGetContact
+func (t ResponsesContactUpsertInternalServerError) AsErrorsGetContact() (ErrorsGetContact, error) {
+	var body ErrorsGetContact
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsGetContact overwrites any union data inside the ResponsesContactUpsertInternalServerError as the provided ErrorsGetContact
+func (t *ResponsesContactUpsertInternalServerError) FromErrorsGetContact(v ErrorsGetContact) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsGetContact performs a merge with any union data inside the ResponsesContactUpsertInternalServerError, using the provided ErrorsGetContact
+func (t *ResponsesContactUpsertInternalServerError) MergeErrorsGetContact(v ErrorsGetContact) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsContactFailedToUpdate returns the union data inside the ResponsesContactUpsertInternalServerError as a ErrorsContactFailedToUpdate
+func (t ResponsesContactUpsertInternalServerError) AsErrorsContactFailedToUpdate() (ErrorsContactFailedToUpdate, error) {
+	var body ErrorsContactFailedToUpdate
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsContactFailedToUpdate overwrites any union data inside the ResponsesContactUpsertInternalServerError as the provided ErrorsContactFailedToUpdate
+func (t *ResponsesContactUpsertInternalServerError) FromErrorsContactFailedToUpdate(v ErrorsContactFailedToUpdate) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsContactFailedToUpdate performs a merge with any union data inside the ResponsesContactUpsertInternalServerError, using the provided ErrorsContactFailedToUpdate
+func (t *ResponsesContactUpsertInternalServerError) MergeErrorsContactFailedToUpdate(v ErrorsContactFailedToUpdate) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesContactUpsertInternalServerError) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesContactUpsertInternalServerError) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
@@ -1599,6 +2401,130 @@ func (t ResponsesCreateTransactionOutlineUnprocessable) MarshalJSON() ([]byte, e
 }
 
 func (t *ResponsesCreateTransactionOutlineUnprocessable) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsInternal returns the union data inside the ResponsesDeleteContactInternalServerError as a ErrorsInternal
+func (t ResponsesDeleteContactInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
+	var body ErrorsInternal
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInternal overwrites any union data inside the ResponsesDeleteContactInternalServerError as the provided ErrorsInternal
+func (t *ResponsesDeleteContactInternalServerError) FromErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInternal performs a merge with any union data inside the ResponsesDeleteContactInternalServerError, using the provided ErrorsInternal
+func (t *ResponsesDeleteContactInternalServerError) MergeErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsDeleteContact returns the union data inside the ResponsesDeleteContactInternalServerError as a ErrorsDeleteContact
+func (t ResponsesDeleteContactInternalServerError) AsErrorsDeleteContact() (ErrorsDeleteContact, error) {
+	var body ErrorsDeleteContact
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsDeleteContact overwrites any union data inside the ResponsesDeleteContactInternalServerError as the provided ErrorsDeleteContact
+func (t *ResponsesDeleteContactInternalServerError) FromErrorsDeleteContact(v ErrorsDeleteContact) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsDeleteContact performs a merge with any union data inside the ResponsesDeleteContactInternalServerError, using the provided ErrorsDeleteContact
+func (t *ResponsesDeleteContactInternalServerError) MergeErrorsDeleteContact(v ErrorsDeleteContact) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesDeleteContactInternalServerError) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesDeleteContactInternalServerError) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsInternal returns the union data inside the ResponsesGetContactInternalServerError as a ErrorsInternal
+func (t ResponsesGetContactInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
+	var body ErrorsInternal
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInternal overwrites any union data inside the ResponsesGetContactInternalServerError as the provided ErrorsInternal
+func (t *ResponsesGetContactInternalServerError) FromErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInternal performs a merge with any union data inside the ResponsesGetContactInternalServerError, using the provided ErrorsInternal
+func (t *ResponsesGetContactInternalServerError) MergeErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsGetContact returns the union data inside the ResponsesGetContactInternalServerError as a ErrorsGetContact
+func (t ResponsesGetContactInternalServerError) AsErrorsGetContact() (ErrorsGetContact, error) {
+	var body ErrorsGetContact
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsGetContact overwrites any union data inside the ResponsesGetContactInternalServerError as the provided ErrorsGetContact
+func (t *ResponsesGetContactInternalServerError) FromErrorsGetContact(v ErrorsGetContact) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsGetContact performs a merge with any union data inside the ResponsesGetContactInternalServerError, using the provided ErrorsGetContact
+func (t *ResponsesGetContactInternalServerError) MergeErrorsGetContact(v ErrorsGetContact) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesGetContactInternalServerError) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesGetContactInternalServerError) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
@@ -1863,6 +2789,218 @@ func (t ResponsesRecordTransactionInternalServerError) MarshalJSON() ([]byte, er
 }
 
 func (t *ResponsesRecordTransactionInternalServerError) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsContactInWrongStatus returns the union data inside the ResponsesUpdateContactBadRequest as a ErrorsContactInWrongStatus
+func (t ResponsesUpdateContactBadRequest) AsErrorsContactInWrongStatus() (ErrorsContactInWrongStatus, error) {
+	var body ErrorsContactInWrongStatus
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsContactInWrongStatus overwrites any union data inside the ResponsesUpdateContactBadRequest as the provided ErrorsContactInWrongStatus
+func (t *ResponsesUpdateContactBadRequest) FromErrorsContactInWrongStatus(v ErrorsContactInWrongStatus) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsContactInWrongStatus performs a merge with any union data inside the ResponsesUpdateContactBadRequest, using the provided ErrorsContactInWrongStatus
+func (t *ResponsesUpdateContactBadRequest) MergeErrorsContactInWrongStatus(v ErrorsContactInWrongStatus) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesUpdateContactBadRequest) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesUpdateContactBadRequest) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsCannotBindRequest returns the union data inside the ResponsesUpsertContactBadRequest as a ErrorsCannotBindRequest
+func (t ResponsesUpsertContactBadRequest) AsErrorsCannotBindRequest() (ErrorsCannotBindRequest, error) {
+	var body ErrorsCannotBindRequest
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsCannotBindRequest overwrites any union data inside the ResponsesUpsertContactBadRequest as the provided ErrorsCannotBindRequest
+func (t *ResponsesUpsertContactBadRequest) FromErrorsCannotBindRequest(v ErrorsCannotBindRequest) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsCannotBindRequest performs a merge with any union data inside the ResponsesUpsertContactBadRequest, using the provided ErrorsCannotBindRequest
+func (t *ResponsesUpsertContactBadRequest) MergeErrorsCannotBindRequest(v ErrorsCannotBindRequest) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsUserDoNotOwnPaymail returns the union data inside the ResponsesUpsertContactBadRequest as a ErrorsUserDoNotOwnPaymail
+func (t ResponsesUpsertContactBadRequest) AsErrorsUserDoNotOwnPaymail() (ErrorsUserDoNotOwnPaymail, error) {
+	var body ErrorsUserDoNotOwnPaymail
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsUserDoNotOwnPaymail overwrites any union data inside the ResponsesUpsertContactBadRequest as the provided ErrorsUserDoNotOwnPaymail
+func (t *ResponsesUpsertContactBadRequest) FromErrorsUserDoNotOwnPaymail(v ErrorsUserDoNotOwnPaymail) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsUserDoNotOwnPaymail performs a merge with any union data inside the ResponsesUpsertContactBadRequest, using the provided ErrorsUserDoNotOwnPaymail
+func (t *ResponsesUpsertContactBadRequest) MergeErrorsUserDoNotOwnPaymail(v ErrorsUserDoNotOwnPaymail) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsContactInvalidPaymail returns the union data inside the ResponsesUpsertContactBadRequest as a ErrorsContactInvalidPaymail
+func (t ResponsesUpsertContactBadRequest) AsErrorsContactInvalidPaymail() (ErrorsContactInvalidPaymail, error) {
+	var body ErrorsContactInvalidPaymail
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsContactInvalidPaymail overwrites any union data inside the ResponsesUpsertContactBadRequest as the provided ErrorsContactInvalidPaymail
+func (t *ResponsesUpsertContactBadRequest) FromErrorsContactInvalidPaymail(v ErrorsContactInvalidPaymail) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsContactInvalidPaymail performs a merge with any union data inside the ResponsesUpsertContactBadRequest, using the provided ErrorsContactInvalidPaymail
+func (t *ResponsesUpsertContactBadRequest) MergeErrorsContactInvalidPaymail(v ErrorsContactInvalidPaymail) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsGettingPKIFailed returns the union data inside the ResponsesUpsertContactBadRequest as a ErrorsGettingPKIFailed
+func (t ResponsesUpsertContactBadRequest) AsErrorsGettingPKIFailed() (ErrorsGettingPKIFailed, error) {
+	var body ErrorsGettingPKIFailed
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsGettingPKIFailed overwrites any union data inside the ResponsesUpsertContactBadRequest as the provided ErrorsGettingPKIFailed
+func (t *ResponsesUpsertContactBadRequest) FromErrorsGettingPKIFailed(v ErrorsGettingPKIFailed) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsGettingPKIFailed performs a merge with any union data inside the ResponsesUpsertContactBadRequest, using the provided ErrorsGettingPKIFailed
+func (t *ResponsesUpsertContactBadRequest) MergeErrorsGettingPKIFailed(v ErrorsGettingPKIFailed) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsSaveContact returns the union data inside the ResponsesUpsertContactBadRequest as a ErrorsSaveContact
+func (t ResponsesUpsertContactBadRequest) AsErrorsSaveContact() (ErrorsSaveContact, error) {
+	var body ErrorsSaveContact
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsSaveContact overwrites any union data inside the ResponsesUpsertContactBadRequest as the provided ErrorsSaveContact
+func (t *ResponsesUpsertContactBadRequest) FromErrorsSaveContact(v ErrorsSaveContact) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsSaveContact performs a merge with any union data inside the ResponsesUpsertContactBadRequest, using the provided ErrorsSaveContact
+func (t *ResponsesUpsertContactBadRequest) MergeErrorsSaveContact(v ErrorsSaveContact) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesUpsertContactBadRequest) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesUpsertContactBadRequest) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsCouldNotFindPaymail returns the union data inside the ResponsesUpsertContactNotFound as a ErrorsCouldNotFindPaymail
+func (t ResponsesUpsertContactNotFound) AsErrorsCouldNotFindPaymail() (ErrorsCouldNotFindPaymail, error) {
+	var body ErrorsCouldNotFindPaymail
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsCouldNotFindPaymail overwrites any union data inside the ResponsesUpsertContactNotFound as the provided ErrorsCouldNotFindPaymail
+func (t *ResponsesUpsertContactNotFound) FromErrorsCouldNotFindPaymail(v ErrorsCouldNotFindPaymail) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsCouldNotFindPaymail performs a merge with any union data inside the ResponsesUpsertContactNotFound, using the provided ErrorsCouldNotFindPaymail
+func (t *ResponsesUpsertContactNotFound) MergeErrorsCouldNotFindPaymail(v ErrorsCouldNotFindPaymail) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesUpsertContactNotFound) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesUpsertContactNotFound) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }

@@ -137,7 +137,7 @@ paths:
           $ref: "../components/responses.yaml#/components/responses/ContactSearchInternalServerError"
 
   /api/v2/admin/contacts/{id}:
-    post:
+    put:
       operationId: adminUpdateContact
       security:
         - XPubAuth:

@@ -25,7 +25,7 @@ func NewContactsRepo(db *gorm.DB) *Contacts {
 }
 
 // Create adds a new contact to the database.
-func (r *Contacts) Create(ctx context.Context, newContact *contactsmodels.NewContact) (*contactsmodels.Contact, error) {
+func (r *Contacts) Create(ctx context.Context, newContact contactsmodels.NewContact) (*contactsmodels.Contact, error) {
 	row := database.UserContact{
 		UserID:   newContact.UserID,
 		FullName: newContact.FullName,
@@ -41,7 +41,7 @@ func (r *Contacts) Create(ctx context.Context, newContact *contactsmodels.NewCon
 }
 
 // Update updates contact in database.
-func (r *Contacts) Update(ctx context.Context, contact *contactsmodels.NewContact) (*contactsmodels.Contact, error) {
+func (r *Contacts) Update(ctx context.Context, contact contactsmodels.NewContact) (*contactsmodels.Contact, error) {
 	row := database.UserContact{
 		FullName: contact.FullName,
 		PubKey:   contact.NewContactPubKey,

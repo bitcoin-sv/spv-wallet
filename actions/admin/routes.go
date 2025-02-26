@@ -15,13 +15,13 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 	adminGroup.GET("/transactions", handlers.AsAdmin(adminSearchTxs))
 
 	// contacts
-	//adminGroup.GET("/contacts", handlers.AsAdmin(contactsSearch))
+	adminGroup.GET("/contacts", handlers.AsAdmin(contactsSearch))
 	adminGroup.POST("/invitations/:id", handlers.AsAdmin(contactsAccept))
 	adminGroup.DELETE("/invitations/:id", handlers.AsAdmin(contactsReject))
-	//adminGroup.DELETE("/contacts/:id", handlers.AsAdmin(contactsDelete))
-	//adminGroup.PUT("/contacts/:id", handlers.AsAdmin(contactsUpdate))
-	//adminGroup.POST("/contacts/:paymail", handlers.AsAdmin(contactsCreate))
-	//adminGroup.POST("/contacts/confirmations", handlers.AsAdmin(contactsConfirm))
+	adminGroup.DELETE("/contacts/:id", handlers.AsAdmin(contactsDelete))
+	adminGroup.PUT("/contacts/:id", handlers.AsAdmin(contactsUpdate))
+	adminGroup.POST("/contacts/:paymail", handlers.AsAdmin(contactsCreate))
+	adminGroup.POST("/contacts/confirmations", handlers.AsAdmin(contactsConfirm))
 
 	// access keys
 	adminGroup.GET("/users/keys", handlers.AsAdmin(accessKeysSearch))
