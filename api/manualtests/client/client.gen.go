@@ -298,6 +298,11 @@ type ModelsBucketAnnotation struct {
 	Bucket string `json:"bucket"`
 }
 
+// ModelsChangeAnnotation defines model for models_ChangeAnnotation.
+type ModelsChangeAnnotation struct {
+	CustomInstructions *ModelsSPVWalletCustomInstructions `json:"customInstructions,omitempty"`
+}
+
 // ModelsCustomInstructions defines model for models_CustomInstructions.
 type ModelsCustomInstructions struct {
 	union json.RawMessage
@@ -375,8 +380,9 @@ type ModelsOutlineAnnotations struct {
 
 // ModelsOutputAnnotation defines model for models_OutputAnnotation.
 type ModelsOutputAnnotation struct {
-	Bucket  ModelsOutputAnnotationBucket    `json:"bucket"`
-	Paymail *ModelsPaymailAnnotationDetails `json:"paymail,omitempty"`
+	Bucket             ModelsOutputAnnotationBucket       `json:"bucket"`
+	CustomInstructions *ModelsSPVWalletCustomInstructions `json:"customInstructions,omitempty"`
+	Paymail            *ModelsPaymailAnnotationDetails    `json:"paymail,omitempty"`
 }
 
 // ModelsOutputAnnotationBucket defines model for ModelsOutputAnnotation.Bucket.
@@ -490,11 +496,13 @@ type ModelsUserInfo struct {
 
 // RequestsAddPaymail defines model for requests_AddPaymail.
 type RequestsAddPaymail struct {
-	Address    string `json:"address"`
-	Alias      string `json:"alias"`
-	AvatarURL  string `json:"avatarURL"`
-	Domain     string `json:"domain"`
-	PublicName string `json:"publicName"`
+	Address   string  `json:"address"`
+	Alias     string  `json:"alias"`
+	AvatarURL *string `json:"avatarURL,omitempty"`
+	Domain    string  `json:"domain"`
+
+	// PublicName If not provided will default to the same value as alias
+	PublicName *string `json:"publicName,omitempty"`
 }
 
 // RequestsCreateUser defines model for requests_CreateUser.

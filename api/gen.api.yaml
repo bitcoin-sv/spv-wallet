@@ -1064,14 +1064,13 @@ components:
                     example: spv-wallet.com
                     type: string
                 publicName:
+                    description: If not provided will default to the same value as alias
                     example: Test
                     type: string
             required:
                 - address
                 - alias
                 - domain
-                - publicName
-                - avatarURL
             type: object
         requests_CreateUser:
             properties:
