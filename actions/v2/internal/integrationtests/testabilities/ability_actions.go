@@ -20,11 +20,16 @@ const (
 
 type IntegrationTestAction interface {
 	Alice() ActorsActions
+	ARC() ARCActions
 }
 
 type ActorsActions interface {
 	ReceivesFromExternal(amount bsv.Satoshis) (txID string)
 	SendsTo(recipient *fixtures.User, amount bsv.Satoshis) (txID string)
+}
+
+type ARCActions interface {
+	Callbacks(txInfo chainmodels.TXInfo)
 }
 
 type actions struct {
@@ -41,6 +46,13 @@ func newActions(t testing.TB, given *fixture) IntegrationTestAction {
 
 func (a *actions) Alice() ActorsActions {
 	return a.fixture.alice
+}
+
+func (a *actions) ARC() ARCActions {
+	return &arcActions{
+		t:       a.t,
+		fixture: a.fixture,
+	}
 }
 
 type user struct {
