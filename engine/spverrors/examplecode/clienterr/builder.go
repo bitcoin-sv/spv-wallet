@@ -2,6 +2,7 @@ package clienterr
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors/examplecode/errdef"
 	"github.com/gin-gonic/gin"
@@ -10,6 +11,7 @@ import (
 )
 
 var propProblemDetails = errorx.RegisterProperty("problem_details")
+var clientError = errorx.NewNamespace("client").NewType("error")
 
 type Builder struct {
 	from           *ClientErrorDefinition
@@ -27,12 +29,11 @@ func (b *Builder) Wrap(cause error, msg string, args ...any) *Builder {
 }
 
 func (b *Builder) Err() *errorx.Error {
-	t := b.from.errType
 	var err *errorx.Error
 	if b.cause != nil {
-		err = t.Wrap(b.cause, "")
+		err = clientError.Wrap(b.cause, "")
 	} else {
-		err = t.NewWithNoMessage()
+		err = clientError.NewWithNoMessage()
 	}
 	return err.WithProperty(propProblemDetails, b.problemDetails)
 }
@@ -46,7 +47,14 @@ func (b *Builder) WithDetailf(detail string, args ...any) *Builder {
 	return b
 }
 
-func (b *Builder) WithInstancef(instance string, args ...any) *Builder {
-	b.problemDetails.Instance = instance
+func (b *Builder) WithInstance(parts ...any) *Builder {
+	var sb strings.Builder
+	for i, p := range parts {
+		sb.WriteString(fmt.Sprintf("%v", p))
+		if i < len(parts)-1 {
+			sb.WriteString("/")
+		}
+	}
+	b.problemDetails.Instance = sb.String()
 	return b
 }

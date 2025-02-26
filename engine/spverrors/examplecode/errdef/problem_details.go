@@ -2,6 +2,7 @@ package errdef
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/joomcode/errorx"
 )
@@ -29,19 +30,11 @@ func (p *ProblemDetails) FromInternalError(err error) *ProblemDetails {
 		return p
 	}
 
-	for _, trait := range globalTraits {
-		if ex.HasTrait(trait.Trait) {
-			p.PushDetail(trait.Title)
-		}
-	}
-
 	if hint, ok := ex.Property(PropPublicHint); ok {
 		p.PushDetail(fmt.Sprintf("Hint: %v", hint))
 	}
 
-	if instance, ok := ex.Property(PropSpecificProblemOccurrence); ok {
-		p.Instance = fmt.Sprintf("%v", instance)
-	}
+	p.Instance = strings.ReplaceAll(ex.Type().FullName(), ".", "/")
 
 	return p
 }

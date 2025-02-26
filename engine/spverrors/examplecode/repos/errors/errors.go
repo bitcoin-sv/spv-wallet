@@ -1,9 +1,12 @@
 package errors
 
-import "github.com/bitcoin-sv/spv-wallet/engine/spverrors/examplecode/errdef"
+import (
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors/examplecode/errdef"
+	"github.com/joomcode/errorx"
+)
 
-var RepoNamespace = errdef.Internal.NewSubNamespace("repo")
+var RepoNamespace = errorx.NewNamespace("repo")
 
-var DbConnectionFailed = RepoNamespace.NewType("db_connection_failed", errdef.TraitConfig)
-var DbIllegalArgument = RepoNamespace.NewType("db_illegal_argument", errdef.TraitIllegalArgument)
-var DbQueryFailed = RepoNamespace.NewType("db_query_failed")
+var DbConnectionFailed = RepoNamespace.NewType("connection_failed", errdef.TraitConfig)
+var DbQueryFailed = RepoNamespace.NewType("query_failed")
+var DbShouldNeverHappen = RepoNamespace.NewType("should_never_happen", errdef.TraitShouldNeverHappen)

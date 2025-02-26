@@ -2,24 +2,9 @@ package errdef
 
 import "github.com/joomcode/errorx"
 
-var globalTraits []TraitDefinition
-
-type TraitDefinition struct {
-	Title string
-	Trait errorx.Trait
-}
-
-func RegisterTrait(name, title string) errorx.Trait {
-	trait := errorx.RegisterTrait(name)
-	def := TraitDefinition{
-		Title: title,
-		Trait: trait,
-	}
-	globalTraits = append(globalTraits, def)
-	return trait
-}
-
-var TraitConfig = RegisterTrait("config", "Server may be configured incorrectly")
-var TraitIllegalArgument = RegisterTrait("illegal_argument", "Illegal Argument")
-var TraitAuth = RegisterTrait("auth", "Authentication problem")
-var TraitARC = RegisterTrait("arc", "ARC related problem")
+var TraitConfig = errorx.RegisterTrait("config")
+var TraitIllegalArgument = errorx.RegisterTrait("illegal_argument")
+var TraitAuth = errorx.RegisterTrait("auth")
+var TraitARC = errorx.RegisterTrait("arc")
+var TraitShouldNeverHappen = errorx.RegisterTrait("should_never_happen")
+var TraitUnsupported = errorx.RegisterTrait("unsupported")

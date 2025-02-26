@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/bitcoin-sv/spv-wallet/api"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors/examplecode/errdef"
 	repoerr "github.com/bitcoin-sv/spv-wallet/engine/spverrors/examplecode/repos/errors"
 )
 
@@ -21,11 +20,9 @@ func (f *FailingRepo) Search(fail *api.ModelsFailingPoint) ([]string, error) {
 		return nil, repoerr.DbConnectionFailed.Wrap(err, "db connection failed")
 	case api.DbQuery:
 		err := fmt.Errorf("query failed from external lib")
-		return nil, repoerr.DbQueryFailed.
-			Wrap(err, "query failed").
-			WithProperty(errdef.PropSpecificProblemOccurrence, "some specific value")
+		return nil, repoerr.DbQueryFailed.Wrap(err, "query failed")
 	default:
-		return nil, errdef.UnsupportedOperation.NewWithNoMessage()
+		return nil, repoerr.DbShouldNeverHappen.NewWithNoMessage()
 	}
 }
 

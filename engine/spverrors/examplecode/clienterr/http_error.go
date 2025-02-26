@@ -26,12 +26,15 @@ func problemDetailsFromError(err error) (problem errdef.ProblemDetails, level ze
 
 		// map internal error to problem details
 		level = zerolog.WarnLevel
-		problem.Type = ex.Type().FullName()
+		problem.Type = "internal"
 		problem.FromInternalError(ex)
-		if errorx.IsOfType(ex, errdef.UnsupportedOperation) {
+		if errorx.HasTrait(ex, errdef.TraitUnsupported) {
 			problem.Title = "Unsupported operation"
 			problem.Status = 501
 			return
+		}
+		if errorx.HasTrait(ex, errdef.TraitShouldNeverHappen) {
+			problem.Detail = "This should never happen"
 		}
 
 		problem.Title = "Internal Server Error"

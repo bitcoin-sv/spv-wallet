@@ -27,8 +27,7 @@ func (s *Service) DoSth(fail *api.ModelsFailingPoint) ([]string, error) {
 			// NOTE: at domain level we don't know if the argument was provided by external client
 			// or by other services which uses this service.
 			return nil, domainerr.WrongArgument.
-				New("Argument has from format %s", "abc").
-				WithProperty(errdef.PropSpecificProblemOccurrence, "user/123/tx/1fad12")
+				New("Argument has from format %s", "abc")
 		case api.ArcDoubleSpentAttempt:
 			return nil, domainerr.SomeARCError.
 				New("Double spent attempt").
