@@ -1,9 +1,11 @@
 package database
 
 import (
+	"strings"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"gorm.io/gorm"
 )
 
 // TrackedOutput represents an output of a transaction.
@@ -20,15 +22,12 @@ type TrackedOutput struct {
 	UpdatedAt time.Time
 }
 
-// IsSpent returns true if the output is spent.
-func (o *TrackedOutput) IsSpent() bool {
-	return o.SpendingTX != ""
-}
-
-// Outpoint returns bsv.Outpoint object which identifies the output.
-func (o *TrackedOutput) Outpoint() *bsv.Outpoint {
-	return &bsv.Outpoint{
-		TxID: o.TxID,
-		Vout: o.Vout,
-	}
+// AfterFind is a GORM hook that is called after retrieving the record from the database.
+func (o *TrackedOutput) AfterFind(_ *gorm.DB) (err error) {
+	// Trim left spaces from SpendingTX
+	// Because the field is char(64) in the database, it will be padded with spaces.
+	// For some reason the value is padded only on postgres,
+	// so if changing, make sure to check it on all databases.
+	o.SpendingTX = strings.TrimLeft(o.SpendingTX, " ")
+	return nil
 }
