@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-var explicitHTTPURLRegex = regexp.MustCompile(`^https?://`)
+var explicitHTTPURLRegex = regexp.MustCompile(`^https?:\/\/(?:www\.)?[a-zA-Z0-9-]+(?:\.[a-zA-Z]{2,})+(?:\/[^\s]*)?`)
 
 // Paymail is a domain model for existing paymail
 type Paymail struct {
@@ -32,6 +32,7 @@ type NewPaymail struct {
 	UserID     string
 }
 
+// CheckAvatarURL checks if avatar is either empty string or a proper url link
 func (np *NewPaymail) CheckAvatarURL() bool {
 	return np.Avatar == "" || explicitHTTPURLRegex.MatchString(np.Avatar)
 }
