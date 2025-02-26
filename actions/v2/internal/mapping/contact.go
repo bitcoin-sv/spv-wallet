@@ -5,7 +5,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
 	"github.com/bitcoin-sv/spv-wallet/lox"
 	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/samber/lo"
 )
 
@@ -47,15 +46,6 @@ func ContactsResponse(operation *contactsmodels.Contact) api.ModelsContact {
 		UpdatedAt: operation.UpdatedAt,
 		DeletedAt: operation.DeletedAt,
 		CreatedAt: operation.CreatedAt,
-	}
-}
-
-func MapContactsParamToFilterPage(params api.GetContactsParams) filter.Page {
-	return filter.Page{
-		Number: GetPointerValue(params.Page),
-		Size:   GetPointerValue(params.Size),
-		Sort:   GetPointerValue(params.Sort),
-		SortBy: GetPointerValue(params.SortBy),
 	}
 }
 

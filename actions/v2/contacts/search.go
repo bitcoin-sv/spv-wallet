@@ -1,6 +1,7 @@
 package contacts
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/mapping"
@@ -18,7 +19,7 @@ func (s *APIContacts) GetContacts(c *gin.Context, params api.GetContactsParams) 
 		return
 	}
 
-	page := mapping.MapContactsParamToFilterPage(params)
+	page := mapContactsParamToFilterPage(params)
 	conditions := mapping.MapToDBConditions(params)
 
 	pagedResult, err := s.engine.ContactService().PaginatedForUser(c.Request.Context(), userID, page, conditions)
@@ -28,4 +29,13 @@ func (s *APIContacts) GetContacts(c *gin.Context, params api.GetContactsParams) 
 	}
 
 	c.JSON(http.StatusOK, mapping.ContactsPagedResponse(pagedResult))
+}
+
+func mapContactsParamToFilterPage(params api.GetContactsParams) filter.Page {
+	return filter.Page{
+		Number: mapping.GetPointerValue(params.Page),
+		Size:   mapping.GetPointerValue(params.Size),
+		Sort:   mapping.GetPointerValue(params.Sort),
+		SortBy: mapping.GetPointerValue(params.SortBy),
+	}
 }

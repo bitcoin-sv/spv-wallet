@@ -109,7 +109,7 @@ paths:
 
   /api/v2/admin/contacts:
     get:
-      operationId: getContacts
+      operationId: adminGetContacts
       security:
         - XPubAuth:
             - "admin"
@@ -131,16 +131,14 @@ paths:
       responses:
         200:
           $ref: "../components/responses.yaml#/components/responses/SearchContactsSuccess"
-        400:
-          $ref: "../components/responses.yaml#/components/responses/AdminUserBadRequest"
         401:
           $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
         500:
-          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+          $ref: "../components/responses.yaml#/components/responses/ContactSearchInternalServerError"
 
   /api/v2/admin/contacts/{id}:
     post:
-      operationId: updateContact
+      operationId: adminUpdateContact
       security:
         - XPubAuth:
             - "admin"
@@ -165,15 +163,13 @@ paths:
       responses:
         200:
           $ref: "../components/responses.yaml#/components/responses/ContactSuccess"
-        400:
-          $ref: "../components/responses.yaml#/components/responses/AdminUserBadRequest"
         401:
           $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
         500:
-          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+          $ref: "../components/responses.yaml#/components/responses/AdminUpdateContactStatusInternalServerError"
 
     delete:
-      operationId: deleteContact
+      operationId: adminDeleteContact
       security:
         - XPubAuth:
             - "admin"
@@ -192,17 +188,15 @@ paths:
       responses:
         200:
           description: Contact deleted
-        400:
-          $ref: "../components/responses.yaml#/components/responses/AdminUserBadRequest"
         401:
           $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
         500:
-          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+          $ref: "../components/responses.yaml#/components/responses/DeleteContactInternalServerError"
 
 
   /api/v2/admin/contacts/{paymail}:
     post:
-      operationId: createContact
+      operationId: adminCreateContact
       security:
         - XPubAuth:
             - "admin"
@@ -228,15 +222,19 @@ paths:
         200:
           $ref: "../components/responses.yaml#/components/responses/ContactSuccess"
         400:
-          $ref: "../components/responses.yaml#/components/responses/AdminUserBadRequest"
+          $ref: "../components/responses.yaml#/components/responses/AdminCreateContactBadRequest"
         401:
           $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
+        404:
+            $ref: "../components/responses.yaml#/components/responses/AdminCreateContactNotFound"
+        409:
+            $ref: "../components/responses.yaml#/components/responses/AdminCreateContactConflict"
         500:
-          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+          $ref: "../components/responses.yaml#/components/responses/AdminCreateContactInternalServerError"
 
   /api/v2/admin/contacts/confirmations:
     post:
-      operationId: confirmContact
+      operationId: adminConfirmContact
       security:
         - XPubAuth:
             - "admin"
@@ -259,11 +257,11 @@ paths:
         401:
           $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
         500:
-          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+          $ref: "../components/responses.yaml#/components/responses/AdminConfirmContactInternalServerError"
 
   /api/v2/admin/invitations/{id}:
     post:
-      operationId: acceptInvitation
+      operationId: adminAcceptInvitation
       security:
         - XPubAuth:
             - "user"
@@ -283,15 +281,13 @@ paths:
       responses:
         200:
           $ref: "../components/responses.yaml#/components/responses/ContactSuccess"
-        400:
-          $ref: "../components/responses.yaml#/components/responses/AdminUserBadRequest"
         401:
           $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
         500:
-          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+          $ref: "../components/responses.yaml#/components/responses/AdminUpdateContactStatusInternalServerError"
 
     delete:
-      operationId: rejectInvitation
+      operationId: adminRejectInvitation
       security:
         - XPubAuth:
             - "user"
@@ -311,9 +307,7 @@ paths:
       responses:
         200:
           description: Invitation rejected
-        400:
-          $ref: "../components/responses.yaml#/components/responses/AdminUserBadRequest"
         401:
           $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
         500:
-          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+          $ref: "../components/responses.yaml#/components/responses/AdminUpdateContactStatusInternalServerError"

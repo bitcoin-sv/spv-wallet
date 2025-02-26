@@ -728,8 +728,8 @@ type ResponsesUserBadRequest = ErrorsInvalidDataID
 // ResponsesUserNotAuthorized defines model for responses_UserNotAuthorized.
 type ResponsesUserNotAuthorized = ErrorsUserAuthorization
 
-// GetContactsParams defines parameters for GetContacts.
-type GetContactsParams struct {
+// AdminGetContactsParams defines parameters for AdminGetContacts.
+type AdminGetContactsParams struct {
 	// Page Page number for pagination
 	Page *RequestsPageNumber `form:"page,omitempty" json:"page,omitempty"`
 
@@ -812,14 +812,14 @@ type CreateTransactionOutlineParams struct {
 // CreateTransactionOutlineParamsFormat defines parameters for CreateTransactionOutline.
 type CreateTransactionOutlineParamsFormat string
 
-// ConfirmContactJSONRequestBody defines body for ConfirmContact for application/json ContentType.
-type ConfirmContactJSONRequestBody = RequestsAdminConfirmContact
+// AdminConfirmContactJSONRequestBody defines body for AdminConfirmContact for application/json ContentType.
+type AdminConfirmContactJSONRequestBody = RequestsAdminConfirmContact
 
-// UpdateContactJSONRequestBody defines body for UpdateContact for application/json ContentType.
-type UpdateContactJSONRequestBody = RequestsUpdateContact
+// AdminUpdateContactJSONRequestBody defines body for AdminUpdateContact for application/json ContentType.
+type AdminUpdateContactJSONRequestBody = RequestsUpdateContact
 
-// CreateContactJSONRequestBody defines body for CreateContact for application/json ContentType.
-type CreateContactJSONRequestBody = RequestsAdminCreateContact
+// AdminCreateContactJSONRequestBody defines body for AdminCreateContact for application/json ContentType.
+type AdminCreateContactJSONRequestBody = RequestsAdminCreateContact
 
 // CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
 type CreateUserJSONRequestBody = RequestsCreateUser

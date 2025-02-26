@@ -9,7 +9,7 @@ paths:
     /api/v2/admin/contacts:
         get:
             description: This endpoint returns all contacts.
-            operationId: getContacts
+            operationId: adminGetContacts
             parameters:
                 - $ref: '#/components/parameters/requests_PageNumber'
                 - $ref: '#/components/parameters/requests_PageSize'
@@ -38,7 +38,7 @@ paths:
     /api/v2/admin/contacts/{id}:
         delete:
             description: This endpoint deletes contact.
-            operationId: deleteContact
+            operationId: adminDeleteContact
             parameters:
                 - description: Contact ID
                   in: path
@@ -63,7 +63,7 @@ paths:
                 - Admin endpoints
         post:
             description: This endpoint updates contact.
-            operationId: updateContact
+            operationId: adminUpdateContact
             parameters:
                 - description: Contact ID
                   in: path
@@ -95,7 +95,7 @@ paths:
     /api/v2/admin/contacts/{paymail}:
         post:
             description: This endpoint creates contact.
-            operationId: createContact
+            operationId: adminCreateContact
             parameters:
                 - description: Contact paymail
                   in: path
@@ -127,7 +127,7 @@ paths:
     /api/v2/admin/contacts/confirmations:
         post:
             description: This endpoint confirms contact.
-            operationId: confirmContact
+            operationId: adminConfirmContact
             requestBody:
                 content:
                     application/json:
@@ -152,7 +152,7 @@ paths:
     /api/v2/admin/invitations/{id}:
         delete:
             description: This endpoint allows to reject invitation for selected ID
-            operationId: rejectInvitation
+            operationId: adminRejectInvitation
             parameters:
                 - description: ID of the contact that the admin would like to reject
                   in: path
@@ -177,7 +177,7 @@ paths:
                 - Admin endpoints
         post:
             description: This endpoint allows to accept invitation for selected ID
-            operationId: acceptInvitation
+            operationId: adminAcceptInvitation
             parameters:
                 - description: ID of the contact that the admin would like to accept
                   in: path

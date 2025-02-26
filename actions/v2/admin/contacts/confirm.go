@@ -7,7 +7,8 @@ import (
 	"net/http"
 )
 
-func (s *APIAdminContacts) ConfirmContact(c *gin.Context) {
+// AdminConfirmContact confirms a contact between two users.
+func (s *APIAdminContacts) AdminConfirmContact(c *gin.Context) {
 	var reqParams *api.RequestsAdminConfirmContact
 	if err := c.Bind(&reqParams); err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.WithTrace(err), s.logger)
@@ -15,7 +16,7 @@ func (s *APIAdminContacts) ConfirmContact(c *gin.Context) {
 	}
 
 	if err := s.engine.ContactService().AdminConfirmContacts(c.Request.Context(), reqParams.PaymailA, reqParams.PaymailB); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrConfirmContact.WithTrace(err), s.logger)
+		spverrors.ErrorResponse(c, err, s.logger)
 		return
 	}
 

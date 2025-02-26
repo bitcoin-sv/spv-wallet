@@ -15,25 +15,25 @@ import (
 type ServerInterface interface {
 	// Get contacts
 	// (GET /api/v2/admin/contacts)
-	GetContacts(c *gin.Context, params GetContactsParams)
+	AdminGetContacts(c *gin.Context, params AdminGetContactsParams)
 	// Confirm contact
 	// (POST /api/v2/admin/contacts/confirmations)
-	ConfirmContact(c *gin.Context)
+	AdminConfirmContact(c *gin.Context)
 	// Delete contact
 	// (DELETE /api/v2/admin/contacts/{id})
-	DeleteContact(c *gin.Context, id int)
+	AdminDeleteContact(c *gin.Context, id int)
 	// Update contact
 	// (POST /api/v2/admin/contacts/{id})
-	UpdateContact(c *gin.Context, id int)
+	AdminUpdateContact(c *gin.Context, id int)
 	// Create contact
 	// (POST /api/v2/admin/contacts/{paymail})
-	CreateContact(c *gin.Context, paymail string)
+	AdminCreateContact(c *gin.Context, paymail string)
 	// Reject invitation
 	// (DELETE /api/v2/admin/invitations/{id})
-	RejectInvitation(c *gin.Context, id int)
+	AdminRejectInvitation(c *gin.Context, id int)
 	// Accept invitation
 	// (POST /api/v2/admin/invitations/{id})
-	AcceptInvitation(c *gin.Context, id int)
+	AdminAcceptInvitation(c *gin.Context, id int)
 	// Get admin status
 	// (GET /api/v2/admin/status)
 	AdminStatus(c *gin.Context)
@@ -99,15 +99,15 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(c *gin.Context)
 
-// GetContacts operation middleware
-func (siw *ServerInterfaceWrapper) GetContacts(c *gin.Context) {
+// AdminGetContacts operation middleware
+func (siw *ServerInterfaceWrapper) AdminGetContacts(c *gin.Context) {
 
 	var err error
 
 	c.Set(XPubAuthScopes, []string{"admin"})
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params GetContactsParams
+	var params AdminGetContactsParams
 
 	// ------------- Optional query parameter "page" -------------
 
@@ -188,11 +188,11 @@ func (siw *ServerInterfaceWrapper) GetContacts(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetContacts(c, params)
+	siw.Handler.AdminGetContacts(c, params)
 }
 
-// ConfirmContact operation middleware
-func (siw *ServerInterfaceWrapper) ConfirmContact(c *gin.Context) {
+// AdminConfirmContact operation middleware
+func (siw *ServerInterfaceWrapper) AdminConfirmContact(c *gin.Context) {
 
 	c.Set(XPubAuthScopes, []string{"admin"})
 
@@ -203,11 +203,11 @@ func (siw *ServerInterfaceWrapper) ConfirmContact(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.ConfirmContact(c)
+	siw.Handler.AdminConfirmContact(c)
 }
 
-// DeleteContact operation middleware
-func (siw *ServerInterfaceWrapper) DeleteContact(c *gin.Context) {
+// AdminDeleteContact operation middleware
+func (siw *ServerInterfaceWrapper) AdminDeleteContact(c *gin.Context) {
 
 	var err error
 
@@ -229,11 +229,11 @@ func (siw *ServerInterfaceWrapper) DeleteContact(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.DeleteContact(c, id)
+	siw.Handler.AdminDeleteContact(c, id)
 }
 
-// UpdateContact operation middleware
-func (siw *ServerInterfaceWrapper) UpdateContact(c *gin.Context) {
+// AdminUpdateContact operation middleware
+func (siw *ServerInterfaceWrapper) AdminUpdateContact(c *gin.Context) {
 
 	var err error
 
@@ -255,11 +255,11 @@ func (siw *ServerInterfaceWrapper) UpdateContact(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.UpdateContact(c, id)
+	siw.Handler.AdminUpdateContact(c, id)
 }
 
-// CreateContact operation middleware
-func (siw *ServerInterfaceWrapper) CreateContact(c *gin.Context) {
+// AdminCreateContact operation middleware
+func (siw *ServerInterfaceWrapper) AdminCreateContact(c *gin.Context) {
 
 	var err error
 
@@ -281,11 +281,11 @@ func (siw *ServerInterfaceWrapper) CreateContact(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.CreateContact(c, paymail)
+	siw.Handler.AdminCreateContact(c, paymail)
 }
 
-// RejectInvitation operation middleware
-func (siw *ServerInterfaceWrapper) RejectInvitation(c *gin.Context) {
+// AdminRejectInvitation operation middleware
+func (siw *ServerInterfaceWrapper) AdminRejectInvitation(c *gin.Context) {
 
 	var err error
 
@@ -307,11 +307,11 @@ func (siw *ServerInterfaceWrapper) RejectInvitation(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.RejectInvitation(c, id)
+	siw.Handler.AdminRejectInvitation(c, id)
 }
 
-// AcceptInvitation operation middleware
-func (siw *ServerInterfaceWrapper) AcceptInvitation(c *gin.Context) {
+// AdminAcceptInvitation operation middleware
+func (siw *ServerInterfaceWrapper) AdminAcceptInvitation(c *gin.Context) {
 
 	var err error
 
@@ -333,7 +333,7 @@ func (siw *ServerInterfaceWrapper) AcceptInvitation(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.AcceptInvitation(c, id)
+	siw.Handler.AdminAcceptInvitation(c, id)
 }
 
 // AdminStatus operation middleware
@@ -870,13 +870,13 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.GET(options.BaseURL+"/api/v2/admin/contacts", wrapper.GetContacts)
-	router.POST(options.BaseURL+"/api/v2/admin/contacts/confirmations", wrapper.ConfirmContact)
-	router.DELETE(options.BaseURL+"/api/v2/admin/contacts/:id", wrapper.DeleteContact)
-	router.POST(options.BaseURL+"/api/v2/admin/contacts/:id", wrapper.UpdateContact)
-	router.POST(options.BaseURL+"/api/v2/admin/contacts/:paymail", wrapper.CreateContact)
-	router.DELETE(options.BaseURL+"/api/v2/admin/invitations/:id", wrapper.RejectInvitation)
-	router.POST(options.BaseURL+"/api/v2/admin/invitations/:id", wrapper.AcceptInvitation)
+	router.GET(options.BaseURL+"/api/v2/admin/contacts", wrapper.AdminGetContacts)
+	router.POST(options.BaseURL+"/api/v2/admin/contacts/confirmations", wrapper.AdminConfirmContact)
+	router.DELETE(options.BaseURL+"/api/v2/admin/contacts/:id", wrapper.AdminDeleteContact)
+	router.POST(options.BaseURL+"/api/v2/admin/contacts/:id", wrapper.AdminUpdateContact)
+	router.POST(options.BaseURL+"/api/v2/admin/contacts/:paymail", wrapper.AdminCreateContact)
+	router.DELETE(options.BaseURL+"/api/v2/admin/invitations/:id", wrapper.AdminRejectInvitation)
+	router.POST(options.BaseURL+"/api/v2/admin/invitations/:id", wrapper.AdminAcceptInvitation)
 	router.GET(options.BaseURL+"/api/v2/admin/status", wrapper.AdminStatus)
 	router.POST(options.BaseURL+"/api/v2/admin/users", wrapper.CreateUser)
 	router.GET(options.BaseURL+"/api/v2/admin/users/:id", wrapper.UserById)

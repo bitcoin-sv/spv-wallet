@@ -9,7 +9,8 @@ import (
 	"net/http"
 )
 
-func (s *APIAdminContacts) UpdateContact(c *gin.Context, id int) {
+// AdminUpdateContact updates a contact.
+func (s *APIAdminContacts) AdminUpdateContact(c *gin.Context, id int) {
 	var requestBody api.RequestsUpdateContact
 	err := c.ShouldBindWith(&requestBody, binding.JSON)
 	if err != nil {

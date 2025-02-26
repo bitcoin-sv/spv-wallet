@@ -6,7 +6,8 @@ import (
 	"net/http"
 )
 
-func (s *APIAdminContacts) RejectInvitation(c *gin.Context, id int) {
+// AdminRejectInvitation rejects an invitation from a contact.
+func (s *APIAdminContacts) AdminRejectInvitation(c *gin.Context, id int) {
 	_, err := s.engine.ContactService().RejectContactByID(c.Request.Context(), uint(id))
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)

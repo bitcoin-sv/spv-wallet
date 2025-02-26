@@ -6,13 +6,13 @@ import (
 	"net/http"
 )
 
-// DeleteContact deletes a contact
-func (s *APIAdminContacts) DeleteContact(c *gin.Context, id int) {
+// AdminDeleteContact deletes a contact
+func (s *APIAdminContacts) AdminDeleteContact(c *gin.Context, id int) {
 	err := s.engine.ContactService().RemoveContactByID(c.Request.Context(), uint(id))
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrDeleteContact.WithTrace(err), s.logger)
+		spverrors.ErrorResponse(c, err, s.logger)
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.Status(http.StatusOK)
 }

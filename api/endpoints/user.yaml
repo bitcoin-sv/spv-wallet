@@ -174,7 +174,7 @@ paths:
         401:
           $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
         500:
-          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+          $ref: "../components/responses.yaml#/components/responses/ContactSearchInternalServerError"
 
 
   /api/v2/contacts/{paymail}:
@@ -205,13 +205,14 @@ paths:
       responses:
         200:
           $ref: "../components/responses.yaml#/components/responses/ContactSuccess"
-        #                TODO: update
-        #        400:
-        #          $ref: "../components/responses.yaml#/components/responses/UpsertContactBadRequest"
+        400:
+          $ref: "../components/responses.yaml#/components/responses/UpsertContactBadRequest"
         401:
           $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        404:
+            $ref: "../components/responses.yaml#/components/responses/UpsertContactNotFound"
         500:
-          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+          $ref: "../components/responses.yaml#/components/responses/ContactUpsertInternalServerError"
 
     get:
       operationId: getContact
@@ -236,8 +237,10 @@ paths:
           $ref: "../components/responses.yaml#/components/responses/ContactSuccess"
         401:
           $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        404:
+          $ref: "../components/responses.yaml#/components/responses/ContactNotFound"
         500:
-          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+          $ref: "../components/responses.yaml#/components/responses/GetContactInternalServerError"
 
     delete:
       operationId: removeContact
@@ -260,13 +263,10 @@ paths:
       responses:
         200:
           description: Success - contact removed
-        #       TODO: update
-        #        400:
-        #          $ref: "../components/responses.yaml#/components/responses/UpsertContactBadRequest"
         401:
           $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
         500:
-          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+          $ref: "../components/responses.yaml#/components/responses/DeleteContactInternalServerError"
 
   /api/v2/contacts/{paymail}/confirmation:
     post:
@@ -290,11 +290,12 @@ paths:
       responses:
         200:
           description: Success - contact confirmed
-        #       TODO: update
-        #        400:
-        #          $ref: "../components/responses.yaml#/components/responses/UpsertContactBadRequest"
+        400:
+          $ref: "../components/responses.yaml#/components/responses/UpdateContactBadRequest"
         401:
           $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        404:
+          $ref: "../components/responses.yaml#/components/responses/ContactNotFound"
         500:
           $ref: "../components/responses.yaml#/components/responses/InternalServerError"
 
@@ -319,11 +320,12 @@ paths:
       responses:
         200:
           description: Success - contact removed
-        #       TODO: update
-        #        400:
-        #          $ref: "../components/responses.yaml#/components/responses/UpsertContactBadRequest"
+        400:
+          $ref: "../components/responses.yaml#/components/responses/UpdateContactBadRequest"
         401:
           $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        404:
+          $ref: "../components/responses.yaml#/components/responses/ContactNotFound"
         500:
           $ref: "../components/responses.yaml#/components/responses/InternalServerError"
 
@@ -349,8 +351,12 @@ paths:
       responses:
         200:
           description: Success - invitation removed
+        400:
+          $ref: "../components/responses.yaml#/components/responses/UpdateContactBadRequest"
         401:
           $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        404:
+          $ref: "../components/responses.yaml#/components/responses/ContactNotFound"
         500:
           $ref: "../components/responses.yaml#/components/responses/InternalServerError"
 
@@ -376,7 +382,11 @@ paths:
       responses:
         200:
           description: Success - invitation accepted
+        400:
+          $ref: "../components/responses.yaml#/components/responses/UpdateContactBadRequest"
         401:
           $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        404:
+          $ref: "../components/responses.yaml#/components/responses/ContactNotFound"
         500:
           $ref: "../components/responses.yaml#/components/responses/InternalServerError"

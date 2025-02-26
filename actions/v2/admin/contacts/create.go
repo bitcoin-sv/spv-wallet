@@ -9,7 +9,8 @@ import (
 	"net/http"
 )
 
-func (s *APIAdminContacts) CreateContact(c *gin.Context, paymail string) {
+// AdminCreateContact creates a new contact for a user.
+func (s *APIAdminContacts) AdminCreateContact(c *gin.Context, paymail string) {
 	var req api.RequestsAdminCreateContact
 	if err := c.Bind(&req); err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.WithTrace(err), s.logger)

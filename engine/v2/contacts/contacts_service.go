@@ -36,7 +36,7 @@ func (s *Service) UpsertContact(ctx context.Context, newContact contactsmodels.N
 	rAlias, rDomain, rAddress := goPaymail.SanitizePaymail(newContact.RequesterPaymail)
 	rPaymail, err := s.paymailAddressService.Find(ctx, rAlias, rDomain)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.ErrCouldNotFindPaymail.WithTrace(err)
 	}
 
 	if rPaymail.UserID != newContact.UserID {
@@ -48,14 +48,14 @@ func (s *Service) UpsertContact(ctx context.Context, newContact contactsmodels.N
 		return nil, spverrors.ErrContactInvalidPaymail
 	}
 
-	contact, err := s.Find(ctx, newContact.UserID, newContact.NewContactPaymail)
-	if err != nil {
-		return nil, err
-	}
-
 	contactPKI, err := s.paymailService.GetPkiForPaymail(ctx, contactPaymail)
 	if err != nil {
 		return nil, spverrors.ErrGettingPKIFailed
+	}
+
+	contact, err := s.Find(ctx, newContact.UserID, newContact.NewContactPaymail)
+	if err != nil {
+		return nil, spverrors.ErrGetContact.Wrap(err)
 	}
 
 	newContact.NewContactPubKey = contactPKI.PubKey
@@ -64,7 +64,7 @@ func (s *Service) UpsertContact(ctx context.Context, newContact contactsmodels.N
 		newContact.Status = contact.Status
 		c, err := s.contactsRepo.Update(ctx, newContact)
 		if err != nil {
-			return nil, err
+			return nil, spverrors.ErrUpdateContact.WithTrace(err)
 		}
 
 		return c, nil
@@ -74,7 +74,7 @@ func (s *Service) UpsertContact(ctx context.Context, newContact contactsmodels.N
 
 	c, err := s.contactsRepo.Create(ctx, newContact)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.ErrSaveContact.WithTrace(err)
 	}
 
 	requesterContactRequest := goPaymail.PikeContactRequestPayload{
@@ -146,7 +146,7 @@ func (s *Service) Find(ctx context.Context, userID, paymail string) (*contactsmo
 func (s *Service) PaginatedForUser(ctx context.Context, userID string, page filter.Page, conditions map[string]interface{}) (*models.PagedResult[contactsmodels.Contact], error) {
 	entities, err := s.contactsRepo.PaginatedForUser(ctx, userID, page, conditions)
 	if err != nil {
-		return nil, spverrors.Wrapf(err, "failed to get contacts for user")
+		return nil, spverrors.ErrContactFailedToGetPaginatedResults.WithTrace(err)
 	}
 
 	return entities, nil
@@ -156,7 +156,7 @@ func (s *Service) PaginatedForUser(ctx context.Context, userID string, page filt
 func (s *Service) PaginatedForAdmin(ctx context.Context, page filter.Page, conditions map[string]interface{}) (*models.PagedResult[contactsmodels.Contact], error) {
 	entities, err := s.contactsRepo.PaginatedForAdmin(ctx, page, conditions)
 	if err != nil {
-		return nil, spverrors.Wrapf(err, "failed to get contacts for user")
+		return nil, spverrors.ErrContactFailedToGetPaginatedResults.WithTrace(err)
 	}
 
 	return entities, nil
@@ -165,7 +165,7 @@ func (s *Service) PaginatedForAdmin(ctx context.Context, page filter.Page, condi
 func (s *Service) UpdateFullNameByID(ctx context.Context, contactID uint, fullName string) (*contactsmodels.Contact, error) {
 	c, err := s.contactsRepo.UpdateByID(ctx, contactID, fullName)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.ErrUpdateContactStatus.WithTrace(err)
 	}
 
 	return c, nil
@@ -173,12 +173,22 @@ func (s *Service) UpdateFullNameByID(ctx context.Context, contactID uint, fullNa
 
 // RemoveContact deletes a contact
 func (s *Service) RemoveContact(ctx context.Context, userID, paymail string) error {
-	return s.contactsRepo.Delete(ctx, userID, paymail)
+	err := s.contactsRepo.Delete(ctx, userID, paymail)
+	if err != nil {
+		return spverrors.ErrDeleteContact.WithTrace(err)
+	}
+
+	return nil
 }
 
 // RemoveContactByID deletes a contact by ID
 func (s *Service) RemoveContactByID(ctx context.Context, contactID uint) error {
-	return s.contactsRepo.DeleteByID(ctx, contactID)
+	err := s.contactsRepo.DeleteByID(ctx, contactID)
+	if err != nil {
+		return spverrors.ErrDeleteContact.WithTrace(err)
+	}
+
+	return nil
 }
 
 // ConfirmContact confirms a contact
@@ -186,10 +196,13 @@ func (s *Service) ConfirmContact(ctx context.Context, userID, paymail string) er
 	contact, err := s.Find(ctx, userID, paymail)
 	if err != nil {
 		return err
+	} else if contact == nil {
+		return spverrors.ErrContactNotFound.WithTrace(err)
 	}
 
 	if contact.Status != contactsmodels.ContactNotConfirmed {
-		return spverrors.Newf("cannot confirm contact. Reason: status: %s, expected: %s", contact.Status, contactsmodels.ContactNotConfirmed)
+		s.log.Error().Msgf("cannot confirm contact. Reason: status: %s, expected: %s", contact.Status, contactsmodels.ContactNotConfirmed)
+		return spverrors.ErrContactInWrongStatus.WithTrace(err)
 	}
 
 	return s.contactsRepo.UpdateStatus(ctx, userID, paymail, contactsmodels.ContactConfirmed)
@@ -200,10 +213,13 @@ func (s *Service) UnconfirmContact(ctx context.Context, userID, paymail string) 
 	contact, err := s.Find(ctx, userID, paymail)
 	if err != nil {
 		return err
+	} else if contact == nil {
+		return spverrors.ErrContactNotFound.WithTrace(err)
 	}
 
 	if contact.Status != contactsmodels.ContactConfirmed {
-		return spverrors.Newf("cannot unconfirm contact. Reason: status: %s, expected: %s", contact.Status, contactsmodels.ContactConfirmed)
+		s.log.Error().Msgf("cannot unconfirm contact. Reason: status: %s, expected: %s", contact.Status, contactsmodels.ContactConfirmed)
+		return spverrors.ErrContactInWrongStatus.WithTrace(err)
 	}
 
 	return s.contactsRepo.UpdateStatus(ctx, userID, paymail, contactsmodels.ContactNotConfirmed)
@@ -214,10 +230,13 @@ func (s *Service) AcceptContact(ctx context.Context, userID, paymail string) err
 	contact, err := s.Find(ctx, userID, paymail)
 	if err != nil {
 		return err
+	} else if contact == nil {
+		return spverrors.ErrContactNotFound.WithTrace(err)
 	}
 
 	if contact.Status != contactsmodels.ContactAwaitAccept {
-		return spverrors.Newf("cannot accept contact. Reason: status: %s, expected: %s", contact.Status, contactsmodels.ContactAwaitAccept)
+		s.log.Error().Msgf("cannot accept contact. Reason: status: %s, expected: %s", contact.Status, contactsmodels.ContactAwaitAccept)
+		return spverrors.ErrContactInWrongStatus.WithTrace(err)
 	}
 
 	return s.contactsRepo.UpdateStatus(ctx, userID, paymail, contactsmodels.ContactNotConfirmed)
@@ -227,7 +246,7 @@ func (s *Service) AcceptContact(ctx context.Context, userID, paymail string) err
 func (s *Service) AcceptContactByID(ctx context.Context, id uint) (*contactsmodels.Contact, error) {
 	contact, err := s.contactsRepo.UpdateStatusByID(ctx, id, contactsmodels.ContactNotConfirmed)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.ErrUpdateContactStatus.WithTrace(err)
 	}
 
 	return contact, nil
@@ -238,10 +257,13 @@ func (s *Service) RejectContact(ctx context.Context, userID, paymail string) err
 	contact, err := s.Find(ctx, userID, paymail)
 	if err != nil {
 		return err
+	} else if contact == nil {
+		return spverrors.ErrContactNotFound.WithTrace(err)
 	}
 
 	if contact.Status != contactsmodels.ContactAwaitAccept {
-		return spverrors.Newf("cannot reject contact. Reason: status: %s, expected: %s", contact.Status, contactsmodels.ContactConfirmed)
+		s.log.Error().Msgf("cannot reject contact. Reason: status: %s, expected: %s", contact.Status, contactsmodels.ContactAwaitAccept)
+		return spverrors.ErrContactInWrongStatus.WithTrace(err)
 	}
 
 	return s.contactsRepo.Delete(ctx, userID, paymail)
@@ -251,7 +273,7 @@ func (s *Service) RejectContact(ctx context.Context, userID, paymail string) err
 func (s *Service) RejectContactByID(ctx context.Context, id uint) (*contactsmodels.Contact, error) {
 	contact, err := s.contactsRepo.UpdateStatusByID(ctx, id, contactsmodels.ContactRejected)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.ErrUpdateContactStatus.WithTrace(err)
 	}
 
 	return contact, nil
@@ -260,18 +282,21 @@ func (s *Service) RejectContactByID(ctx context.Context, id uint) (*contactsmode
 // AdminCreateContact creates a new contact for the provided paymail
 func (s *Service) AdminCreateContact(ctx context.Context, newContact contactsmodels.NewContact) (*contactsmodels.Contact, error) {
 	err := validateNewContact(newContact)
+	if err != nil {
+		return nil, err
+	}
 
 	rAlias, rDomain, _ := goPaymail.SanitizePaymail(newContact.RequesterPaymail)
 	rPaymailAddr, err := s.paymailAddressService.Find(ctx, rAlias, rDomain)
 	if err != nil {
-		return nil, spverrors.ErrCouldNotFindPaymail.Wrap(err)
+		return nil, spverrors.ErrCouldNotFindPaymail.WithTrace(err)
 	} else if rPaymailAddr == nil {
 		return nil, spverrors.ErrCouldNotFindPaymail
 	}
 
 	contact, err := s.Find(ctx, rPaymailAddr.UserID, newContact.NewContactPaymail)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.ErrGetContact.WithTrace(err)
 	} else if contact != nil {
 		return nil, spverrors.ErrContactAlreadyExists
 	}
@@ -300,17 +325,17 @@ func (s *Service) AdminCreateContact(ctx context.Context, newContact contactsmod
 func (s *Service) AdminConfirmContacts(ctx context.Context, paymailA, paymailB string) error {
 	contactA, contactB, err := s.retrieveContacts(ctx, paymailA, paymailB)
 	if err != nil {
-		return spverrors.ErrGetContact.Wrap(err)
+		return spverrors.ErrGetContact.WithTrace(err)
 	}
 
 	err = s.contactsRepo.UpdateStatus(ctx, contactA.UserID, contactA.Paymail, contactsmodels.ContactConfirmed)
 	if err != nil {
-		return spverrors.ErrUpdateContactStatus.Wrap(err)
+		return spverrors.ErrUpdateContactStatus.WithTrace(err)
 	}
 
 	err = s.contactsRepo.UpdateStatus(ctx, contactB.UserID, contactB.Paymail, contactsmodels.ContactConfirmed)
 	if err != nil {
-		return spverrors.ErrUpdateContactStatus.Wrap(err)
+		return spverrors.ErrUpdateContactStatus.WithTrace(err)
 	}
 
 	return nil
