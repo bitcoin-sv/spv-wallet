@@ -41,5 +41,5 @@ var ErrGettingAddressFromPublicKey = models.SPVError{
 var ErrGettingLockingScript = models.SPVError{
 	Code:       "error-getting-locking-script",
 	Message:    "Failed to get locking script from address",
-	StatusCode: 500,
+	StatusCode: 422,
 }
