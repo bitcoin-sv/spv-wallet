@@ -32,6 +32,15 @@ func Test(t *testing.T) {
 			txInfo:       minimalTxInfo(chainmodels.SeenOnNetwork),
 			expectStatus: "BROADCASTED",
 		},
+		"On Mined without BUMP don't change status": {
+			txInfo: chainmodels.TXInfo{
+				TXStatus:    chainmodels.Mined,
+				BlockHash:   "00000000000000000f0905597b6cac80031f0f56834e74dce1a714c682a9ed38",
+				BlockHeight: 885803,
+				Timestamp:   time.Now(),
+			},
+			expectStatus: "BROADCASTED",
+		},
 		"On DoubleSpendAttempted mark as problematic": {
 			txInfo:       minimalTxInfo(chainmodels.DoubleSpendAttempted),
 			expectStatus: "PROBLEMATIC",
@@ -79,7 +88,7 @@ func Test(t *testing.T) {
 				WithTxID(receiveTxID).
 				WithTxStatus(test.expectStatus)
 
-			// TODO: Assert for tx block height and BEEF
+			// TODO: Assert for tx block height/hash and BEEF after Searching Transactions is implemented
 		})
 	}
 }

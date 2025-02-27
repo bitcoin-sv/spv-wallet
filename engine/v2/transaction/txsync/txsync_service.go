@@ -45,9 +45,29 @@ func (s *Service) Handle(ctx context.Context, txInfo chainmodels.TXInfo) error {
 	if err != nil {
 		return spverrors.Wrapf(err, "failed to parse merkle path for transaction %s", txInfo.TxID)
 	}
-	_ = bump
 
-	err = s.transactionsRepo.SetAsMined(ctx, txInfo.TxID, txInfo.BlockHash, txInfo.BlockHeight)
+	hex, isBEEF, err := s.transactionsRepo.GetTransactionHex(ctx, txInfo.TxID)
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to get transaction hex for transaction %s", txInfo.TxID)
+	}
+	var tx *trx.Transaction
+	if isBEEF {
+		tx, err = trx.NewTransactionFromBEEFHex(hex)
+	} else {
+		tx, err = trx.NewTransactionFromHex(hex)
+	}
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to parse transaction hex for transaction %s", txInfo.TxID)
+	}
+
+	tx.MerklePath = bump
+
+	beefHex, err := tx.BEEFHex()
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to get BEEF hex for transaction %s", txInfo.TxID)
+	}
+
+	err = s.transactionsRepo.SetAsMined(ctx, txInfo.TxID, txInfo.BlockHash, txInfo.BlockHeight, beefHex)
 	if err != nil {
 		return spverrors.Wrapf(err, "failed to set MINED status for transaction %s", txInfo.TxID)
 	}
