@@ -10,6 +10,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// blockHeight is used to generate different block height for each use of fixture.
+var blockHeight = uint32(1000)
+
 // grandparentTXIDs are used to indicate prevTXID for parentTXs(source transactions)
 // [grandparentTX] -> [parentTX] -> [tx]
 // tx is the actual transaction that is being created
@@ -58,7 +61,6 @@ type txSpec struct {
 
 	grandparentTXIndex int
 	sourceTransactions map[string]*trx.Transaction
-	blockHeight        uint32
 	sender             User
 	recipient          User
 }
@@ -67,7 +69,6 @@ type txSpec struct {
 func GivenTX(t testing.TB) GivenTXSpec {
 	return &txSpec{
 		t:                  t,
-		blockHeight:        1000,
 		grandparentTXIndex: 0,
 		sourceTransactions: make(map[string]*trx.Transaction),
 		sender:             Sender,
@@ -299,8 +300,8 @@ func (spec *txSpec) getNextGrandparentTXID() string {
 }
 
 func (spec *txSpec) getNextBlockHeight() uint32 {
-	h := spec.blockHeight
-	spec.blockHeight++
+	h := blockHeight
+	blockHeight++
 	return h
 }
 
