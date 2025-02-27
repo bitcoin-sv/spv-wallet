@@ -35,6 +35,22 @@ func (t *Transactions) SetStatus(ctx context.Context, txID string, status txmode
 	return nil
 }
 
+func (t *Transactions) SetAsMined(ctx context.Context, txID string, blockHash string, blockHeight int64) error {
+	err := t.db.
+		Model(&database.TrackedTransaction{}).
+		WithContext(ctx).
+		Where("id = ?", txID).
+		Updates(map[string]any{
+			"block_hash":   blockHash,
+			"block_height": blockHeight,
+			"tx_status":    txmodels.TxStatusMined,
+		}).Error
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to update transaction as mined for %s", txID)
+	}
+	return nil
+}
+
 // HasTransactionInputSources checks if all the provided input source transaction IDs exist in the database.
 // If all of them are found, the transaction data can be serialized into Raw HEX format.
 // Otherwise, serialization should be done using the BEEFHex format.

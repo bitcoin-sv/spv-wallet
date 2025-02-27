@@ -243,7 +243,8 @@ func (c *Client) loadChainService() {
 
 func (c *Client) loadTxSyncService() {
 	if c.options.txSync == nil {
-		c.options.txSync = txsync.NewService(c.Repositories().Transactions)
+		logger := c.Logger().With().Str("subservice", "tx_sync").Logger()
+		c.options.txSync = txsync.NewService(logger, c.Repositories().Transactions)
 	}
 }
 
