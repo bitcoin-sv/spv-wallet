@@ -150,11 +150,12 @@ func TestTransactionWithExternalPaymailTransfer(t *testing.T) {
 func TestTransactionToTopUpRegressionTests(t *testing.T) {
 	t.Skip("don't run yet")
 
-	// multiplier How many outputs in transaction (WARN! it will multiply the payment amount from state.yaml)
+	// multiplier - How many outputs in transaction (WARN! it will multiply the payment amount from state.yaml)
 	multiplier := 100
 
-	// times How many transactions to create (WARN! each transaction will have amount of payment multiplied by multiplier)
-	// in other words, WHEN:
+	// times - How many transactions to create (WARN! each transaction will have amount of payment multiplied by multiplier)
+	// for example:
+	// WHEN:
 	// payment amount = 11
 	// multiplier = 100
 	// times = 10
