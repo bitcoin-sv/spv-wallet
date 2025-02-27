@@ -27,7 +27,7 @@ var ErrType42DerivationFailed = models.SPVError{
 var ErrUnknownInstructionType = models.SPVError{
 	Code:       "error-unknown-instruction-type",
 	Message:    "Unknown instruction type",
-	StatusCode: 500,
+	StatusCode: 400,
 }
 
 // ErrGettingAddressFromPublicKey is returned when an address cannot be derived from a public key
