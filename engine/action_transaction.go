@@ -337,6 +337,8 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 // HandleTxCallback will update the broadcast callback transaction info, like: block height, block hash, status, bump.
 func (c *Client) HandleTxCallback(ctx context.Context, callbackResp *chainmodels.TXInfo) error {
 	logger := c.options.logger
+	logger.Trace().Msgf("handling tx callback from ARC for TX: %v", callbackResp.TxID)
+
 	bump, err := trx.NewMerklePathFromHex(callbackResp.MerklePath)
 
 	if err != nil {
