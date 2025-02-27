@@ -29,7 +29,7 @@ type ActorsActions interface {
 }
 
 type ARCActions interface {
-	Callbacks(txInfo chainmodels.TXInfo)
+	ReceivesCallback(txInfo chainmodels.TXInfo)
 }
 
 type actions struct {

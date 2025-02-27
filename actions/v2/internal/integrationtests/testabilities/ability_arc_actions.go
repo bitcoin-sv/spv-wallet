@@ -14,7 +14,7 @@ type arcActions struct {
 	fixture *fixture
 }
 
-func (a *arcActions) Callbacks(txInfo chainmodels.TXInfo) {
+func (a *arcActions) ReceivesCallback(txInfo chainmodels.TXInfo) {
 	client := a.fixture.HttpClient().ForAnonymous()
 
 	res, _ := client.R().

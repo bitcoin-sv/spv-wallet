@@ -81,7 +81,7 @@ func Test(t *testing.T) {
 
 			// when:
 			test.txInfo.TxID = receiveTxID
-			when.ARC().Callbacks(test.txInfo)
+			when.ARC().ReceivesCallback(test.txInfo)
 
 			// then:
 			then.Alice().Operations().Last().
