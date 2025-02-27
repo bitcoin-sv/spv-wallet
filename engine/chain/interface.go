@@ -2,7 +2,6 @@ package chain
 
 import (
 	"context"
-	"github.com/gin-gonic/gin"
 	"net/url"
 
 	"github.com/bitcoin-sv/go-paymail/spv"
@@ -10,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/gin-gonic/gin"
 )
 
 // ARCService for querying ARC server.

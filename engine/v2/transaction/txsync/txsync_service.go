@@ -2,19 +2,21 @@ package txsync
 
 import (
 	"context"
-	trx "github.com/bitcoin-sv/go-sdk/transaction"
-	"github.com/rs/zerolog"
 
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
+	"github.com/rs/zerolog"
 )
 
+// Service is meant to handle the ARC callback and update the transaction status in the database.
 type Service struct {
 	logger           zerolog.Logger
 	transactionsRepo TransactionsRepo
 }
 
+// NewService creates a new transaction sync service.
 func NewService(logger zerolog.Logger, transactionsRepo TransactionsRepo) *Service {
 	return &Service{
 		transactionsRepo: transactionsRepo,
@@ -22,6 +24,7 @@ func NewService(logger zerolog.Logger, transactionsRepo TransactionsRepo) *Servi
 	}
 }
 
+// Handle processes the ARC callback and updates the transaction status in the database.
 func (s *Service) Handle(ctx context.Context, txInfo chainmodels.TXInfo) error {
 	if txInfo.TxID == "" {
 		return spverrors.Newf("Received ARC callback with empty transaction ID")

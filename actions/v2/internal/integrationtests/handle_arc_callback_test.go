@@ -1,12 +1,12 @@
 package integrationtests
 
 import (
-	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
-	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"testing"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/integrationtests/testabilities"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 )
 
 func Test(t *testing.T) {

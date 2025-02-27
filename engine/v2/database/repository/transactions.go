@@ -2,13 +2,13 @@ package repository
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"maps"
 	"slices"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/beef"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"gorm.io/gorm"
 )
 
@@ -23,6 +23,8 @@ func NewTransactions(db *gorm.DB) *Transactions {
 	return &Transactions{db: db}
 }
 
+// SetStatus updates the transaction status in the database.
+// NOTE: For MINED status use SetAsMined instead.
 func (t *Transactions) SetStatus(ctx context.Context, txID string, status txmodels.TxStatus) error {
 	err := t.db.
 		Model(&database.TrackedTransaction{}).
@@ -35,6 +37,7 @@ func (t *Transactions) SetStatus(ctx context.Context, txID string, status txmode
 	return nil
 }
 
+// SetAsMined updates the transaction status to Mined and sets the block hash, height, and BEEF hex.
 func (t *Transactions) SetAsMined(ctx context.Context, txID string, blockHash string, blockHeight int64, beefHex string) error {
 	err := t.db.
 		Model(&database.TrackedTransaction{}).
@@ -52,6 +55,7 @@ func (t *Transactions) SetAsMined(ctx context.Context, txID string, blockHash st
 	return nil
 }
 
+// GetTransactionHex retrieves the serialized transaction data in HEX format and determines if it is in BEEF format or Raw.
 func (t *Transactions) GetTransactionHex(ctx context.Context, txID string) (hex string, isBEEF bool, err error) {
 	var record database.TrackedTransaction
 	err = t.db.

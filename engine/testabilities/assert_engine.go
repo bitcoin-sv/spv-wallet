@@ -1,13 +1,13 @@
 package testabilities
 
 import (
-	sdk "github.com/bitcoin-sv/go-sdk/transaction"
-	"github.com/bitcoin-sv/spv-wallet/engine/tester"
-	"github.com/bitcoin-sv/spv-wallet/engine/tester/jsonrequire"
 	"testing"
 
+	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	testpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/jsonrequire"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/stretchr/testify/require"
 )

@@ -13,6 +13,7 @@ import (
 const callbackPath = "/arc/broadcast/callback"
 const bearerSchema = "Bearer "
 
+// RegisterCallback registers the ARC callback handler and sets up final URL sent to ARC during broadcast.
 func (s *Service) RegisterCallback(handler chainmodels.TXInfoHandler, router *gin.Engine) {
 	if s.arcCfg.Callback == nil {
 		s.logger.Info().Msg("Skipping ARC callback registration as it is not configured")

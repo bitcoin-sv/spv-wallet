@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txsync"
 
 	paymailclient "github.com/bitcoin-sv/go-paymail"
 	paymailserver "github.com/bitcoin-sv/go-paymail/server"
@@ -23,6 +22,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines/utxo"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/record"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txsync"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users"
 	"github.com/mrz1836/go-cachestore"
 )

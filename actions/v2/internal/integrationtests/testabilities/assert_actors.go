@@ -1,10 +1,10 @@
 package testabilities
 
 import (
-	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
+	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 )
 
 type IntegrationTestAssertion interface {
