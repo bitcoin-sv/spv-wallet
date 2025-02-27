@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txsync"
 	"net/http"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -167,6 +168,7 @@ type V2 interface {
 	AddressesService() *addresses.Service
 	DataService() *data.Service
 	OperationsService() *operations.Service
+	TxSyncService() *txsync.Service
 }
 
 // ClientInterface is the client (spv wallet engine) interface comprised of all services/actions

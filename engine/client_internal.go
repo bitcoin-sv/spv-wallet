@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txsync"
 
 	paymailclient "github.com/bitcoin-sv/go-paymail"
 	paymailserver "github.com/bitcoin-sv/go-paymail/server"
@@ -237,6 +238,12 @@ func (c *Client) loadChainService() {
 		logger := c.Logger().With().Str("subservice", "chain").Logger()
 		c.options.arcConfig.TxsGetter = newSDKTxGetter(c)
 		c.options.chainService = chain.NewChainService(logger, c.options.httpClient, c.options.arcConfig, c.options.bhsConfig)
+	}
+}
+
+func (c *Client) loadTxSyncService() {
+	if c.options.txSync == nil {
+		c.options.txSync = txsync.NewService()
 	}
 }
 

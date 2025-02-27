@@ -2,6 +2,7 @@ package chain
 
 import (
 	"context"
+	"github.com/gin-gonic/gin"
 	"net/url"
 
 	"github.com/bitcoin-sv/go-paymail/spv"
@@ -16,6 +17,7 @@ type ARCService interface {
 	QueryTransaction(ctx context.Context, txID string) (*chainmodels.TXInfo, error)
 	GetFeeUnit(ctx context.Context) (*bsv.FeeUnit, error)
 	Broadcast(ctx context.Context, tx *sdk.Transaction) (*chainmodels.TXInfo, error)
+	RegisterCallback(handler chainmodels.TXInfoHandler, router *gin.Engine)
 }
 
 // BHSService for querying BHS server.

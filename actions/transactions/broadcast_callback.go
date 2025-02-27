@@ -12,15 +12,15 @@ import (
 // broadcastCallback will handle a broadcastCallback call from the broadcast api
 func broadcastCallback(c *gin.Context) {
 	logger := reqctx.Logger(c)
-	var callbackResp chainmodels.TXInfo
+	var callbackResp *chainmodels.TXInfo
 
-	err := c.Bind(callbackResp)
+	err := c.Bind(&callbackResp)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
-	err = reqctx.Engine(c).HandleTxCallback(c.Request.Context(), &callbackResp)
+	err = reqctx.Engine(c).HandleTxCallback(c.Request.Context(), callbackResp)
 	if err != nil {
 		logger.Err(err).Msgf("failed to update transaction - tx: %v", callbackResp)
 	}

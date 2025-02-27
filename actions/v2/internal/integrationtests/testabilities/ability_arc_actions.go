@@ -17,9 +17,10 @@ func (a *arcActions) Callbacks(txInfo chainmodels.TXInfo) {
 	client := a.fixture.HttpClient().ForAnonymous()
 
 	res, _ := client.R().
+		SetHeader("Content-Type", "application/json").
 		SetBody(txInfo).
 		SetAuthToken(ARCCallbackToken).
-		Post("/transactions/transaction/broadcast/callback")
+		Post("/arc/broadcast/callback")
 
 	require.Equal(a.t, 200, res.StatusCode())
 }

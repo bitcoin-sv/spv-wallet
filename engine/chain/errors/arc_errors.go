@@ -31,3 +31,6 @@ var ErrGetFeeUnit = models.SPVError{Message: "Fee unit cannot be retrieved", Sta
 
 // ErrEFConversion is when EF conversion fails
 var ErrEFConversion = models.SPVError{Message: "EF conversion failed", StatusCode: 500, Code: "error-ef-conversion"}
+
+// ErrARCRegisterCallback is when ARC register callback fails
+var ErrARCRegisterCallback = models.SPVError{Message: "ARC register callback failed", StatusCode: 500, Code: "error-arc-register-callback"}

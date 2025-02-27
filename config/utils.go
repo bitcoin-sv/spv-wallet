@@ -31,3 +31,8 @@ func (c *AppConfig) GetUserAgent() string {
 func (c *AppConfig) IsBeefEnabled() bool {
 	return c.Paymail != nil && c.Paymail.Beef.Enabled()
 }
+
+// ARCCallbackEnabled returns true if the ARC callback is enabled
+func (c *AppConfig) ARCCallbackEnabled() bool {
+	return c.ARC != nil && c.ARC.Callback != nil && c.ARC.Callback.Enabled
+}
