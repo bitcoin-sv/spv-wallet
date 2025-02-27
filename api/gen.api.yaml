@@ -1,10 +1,10 @@
 openapi: 3.0.0
 info:
     license:
-        name: Open BSV Licence
-        url: xyz
+        name: MIT
+        url: https://github.com/bitcoin-sv/spv-wallet/blob/main/LICENSE
     title: SPV Wallet API
-    version: development
+    version: main
 paths:
     /api/v2/admin/status:
         get:
