@@ -6,7 +6,7 @@ import "github.com/bitcoin-sv/spv-wallet/models"
 var ErrProcessingCustomInstructions = models.SPVError{
 	Code:       "error-custom-instructions-processing",
 	Message:    "Failed to process custom instructions",
-	StatusCode: 500,
+	StatusCode: 422,
 }
 
 // ErrFinalizingCustomInstructions is returned when custom instructions cannot be finalized
