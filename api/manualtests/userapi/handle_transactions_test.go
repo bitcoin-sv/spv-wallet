@@ -148,10 +148,10 @@ func TestTransactionWithExternalPaymailTransfer(t *testing.T) {
 }
 
 func TestTransactionToTopUpRegressionTests(t *testing.T) {
-	// t.Skip("don't run yet")
+	t.Skip("don't run yet")
 
 	// multiplier How many outputs in transaction (WARN! it will multiply the payment amount from state.yaml)
-	multiplier := 2
+	multiplier := 100
 
 	// times How many transactions to create (WARN! each transaction will have amount of payment multiplied by multiplier)
 	// in other words, WHEN:
@@ -160,7 +160,7 @@ func TestTransactionToTopUpRegressionTests(t *testing.T) {
 	// times = 10
 	// THEN:
 	// 10 transactions will be created, each with 1100 satoshis + 1 sat per fee -> so you need to have at least 11010 satoshis on your user
-	times := 1
+	times := 10
 
 	logger := manualtests.Logger()
 
@@ -309,19 +309,19 @@ func RequestTopUpToRegressionTests(multiplier int) manualtests.GenericCallWithSt
 			panic("multiplier must be greater than 0")
 		}
 
-		unsignedMultiplier := uint(multiplier)
+		unsignedMultiplier := uint64(multiplier)
 
 		recipient, err := state.Payment.ShouldGetRegressionTestsFaucetPaymail()
 		require.NoError(state.T, err)
 
-		amount := state.Payment.Amount * uint64(unsignedMultiplier)
+		amount := state.Payment.Amount * unsignedMultiplier
 
 		req := RequestPaymailPaymentTransactionSplitIntoMultipleOutputsOutlineTo(recipient, amount, unsignedMultiplier)
 		return req(state, c)
 	}
 }
 
-func RequestPaymailPaymentTransactionSplitIntoMultipleOutputsOutlineTo(recipient string, amount uint64, numberOfSplits uint) manualtests.GenericCallWithState[*client.CreateTransactionOutlineResponse] {
+func RequestPaymailPaymentTransactionSplitIntoMultipleOutputsOutlineTo(recipient string, amount uint64, numberOfSplits uint64) manualtests.GenericCallWithState[*client.CreateTransactionOutlineResponse] {
 	return func(state manualtests.StateForCall, c *client.ClientWithResponses) (*client.CreateTransactionOutlineResponse, error) {
 
 		paymailOutput := client.RequestsPaymailOutputSpecification{
