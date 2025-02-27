@@ -10,8 +10,8 @@ import (
 	configerrors "github.com/bitcoin-sv/spv-wallet/config/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
+	"github.com/bitcoin-sv/spv-wallet/lox"
 	"github.com/gin-gonic/gin"
-	"github.com/samber/lo"
 )
 
 // CreateUser creates a new user
@@ -43,8 +43,8 @@ func (s *APIAdminUsers) CreateUser(c *gin.Context) {
 			Alias:  alias,
 			Domain: domain,
 
-			PublicName: lo.IfF(requestBody.Paymail.PublicName != nil, func() string { return *requestBody.Paymail.PublicName }).Else(""),
-			Avatar:     lo.IfF(requestBody.Paymail.AvatarURL != nil, func() string { return *requestBody.Paymail.AvatarURL }).Else(""),
+			PublicName: lox.Unwrap(requestBody.Paymail.PublicName).Else(""),
+			Avatar:     lox.Unwrap(requestBody.Paymail.AvatarURL).Else(""),
 		}
 	}
 

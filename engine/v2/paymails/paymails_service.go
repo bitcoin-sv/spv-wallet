@@ -40,7 +40,7 @@ func (s *Service) Create(ctx context.Context, newPaymail *paymailsmodels.NewPaym
 		return nil, spverrors.Newf("user does not exist")
 	}
 
-	if isValid := newPaymail.CheckAvatarURL(); !isValid {
+	if err := newPaymail.ValidateAvatar(); err != nil {
 		return nil, spverrors.Newf("invalid avatar url during paymail creation")
 	}
 	if newPaymail.PublicName == "" {

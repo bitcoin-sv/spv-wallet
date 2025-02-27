@@ -31,8 +31,8 @@ func (s *Service) Create(ctx context.Context, newUser *usersmodels.NewUser) (*us
 		if err := s.config.Paymail.CheckDomain(newUser.Paymail.Domain); err != nil {
 			return nil, spverrors.Wrapf(err, "invalid domain during user creation")
 		}
-		if isValid := newUser.Paymail.CheckAvatarURL(); !isValid {
-			return nil, spverrors.Newf("invalid avatar url during user creation")
+		if err := newUser.Paymail.ValidateAvatar(); err != nil {
+			return nil, spverrors.Wrapf(err, "invalid avatar url during user creation")
 		}
 		if newUser.Paymail.PublicName == "" {
 			newUser.Paymail.PublicName = newUser.Paymail.Alias

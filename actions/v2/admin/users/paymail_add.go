@@ -10,8 +10,8 @@ import (
 	configerrors "github.com/bitcoin-sv/spv-wallet/config/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
+	"github.com/bitcoin-sv/spv-wallet/lox"
 	"github.com/gin-gonic/gin"
-	"github.com/samber/lo"
 )
 
 // AddPaymailToUser add paymails to the user
@@ -33,8 +33,8 @@ func (s *APIAdminUsers) AddPaymailToUser(c *gin.Context, id string) {
 	newPaymail := &paymailsmodels.NewPaymail{
 		Alias:      alias,
 		Domain:     domain,
-		PublicName: lo.IfF(requestBody.PublicName != nil, func() string { return *requestBody.PublicName }).Else(""),
-		Avatar:     lo.IfF(requestBody.AvatarURL != nil, func() string { return *requestBody.AvatarURL }).Else(""),
+		PublicName: lox.Unwrap(requestBody.PublicName).Else(""),
+		Avatar:     lox.Unwrap(requestBody.AvatarURL).Else(""),
 		UserID:     id,
 	}
 	createdPaymail, err := s.engine.PaymailsService().Create(c, newPaymail)

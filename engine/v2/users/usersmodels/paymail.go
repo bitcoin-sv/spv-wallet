@@ -1,11 +1,12 @@
 package usersmodels
 
 import (
-	"regexp"
+	"net/url"
 	"time"
-)
 
-var explicitHTTPURLRegex = regexp.MustCompile(`^https?:\/\/(?:www\.)?[a-zA-Z0-9-]+(?:\.[a-zA-Z]{2,})+(?:\/[^\s]*)?`)
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailerrors"
+)
 
 // Paymail is a domain model for existing paymail
 type Paymail struct {
@@ -32,7 +33,20 @@ type NewPaymail struct {
 	UserID     string
 }
 
-// CheckAvatarURL checks if avatar is either empty string or a proper url link
-func (np *NewPaymail) CheckAvatarURL() bool {
-	return np.Avatar == "" || explicitHTTPURLRegex.MatchString(np.Avatar)
+// ValidateAvatar checks if avatar is either empty string or a proper url link
+func (np *NewPaymail) ValidateAvatar() error {
+	if np.Avatar == "" {
+		return nil
+	}
+
+	URL, err := url.Parse(np.Avatar)
+	if err != nil {
+		return paymailerrors.ErrInvalidAvatarURL.Wrap(err)
+	}
+
+	if URL.Scheme != "http" && URL.Scheme != "https" {
+		return paymailerrors.ErrInvalidAvatarURL.Wrap(spverrors.Newf("avatarURL should have http(s) scheme"))
+	}
+
+	return nil
 }
