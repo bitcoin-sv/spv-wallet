@@ -298,6 +298,11 @@ type ModelsBucketAnnotation struct {
 	Bucket string `json:"bucket"`
 }
 
+// ModelsChangeAnnotation defines model for models_ChangeAnnotation.
+type ModelsChangeAnnotation struct {
+	CustomInstructions *ModelsSPVWalletCustomInstructions `json:"customInstructions,omitempty"`
+}
+
 // ModelsCustomInstructions defines model for models_CustomInstructions.
 type ModelsCustomInstructions struct {
 	union json.RawMessage
@@ -375,8 +380,9 @@ type ModelsOutlineAnnotations struct {
 
 // ModelsOutputAnnotation defines model for models_OutputAnnotation.
 type ModelsOutputAnnotation struct {
-	Bucket  ModelsOutputAnnotationBucket    `json:"bucket"`
-	Paymail *ModelsPaymailAnnotationDetails `json:"paymail,omitempty"`
+	Bucket             ModelsOutputAnnotationBucket       `json:"bucket"`
+	CustomInstructions *ModelsSPVWalletCustomInstructions `json:"customInstructions,omitempty"`
+	Paymail            *ModelsPaymailAnnotationDetails    `json:"paymail,omitempty"`
 }
 
 // ModelsOutputAnnotationBucket defines model for ModelsOutputAnnotation.Bucket.
@@ -529,10 +535,15 @@ type RequestsOpReturnStringsOutput = []string
 
 // RequestsPaymailOutputSpecification defines model for requests_PaymailOutputSpecification.
 type RequestsPaymailOutputSpecification struct {
-	From     *string                                `json:"from"`
-	Satoshis uint64                                 `json:"satoshis"`
-	To       string                                 `json:"to"`
-	Type     RequestsPaymailOutputSpecificationType `json:"type"`
+	From     *string `json:"from"`
+	Satoshis uint64  `json:"satoshis"`
+
+	// Splits Number of outputs that will be created from the satoshis <br>
+	// Warning: satoshis must be divisible by splits without remainder <br>
+	// Warning: if recipient will respond with more then 1 output, then splits must be 1
+	Splits *uint64                                `json:"splits,omitempty"`
+	To     string                                 `json:"to"`
+	Type   RequestsPaymailOutputSpecificationType `json:"type"`
 }
 
 // RequestsPaymailOutputSpecificationType defines model for RequestsPaymailOutputSpecification.Type.

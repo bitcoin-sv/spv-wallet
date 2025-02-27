@@ -21,6 +21,7 @@ const notConfiguredFaucetURL = "https://replace_me.localhost"
 const notConfiguredXprv = "xprvreplaceme"
 const notConfiguredRecipientID = "replace_me"
 const notConfiguredExternalPaymail = "replace.me@locahost"
+const notConfiguredRegressionPaymail = "regression_tests_funds@replace.me.locahost"
 
 var StateError = errorx.NewType(errorx.CommonErrors, "state_error")
 
@@ -55,10 +56,11 @@ func NewState() *State {
 	}
 
 	payment := Payment{
-		Amount:          10,
-		RecipientID:     notConfiguredRecipientID,
-		ExternalPaymail: notConfiguredExternalPaymail,
-		state:           state,
+		Amount:                 10,
+		RecipientID:            notConfiguredRecipientID,
+		ExternalPaymail:        notConfiguredExternalPaymail,
+		RegressionTestsPaymail: notConfiguredRegressionPaymail,
+		state:                  state,
 	}
 
 	state.User = user
