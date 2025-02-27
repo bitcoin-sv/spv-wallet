@@ -20,11 +20,18 @@ const (
 
 type IntegrationTestAction interface {
 	Alice() ActorsActions
+	Bob() ActorsActions
+
+	// external guy
+	Charlie() ActorsActions
 }
 
 type ActorsActions interface {
 	ReceivesFromExternal(amount bsv.Satoshis) (txID string)
-	SendsTo(recipient *fixtures.User, amount bsv.Satoshis) (txID string)
+	SendsTo(recipient *fixtures.User, amount bsv.Satoshis, additionalOutputs ...map[string]any) (txID string)
+
+	// remove as we should base on the receives from external
+	TopUp(amount bsv.Satoshis) fixtures.GivenTXSpec
 }
 
 type actions struct {
@@ -42,6 +49,8 @@ func newActions(t testing.TB, given *fixture) IntegrationTestAction {
 func (a *actions) Alice() ActorsActions {
 	return a.fixture.alice
 }
+func (a *actions) Bob() ActorsActions     { return a.fixture.bob }
+func (a *actions) Charlie() ActorsActions { return a.fixture.charlie }
 
 type user struct {
 	fixtures.User
@@ -106,18 +115,27 @@ func (u *user) ReceivesFromExternal(amount bsv.Satoshis) string {
 }
 
 // SendsTo simulates sending funds to another user
-func (u *user) SendsTo(recipient *fixtures.User, amount bsv.Satoshis) string {
+func (u *user) SendsTo(recipient *fixtures.User, amount bsv.Satoshis, additionalOutputs ...map[string]any) string {
 	_, then := testabilities.NewOf(u.app, u.t)
+
+	// for the sake of simplicity - main output in this method is always paymail
+	primaryOutput := map[string]any{
+		"type":     "paymail",
+		"to":       recipient.DefaultPaymail(),
+		"satoshis": uint64(amount),
+	}
+
+	// interface to outline -> paymail output (Spec), different implementation for op return
+	// basic usage -> array of interfaces and .ToOutline
+	// RequestsOpReturnOutputSpecificationType
+	// check for functions
+
+	outputs := []map[string]any{primaryOutput}
+	outputs = append(outputs, additionalOutputs...)
 
 	outlineClient := u.app.HttpClient().ForGivenUser(u.User)
 	outlineBody := map[string]any{
-		"outputs": []map[string]any{
-			{
-				"type":     "paymail",
-				"to":       recipient.DefaultPaymail(),
-				"satoshis": uint64(amount),
-			},
-		},
+		"outputs": outputs,
 	}
 
 	outlineRes, _ := outlineClient.R().
@@ -171,4 +189,8 @@ func (u *user) SendsTo(recipient *fixtures.User, amount bsv.Satoshis) string {
 	then.Response(recordRes).IsCreated()
 
 	return tx.TxID().String()
+}
+
+func (u *user) TopUp(amount bsv.Satoshis) fixtures.GivenTXSpec {
+	return u.app.Faucet(u.User).TopUp(amount)
 }

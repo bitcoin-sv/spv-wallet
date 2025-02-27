@@ -12,8 +12,10 @@ import (
 type IntegrationTestFixtures interface {
 	StartedSPVWalletV2() (cleanup func())
 	Paymail() testpaymail.PaymailClientFixture
+
 	Alice() *fixtures.User
 	Bob() *fixtures.User
+	Charlie() *fixtures.User
 }
 
 type fixture struct {
@@ -60,4 +62,9 @@ func (f *fixture) Alice() *fixtures.User {
 func (f *fixture) Bob() *fixtures.User {
 	bob := f.bob.User
 	return &bob
+}
+
+func (f *fixture) Charlie() *fixtures.User {
+	charlie := f.charlie.User
+	return &charlie
 }

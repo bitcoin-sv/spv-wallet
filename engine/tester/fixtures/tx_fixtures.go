@@ -10,6 +10,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+var blockHeight uint32 = 1000
+
 // grandparentTXIDs are used to indicate prevTXID for parentTXs(source transactions)
 // [grandparentTX] -> [parentTX] -> [tx]
 // tx is the actual transaction that is being created
@@ -67,7 +69,7 @@ type txSpec struct {
 func GivenTX(t testing.TB) GivenTXSpec {
 	return &txSpec{
 		t:                  t,
-		blockHeight:        1000,
+		blockHeight:        300000,
 		grandparentTXIndex: 0,
 		sourceTransactions: make(map[string]*trx.Transaction),
 		sender:             Sender,
@@ -299,8 +301,8 @@ func (spec *txSpec) getNextGrandparentTXID() string {
 }
 
 func (spec *txSpec) getNextBlockHeight() uint32 {
-	h := spec.blockHeight
-	spec.blockHeight++
+	h := blockHeight
+	blockHeight++
 	return h
 }
 
