@@ -20,7 +20,7 @@ var ErrFinalizingCustomInstructions = models.SPVError{
 var ErrType42DerivationFailed = models.SPVError{
 	Code:       "error-custom-instructions-derivation-failed",
 	Message:    "Failed to derive type42 public key for given instruction",
-	StatusCode: 500,
+	StatusCode: 422,
 }
 
 // ErrUnknownInstructionType is returned when an unknown instruction type is encountered
