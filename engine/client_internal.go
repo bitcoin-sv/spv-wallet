@@ -243,7 +243,7 @@ func (c *Client) loadChainService() {
 
 func (c *Client) loadTxSyncService() {
 	if c.options.txSync == nil {
-		c.options.txSync = txsync.NewService()
+		c.options.txSync = txsync.NewService(c.Repositories().Transactions)
 	}
 }
 

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"maps"
 	"slices"
 
@@ -20,6 +21,18 @@ type Transactions struct {
 // It initializes a database-backed service for querying and managing transactions.
 func NewTransactions(db *gorm.DB) *Transactions {
 	return &Transactions{db: db}
+}
+
+func (t *Transactions) SetStatus(ctx context.Context, txID string, status txmodels.TxStatus) error {
+	err := t.db.
+		Model(&database.TrackedTransaction{}).
+		WithContext(ctx).
+		Where("id = ?", txID).
+		Update("tx_status", status).Error
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to update transaction status for %s", txID)
+	}
+	return nil
 }
 
 // HasTransactionInputSources checks if all the provided input source transaction IDs exist in the database.

@@ -18,6 +18,26 @@ func Test(t *testing.T) {
 			txInfo:       minimalTxInfo(chainmodels.SentToNetwork),
 			expectStatus: "BROADCASTED",
 		},
+		"On SeenOnNetwork do nothing": {
+			txInfo:       minimalTxInfo(chainmodels.SeenOnNetwork),
+			expectStatus: "BROADCASTED",
+		},
+		"On DoubleSpendAttempted mark as problematic": {
+			txInfo:       minimalTxInfo(chainmodels.DoubleSpendAttempted),
+			expectStatus: "PROBLEMATIC",
+		},
+		"On SeenInOrphanMempool mark as problematic": {
+			txInfo:       minimalTxInfo(chainmodels.SeenInOrphanMempool),
+			expectStatus: "PROBLEMATIC",
+		},
+		"On Rejected mark as problematic": {
+			txInfo:       minimalTxInfo(chainmodels.Rejected),
+			expectStatus: "PROBLEMATIC",
+		},
+		"On Unknown mark as problematic": {
+			txInfo:       minimalTxInfo(chainmodels.Unknown),
+			expectStatus: "PROBLEMATIC",
+		},
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
