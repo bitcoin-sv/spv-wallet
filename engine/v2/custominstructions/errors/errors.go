@@ -34,7 +34,7 @@ var ErrUnknownInstructionType = models.SPVError{
 var ErrGettingAddressFromPublicKey = models.SPVError{
 	Code:       "error-getting-address-from-public-key",
 	Message:    "Failed to get address from public key",
-	StatusCode: 500,
+	StatusCode: 422,
 }
 
 // ErrGettingLockingScript is returned when a locking script cannot be derived from an address
