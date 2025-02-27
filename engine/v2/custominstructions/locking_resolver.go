@@ -21,22 +21,29 @@ func NewLockingScriptInterpreter() *Interpreter[*LockingScriptResolver, primitiv
 
 // AddressResolver implements resolver for custom instructions that resolve a public key to an address.
 type AddressResolver struct {
+	pubKey  *primitives.PublicKey
 	Address *script.Address
 }
 
+// Initialize initializes the address resolver with a public key.
+func (ar *AddressResolver) Initialize(key *primitives.PublicKey) error {
+	ar.pubKey = key
+	return nil
+}
+
 // Type42 derives a new public key from the current public key using a type42 method.
-func (ar *AddressResolver) Type42(acc *Accumulator[primitives.PublicKey], instruction string) (bool, error) {
-	pub, err := type42.Derive(acc.Key, instruction)
+func (ar *AddressResolver) Type42(instruction string) (bool, error) {
+	pub, err := type42.Derive(ar.pubKey, instruction)
 	if err != nil {
 		return false, errors.ErrType42DerivationFailed.Wrap(err)
 	}
-	acc.Key = pub
+	ar.pubKey = pub
 	return true, nil
 }
 
 // Sign derives an address from the current public key.
-func (ar *AddressResolver) Sign(acc *Accumulator[primitives.PublicKey], _ string) (bool, error) {
-	addr, err := script.NewAddressFromPublicKey(acc.Key, true)
+func (ar *AddressResolver) Sign(_ string) (bool, error) {
+	addr, err := script.NewAddressFromPublicKey(ar.pubKey, true)
 	if err != nil {
 		return false, errors.ErrGettingAddressFromPublicKey.Wrap(err)
 	}
@@ -45,10 +52,10 @@ func (ar *AddressResolver) Sign(acc *Accumulator[primitives.PublicKey], _ string
 }
 
 // Finalize ensures that the address is resolved.
-func (ar *AddressResolver) Finalize(acc *Accumulator[primitives.PublicKey]) error {
+func (ar *AddressResolver) Finalize() error {
 	if ar.Address == nil {
 		// this is implicit "Sign" if there was no "Sign" instruction in provided custom instructions
-		_, err := ar.Sign(acc, "P2PKH")
+		_, err := ar.Sign("P2PKH")
 		if err != nil {
 			return spverrors.Wrapf(err, "failed to finalize and derive address")
 		}
@@ -64,8 +71,8 @@ type LockingScriptResolver struct {
 }
 
 // Finalize ensures that the address is resolved and derives the locking script from the address.
-func (lr *LockingScriptResolver) Finalize(acc *Accumulator[primitives.PublicKey]) error {
-	err := lr.AddressResolver.Finalize(acc)
+func (lr *LockingScriptResolver) Finalize() error {
+	err := lr.AddressResolver.Finalize()
 	if err != nil {
 		return err
 	}

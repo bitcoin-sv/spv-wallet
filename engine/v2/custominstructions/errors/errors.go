@@ -16,6 +16,13 @@ var ErrFinalizingCustomInstructions = models.SPVError{
 	StatusCode: 500,
 }
 
+// ErrInitializingCustomInstructions is returned when custom instructions cannot be initialized
+var ErrInitializingCustomInstructions = models.SPVError{
+	Code:       "error-custom-instructions-initialize",
+	Message:    "Failed to initialize custom instructions",
+	StatusCode: 500,
+}
+
 // ErrType42DerivationFailed is returned when a type42 public key cannot be derived
 var ErrType42DerivationFailed = models.SPVError{
 	Code:       "error-custom-instructions-derivation-failed",

@@ -19,17 +19,20 @@ func NewInterpreter[R Resolver[TKey], TKey InputKeys](resolver R) *Interpreter[R
 
 // Process processes custom instructions for a given key.
 func (p *Interpreter[I, TKey]) Process(key *TKey, instructions bsv.CustomInstructions) (I, error) {
-	acc := &Accumulator[TKey]{
-		Key: key,
-	}
 	var err error
 	var proceed bool
+
+	err = p.resolver.Initialize(key)
+	if err != nil {
+		return p.resolver, errors.ErrInitializingCustomInstructions.Wrap(err)
+	}
+
 	for _, instruction := range instructions {
 		switch instruction.Type {
 		case Type42:
-			proceed, err = p.resolver.Type42(acc, instruction.Instruction)
+			proceed, err = p.resolver.Type42(instruction.Instruction)
 		case Sign:
-			proceed, err = p.resolver.Sign(acc, instruction.Instruction)
+			proceed, err = p.resolver.Sign(instruction.Instruction)
 		default:
 			return p.resolver, errors.ErrUnknownInstructionType
 		}
@@ -41,7 +44,7 @@ func (p *Interpreter[I, TKey]) Process(key *TKey, instructions bsv.CustomInstruc
 		}
 	}
 
-	err = p.resolver.Finalize(acc)
+	err = p.resolver.Finalize()
 	if err != nil {
 		return p.resolver, errors.ErrFinalizingCustomInstructions.Wrap(err)
 	}
