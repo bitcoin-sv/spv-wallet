@@ -30,6 +30,12 @@ func Test(t *testing.T) {
 			receiveTxID := when.Alice().ReceivesFromExternal(10)
 
 			// then:
+			then.ARC().Broadcasted().
+				WithTxID(receiveTxID).
+				WithCallbackURL("https://example.com/arc/broadcast/callback").
+				WithCallbackToken(testabilities.ARCCallbackToken)
+
+			// and:
 			then.Alice().Operations().Last().
 				WithTxID(receiveTxID).
 				WithTxStatus("BROADCASTED")
