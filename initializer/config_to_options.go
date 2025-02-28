@@ -292,7 +292,7 @@ func addARCOpts(c *config.AppConfig, options []engine.ClientOps) ([]engine.Clien
 			}
 		}
 		arcCfg.Callback = &chainmodels.ARCCallbackConfig{
-			URL:   c.ARC.Callback.Host,
+			URL:   c.ARC.Callback.Host + config.BroadcastCallbackRoute,
 			Token: c.ARC.Callback.Token,
 		}
 	}
