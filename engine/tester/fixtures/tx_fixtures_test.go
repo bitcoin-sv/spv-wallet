@@ -1,10 +1,13 @@
 package fixtures
 
 import (
+	"fmt"
+	"sync"
 	"testing"
 
 	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/go-sdk/spv"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/stretchr/testify/require"
 )
 
@@ -59,6 +62,42 @@ func TestMockTXGeneration(t *testing.T) {
 			require.Equal(t, test.beef, spec.BEEF())
 			require.Equal(t, test.rawTX, spec.RawTX())
 			require.Equal(t, test.ef, spec.EF())
+		})
+	}
+}
+
+func someTxSpec(given GivenTXSpec) GivenTXSpec {
+	return given.WithInput(2).WithOPReturn("hello world").WithP2PKHOutput(1)
+}
+
+func TestDeterministic(t *testing.T) {
+	a := someTxSpec(GivenTX(t))
+	b := someTxSpec(GivenTX(t))
+
+	require.Equal(t, a.TX(), b.TX())
+}
+
+func TestUniqueness(t *testing.T) {
+	a := someTxSpec(GivenUniqueTX(t))
+	b := someTxSpec(GivenUniqueTX(t))
+
+	require.NotEqual(t, a.TX(), b.TX())
+}
+
+func TestUniquenessAmongSubtests(t *testing.T) {
+	all := make([]*trx.Transaction, 0)
+	lock := sync.Mutex{}
+
+	for i := range 100 {
+		t.Run(fmt.Sprintf("subtest %d", i), func(t *testing.T) {
+			t.Parallel()
+
+			tx := someTxSpec(GivenUniqueTX(t))
+
+			lock.Lock()
+			require.NotContains(t, all, tx.TX())
+			all = append(all, tx.TX())
+			lock.Unlock()
 		})
 	}
 }

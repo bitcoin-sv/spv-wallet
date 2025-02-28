@@ -1,6 +1,9 @@
 package fixtures
 
 import (
+	"strings"
+	"sync"
+	"sync/atomic"
 	"testing"
 
 	"github.com/bitcoin-sv/go-sdk/script"
@@ -22,6 +25,24 @@ var grandparentTXIDs = []string{
 	"e4fb03a7eae2f3766f76d52719633a65c7882c7734ae7afe603e97d193f42c0e",
 	"53e784cb876751e114c9e4c1921240f184b6dff8d167715227e3708d0f7bb26d",
 	"27a53423aa3e5d5c46bf30be53a9998dd247daf758847f244f82d430be71de6e",
+}
+
+// scopes are used to keep track of the block height for each test
+// It is used for GivenUniqueTX to create unique block heights
+// for each transaction specs inside one scope (each test is a scope).
+// all subtests of a test share the same scope
+var scopes = sync.Map{}
+
+func newScope(t testing.TB) *atomic.Uint32 {
+	baseTestName := strings.Split(t.Name(), "/")[0]
+	actual, _ := scopes.LoadOrStore(baseTestName, initialBlockHeight())
+	return actual.(*atomic.Uint32)
+}
+
+func initialBlockHeight() *atomic.Uint32 {
+	blockHeight := &atomic.Uint32{}
+	blockHeight.Store(999)
+	return blockHeight
 }
 
 // GivenTXSpec is a builder for creating MOCK! transactions
@@ -58,7 +79,7 @@ type txSpec struct {
 
 	grandparentTXIndex int
 	sourceTransactions map[string]*trx.Transaction
-	blockHeight        uint32
+	blockHeight        *atomic.Uint32
 	sender             User
 	recipient          User
 }
@@ -67,12 +88,20 @@ type txSpec struct {
 func GivenTX(t testing.TB) GivenTXSpec {
 	return &txSpec{
 		t:                  t,
-		blockHeight:        1000,
+		blockHeight:        initialBlockHeight(),
 		grandparentTXIndex: 0,
 		sourceTransactions: make(map[string]*trx.Transaction),
 		sender:             Sender,
 		recipient:          RecipientInternal,
 	}
+}
+
+// GivenUniqueTX creates a new GivenTXSpec for building a MOCK! transaction
+// with a unique parent transaction's block heights for each transaction specs.
+func GivenUniqueTX(t testing.TB) GivenTXSpec {
+	tx := GivenTX(t).(*txSpec)
+	tx.blockHeight = newScope(t)
+	return tx
 }
 
 // WithSender sets the sender for the transaction (default is Sender)
@@ -299,9 +328,7 @@ func (spec *txSpec) getNextGrandparentTXID() string {
 }
 
 func (spec *txSpec) getNextBlockHeight() uint32 {
-	h := spec.blockHeight
-	spec.blockHeight++
-	return h
+	return spec.blockHeight.Add(1)
 }
 
 func ptr[T any](value T) *T {
