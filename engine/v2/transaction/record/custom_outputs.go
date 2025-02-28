@@ -9,7 +9,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
 
 type customOutputsResolver struct {
@@ -43,7 +42,7 @@ func (c *customOutputsResolver) resolveAddress(address string, vout uint32) {
 func (c *customOutputsResolver) annotatedOutputs() iter.Seq2[string, txmodels.NewOutput] {
 	return func(yield func(address string, output txmodels.NewOutput) bool) {
 		for vout, annotation := range c.annotations {
-			if annotation.Bucket != bucket.BSV || annotation.CustomInstructions == nil {
+			if annotation.CustomInstructions == nil {
 				continue
 			}
 
@@ -57,12 +56,6 @@ func (c *customOutputsResolver) annotatedOutputs() iter.Seq2[string, txmodels.Ne
 				Process(userPubKey, *annotation.CustomInstructions)
 			if err != nil {
 				c.err = spverrors.Wrapf(err, "failed to derive address from custom instructions for user %s", c.userID)
-				break
-			}
-
-			_, ok := c.txAddresses[interpreted.Address.AddressString]
-			if !ok {
-				c.err = spverrors.Newf("address derived from custom instructions doesn't match any of the addresses in the locking scripts")
 				break
 			}
 
