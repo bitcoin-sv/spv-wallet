@@ -13,7 +13,7 @@ import (
 
 type TransactionDetailsAssertions interface {
 	WithOutputValues(values ...bsv.Satoshis) TransactionDetailsAssertions
-	OutputUnlockableBy(vout int, user fixtures.User) TransactionDetailsAssertions
+	OutputUnlockableBy(vout uint32, user fixtures.User) TransactionDetailsAssertions
 }
 
 type transactionAssertions struct {
@@ -33,7 +33,7 @@ func (a *transactionAssertions) WithOutputValues(values ...bsv.Satoshis) Transac
 	return a
 }
 
-func (a *transactionAssertions) OutputUnlockableBy(vout int, user fixtures.User) TransactionDetailsAssertions {
+func (a *transactionAssertions) OutputUnlockableBy(vout uint32, user fixtures.User) TransactionDetailsAssertions {
 	a.t.Helper()
 	a.assert.Less(vout, len(a.tx.Outputs), "there is no vout to unlock in transaction outputs")
 
@@ -45,7 +45,7 @@ func (a *transactionAssertions) OutputUnlockableBy(vout int, user fixtures.User)
 
 	fixtures.GivenTX(a.t).
 		WithSender(user).
-		WithInputFromUTXO(a.tx, uint32(vout), *outputAnnotation.CustomInstructions...).
+		WithInputFromUTXO(a.tx, vout, *outputAnnotation.CustomInstructions...).
 		WithOPReturn("dummy data").
 		TX() // during TX call, the transaction is signed. Should fail if the UTXO cannot be unlocked by the user.
 

@@ -39,7 +39,7 @@ type WithParseableBEEFTransactionOutlineAssertion interface {
 	HasInputs(count int) WithParseableBEEFTransactionOutlineAssertion
 	Input(index int) InputAssertion
 	HasOutputs(count int) WithParseableBEEFTransactionOutlineAssertion
-	Output(index int) OutputAssertion
+	Output(index uint32) OutputAssertion
 }
 
 func Then(t testing.TB, fixture TransactionOutlineFixture) TransactionOutlineAssertion {
@@ -146,9 +146,9 @@ func (a *assertion) HasOutputs(count int) WithParseableBEEFTransactionOutlineAss
 	return a
 }
 
-func (a *assertion) Output(index int) OutputAssertion {
+func (a *assertion) Output(index uint32) OutputAssertion {
 	a.t.Helper()
-	a.require.Greater(len(a.tx.Outputs), index, "Transaction Outputs doesn't have output %d", index)
+	a.require.Greater(uint32(len(a.tx.Outputs)), index, "Transaction Outputs doesn't have output %d", index)
 
 	return &txOutputAssertion{
 		parent:     a,
