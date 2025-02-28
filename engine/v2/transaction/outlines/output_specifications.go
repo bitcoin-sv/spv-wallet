@@ -2,6 +2,7 @@ package outlines
 
 import (
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
@@ -91,7 +92,11 @@ func (a annotatedOutputs) toAnnotations() transaction.OutputsAnnotations {
 	annotations := make(transaction.OutputsAnnotations)
 	for outputIndex, out := range a {
 		if out.OutputAnnotation != nil {
-			annotations[outputIndex] = out.OutputAnnotation
+			vout32, err := conv.IntToUint32(outputIndex)
+			if err != nil {
+				panic(spverrors.Wrapf(err, "failed to convert output index %d to uint32", outputIndex))
+			}
+			annotations[vout32] = out.OutputAnnotation
 		}
 	}
 	return annotations

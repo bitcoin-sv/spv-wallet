@@ -81,6 +81,7 @@ linters-settings:
       - name: exported
         exclude:
           - "**/testabilities/**"
+          - "**/tester/**"
 
 issues:
   # List of regexps of issue texts to exclude, empty list by default.

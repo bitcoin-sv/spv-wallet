@@ -12,6 +12,7 @@ import (
 // Service for recording transactions
 type Service struct {
 	addresses    AddressesService
+	users        UsersService
 	outputs      OutputsRepo
 	operations   OperationsRepo
 	transactions TransactionsRepo
@@ -24,7 +25,8 @@ type Service struct {
 // NewService creates a new service for transactions
 func NewService(
 	logger zerolog.Logger,
-	addressesRepo AddressesService,
+	addresses AddressesService,
+	users UsersService,
 	outputsRepo OutputsRepo,
 	operationsRepo OperationsRepo,
 	transactionsRepo TransactionsRepo,
@@ -32,7 +34,8 @@ func NewService(
 	paymailNotifier PaymailNotifier,
 ) *Service {
 	return &Service{
-		addresses:       addressesRepo,
+		addresses:       addresses,
+		users:           users,
 		outputs:         outputsRepo,
 		operations:      operationsRepo,
 		broadcaster:     broadcaster,

@@ -35,7 +35,7 @@ type txOutputAssertion struct {
 	require    *require.Assertions
 	txout      *sdk.TransactionOutput
 	annotation *transaction.OutputAnnotation
-	index      int
+	index      uint32
 	txFixture  txtestability.TransactionsFixtures
 }
 
@@ -95,7 +95,7 @@ func (a *txOutputAssertion) UnlockableBySender() TransactionOutlinePaymailOutput
 
 	a.txFixture.Tx().
 		WithSender(fixtures.Sender).
-		WithInputFromUTXO(a.parent.tx, uint32(a.index), *a.annotation.CustomInstructions...).
+		WithInputFromUTXO(a.parent.tx, a.index, *a.annotation.CustomInstructions...).
 		WithOPReturn("dummy data").
 		TX() // during TX call, the transaction is signed. Should fail if the UTXO cannot be unlocked by the user.
 
