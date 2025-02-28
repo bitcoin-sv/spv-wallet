@@ -27,10 +27,10 @@ var grandparentTXIDs = []string{
 	"27a53423aa3e5d5c46bf30be53a9998dd247daf758847f244f82d430be71de6e",
 }
 
-// scopes are used to keep track of the block height for each test
-// It is used for GivenUniqueTX to create unique block heights
-// for each transaction specs inside one scope (each test is a scope).
-// all subtests of a test share the same scope
+// scopes are used to keep track of the block height.
+// It is used by GivenUniqueTX to create unique block heights
+// for each transaction specs within a scope (each test is a scope).
+// All subtests (t.Run) of a test function share the same scope.
 var scopes = sync.Map{}
 
 func newScope(t testing.TB) *atomic.Uint32 {
@@ -97,7 +97,7 @@ func GivenTX(t testing.TB) GivenTXSpec {
 }
 
 // GivenUniqueTX creates a new GivenTXSpec for building a MOCK! transaction
-// with a unique parent transaction's block heights for each transaction specs.
+// with a unique parent block heights per tx spec.
 func GivenUniqueTX(t testing.TB) GivenTXSpec {
 	tx := GivenTX(t).(*txSpec)
 	tx.blockHeight = newScope(t)
