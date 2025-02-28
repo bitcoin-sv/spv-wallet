@@ -75,7 +75,7 @@ func TestInternalOutgoingTransaction(t *testing.T) {
 		client := given.HttpClient().ForGivenUser(sender)
 
 		// and:
-		txSpec := fixtures.GivenTX(t).
+		txSpec := given.Tx().
 			WithSender(sender).
 			WithRecipient(recipient).
 			WithInputFromUTXO(sourceTxSpec.TX(), 0).

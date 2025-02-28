@@ -32,7 +32,7 @@ func TestExternalOutgoingTransaction(t *testing.T) {
 	reference := "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7"
 
 	// and:
-	txSpec := fixtures.GivenTX(t).
+	txSpec := given.Tx().
 		WithSender(sender).
 		WithRecipient(recipient).
 		WithInputFromUTXO(sourceTxSpec.TX(), 0).

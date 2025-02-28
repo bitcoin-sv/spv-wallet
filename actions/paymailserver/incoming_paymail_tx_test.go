@@ -83,7 +83,7 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 
 	t.Run("step 2 - call receive-transaction capability", func(t *testing.T) {
 		// given:
-		txSpec := fixtures.GivenTX(t).
+		txSpec := given.Tx().
 			WithInput(satoshis+1).
 			WithOutputScript(satoshis, testState.lockingScript)
 
@@ -240,7 +240,7 @@ func TestIncomingPaymailBeef(t *testing.T) {
 
 	t.Run("step 2 - call beef capability", func(t *testing.T) {
 		// given:
-		txSpec := fixtures.GivenTX(t).
+		txSpec := given.Tx().
 			WithInput(satoshis+1).
 			WithOutputScript(satoshis, testState.lockingScript)
 

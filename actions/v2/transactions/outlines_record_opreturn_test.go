@@ -9,6 +9,7 @@ import (
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures/txtestability"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
@@ -17,8 +18,8 @@ const (
 	dataOfOpReturnTx              = "hello world"
 )
 
-func givenTXWithOpReturn(t *testing.T) fixtures.GivenTXSpec {
-	return fixtures.GivenTX(t).
+func givenTXWithOpReturn(t *testing.T) txtestability.TransactionSpec {
+	return txtestability.Given(t).Tx().
 		WithInput(1).
 		WithOPReturn(dataOfOpReturnTx)
 }
@@ -35,7 +36,7 @@ func TestOutlinesRecordOpReturn(t *testing.T) {
 	ownedTransaction := givenForAllTests.Faucet(fixtures.Sender).TopUp(1000)
 
 	// and:
-	txSpec := fixtures.GivenTX(t).
+	txSpec := givenForAllTests.Tx().
 		WithSender(fixtures.Sender).
 		WithInputFromUTXO(ownedTransaction.TX(), 0).
 		WithOPReturn(dataOfOpReturnTx)
@@ -144,12 +145,14 @@ func TestOutlinesRecordOpReturn(t *testing.T) {
 }
 
 func TestOutlinesRecordOpReturnErrorCases(t *testing.T) {
-	givenUnsignedTX := fixtures.GivenTX(t).
+	given := testabilities.Given(t)
+
+	givenUnsignedTX := given.Tx().
 		WithoutSigning().
 		WithInput(1).
 		WithOPReturn(dataOfOpReturnTx)
 
-	givenTxWithP2PKHOutput := fixtures.GivenTX(t).
+	givenTxWithP2PKHOutput := given.Tx().
 		WithInput(2).
 		WithP2PKHOutput(1)
 
@@ -389,7 +392,7 @@ func TestRecordOpReturnTwiceByTheSameUser(t *testing.T) {
 	ownedTransaction := givenForAllTests.Faucet(fixtures.Sender).TopUp(1000)
 
 	// and:
-	txSpec := fixtures.GivenTX(t).
+	txSpec := givenForAllTests.Tx().
 		WithSender(fixtures.Sender).
 		WithInputFromUTXO(ownedTransaction.TX(), 0).
 		WithOPReturn(dataOfOpReturnTx)

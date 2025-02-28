@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures/txtestability"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
@@ -35,6 +36,7 @@ type txOutputAssertion struct {
 	txout      *sdk.TransactionOutput
 	annotation *transaction.OutputAnnotation
 	index      int
+	txFixture  txtestability.TransactionsFixtures
 }
 
 func (a *txOutputAssertion) HasBucket(bucket bucket.Name) OutputAssertion {
@@ -91,7 +93,7 @@ func (a *txOutputAssertion) HasReference(reference string) TransactionOutlinePay
 func (a *txOutputAssertion) UnlockableBySender() TransactionOutlinePaymailOutputAssertion {
 	a.require.NotNil(a.annotation.CustomInstructions, "output %d has no custom instructions", a.index)
 
-	fixtures.GivenTX(a.t).
+	a.txFixture.Tx().
 		WithSender(fixtures.Sender).
 		WithInputFromUTXO(a.parent.tx, uint32(a.index), *a.annotation.CustomInstructions...).
 		WithOPReturn("dummy data").

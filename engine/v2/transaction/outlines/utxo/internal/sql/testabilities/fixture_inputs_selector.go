@@ -8,6 +8,7 @@ import (
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures/txtestability"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines/utxo/internal/sql"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
@@ -32,16 +33,19 @@ type SatoshisAndSizeProvider interface {
 
 type inputsSelectorFixture struct {
 	testabilities.DatabaseFixture
-	t  testing.TB
-	db *gorm.DB
+	t           testing.TB
+	db          *gorm.DB
+	transaction txtestability.TransactionsFixtures
 }
 
 func newFixture(t testing.TB) (InputsSelectorFixture, func()) {
 	givenDB, cleanup := testabilities.Given(t, testengine.WithV2())
+	givenTx := txtestability.Given(t)
 	return &inputsSelectorFixture{
 		t:               t,
 		DatabaseFixture: givenDB,
 		db:              givenDB.GormDB(),
+		transaction:     givenTx,
 	}, cleanup
 }
 
@@ -57,7 +61,7 @@ func (i *inputsSelectorFixture) ForSatoshisAndSize(provider SatoshisAndSizeProvi
 	sats := uint64(provider.Satoshis())
 	size := provider.Size()
 
-	bsvTransaction := fixtures.GivenTX(i.t).
+	bsvTransaction := i.transaction.Tx().
 		WithP2PKHOutput(sats).
 		TX()
 

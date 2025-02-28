@@ -12,6 +12,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/keys/type42"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/samber/lo"
 )
 
 // User is a fixture that is representing a user of the system.
@@ -221,7 +222,7 @@ func (f *User) P2PKHUnlockingScriptTemplate(instructions ...bsv.CustomInstructio
 		}
 	}
 
-	unlockingScript, err := p2pkh.Unlock(priv, ptr(sighash.AllForkID))
+	unlockingScript, err := p2pkh.Unlock(priv, lo.ToPtr(sighash.AllForkID))
 	if err != nil {
 		panic("Invalid setup of user fixture, cannot restore unlocking script: " + err.Error())
 	}
