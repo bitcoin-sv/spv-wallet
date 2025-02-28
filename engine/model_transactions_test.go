@@ -41,6 +41,10 @@ func (x transactionServiceMock) getDestinationByLockingScript(_ context.Context,
 	return x.destinations[lockingScript], nil
 }
 
+func (x transactionServiceMock) getDestinationByAddress(_ context.Context, address string, _ ...ModelOps) (*Destination, error) {
+	return x.destinations[address], nil
+}
+
 func (x transactionServiceMock) getUtxo(_ context.Context, txID string, index uint32, _ ...ModelOps) (*Utxo, error) {
 	return x.utxos[txID][index], nil
 }

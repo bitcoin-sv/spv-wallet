@@ -69,15 +69,15 @@ func getDbDefaults() *DbConfig {
 	return &DbConfig{
 		Datastore: &DatastoreConfig{
 			Debug:       false,
-			Engine:      "sqlite",
+			Engine:      "postgresql",
 			TablePrefix: "xapi",
 		},
 		SQL: &datastore.SQLConfig{
 			Driver:             "postgresql",
 			ExistingConnection: nil,
 			Host:               "localhost",
-			Name:               "xapi",
-			Password:           "",
+			Name:               "postgres",
+			Password:           "postgres",
 			Port:               "5432",
 			Replica:            false,
 			TimeZone:           "UTC",
@@ -125,12 +125,12 @@ func getNotificationDefaults() *NotificationsConfig {
 func getPaymailDefaults() *PaymailConfig {
 	return &PaymailConfig{
 		Beef: &BeefConfig{
-			UseBeef:                                true,
+			UseBeef:                                false,
 			BlockHeadersServiceHeaderValidationURL: "http://localhost:8080/api/v1/chain/merkleroot/verify",
 			BlockHeadersServiceAuthToken:           "mQZQ6WmxURxWz5ch", // #nosec G101
 		},
 		DefaultFromPaymail:      "from@domain.com",
-		Domains:                 []string{"localhost"},
+		Domains:                 []string{"localhost", "kuba.4chain.pm"},
 		DomainValidationEnabled: true,
 		SenderValidationEnabled: false,
 	}

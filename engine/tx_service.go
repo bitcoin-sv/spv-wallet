@@ -127,12 +127,13 @@ func (m *Transaction) _processOutputs(ctx context.Context) (err error) {
 
 			txLockingScript := output.LockingScript.String()
 			lockingScript := utils.GetDestinationLockingScript(txLockingScript)
+			address := utils.GetAddressFromScript(lockingScript)
 
 			// only Save utxos for known destinations
 			// todo: optimize this SQL SELECT by requesting all the scripts at once (vs in this loop)
 			// todo: how to handle tokens and other non-standard outputs ?
-			if destination, err = m.transactionService.getDestinationByLockingScript(
-				ctx, lockingScript, opts...,
+			if destination, err = m.transactionService.getDestinationByAddress(
+				ctx, address, opts...,
 			); err != nil {
 				return
 			} else if destination != nil {

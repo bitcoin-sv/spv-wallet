@@ -255,12 +255,19 @@ func (t *TransactionOutput) processPaymailViaP2P(client paymailclient.ServiceCli
 
 	// Loop all received P2P outputs and build scripts
 	for index, out := range destinationInfo.Outputs {
+		script := out.Script
+
+		// append user custom script if given
+		if t.Script != "" {
+			script += t.Script
+		}
+
 		t.Scripts = append(
 			t.Scripts,
 			&ScriptOutput{
 				Address:    out.Address,
 				Satoshis:   outputValues[index],
-				Script:     out.Script,
+				Script:     script,
 				ScriptType: utils.ScriptTypePubKeyHash,
 			},
 		)
