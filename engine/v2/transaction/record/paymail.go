@@ -2,7 +2,6 @@ package record
 
 import (
 	"github.com/bitcoin-sv/go-paymail"
-	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
@@ -31,18 +30,13 @@ func (pi *paymailInfo) equalsToAnnotation(annotation *transaction.PaymailAnnotat
 	return *pi.annotation == *annotation
 }
 
-func (pi *paymailInfo) add(vout int, annotation *transaction.PaymailAnnotation) error {
+func (pi *paymailInfo) add(vout uint32, annotation *transaction.PaymailAnnotation) error {
 	if !pi.empty() && !pi.equalsToAnnotation(annotation) {
 		return txerrors.ErrMultiPaymailRecipientsNotSupported
 	}
 
-	vout32, err := conv.IntToUint32(vout)
-	if err != nil {
-		return txerrors.ErrAnnotationIndexConversion.Wrap(err)
-	}
-
 	pi.annotation = annotation
-	pi.vouts[vout32] = struct{}{}
+	pi.vouts[vout] = struct{}{}
 	return nil
 }
 

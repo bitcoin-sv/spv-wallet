@@ -22,7 +22,7 @@ type InputAnnotation struct {
 }
 
 // OutputsAnnotations represents the metadata for chosen outputs. The key is the index of the output.
-type OutputsAnnotations map[int]*OutputAnnotation
+type OutputsAnnotations map[uint32]*OutputAnnotation
 
 // OutputAnnotation represents the metadata for the output.
 type OutputAnnotation struct {
