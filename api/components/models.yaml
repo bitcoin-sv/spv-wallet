@@ -411,7 +411,7 @@ components:
           description: ID of the transaction
       required:
         - txID
-    
+
     MerkleRoot:
       type: object
       required:

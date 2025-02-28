@@ -83,7 +83,7 @@ func TestGETMerkleRootsFailure(t *testing.T) {
 		expResponseCode int
 	}{
 		"Get MerkleRoots with wrong batch size": {
-			responseCode:    400, 
+			responseCode:    400,
 			response:        "{\"code\": \"ErrInvalidBatchSize\",\"message\": \"batchSize must be 0 or a positive integer\"}",
 			expResponseCode: 400,
 			expectErr:       "{\"code\":\"error-invalid-batch-size\",\"message\":\"batchSize must be 0 or a positive integer\"}",
