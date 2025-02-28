@@ -2,7 +2,7 @@ package lox
 
 import "github.com/samber/lo"
 
-// IFElse is an interface that satisfies github.com/samber/lo IfF
+// IfElse is an interface that satisfies github.com/samber/lo IfF
 // function return value
 type IfElse[T any] interface {
 	Else(result T) T
