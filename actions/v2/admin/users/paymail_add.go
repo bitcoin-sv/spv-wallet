@@ -26,7 +26,6 @@ func (s *APIAdminUsers) AddPaymailToUser(c *gin.Context, id string) {
 		return
 	}
 
-	// map response to correct error
 	createdPaymail, err := s.engine.PaymailsService().Create(c, newPaymail)
 	if err != nil {
 		spverrors.MapResponse(c, err, s.logger).
