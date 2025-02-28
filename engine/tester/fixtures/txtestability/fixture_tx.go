@@ -68,17 +68,25 @@ func Given(t testing.TB) TransactionsFixtures {
 func (f *txFixturesFactory) Tx() TransactionSpec {
 	spec := &txSpec{
 		t:                  f.t,
-		blockHeight:        f.blockHeight,
-		grandparentTXIndex: f.grandparentTXIndex,
 		sourceTransactions: make(map[string]*trx.Transaction),
 		sender:             fixtures.Sender,
 		recipient:          fixtures.RecipientInternal,
+		fixtureFactory:     f,
 	}
 
-	f.blockHeight++
-	f.grandparentTXIndex++
-
 	return spec
+}
+
+func (f *txFixturesFactory) getNextGrandparentTXID() string {
+	id := grandparentTXIDs[f.grandparentTXIndex]
+	f.grandparentTXIndex = (f.grandparentTXIndex + 1) % len(grandparentTXIDs)
+	return id
+}
+
+func (f *txFixturesFactory) getNextBlockHeight() uint32 {
+	h := f.blockHeight
+	f.blockHeight++
+	return h
 }
 
 type txSpec struct {
@@ -92,6 +100,7 @@ type txSpec struct {
 	blockHeight        uint32
 	sender             fixtures.User
 	recipient          fixtures.User
+	fixtureFactory     *txFixturesFactory
 }
 
 // WithSender sets the sender for the transaction (default is Sender)
@@ -282,7 +291,7 @@ func (spec *txSpec) makeParentTX(satoshis ...uint64) *trx.Transaction {
 		total += s
 	}
 	withFee := total + 1
-	utxo, err := trx.NewUTXO(spec.getNextGrandparentTXID(), 0, spec.sender.P2PKHLockingScript().String(), withFee)
+	utxo, err := trx.NewUTXO(spec.fixtureFactory.getNextGrandparentTXID(), 0, spec.sender.P2PKHLockingScript().String(), withFee)
 	require.NoError(spec.t, err, "creating utxo for parent tx")
 
 	utxo.UnlockingScriptTemplate = spec.sender.P2PKHUnlockingScriptTemplate()
@@ -300,7 +309,7 @@ func (spec *txSpec) makeParentTX(satoshis ...uint64) *trx.Transaction {
 	require.NoError(spec.t, err, "signing parent tx")
 
 	// each merkle proof should have a different block height to not collide with each other
-	err = tx.AddMerkleProof(trx.NewMerklePath(spec.getNextBlockHeight(), [][]*trx.PathElement{{
+	err = tx.AddMerkleProof(trx.NewMerklePath(spec.fixtureFactory.getNextBlockHeight(), [][]*trx.PathElement{{
 		&trx.PathElement{
 			Hash:   tx.TxID(),
 			Offset: 0,
@@ -309,20 +318,4 @@ func (spec *txSpec) makeParentTX(satoshis ...uint64) *trx.Transaction {
 	require.NoError(spec.t, err, "adding merkle proof to parent tx")
 
 	return tx
-}
-
-func (spec *txSpec) getNextGrandparentTXID() string {
-	id := grandparentTXIDs[spec.grandparentTXIndex]
-	spec.grandparentTXIndex = (spec.grandparentTXIndex + 1) % len(grandparentTXIDs)
-	return id
-}
-
-func (spec *txSpec) getNextBlockHeight() uint32 {
-	h := spec.blockHeight
-	spec.blockHeight++
-	return h
-}
-
-func ptr[T any](value T) *T {
-	return &value
 }
