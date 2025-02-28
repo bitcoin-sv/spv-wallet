@@ -145,3 +145,44 @@ paths:
           $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
         500:
           $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+
+  /api/v2/merkleroots:
+    get:
+      operationId: getMerkleRoots
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - Merkleroots
+      summary: Get Merkleroots
+      description: >-
+        This endpoint fetches merkleroots from block header service according to the given query parameters.
+      parameters:
+        - name: batchSize
+          in: query
+          description: Batch size of merkleroots to be returned
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+          example: 100
+        - name: lastEvaluatedKey
+          in: query
+          description: Last processed merkleroot in client's database
+          required: false
+          schema:
+            type: string
+          example: "00000000000000000216b36abb2f8a55bec9bb7c35c268781e77d85c98a90189"
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/GetMerklerootsSuccess"
+        400:
+          $ref: "../components/responses.yaml#/components/responses/GetMerklerootsBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        404:
+          $ref: "../components/responses.yaml#/components/responses/GetMerklerootsNotFound"
+        409:
+          $ref: "../components/responses.yaml#/components/responses/GetMerklerootsConflict"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/GetMerklerootsInternalServerError"

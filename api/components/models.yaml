@@ -107,6 +107,39 @@ components:
           description: Total number of pages
           example: 10
 
+    ExclusiveStartKeySearchPage:
+      type: object
+      required:
+        - totalElements
+        - size
+        - lastEvaluatedKey
+      properties:
+        totalElements:
+          type: integer
+          description: Total number of items
+          example: 456
+        size:
+          type: integer
+          description: Number of items in returned data
+          example: 50
+        lastEvaluatedKey:
+          type: string
+          description: Last evaluated key
+          example: "00000000000000000216b36abb2f8a55bec9bb7c35c268781e77d85c98a90189"
+
+    GetMerkleRootResult:
+      type: object
+      required:
+        - content
+        - page
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/MerkleRoot'
+        page:
+          $ref: '#/components/schemas/ExclusiveStartKeySearchPage'
+
     Data:
       type: object
       properties:
@@ -378,3 +411,18 @@ components:
           description: ID of the transaction
       required:
         - txID
+    
+    MerkleRoot:
+      type: object
+      required:
+        - merkleRoot
+        - blockHeight
+      properties:
+        merkleRoot:
+          type: string
+          description: Transaction ID
+          example: "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
+        blockHeight:
+          type: integer
+          description: Block height
+          example: 1234
