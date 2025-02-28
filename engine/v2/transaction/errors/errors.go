@@ -29,6 +29,12 @@ var (
 	// ErrTxOutlineInsufficientFunds is returned when user has not enough BSV in UTXOs to fund the transaction.
 	ErrTxOutlineInsufficientFunds = models.SPVError{Code: "tx-outline-not-enough-funds", Message: "not enough funds to make the transaction", StatusCode: 422}
 
+	// ErrTxOutlinePaymailSatoshisMustBeDivisibleBySplits is returned when user choose to split paymail output but the satoshis are not divisible by splits number.
+	ErrTxOutlinePaymailSatoshisMustBeDivisibleBySplits = models.SPVError{Code: "tx-outline-paymail-satoshis-must-be-divisible-by-splits", Message: "paymail output satoshis must be divisible by chosen splits number", StatusCode: 400}
+
+	// ErrTxOutlinePaymailCannotSplitWhenRecipientSplitting is returned when user choose to split paymail output but the recipient responds from p2p destinations with multiple outputs.
+	ErrTxOutlinePaymailCannotSplitWhenRecipientSplitting = models.SPVError{Code: "tx-outline-paymail-cannot-split-when-recipient-splitting", Message: "cannot split paymail output when recipient responds with multiple outputs", StatusCode: 400}
+
 	// ErrFailedToDecodeHex is returned when hex decoding fails.
 	ErrFailedToDecodeHex = models.SPVError{Code: "failed-to-decode-hex", Message: "failed to decode hex", StatusCode: 400}
 
@@ -49,9 +55,6 @@ var (
 
 	// ErrParsingScript is when the script parsing fails.
 	ErrParsingScript = models.SPVError{Code: "error-parsing-script", Message: "failed to parse script", StatusCode: 400}
-
-	// ErrSavingData is when the data saving fails.
-	ErrSavingData = models.SPVError{Code: "error-saving-data", Message: "failed to save data", StatusCode: 400}
 
 	// ErrTxBroadcast is when the transaction broadcast fails.
 	ErrTxBroadcast = models.SPVError{Code: "error-tx-broadcast", Message: "failed to broadcast transaction", StatusCode: 500}
