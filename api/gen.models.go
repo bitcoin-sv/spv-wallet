@@ -489,11 +489,13 @@ type ModelsUserInfo struct {
 
 // RequestsAddPaymail defines model for requests_AddPaymail.
 type RequestsAddPaymail struct {
-	Address    string `json:"address"`
-	Alias      string `json:"alias"`
-	AvatarURL  string `json:"avatarURL"`
-	Domain     string `json:"domain"`
-	PublicName string `json:"publicName"`
+	Address   string  `json:"address"`
+	Alias     string  `json:"alias"`
+	AvatarURL *string `json:"avatarURL,omitempty"`
+	Domain    string  `json:"domain"`
+
+	// PublicName If not provided will default to the same value as alias
+	PublicName *string `json:"publicName,omitempty"`
 }
 
 // RequestsCreateUser defines model for requests_CreateUser.

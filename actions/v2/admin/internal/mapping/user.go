@@ -18,14 +18,24 @@ func UserToResponse(u *usersmodels.User) api.ModelsUser {
 	}
 }
 
-// UsersPaymailToResponse maps a user's paymail to a response
-func UsersPaymailToResponse(p *usersmodels.Paymail) api.ModelsPaymail {
-	return api.ModelsPaymail{
-		Id:         p.ID,
-		Alias:      p.Alias,
-		Domain:     p.Domain,
-		Paymail:    p.Alias + "@" + p.Domain,
-		PublicName: p.PublicName,
-		Avatar:     p.Avatar,
+// RequestCreateUserToNewUserModel maps a create user request to new user model
+func RequestCreateUserToNewUserModel(r *api.RequestsCreateUser) (*usersmodels.NewUser, error) {
+	newUser := &usersmodels.NewUser{
+		PublicKey: r.PublicKey,
 	}
+
+	if isPaymailDefined(r) {
+		newPaymail, err := RequestAddPaymailToNewPaymailModel(r.Paymail, "")
+		if err != nil {
+			return nil, err
+		}
+
+		newUser.Paymail = newPaymail
+	}
+
+	return newUser, nil
+}
+
+func isPaymailDefined(r *api.RequestsCreateUser) bool {
+	return r.Paymail != nil
 }

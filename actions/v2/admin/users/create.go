@@ -9,7 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/api"
 	configerrors "github.com/bitcoin-sv/spv-wallet/config/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailerrors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,36 +21,22 @@ func (s *APIAdminUsers) CreateUser(c *gin.Context) {
 		return
 	}
 
-	requestBody := &createUserRequest{&request}
-
-	if err := validatePubKey(requestBody.PublicKey); err != nil {
+	if err := validatePubKey(request.PublicKey); err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return
 	}
 
-	newUser := &usersmodels.NewUser{
-		PublicKey: requestBody.PublicKey,
-	}
-	if requestBody.PaymailDefined() {
-		alias, domain, err := parsePaymail(requestBody.PaymailRequestBody())
-		if err != nil {
-			spverrors.ErrorResponse(c, err, s.logger)
-			return
-		}
-
-		newUser.Paymail = &usersmodels.NewPaymail{
-			Alias:  alias,
-			Domain: domain,
-
-			PublicName: requestBody.Paymail.PublicName,
-			Avatar:     requestBody.Paymail.AvatarURL,
-		}
+	newUser, err := mapping.RequestCreateUserToNewUserModel(&request)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, s.logger)
+		return
 	}
 
 	createdUser, err := s.engine.UsersService().Create(c, newUser)
 	if err != nil {
 		spverrors.MapResponse(c, err, s.logger).
 			If(configerrors.ErrUnsupportedDomain).Then(adminerrors.ErrInvalidDomain).
+			If(paymailerrors.ErrInvalidAvatarURL).Then(adminerrors.ErrInvalidAvatarURL).
 			Else(adminerrors.ErrCreatingUser)
 		return
 	}
@@ -64,16 +50,4 @@ func validatePubKey(pubKey string) error {
 		return adminerrors.ErrInvalidPublicKey.Wrap(err)
 	}
 	return nil
-}
-
-type createUserRequest struct {
-	*api.RequestsCreateUser
-}
-
-func (r *createUserRequest) PaymailDefined() bool {
-	return r.RequestsCreateUser.Paymail != nil
-}
-
-func (r *createUserRequest) PaymailRequestBody() *addPaymailRequest {
-	return &addPaymailRequest{r.RequestsCreateUser.Paymail}
 }
