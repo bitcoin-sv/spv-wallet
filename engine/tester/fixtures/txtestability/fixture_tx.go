@@ -1,4 +1,4 @@
-package fixtures
+package txtestability
 
 import (
 	"testing"
@@ -6,6 +6,7 @@ import (
 	"github.com/bitcoin-sv/go-sdk/script"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/conv"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/require"
 )
@@ -24,22 +25,22 @@ var grandparentTXIDs = []string{
 	"27a53423aa3e5d5c46bf30be53a9998dd247daf758847f244f82d430be71de6e",
 }
 
-// GivenTXSpec is a builder for creating MOCK! transactions
-//
-// NOTE: Using several inputs in a single transaction is not recommended RIGHT NOW because:
-// in that case the resulting BEEF hex will be varying because of the order of inputs
-// TODO: Remove this comment after the go-sdk algorithm is fixed
-type GivenTXSpec interface {
-	WithSender(sender User) GivenTXSpec
-	WithRecipient(recipient User) GivenTXSpec
-	WithoutSigning() GivenTXSpec
-	WithInput(satoshis uint64) GivenTXSpec
-	WithInputFromUTXO(tx *trx.Transaction, vout uint32, customInstructions ...bsv.CustomInstruction) GivenTXSpec
-	WithSingleSourceInputs(satoshis ...uint64) GivenTXSpec
-	WithOPReturn(dataStr string) GivenTXSpec
-	WithOutputScriptParts(parts ...ScriptPart) GivenTXSpec
-	WithOutputScript(satoshis uint64, script *script.Script) GivenTXSpec
-	WithP2PKHOutput(satoshis uint64) GivenTXSpec
+type TransactionsFixtures interface {
+	Tx() TransactionSpec
+}
+
+// TransactionSpec is a builder for creating MOCK! transactions
+type TransactionSpec interface {
+	WithSender(sender fixtures.User) TransactionSpec
+	WithRecipient(recipient fixtures.User) TransactionSpec
+	WithoutSigning() TransactionSpec
+	WithInput(satoshis uint64) TransactionSpec
+	WithInputFromUTXO(tx *trx.Transaction, vout uint32, customInstructions ...bsv.CustomInstruction) TransactionSpec
+	WithSingleSourceInputs(satoshis ...uint64) TransactionSpec
+	WithOPReturn(dataStr string) TransactionSpec
+	WithOutputScriptParts(parts ...ScriptPart) TransactionSpec
+	WithOutputScript(satoshis uint64, script *script.Script) TransactionSpec
+	WithP2PKHOutput(satoshis uint64) TransactionSpec
 
 	TX() *trx.Transaction
 	InputUTXO(inputID int) bsv.Outpoint
@@ -50,56 +51,81 @@ type GivenTXSpec interface {
 	EF() string
 }
 
+type txFixturesFactory struct {
+	t                  testing.TB
+	blockHeight        uint32
+	grandparentTXIndex int
+}
+
+func Given(t testing.TB) TransactionsFixtures {
+	return &txFixturesFactory{
+		t:                  t,
+		blockHeight:        1000,
+		grandparentTXIndex: 0,
+	}
+}
+
+func (f *txFixturesFactory) Tx() TransactionSpec {
+	spec := &txSpec{
+		t:                  f.t,
+		sourceTransactions: make(map[string]*trx.Transaction),
+		sender:             fixtures.Sender,
+		recipient:          fixtures.RecipientInternal,
+		fixtureFactory:     f,
+	}
+
+	return spec
+}
+
+func (f *txFixturesFactory) getNextGrandparentTXID() string {
+	id := grandparentTXIDs[f.grandparentTXIndex]
+	f.grandparentTXIndex = (f.grandparentTXIndex + 1) % len(grandparentTXIDs)
+	return id
+}
+
+func (f *txFixturesFactory) getNextBlockHeight() uint32 {
+	h := f.blockHeight
+	f.blockHeight++
+	return h
+}
+
 type txSpec struct {
 	utxos          []*trx.UTXO
 	outputs        []*trx.TransactionOutput
 	t              testing.TB
 	disableSigning bool
 
-	grandparentTXIndex int
 	sourceTransactions map[string]*trx.Transaction
-	blockHeight        uint32
-	sender             User
-	recipient          User
-}
-
-// GivenTX creates a new GivenTXSpec for building a MOCK! transaction
-func GivenTX(t testing.TB) GivenTXSpec {
-	return &txSpec{
-		t:                  t,
-		blockHeight:        1000,
-		grandparentTXIndex: 0,
-		sourceTransactions: make(map[string]*trx.Transaction),
-		sender:             Sender,
-		recipient:          RecipientInternal,
-	}
+	sender             fixtures.User
+	recipient          fixtures.User
+	fixtureFactory     *txFixturesFactory
 }
 
 // WithSender sets the sender for the transaction (default is Sender)
-func (spec *txSpec) WithSender(sender User) GivenTXSpec {
+func (spec *txSpec) WithSender(sender fixtures.User) TransactionSpec {
 	spec.sender = sender
 	return spec
 }
 
 // WithRecipient sets the recipient for the transaction (default is RecipientInternal)
-func (spec *txSpec) WithRecipient(recipient User) GivenTXSpec {
+func (spec *txSpec) WithRecipient(recipient fixtures.User) TransactionSpec {
 	spec.recipient = recipient
 	return spec
 }
 
 // WithoutSigning disables signing of the transaction (default is false)
-func (spec *txSpec) WithoutSigning() GivenTXSpec {
+func (spec *txSpec) WithoutSigning() TransactionSpec {
 	spec.disableSigning = true
 	return spec
 }
 
 // WithInput adds an input to the transaction with the specified satoshis
 // it automatically creates a parent tx (sourceTX) with P2PKH UTXO with provided satoshis
-func (spec *txSpec) WithInput(satoshis uint64) GivenTXSpec {
+func (spec *txSpec) WithInput(satoshis uint64) TransactionSpec {
 	return spec.WithSingleSourceInputs(satoshis)
 }
 
-func (spec *txSpec) WithInputFromUTXO(tx *trx.Transaction, vout uint32, customInstructions ...bsv.CustomInstruction) GivenTXSpec {
+func (spec *txSpec) WithInputFromUTXO(tx *trx.Transaction, vout uint32, customInstructions ...bsv.CustomInstruction) TransactionSpec {
 	output := tx.Outputs[vout]
 	utxo, err := trx.NewUTXO(tx.TxID().String(), vout, output.LockingScript.String(), output.Satoshis)
 	require.NoError(spec.t, err, "creating utxo for input")
@@ -113,7 +139,7 @@ func (spec *txSpec) WithInputFromUTXO(tx *trx.Transaction, vout uint32, customIn
 
 // WithSingleSourceInputs adds inputs to the transaction with the specified satoshis
 // All the inputs will be sourced from a single parent transaction
-func (spec *txSpec) WithSingleSourceInputs(satoshis ...uint64) GivenTXSpec {
+func (spec *txSpec) WithSingleSourceInputs(satoshis ...uint64) TransactionSpec {
 	sourceTX := spec.makeParentTX(satoshis...)
 	for i, s := range satoshis {
 		i32, _ := conv.IntToUint32(i)
@@ -130,7 +156,7 @@ func (spec *txSpec) WithSingleSourceInputs(satoshis ...uint64) GivenTXSpec {
 }
 
 // WithOPReturn adds an OP_RETURN output to the transaction with the specified data
-func (spec *txSpec) WithOPReturn(dataStr string) GivenTXSpec {
+func (spec *txSpec) WithOPReturn(dataStr string) TransactionSpec {
 	data := []byte(dataStr)
 	o, err := trx.CreateOpReturnOutput([][]byte{data})
 	require.NoError(spec.t, err, "creating op return output")
@@ -140,8 +166,8 @@ func (spec *txSpec) WithOPReturn(dataStr string) GivenTXSpec {
 	return spec
 }
 
-// WithP2PKHOutput adds a P2PKH output to the transaction with the specified satoshis
-func (spec *txSpec) WithP2PKHOutput(satoshis uint64) GivenTXSpec {
+// WithP2PKHOutput adds a P2PKH output to the transaction with the specified satoshis owned by the recipient
+func (spec *txSpec) WithP2PKHOutput(satoshis uint64) TransactionSpec {
 	spec.outputs = append(spec.outputs, &trx.TransactionOutput{
 		Satoshis:      satoshis,
 		LockingScript: spec.recipient.P2PKHLockingScript(),
@@ -150,7 +176,7 @@ func (spec *txSpec) WithP2PKHOutput(satoshis uint64) GivenTXSpec {
 }
 
 // WithOutputScript adds an output to the transaction with the specified satoshis and script
-func (spec *txSpec) WithOutputScript(satoshis uint64, script *script.Script) GivenTXSpec {
+func (spec *txSpec) WithOutputScript(satoshis uint64, script *script.Script) TransactionSpec {
 	spec.outputs = append(spec.outputs, &trx.TransactionOutput{
 		Satoshis:      satoshis,
 		LockingScript: script,
@@ -180,7 +206,7 @@ func (data PushData) Append(s *script.Script) error {
 }
 
 // WithOutputScriptParts adds an output to the transaction with the specified script parts
-func (spec *txSpec) WithOutputScriptParts(parts ...ScriptPart) GivenTXSpec {
+func (spec *txSpec) WithOutputScriptParts(parts ...ScriptPart) TransactionSpec {
 	s := &script.Script{}
 	for _, part := range parts {
 		err := part.Append(s)
@@ -263,7 +289,7 @@ func (spec *txSpec) makeParentTX(satoshis ...uint64) *trx.Transaction {
 		total += s
 	}
 	withFee := total + 1
-	utxo, err := trx.NewUTXO(spec.getNextGrandparentTXID(), 0, spec.sender.P2PKHLockingScript().String(), withFee)
+	utxo, err := trx.NewUTXO(spec.fixtureFactory.getNextGrandparentTXID(), 0, spec.sender.P2PKHLockingScript().String(), withFee)
 	require.NoError(spec.t, err, "creating utxo for parent tx")
 
 	utxo.UnlockingScriptTemplate = spec.sender.P2PKHUnlockingScriptTemplate()
@@ -281,7 +307,7 @@ func (spec *txSpec) makeParentTX(satoshis ...uint64) *trx.Transaction {
 	require.NoError(spec.t, err, "signing parent tx")
 
 	// each merkle proof should have a different block height to not collide with each other
-	err = tx.AddMerkleProof(trx.NewMerklePath(spec.getNextBlockHeight(), [][]*trx.PathElement{{
+	err = tx.AddMerkleProof(trx.NewMerklePath(spec.fixtureFactory.getNextBlockHeight(), [][]*trx.PathElement{{
 		&trx.PathElement{
 			Hash:   tx.TxID(),
 			Offset: 0,
@@ -290,20 +316,4 @@ func (spec *txSpec) makeParentTX(satoshis ...uint64) *trx.Transaction {
 	require.NoError(spec.t, err, "adding merkle proof to parent tx")
 
 	return tx
-}
-
-func (spec *txSpec) getNextGrandparentTXID() string {
-	id := grandparentTXIDs[spec.grandparentTXIndex]
-	spec.grandparentTXIndex = (spec.grandparentTXIndex + 1) % len(grandparentTXIDs)
-	return id
-}
-
-func (spec *txSpec) getNextBlockHeight() uint32 {
-	h := spec.blockHeight
-	spec.blockHeight++
-	return h
-}
-
-func ptr[T any](value T) *T {
-	return &value
 }

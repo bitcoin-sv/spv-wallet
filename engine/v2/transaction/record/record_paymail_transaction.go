@@ -28,7 +28,7 @@ func (s *Service) RecordPaymailTransaction(ctx context.Context, tx *trx.Transact
 		operation.Subtract(utxo.Satoshis)
 	}
 
-	p2pkhOutputs, err := flow.findRelevantP2PKHOutputs()
+	p2pkhOutputs, err := flow.createUTXOsForTrackedAddresses(flow.allP2PKHAddresses())
 	if err != nil {
 		return err
 	}
