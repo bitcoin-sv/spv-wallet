@@ -80,8 +80,8 @@ func TestAddPaymail(t *testing.T) {
 
 		// then:
 		then.Response(res).
-			HasStatus(500).
-			WithJSONf(apierror.ExpectedJSON("error-user-adding-paymail", "error adding paymail"))
+			HasStatus(400).
+			WithJSONf(apierror.ExpectedJSON("error-user-invalid-avatar-url", "invalid avatar url"))
 	})
 
 	t.Run("Add a paymail to a user as admin using alias and domain as address", func(t *testing.T) {

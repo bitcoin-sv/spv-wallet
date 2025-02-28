@@ -41,7 +41,7 @@ func (s *Service) Create(ctx context.Context, newPaymail *paymailsmodels.NewPaym
 	}
 
 	if err := newPaymail.ValidateAvatar(); err != nil {
-		return nil, spverrors.Newf("invalid avatar url during paymail creation")
+		return nil, spverrors.Wrapf(err, "invalid avatar url during user creation")
 	}
 	if newPaymail.PublicName == "" {
 		newPaymail.PublicName = newPaymail.Alias

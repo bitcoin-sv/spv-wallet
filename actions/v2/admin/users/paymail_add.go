@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/api"
 	configerrors "github.com/bitcoin-sv/spv-wallet/config/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailerrors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,10 +26,12 @@ func (s *APIAdminUsers) AddPaymailToUser(c *gin.Context, id string) {
 		return
 	}
 
+	// map response to correct error
 	createdPaymail, err := s.engine.PaymailsService().Create(c, newPaymail)
 	if err != nil {
 		spverrors.MapResponse(c, err, s.logger).
 			If(configerrors.ErrUnsupportedDomain).Then(adminerrors.ErrInvalidDomain).
+			If(paymailerrors.ErrInvalidAvatarURL).Then(adminerrors.ErrInvalidAvatarURL).
 			Else(adminerrors.ErrAddingPaymail)
 		return
 	}

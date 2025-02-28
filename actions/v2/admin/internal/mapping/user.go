@@ -18,6 +18,7 @@ func UserToResponse(u *usersmodels.User) api.ModelsUser {
 	}
 }
 
+// RequestCreateUserToNewUserModel maps a create user request to new user model
 func RequestCreateUserToNewUserModel(r *api.RequestsCreateUser) (*usersmodels.NewUser, error) {
 	newUser := &usersmodels.NewUser{
 		PublicKey: r.PublicKey,

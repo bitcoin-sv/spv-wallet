@@ -32,6 +32,7 @@ func UsersPaymailToResponse(p *paymailsmodels.Paymail) api.ModelsPaymail {
 	}
 }
 
+// RequestAddPaymailToNewPaymailModel maps a add paymail request to new paymail model
 func RequestAddPaymailToNewPaymailModel(r *api.RequestsAddPaymail, userID string) (*paymailsmodels.NewPaymail, error) {
 	alias, domain, err := parsePaymail(r)
 	if err != nil {
