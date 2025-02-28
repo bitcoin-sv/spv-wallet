@@ -6,20 +6,20 @@ import (
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/internal/ef"
-	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures/txtestability"
 	"github.com/stretchr/testify/require"
 )
 
-func givenSingleINSingleOUTTX(t *testing.T) fixtures.GivenTXSpec {
-	return fixtures.GivenTX(t).WithInput(10).WithP2PKHOutput(1)
+func givenSingleINSingleOUTTX(t *testing.T) txtestability.TransactionSpec {
+	return txtestability.Given(t).Tx().WithInput(10).WithP2PKHOutput(1)
 }
 
-func givenMultipleINsTX(t *testing.T) fixtures.GivenTXSpec {
+func givenMultipleINsTX(t *testing.T) txtestability.TransactionSpec {
 	return givenSingleINSingleOUTTX(t).WithInput(2)
 }
 
-func givenSingleSourceINsTX(t *testing.T) fixtures.GivenTXSpec {
-	return fixtures.GivenTX(t).WithSingleSourceInputs(1, 2).WithP2PKHOutput(1)
+func givenSingleSourceINsTX(t *testing.T) txtestability.TransactionSpec {
+	return txtestability.Given(t).Tx().WithSingleSourceInputs(1, 2).WithP2PKHOutput(1)
 }
 
 func TestConverterFromRawTx(t *testing.T) {

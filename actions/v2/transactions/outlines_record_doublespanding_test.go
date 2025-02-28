@@ -26,7 +26,7 @@ func TestDoubleSpending(t *testing.T) {
 		given, then := testabilities.NewOf(givenForAllTests, t)
 
 		// and:
-		txSpec := fixtures.GivenTX(t).
+		txSpec := given.Tx().
 			WithSender(fixtures.Sender).
 			WithInputFromUTXO(sourceTxSpec.TX(), 0).
 			WithOPReturn("hello world")
@@ -73,7 +73,7 @@ func TestDoubleSpending(t *testing.T) {
 		given, then := testabilities.NewOf(givenForAllTests, t)
 
 		// and:
-		txSpec := fixtures.GivenTX(t).
+		txSpec := given.Tx().
 			WithSender(fixtures.Sender).
 			WithInputFromUTXO(sourceTxSpec.TX(), 0).
 			WithOPReturn("other data")
