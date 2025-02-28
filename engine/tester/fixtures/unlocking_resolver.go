@@ -6,6 +6,7 @@ import (
 	sighash "github.com/bitcoin-sv/go-sdk/transaction/sighash"
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/keys/type42"
+	"github.com/samber/lo"
 )
 
 type UnlockingTemplateResolver struct {
@@ -28,7 +29,7 @@ func (un *UnlockingTemplateResolver) Type42(instruction string) (bool, error) {
 }
 
 func (un *UnlockingTemplateResolver) Sign(_ string) (bool, error) {
-	template, err := p2pkh.Unlock(un.privKey, ptr(sighash.AllForkID))
+	template, err := p2pkh.Unlock(un.privKey, lo.ToPtr(sighash.AllForkID))
 	if err != nil {
 		panic("Invalid setup of user fixture, cannot restore unlocking script: " + err.Error())
 	}

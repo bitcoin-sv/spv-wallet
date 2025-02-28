@@ -110,7 +110,7 @@ func TestTransactionWithChange(t *testing.T) {
 			sourceTxSpec := given.Faucet(sender).TopUp(1001)
 
 			// and:
-			txSpec := fixtures.GivenTX(t).
+			txSpec := given.Tx().
 				WithSender(sender).
 				WithInputFromUTXO(sourceTxSpec.TX(), 0).
 				WithOPReturn("hello, world")

@@ -95,9 +95,7 @@ type txSpec struct {
 	t              testing.TB
 	disableSigning bool
 
-	grandparentTXIndex int
 	sourceTransactions map[string]*trx.Transaction
-	blockHeight        uint32
 	sender             fixtures.User
 	recipient          fixtures.User
 	fixtureFactory     *txFixturesFactory
