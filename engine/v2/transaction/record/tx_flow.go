@@ -132,8 +132,8 @@ func (f *txFlow) addOutputs(outputs ...txmodels.NewOutput) {
 	f.txRow.AddOutputs(outputs...)
 }
 
-func (f *txFlow) findRelevantP2PKHOutputs() (iter.Seq[txmodels.NewOutput], error) {
-	relevantOutputs := map[string]uint32{} // address -> vout
+func (f *txFlow) allP2PKHAddresses() addresses {
+	addrs := make(addresses)
 	for vout, output := range f.tx.Outputs {
 		lockingScript := output.LockingScript
 		if !lockingScript.IsP2PKH() {
@@ -144,34 +144,38 @@ func (f *txFlow) findRelevantP2PKHOutputs() (iter.Seq[txmodels.NewOutput], error
 			f.service.logger.Warn().Err(err).Msg("failed to get address from locking script")
 			continue
 		}
-
 		voutU32, err := conv.IntToUint32(vout)
 		if err != nil {
 			f.service.logger.Warn().Err(err).Msg("failed to convert vout to uint32")
 			continue
 		}
 
-		relevantOutputs[address.AddressString] = voutU32
+		addrs.append(address.AddressString, voutU32)
 	}
+	return addrs
+}
 
-	rows, err := f.service.addresses.FindByStringAddresses(f.ctx, maps.Keys(relevantOutputs))
+func (f *txFlow) createUTXOsForTrackedAddresses(potentialTrackedUniqueAddresses addresses) (iter.Seq[txmodels.NewOutput], error) {
+	trackedAddresses, err := f.service.addresses.FindByStringAddresses(f.ctx, maps.Keys(potentialTrackedUniqueAddresses))
 	if err != nil {
 		return nil, txerrors.ErrGettingAddresses.Wrap(err)
 	}
 
 	return func(yield func(output txmodels.NewOutput) bool) {
-		for _, row := range rows {
-			vout, ok := relevantOutputs[row.Address]
+		for _, tracked := range trackedAddresses {
+			addrInfo, ok := potentialTrackedUniqueAddresses[tracked.Address]
 			if !ok {
-				f.service.logger.Warn().Str("address", row.Address).Msg("Got not relevant address from database")
+				f.service.logger.Warn().Str("address", tracked.Address).Msg("Got not relevant address from database")
 				continue
 			}
-			yield(txmodels.NewOutputForP2PKH(
-				bsv.Outpoint{TxID: f.txID, Vout: vout},
-				row.UserID,
-				bsv.Satoshis(f.tx.Outputs[vout].Satoshis),
-				row.CustomInstructions,
-			))
+			for voutsContainingAddress := range addrInfo.vouts {
+				yield(txmodels.NewOutputForP2PKH(
+					bsv.Outpoint{TxID: f.txID, Vout: voutsContainingAddress},
+					tracked.UserID,
+					bsv.Satoshis(f.tx.Outputs[voutsContainingAddress].Satoshis),
+					tracked.CustomInstructions,
+				))
+			}
 		}
 	}, nil
 }

@@ -140,7 +140,7 @@ func (spec *txSpec) WithOPReturn(dataStr string) GivenTXSpec {
 	return spec
 }
 
-// WithP2PKHOutput adds a P2PKH output to the transaction with the specified satoshis
+// WithP2PKHOutput adds a P2PKH output to the transaction with the specified satoshis owned by the recipient
 func (spec *txSpec) WithP2PKHOutput(satoshis uint64) GivenTXSpec {
 	spec.outputs = append(spec.outputs, &trx.TransactionOutput{
 		Satoshis:      satoshis,
