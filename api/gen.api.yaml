@@ -143,6 +143,43 @@ paths:
             summary: Get data for user
             tags:
                 - Data
+    /api/v2/merkleroots:
+        get:
+            description: This endpoint fetches merkleroots from block header service according to the given query parameters.
+            operationId: getMerkleRoots
+            parameters:
+                - description: Batch size of merkleroots to be returned
+                  example: 100
+                  in: query
+                  name: batchSize
+                  schema:
+                    minimum: 0
+                    type: integer
+                - description: Last processed merkleroot in client's database
+                  example: 00000000000000000216b36abb2f8a55bec9bb7c35c268781e77d85c98a90189
+                  in: query
+                  name: lastEvaluatedKey
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    $ref: '#/components/responses/responses_GetMerklerootsSuccess'
+                "400":
+                    $ref: '#/components/responses/responses_GetMerklerootsBadRequest'
+                "401":
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
+                "404":
+                    $ref: '#/components/responses/responses_GetMerklerootsNotFound'
+                "409":
+                    $ref: '#/components/responses/responses_GetMerklerootsConflict'
+                "500":
+                    $ref: '#/components/responses/responses_GetMerklerootsInternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Get Merkleroots
+            tags:
+                - Merkleroots
     /api/v2/operations/search:
         get:
             description: This endpoint allows to search operations for authenticated user
@@ -363,6 +400,43 @@ components:
                     schema:
                         $ref: '#/components/schemas/models_Data'
             description: Data found
+        responses_GetMerklerootsBadRequest:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/errors_InvalidBatchSize'
+            description: Bad request is an error that occurs when the request is malformed.
+        responses_GetMerklerootsConflict:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/errors_MerkleRootNotInLongestChain'
+            description: Conflict is an error that occurs when the request conflicts with the current state of the server.
+        responses_GetMerklerootsInternalServerError:
+            content:
+                application/json:
+                    schema:
+                        oneOf:
+                            - $ref: '#/components/schemas/errors_BHSUnreachable'
+                            - $ref: '#/components/schemas/errors_BHSNoSuccessResponse'
+                            - $ref: '#/components/schemas/errors_BHSUnauthorized'
+                            - $ref: '#/components/schemas/errors_BHSBadRequest'
+                            - $ref: '#/components/schemas/errors_BHSUnhealthy'
+                            - $ref: '#/components/schemas/errors_BHSBadURL'
+                            - $ref: '#/components/schemas/errors_BHSParsingResponse'
+            description: Internal server error
+        responses_GetMerklerootsNotFound:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/errors_MerkleRootNotFound'
+            description: Not found is an error that occurs when the requested resource is not found.
+        responses_GetMerklerootsSuccess:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/models_GetMerkleRootResult'
+            description: Merkleroots found
         responses_InternalServerError:
             content:
                 application/json:
@@ -482,6 +556,69 @@ components:
                     message:
                         example: xpub authorization required
                   type: object
+        errors_BHSBadRequest:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-bhs-bad-request
+                    message:
+                        example: BHS bad request
+                  type: object
+        errors_BHSBadURL:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-bhs-bad-url
+                    message:
+                        example: cannot create Block Header Service url. Please check your configuration
+                  type: object
+        errors_BHSNoSuccessResponse:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-bhs-no-success-response
+                    message:
+                        example: Block Header Service request did not return a success response
+                  type: object
+        errors_BHSParsingResponse:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-bhs-parse-response
+                    message:
+                        example: cannot parse Block Header Service response
+                  type: object
+        errors_BHSUnauthorized:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-bhs-unauthorized
+                    message:
+                        example: BHS returned unauthorized
+                  type: object
+        errors_BHSUnhealthy:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-bhs-unhealthy
+                    message:
+                        example: Block Header Service is unhealthy
+                  type: object
+        errors_BHSUnreachable:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-bhs-unreachable
+                    message:
+                        example: Block Header Service cannot be requested
+                  type: object
         errors_CannotBindRequest:
             allOf:
                 - $ref: '#/components/schemas/errors_Schema'
@@ -536,6 +673,15 @@ components:
                     message:
                         example: internal server error
                   type: object
+        errors_InvalidBatchSize:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-invalid-batch-size
+                    message:
+                        example: batchSize must be 0 or a positive integer
+                  type: object
         errors_InvalidDataID:
             allOf:
                 - $ref: '#/components/schemas/errors_Schema'
@@ -571,6 +717,24 @@ components:
                         example: error-user-invalid-pubkey
                     message:
                         example: invalid public key
+                  type: object
+        errors_MerkleRootNotFound:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-merkleroot-not-found
+                    message:
+                        example: No block with provided merkleroot was found
+                  type: object
+        errors_MerkleRootNotInLongestChain:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-merkleroot-not-part-of-longest-chain
+                    message:
+                        example: Provided merkleroot is not part of the longest chain
                   type: object
         errors_NoOperations:
             allOf:
@@ -759,6 +923,37 @@ components:
             required:
                 - bucket
             type: object
+        models_ExclusiveStartKeySearchPage:
+            properties:
+                lastEvaluatedKey:
+                    description: Last evaluated key
+                    example: 00000000000000000216b36abb2f8a55bec9bb7c35c268781e77d85c98a90189
+                    type: string
+                size:
+                    description: Number of items in returned data
+                    example: 50
+                    type: integer
+                totalElements:
+                    description: Total number of items
+                    example: 456
+                    type: integer
+            required:
+                - totalElements
+                - size
+                - lastEvaluatedKey
+            type: object
+        models_GetMerkleRootResult:
+            properties:
+                content:
+                    items:
+                        $ref: '#/components/schemas/models_MerkleRoot'
+                    type: array
+                page:
+                    $ref: '#/components/schemas/models_ExclusiveStartKeySearchPage'
+            required:
+                - content
+                - page
+            type: object
         models_InputAnnotation:
             properties:
                 customInstructions:
@@ -780,6 +975,20 @@ components:
                     type: object
             required:
                 - inputs
+            type: object
+        models_MerkleRoot:
+            properties:
+                blockHeight:
+                    description: Block height
+                    example: 1234
+                    type: integer
+                merkleRoot:
+                    description: Transaction ID
+                    example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
+                    type: string
+            required:
+                - merkleRoot
+                - blockHeight
             type: object
         models_Operation:
             properties:
