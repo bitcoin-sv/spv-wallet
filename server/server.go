@@ -123,6 +123,10 @@ func setupServerRoutes(appConfig *config.AppConfig, spvWalletEngine engine.Clien
 				spverrors.ErrorResponse(c, err, log)
 			},
 		})
+
+		if appConfig.ARCCallbackEnabled() {
+			spvWalletEngine.Chain().RegisterCallback(spvWalletEngine.TxSyncService(), ginEngine)
+		}
 	}
 
 	if appConfig.DebugProfiling {

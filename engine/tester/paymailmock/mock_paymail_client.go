@@ -7,8 +7,9 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
-	"github.com/bitcoin-sv/go-paymail/tester"
+	paymailtester "github.com/bitcoin-sv/go-paymail/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"
 )
@@ -20,7 +21,7 @@ type PaymailClientMock struct {
 	capabilities []*CapabilityMock
 
 	mockTransport *httpmock.MockTransport
-	sniffer       *httpSniffer
+	sniffer       *tester.HTTPSniffer
 
 	localDomain    string
 	localTransport http.RoundTripper
@@ -45,7 +46,7 @@ func MockClient(mockTransport *httpmock.MockTransport, domain string, moreDomain
 
 	// Set the HTTP mocking client
 	// restyClient -> sniffer -> mockTransport
-	sniffer := newHTTPSniffer(mockTransport)
+	sniffer := tester.NewHTTPSniffer(mockTransport)
 
 	client := resty.New()
 	client.SetTransport(sniffer)
@@ -75,7 +76,7 @@ func MockClient(mockTransport *httpmock.MockTransport, domain string, moreDomain
 	}
 
 	// Set the custom resolver
-	newClient.WithCustomResolver(tester.NewCustomResolver(
+	newClient.WithCustomResolver(paymailtester.NewCustomResolver(
 		newClient.GetResolver(),
 		hosts,
 		records,
@@ -196,8 +197,8 @@ func (c *PaymailClientMock) findDomain(domain string) paymailDomainName {
 }
 
 // GetCallByRegex is returning the details of a call made to the mocked server by a URL matching a regex.
-func (c *PaymailClientMock) GetCallByRegex(r string) *CallDetails {
-	return c.sniffer.getCallByRegex(r)
+func (c *PaymailClientMock) GetCallByRegex(r string) *tester.CallDetails {
+	return c.sniffer.GetCallByRegex(r)
 }
 
 func (c *PaymailClientMock) useBasicCapabilities() {

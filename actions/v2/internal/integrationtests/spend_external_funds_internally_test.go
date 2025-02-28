@@ -12,7 +12,7 @@ func TestSpendExternalFundsInternally(t *testing.T) {
 	cleanup := given.StartedSPVWalletV2()
 	defer cleanup()
 
-	// and:
+	// when:
 	receiveTxID := when.Alice().ReceivesFromExternal(10)
 
 	// then:

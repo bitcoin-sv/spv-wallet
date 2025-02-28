@@ -27,6 +27,9 @@ type TrackedTransaction struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
+	BlockHeight *int64
+	BlockHash   *string
+
 	Data []*Data `gorm:"foreignKey:TxID"`
 
 	Inputs  []*TrackedOutput `gorm:"foreignKey:SpendingTX"`

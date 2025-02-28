@@ -61,22 +61,24 @@ type EngineWithConfig struct {
 }
 
 type engineFixture struct {
-	config             *config.AppConfig
-	engine             engine.ClientInterface
-	t                  testing.TB
-	logger             zerolog.Logger
-	dbConnectionString string
-	externalTransport  *httpmock.MockTransport
-	paymailClient      *paymailmock.PaymailClientMock
+	config                       *config.AppConfig
+	engine                       engine.ClientInterface
+	t                            testing.TB
+	logger                       zerolog.Logger
+	dbConnectionString           string
+	externalTransport            *httpmock.MockTransport
+	paymailClient                *paymailmock.PaymailClientMock
+	externalTransportWithSniffer *tester.HTTPSniffer
 }
 
 func Given(t testing.TB) EngineFixture {
 	externalTransport := httpmock.NewMockTransport()
 	f := &engineFixture{
-		t:                 t,
-		logger:            tester.Logger(t),
-		externalTransport: externalTransport,
-		paymailClient:     paymailmock.MockClient(externalTransport, fixtures.PaymailDomainExternal),
+		t:                            t,
+		logger:                       tester.Logger(t),
+		externalTransport:            externalTransport,
+		paymailClient:                paymailmock.MockClient(externalTransport, fixtures.PaymailDomainExternal),
+		externalTransportWithSniffer: tester.NewHTTPSniffer(externalTransport),
 	}
 
 	return f
@@ -194,7 +196,7 @@ func (f *engineFixture) addMockedExternalDependenciesOptions(options []engine.Cl
 
 func (f *engineFixture) httpClientWithMockedTransport() *resty.Client {
 	client := resty.New()
-	client.SetTransport(f.externalTransport)
+	client.SetTransport(f.externalTransportWithSniffer)
 	return client
 }
 

@@ -4,11 +4,13 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
+	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 )
 
 type IntegrationTestAssertion interface {
 	Alice() SpvWalletActorsStateAssertions
 	Bob() SpvWalletActorsStateAssertions
+	ARC() testengine.ARCAssertions
 }
 
 // SpvWalletActorsStateAssertions about spv-wallet users

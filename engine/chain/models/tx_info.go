@@ -1,6 +1,9 @@
 package chainmodels
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 // TXInfo is the struct that represents the transaction information from ARC
 type TXInfo struct {
@@ -16,4 +19,9 @@ type TXInfo struct {
 // Found presents a convention to indicate that the transaction is known by ARC
 func (t *TXInfo) Found() bool {
 	return t != nil
+}
+
+// TXInfoHandler is an interface that defines the method to handle the transaction information originating from ARC
+type TXInfoHandler interface {
+	Handle(ctx context.Context, txInfo TXInfo) error
 }
