@@ -34,6 +34,9 @@ type ServerInterface interface {
 	// Get operations for user
 	// (GET /api/v2/operations/search)
 	SearchOperations(c *gin.Context, params SearchOperationsParams)
+
+	// (GET /api/v2/test/errors)
+	GetApiV2TestErrors(c *gin.Context, params GetApiV2TestErrorsParams)
 	// Record transaction outline
 	// (POST /api/v2/transactions)
 	RecordTransactionOutline(c *gin.Context)
@@ -229,6 +232,32 @@ func (siw *ServerInterfaceWrapper) SearchOperations(c *gin.Context) {
 	siw.Handler.SearchOperations(c, params)
 }
 
+// GetApiV2TestErrors operation middleware
+func (siw *ServerInterfaceWrapper) GetApiV2TestErrors(c *gin.Context) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetApiV2TestErrorsParams
+
+	// ------------- Optional query parameter "fail" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "fail", c.Request.URL.Query(), &params.Fail)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter fail: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetApiV2TestErrors(c, params)
+}
+
 // RecordTransactionOutline operation middleware
 func (siw *ServerInterfaceWrapper) RecordTransactionOutline(c *gin.Context) {
 
@@ -321,6 +350,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/api/v2/configs/shared", wrapper.SharedConfig)
 	router.GET(options.BaseURL+"/api/v2/data/:id", wrapper.DataById)
 	router.GET(options.BaseURL+"/api/v2/operations/search", wrapper.SearchOperations)
+	router.GET(options.BaseURL+"/api/v2/test/errors", wrapper.GetApiV2TestErrors)
 	router.POST(options.BaseURL+"/api/v2/transactions", wrapper.RecordTransactionOutline)
 	router.POST(options.BaseURL+"/api/v2/transactions/outlines", wrapper.CreateTransactionOutline)
 	router.GET(options.BaseURL+"/api/v2/users/current", wrapper.CurrentUser)

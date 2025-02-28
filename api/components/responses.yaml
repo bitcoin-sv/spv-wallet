@@ -5,6 +5,14 @@ info:
 
 components:
   responses:
+    ##################
+    ProblemDetails:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/ProblemDetails"
+    ##################
     SharedConfig:
       description: Shared config
       content:
