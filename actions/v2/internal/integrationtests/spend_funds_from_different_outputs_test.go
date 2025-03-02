@@ -27,7 +27,7 @@ func TestSpendingFromMultipleSourceOutputs(t *testing.T) {
 		WithType("incoming")
 
 	// when:
-	txID4 := when.Alice().SendsTo(given.Bob(), 41)
+	txID4 := when.Alice().SendsFundsTo(given.Bob(), 41)
 
 	// then:
 	then.Alice().Balance().IsEqualTo(0)

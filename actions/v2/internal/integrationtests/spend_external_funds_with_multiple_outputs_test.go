@@ -23,14 +23,11 @@ func TestSpendExternalFundsWithMultipleOutputs(t *testing.T) {
 		WithType("incoming")
 
 	// when:
-	// move to two methods for example OpReturn Paymail etc
-	dataOutput := map[string]any{
-		"type":     "op_return",
-		"dataType": "strings",
-		"data":     []string{"Hello, world!"},
-	}
-
-	internalTxID := when.Alice().SendsTo(given.Bob(), 1, dataOutput)
+	when.Alice().AddPaymailOutput(given.Bob(), 1)
+	when.Alice().AddOpReturnOutput([]string{"Hello", "Bob!"})
+	when.Alice().CreateOutline()
+	when.Alice().SignOutline()
+	internalTxID := when.Alice().SendTransaction()
 
 	// then:
 	then.Alice().Balance().IsEqualTo(0)

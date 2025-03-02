@@ -24,7 +24,7 @@ func TestSpendExternalFundsInternally(t *testing.T) {
 		WithType("incoming")
 
 	// when:
-	internalTxID := when.Alice().SendsTo(given.Bob(), 5)
+	internalTxID := when.Alice().SendsFundsTo(given.Bob(), 5)
 
 	// then:
 	then.Alice().Balance().IsEqualTo(0)

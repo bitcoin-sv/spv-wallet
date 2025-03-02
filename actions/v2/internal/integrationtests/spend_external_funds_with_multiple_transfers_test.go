@@ -18,7 +18,7 @@ func TestSpendInternalFundsWithMultipleTransfers(t *testing.T) {
 	then.Alice().Balance().IsEqualTo(50)
 
 	// when:
-	firstTxID := when.Alice().SendsTo(given.Bob(), 30)
+	firstTxID := when.Alice().SendsFundsTo(given.Bob(), 30)
 
 	// then:
 	then.Alice().Balance().IsEqualTo(0)

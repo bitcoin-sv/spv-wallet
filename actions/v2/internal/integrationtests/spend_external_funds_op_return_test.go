@@ -1,8 +1,37 @@
 package integrationtests
 
-// add testcase that we will receive external funds and send it via opreturn
-// separated method for opreturn
+import (
+	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/integrationtests/testabilities"
+	"testing"
+)
 
-// 1. Create SendsTo method (second one) with abstractions to allow create custom outputs etc
-// 2. Create separated method for SendsOpReturn
-// 3. And use it here
+func TestSpendExternalFundsOpReturn(t *testing.T) {
+	// given:
+	given, when, then := testabilities.New(t)
+	cleanup := given.StartedSPVWalletV2()
+	defer cleanup()
+
+	// and:
+	receiveTxID := when.Alice().ReceivesFromExternal(2)
+
+	// then:
+	then.Alice().Balance().IsEqualTo(2)
+	then.Alice().Operations().Last().
+		WithTxID(receiveTxID).
+		WithTxStatus("BROADCASTED").
+		WithValue(2).
+		WithType("incoming")
+
+	// when:
+	internalTxID := when.Alice().SendsData([]string{"Hello", "Bob!"})
+
+	// then:
+	then.Alice().Balance().IsEqualTo(0)
+
+	then.Alice().Operations().Last().
+		WithTxID(internalTxID).
+		WithTxStatus("BROADCASTED").
+		WithValue(-2).
+		WithType("outgoing")
+
+}
