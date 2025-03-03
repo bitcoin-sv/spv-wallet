@@ -14,13 +14,14 @@ type arcActions struct {
 	fixture *fixture
 }
 
-func (a *arcActions) ReceivesCallback(txInfo chainmodels.TXInfo) {
+func (a *arcActions) SendsCallback(txInfo chainmodels.TXInfo) {
 	client := a.fixture.HttpClient().ForAnonymous()
+	token := a.fixture.Config().ARC.Callback.Token
 
 	res, _ := client.R().
 		SetHeader("Content-Type", "application/json").
 		SetBody(txInfo).
-		SetAuthToken(ARCCallbackToken).
+		SetAuthToken(token).
 		Post("/arc/broadcast/callback")
 
 	require.Equal(a.t, 200, res.StatusCode())

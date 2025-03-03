@@ -4,33 +4,36 @@ import (
 	"testing"
 	"time"
 
+	"github.com/bitcoin-sv/go-sdk/chainhash"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/integrationtests/testabilities"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 )
 
-func Test(t *testing.T) {
+func TestHandlingARCCallback(t *testing.T) {
 	tests := map[string]struct {
-		txInfo       chainmodels.TXInfo
-		expectStatus string
+		txInfo         chainmodels.TXInfo
+		expectStatus   txmodels.TxStatus
+		beforeCallback func(t *testing.T, txInfo *chainmodels.TXInfo)
 	}{
 		"On Mined with BUMP": {
 			txInfo: chainmodels.TXInfo{
 				TXStatus:    chainmodels.Mined,
-				BlockHash:   "00000000000000000f0905597b6cac80031f0f56834e74dce1a714c682a9ed38",
 				BlockHeight: 885803,
 				Timestamp:   time.Now(),
-				MerklePath:  "fe2b840d000902fd95010026e9ab42eb62d82f23a8940aeb02d58d69e92a6aa7d1f5b48674efb50707fc6dfd940102cd12118ddd85e4383901e13a04cd1179cec4740095eb70d2795f285f05aac5bd01cb007a63e80a3d3a937485e84f3f1a81670b626901cd705952d90d251a1c5ca907a1016400d463d7cc431fde3583bb4ba22089a27ac7cda8c5b5353ead60ee82a4b9e38c8d013300d9130482034bd2baeae736db5faeef985df314c91b164ccc36322c9c854061fe011800a15436aa01ce6e5f4290b974438700cfa689410ac9247bc04caee82f4a407032010d0082efd108a321a156023ad70c5601921df4b88fdd5402db21eb123870282458dd010700bea1a97aebcd5ff3b118fc64c85e2643c09426d22c00c700f84b8064b6c5745301020035ffd9b671117fcba0c027b0e4b966c68cb0c10994f241a5a647db51c2d0bdaa0100009f212e79950c6b827f6139d1c2a21bdcb6a275a0740c94b7e24795c4d4d7280a",
 			},
-			expectStatus: "MINED",
+			beforeCallback: calcBumpAndBlockHash,
+			expectStatus:   txmodels.TxStatusMined,
 		},
 		"On SentToNetwork do nothing": {
 			txInfo:       minimalTxInfo(chainmodels.SentToNetwork),
-			expectStatus: "BROADCASTED",
+			expectStatus: txmodels.TxStatusBroadcasted,
 		},
 		"On SeenOnNetwork do nothing": {
 			txInfo:       minimalTxInfo(chainmodels.SeenOnNetwork),
-			expectStatus: "BROADCASTED",
+			expectStatus: txmodels.TxStatusBroadcasted,
 		},
 		"On Mined without BUMP don't change status": {
 			txInfo: chainmodels.TXInfo{
@@ -39,23 +42,23 @@ func Test(t *testing.T) {
 				BlockHeight: 885803,
 				Timestamp:   time.Now(),
 			},
-			expectStatus: "BROADCASTED",
+			expectStatus: txmodels.TxStatusBroadcasted,
 		},
 		"On DoubleSpendAttempted mark as problematic": {
 			txInfo:       minimalTxInfo(chainmodels.DoubleSpendAttempted),
-			expectStatus: "PROBLEMATIC",
+			expectStatus: txmodels.TxStatusProblematic,
 		},
 		"On SeenInOrphanMempool mark as problematic": {
 			txInfo:       minimalTxInfo(chainmodels.SeenInOrphanMempool),
-			expectStatus: "PROBLEMATIC",
+			expectStatus: txmodels.TxStatusProblematic,
 		},
 		"On Rejected mark as problematic": {
 			txInfo:       minimalTxInfo(chainmodels.Rejected),
-			expectStatus: "PROBLEMATIC",
+			expectStatus: txmodels.TxStatusProblematic,
 		},
 		"On Unknown mark as problematic": {
 			txInfo:       minimalTxInfo(chainmodels.Unknown),
-			expectStatus: "PROBLEMATIC",
+			expectStatus: txmodels.TxStatusProblematic,
 		},
 	}
 	for name, test := range tests {
@@ -79,14 +82,23 @@ func Test(t *testing.T) {
 				WithTxID(receiveTxID).
 				WithTxStatus("BROADCASTED")
 
+			// given:
+			test.txInfo.TxID = receiveTxID
+			if test.beforeCallback != nil {
+				test.beforeCallback(t, &test.txInfo)
+			}
+
 			// when:
 			test.txInfo.TxID = receiveTxID
-			when.ARC().ReceivesCallback(test.txInfo)
+			if test.beforeCallback != nil {
+				test.beforeCallback(t, &test.txInfo)
+			}
+			when.ARC().SendsCallback(test.txInfo)
 
 			// then:
 			then.Alice().Operations().Last().
 				WithTxID(receiveTxID).
-				WithTxStatus(test.expectStatus)
+				WithTxStatus(string(test.expectStatus))
 
 			// TODO: Assert for tx block height/hash and BEEF after Searching Transactions is implemented
 		})
@@ -98,4 +110,18 @@ func minimalTxInfo(txStatus chainmodels.TXStatus) chainmodels.TXInfo {
 		TXStatus:  txStatus,
 		Timestamp: time.Now(),
 	}
+}
+
+func calcBumpAndBlockHash(t *testing.T, txInfo *chainmodels.TXInfo) {
+	t.Helper()
+
+	txID, _ := chainhash.NewHashFromHex(txInfo.TxID)
+	bump := trx.NewMerklePath(uint32(txInfo.BlockHeight), [][]*trx.PathElement{{
+		&trx.PathElement{
+			Hash:   txID,
+			Offset: 0,
+		},
+	}})
+	txInfo.MerklePath = bump.Hex()
+	txInfo.BlockHash, _ = bump.ComputeRootHex(&txInfo.TxID)
 }

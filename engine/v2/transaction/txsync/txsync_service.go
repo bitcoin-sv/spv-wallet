@@ -44,9 +44,9 @@ func (s *Service) Handle(ctx context.Context, txInfo chainmodels.TXInfo) error {
 			Msgf("Received ARC callback with transaction which is not mined yet")
 	}
 
-	bump, err := trx.NewMerklePathFromHex(txInfo.MerklePath)
+	bump, err := parseMerklePath(txInfo.MerklePath, txInfo.TxID)
 	if err != nil {
-		return spverrors.Wrapf(err, "failed to parse merkle path for transaction %s", txInfo.TxID)
+		return err
 	}
 
 	hex, isBEEF, err := s.transactionsRepo.GetTransactionHex(ctx, txInfo.TxID)
@@ -76,4 +76,18 @@ func (s *Service) Handle(ctx context.Context, txInfo chainmodels.TXInfo) error {
 	}
 
 	return nil
+}
+
+func parseMerklePath(merklePath string, txID string) (*trx.MerklePath, error) {
+	bump, err := trx.NewMerklePathFromHex(merklePath)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to parse merkle path for transaction %s", txID)
+	}
+
+	_, err = bump.ComputeRootHex(&txID)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to validate merkle path %s for transaction %s", merklePath, txID)
+	}
+
+	return bump, nil
 }

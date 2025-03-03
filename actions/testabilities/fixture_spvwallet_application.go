@@ -38,6 +38,8 @@ type SPVWalletApplicationFixture interface {
 	Faucet(user fixtures.User) testengine.FaucetFixture
 
 	EngineFixture() testengine.EngineFixture
+
+	Config() *config.AppConfig
 }
 
 type BlockHeadersServiceFixture interface {
@@ -158,4 +160,8 @@ func (f *appFixture) Faucet(user fixtures.User) testengine.FaucetFixture {
 
 func (f *appFixture) EngineFixture() testengine.EngineFixture {
 	return f.engineFixture
+}
+
+func (f *appFixture) Config() *config.AppConfig {
+	return &f.engineWithConfig.Config
 }
