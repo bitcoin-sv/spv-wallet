@@ -24,6 +24,7 @@ const notConfiguredExternalPaymail = "replace.me@locahost"
 const notConfiguredRegressionPaymail = "regression_tests_funds@replace.me.locahost"
 
 var StateError = errorx.NewType(errorx.CommonErrors, "state_error")
+var NotFound = errorx.NewType(errorx.CommonErrors, "not_found")
 
 type State struct {
 	Domain                string `mapstructure:"domain"     yaml:"domain"`
@@ -32,7 +33,7 @@ type State struct {
 	AdminXpub             string `mapstructure:"admin"      yaml:"admin"`
 	User                  User
 	Payment               Payment `mapstructure:"payment" yaml:"payment"`
-	OldUsers              []User  `mapstructure:"zzz_old_users" yaml:"zzz_old_users"`
+	OldUsers              []*User `mapstructure:"zzz_old_users" yaml:"zzz_old_users"`
 	configFilePath        string
 	configFileJustCreated bool
 }
@@ -123,7 +124,8 @@ func (s *State) SaveOnSuccess(res Result) error {
 
 func (s *State) NewUser(xpriv string, xpub string) (*User, error) {
 	if !s.User.IsEmpty() {
-		s.OldUsers = append(s.OldUsers, s.User)
+		oldUser := s.User
+		s.OldUsers = append(s.OldUsers, &oldUser)
 	}
 	err := s.User.new(xpriv, xpub)
 	if err != nil {
@@ -262,12 +264,14 @@ func (s *State) UseUserWithID(userID string) error {
 		return err
 	}
 
-	s.OldUsers = append(s.OldUsers, s.User)
-	s.OldUsers = lo.UniqBy(s.OldUsers, func(user User) string {
-		return user.ID
-	})
+	oldUser := s.User
 
 	s.User = *founded
+
+	s.OldUsers = lo.Filter(s.OldUsers, func(user *User, _ int) bool {
+		return user.ID != founded.ID
+	})
+	s.OldUsers = append(s.OldUsers, &oldUser)
 
 	return nil
 }
@@ -289,15 +293,15 @@ func (s *State) GetOldUserById(userID string) (*User, error) {
 		return nil, StateError.New("no old users to search for user")
 	}
 
-	founded, success := lo.Find(s.OldUsers, func(user User) bool {
+	founded, success := lo.Find(s.OldUsers, func(user *User) bool {
 		return user.ID == userID
 	})
 
 	if !success {
-		return nil, StateError.New("user with ID %s not found", userID)
+		return nil, NotFound.New("user with ID %s not found", userID)
 	}
 
-	return &founded, nil
+	return founded, nil
 
 }
 
