@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures/txtestability"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/assert"
@@ -43,7 +44,7 @@ func (a *transactionAssertions) OutputUnlockableBy(vout uint32, user fixtures.Us
 	}
 	a.require.NotNil(outputAnnotation.CustomInstructions, "output %d has no custom instructions", vout)
 
-	fixtures.GivenTX(a.t).
+	txtestability.Given(a.t).Tx().
 		WithSender(user).
 		WithInputFromUTXO(a.tx, vout, *outputAnnotation.CustomInstructions...).
 		WithOPReturn("dummy data").

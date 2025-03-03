@@ -12,6 +12,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/testabilities/testmode"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures/txtestability"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
@@ -47,12 +48,15 @@ type EngineFixture interface {
 
 	// Faucet creates a new test fixture for Faucet
 	Faucet(user fixtures.User) FaucetFixture
+
+	// Tx creates a new mocked transaction builder
+	Tx() txtestability.TransactionSpec
 }
 
 // FaucetFixture is a test fixture for the faucet service
 type FaucetFixture interface {
-	TopUp(satoshis bsv.Satoshis) fixtures.GivenTXSpec
-	StoreData(data string) (fixtures.GivenTXSpec, string)
+	TopUp(satoshis bsv.Satoshis) txtestability.TransactionSpec
+	StoreData(data string) (txtestability.TransactionSpec, string)
 }
 
 type EngineWithConfig struct {
@@ -68,6 +72,7 @@ type engineFixture struct {
 	dbConnectionString           string
 	externalTransport            *httpmock.MockTransport
 	paymailClient                *paymailmock.PaymailClientMock
+	txFixture                    txtestability.TransactionsFixtures
 	externalTransportWithSniffer *tester.HTTPSniffer
 }
 
@@ -78,6 +83,7 @@ func Given(t testing.TB) EngineFixture {
 		logger:                       tester.Logger(t),
 		externalTransport:            externalTransport,
 		paymailClient:                paymailmock.MockClient(externalTransport, fixtures.PaymailDomainExternal),
+		txFixture:                    txtestability.Given(t),
 		externalTransportWithSniffer: tester.NewHTTPSniffer(externalTransport),
 	}
 
@@ -92,6 +98,7 @@ func (f *engineFixture) NewTest(t testing.TB) EngineFixture {
 	newFixture := *f
 	newFixture.t = t
 	newFixture.logger = tester.Logger(t)
+	newFixture.txFixture = txtestability.Given(t)
 	return &newFixture
 }
 
@@ -137,14 +144,19 @@ func (f *engineFixture) ConfigForTests(opts ...ConfigOpts) *config.AppConfig {
 
 func (f *engineFixture) Faucet(user fixtures.User) FaucetFixture {
 	return &faucetFixture{
-		engine:  f.engine,
-		user:    user,
-		t:       f.t,
-		assert:  assert.New(f.t),
-		require: require.New(f.t),
-		arc:     f.ARC(),
-		bhs:     f.BHS(),
+		engine:    f.engine,
+		user:      user,
+		t:         f.t,
+		assert:    assert.New(f.t),
+		require:   require.New(f.t),
+		arc:       f.ARC(),
+		bhs:       f.BHS(),
+		txFixture: f.txFixture,
 	}
+}
+
+func (f *engineFixture) Tx() txtestability.TransactionSpec {
+	return f.txFixture.Tx()
 }
 
 // prepareDBConfigForTests creates a new connection that will be used as connection for engine
