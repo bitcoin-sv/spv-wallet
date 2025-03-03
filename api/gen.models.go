@@ -155,6 +155,12 @@ type ErrorsInternal struct {
 	Message interface{} `json:"message"`
 }
 
+// ErrorsInvalidAvatarURL defines model for errors_InvalidAvatarURL.
+type ErrorsInvalidAvatarURL struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ErrorsInvalidDataID defines model for errors_InvalidDataID.
 type ErrorsInvalidDataID struct {
 	Code    interface{} `json:"code"`
@@ -589,6 +595,11 @@ type ResponsesAdminGetUser = ModelsUser
 
 // ResponsesAdminGetUserInternalServerError defines model for responses_AdminGetUserInternalServerError.
 type ResponsesAdminGetUserInternalServerError = ErrorsGettingUser
+
+// ResponsesAdminInvalidAvatarURL defines model for responses_AdminInvalidAvatarURL.
+type ResponsesAdminInvalidAvatarURL struct {
+	union json.RawMessage
+}
 
 // ResponsesAdminUserBadRequest defines model for responses_AdminUserBadRequest.
 type ResponsesAdminUserBadRequest struct {
@@ -1113,6 +1124,42 @@ func (t RequestsTransactionOutlineOutputSpecification) MarshalJSON() ([]byte, er
 }
 
 func (t *RequestsTransactionOutlineOutputSpecification) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsInvalidAvatarURL returns the union data inside the ResponsesAdminInvalidAvatarURL as a ErrorsInvalidAvatarURL
+func (t ResponsesAdminInvalidAvatarURL) AsErrorsInvalidAvatarURL() (ErrorsInvalidAvatarURL, error) {
+	var body ErrorsInvalidAvatarURL
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInvalidAvatarURL overwrites any union data inside the ResponsesAdminInvalidAvatarURL as the provided ErrorsInvalidAvatarURL
+func (t *ResponsesAdminInvalidAvatarURL) FromErrorsInvalidAvatarURL(v ErrorsInvalidAvatarURL) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInvalidAvatarURL performs a merge with any union data inside the ResponsesAdminInvalidAvatarURL, using the provided ErrorsInvalidAvatarURL
+func (t *ResponsesAdminInvalidAvatarURL) MergeErrorsInvalidAvatarURL(v ErrorsInvalidAvatarURL) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesAdminInvalidAvatarURL) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesAdminInvalidAvatarURL) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }

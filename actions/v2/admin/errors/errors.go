@@ -12,7 +12,7 @@ var ErrCreatingUser = models.SPVError{Message: "error creating user", StatusCode
 var ErrInvalidPaymail = models.SPVError{Message: "invalid paymail", StatusCode: 400, Code: "error-user-invalid-paymail"}
 
 // ErrInvalidAvatarURL is returned when the avatar url is invalid
-var ErrInvalidAvatarURL = models.SPVError{Message: "invalid avatar url", StatusCode: 400, Code: "error-user-invalid-avatar-url"}
+var ErrInvalidAvatarURL = models.SPVError{Message: "invalid avatar url", StatusCode: 422, Code: "error-user-invalid-avatar-url"}
 
 // ErrAddingPaymail is returned when the paymail addition fails
 var ErrAddingPaymail = models.SPVError{Message: "error adding paymail", StatusCode: 500, Code: "error-user-adding-paymail"}

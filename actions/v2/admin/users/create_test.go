@@ -131,7 +131,7 @@ func TestCreateUserWithBadURLAvatar(t *testing.T) {
 
 	// then:
 	then.Response(res).
-		HasStatus(400).
+		HasStatus(422).
 		WithJSONf(apierror.ExpectedJSON("error-user-invalid-avatar-url", "invalid avatar url"))
 
 }

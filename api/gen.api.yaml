@@ -38,6 +38,8 @@ paths:
                     $ref: '#/components/responses/responses_AdminUserBadRequest'
                 "401":
                     $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
+                "422":
+                    $ref: '#/components/responses/responses_AdminInvalidAvatarURL'
                 "500":
                     $ref: '#/components/responses/responses_AdminCreateUserInternalServerError'
             security:
@@ -92,6 +94,8 @@ paths:
                     $ref: '#/components/responses/responses_AdminUserBadRequest'
                 "401":
                     $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
+                "422":
+                    $ref: '#/components/responses/responses_AdminInvalidAvatarURL'
             security:
                 - XPubAuth:
                     - admin
@@ -308,6 +312,13 @@ components:
                     schema:
                         $ref: '#/components/schemas/errors_GettingUser'
             description: Internal error while getting user
+        responses_AdminInvalidAvatarURL:
+            content:
+                application/json:
+                    schema:
+                        oneOf:
+                            - $ref: '#/components/schemas/errors_InvalidAvatarURL'
+            description: Unprocessable entity is an error that occurs when the request cannot be fulfilled.
         responses_AdminUserBadRequest:
             content:
                 application/json:
@@ -535,6 +546,15 @@ components:
                         example: error-internal-server-error
                     message:
                         example: internal server error
+                  type: object
+        errors_InvalidAvatarURL:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-user-invalid-avatar-url
+                    message:
+                        example: invalid avatar url
                   type: object
         errors_InvalidDataID:
             allOf:
