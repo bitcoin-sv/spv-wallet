@@ -2,12 +2,10 @@ package testabilities
 
 import (
 	"testing"
-
-	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 )
 
-func New(t testing.TB) (given TransactionsEndpointFixture, then testabilities.TransactionsEndpointAssertions) {
+func New(t testing.TB) (given TransactionsEndpointFixture, then TransactionsEndpointAssertions) {
 	given = Given(t)
-	then = testabilities.NewTransactionsEndpointAssertions(t, given)
+	then = Then(t, given)
 	return
 }

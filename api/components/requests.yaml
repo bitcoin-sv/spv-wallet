@@ -66,33 +66,29 @@ components:
       discriminator:
         propertyName: type
         mapping:
-          op_return: '#/components/schemas/OpReturnOutput'
-          paymail: '#/components/schemas/PaymailOutput'
+          # Note: unfortunately we need to refer the type name after merging the schemas.
+          op_return: '#/components/schemas/requests_OpReturnOutputSpecification'
+          paymail: '#/components/schemas/requests_PaymailOutputSpecification'
 
     OpReturnOutputSpecification:
-      allOf:
-        - type: object
-          required:
-            - type
-          properties:
-            type:
-              type: string
-              enum: [ op_return ]
-              example: op_return
-            dataType:
-              type: string
-              enum: [ hexes, strings ]
-              default: strings
-              example: strings
-            data:
-              oneOf:
-                - $ref: "#/components/schemas/OpReturnHexesOutput"
-                - $ref: "#/components/schemas/OpReturnStringsOutput"
-          discriminator:
-            propertyName: dataType
-            mapping:
-              hexes: '#/components/schemas/OpReturnHexesOutput'
-              strings: '#/components/schemas/OpReturnStringsOutput'
+      type: object
+      required:
+        - type
+        - data
+      properties:
+        type:
+          type: string
+          enum: [ op_return ]
+          example: op_return
+        dataType:
+          type: string
+          enum: [ hexes, strings ]
+          default: strings
+          example: strings
+        data:
+          oneOf:
+            - $ref: "#/components/schemas/OpReturnHexesOutput"
+            - $ref: "#/components/schemas/OpReturnStringsOutput"
 
     OpReturnHexesOutput:
       type: array
@@ -111,7 +107,7 @@ components:
       properties:
         type:
           type: string
-          enum: [ paymail ]
+          enum: [paymail]
           example: paymail
         to:
           type: string

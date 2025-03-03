@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures/txtestability"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
@@ -17,6 +19,7 @@ type OutputAssertion interface {
 	HasLockingScript(lockingScript string) OutputAssertion
 	IsDataOnly() OutputAssertion
 	IsPaymail() TransactionOutlinePaymailOutputAssertion
+	UnlockableBySender() TransactionOutlinePaymailOutputAssertion
 }
 
 type TransactionOutlinePaymailOutputAssertion interface {
@@ -32,7 +35,8 @@ type txOutputAssertion struct {
 	require    *require.Assertions
 	txout      *sdk.TransactionOutput
 	annotation *transaction.OutputAnnotation
-	index      int
+	index      uint32
+	txFixture  txtestability.TransactionsFixtures
 }
 
 func (a *txOutputAssertion) HasBucket(bucket bucket.Name) OutputAssertion {
@@ -83,5 +87,17 @@ func (a *txOutputAssertion) HasSender(sender string) TransactionOutlinePaymailOu
 func (a *txOutputAssertion) HasReference(reference string) TransactionOutlinePaymailOutputAssertion {
 	a.t.Helper()
 	a.assert.Equal(reference, a.annotation.Paymail.Reference, "Output %d has invalid paymail reference", a.index)
+	return a
+}
+
+func (a *txOutputAssertion) UnlockableBySender() TransactionOutlinePaymailOutputAssertion {
+	a.require.NotNil(a.annotation.CustomInstructions, "output %d has no custom instructions", a.index)
+
+	a.txFixture.Tx().
+		WithSender(fixtures.Sender).
+		WithInputFromUTXO(a.parent.tx, a.index, *a.annotation.CustomInstructions...).
+		WithOPReturn("dummy data").
+		TX() // during TX call, the transaction is signed. Should fail if the UTXO cannot be unlocked by the user.
+
 	return a
 }

@@ -15,7 +15,7 @@ func PaymailPKI(pubKey *primitives.PublicKey, alias, domain string) (*primitives
 	}
 
 	derivationKey := fmt.Sprintf("1-paymail_pki-%s@%s_%s", alias, domain, rotationSuffix)
-	derivedPubByRef, err := derive(pubKey, derivationKey)
+	derivedPubByRef, err := Derive(pubKey, derivationKey)
 	if err != nil {
 		return nil, derivationKey, ErrDeriveKey.Wrap(err)
 	}

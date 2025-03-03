@@ -176,7 +176,7 @@ func (c *Client) loadTransactionOutlinesService() error {
 		utxoSelector := utxo.NewSelector(c.Datastore().DB(), c.FeeUnit())
 		beefService := beef.NewService(c.Repositories().Transactions)
 
-		c.options.transactionOutlinesService = outlines.NewService(c.PaymailService(), c.options.paymails, beefService, utxoSelector, logger)
+		c.options.transactionOutlinesService = outlines.NewService(c.PaymailService(), c.options.paymails, beefService, utxoSelector, c.FeeUnit(), logger, c.UsersService())
 	}
 	return nil
 }
@@ -186,7 +186,8 @@ func (c *Client) loadTransactionRecordService() error {
 		logger := c.Logger().With().Str("subservice", "transactionRecord").Logger()
 		c.options.transactionRecordService = record.NewService(
 			logger,
-			c.Repositories().Addresses,
+			c.AddressesService(),
+			c.UsersService(),
 			c.Repositories().Outputs,
 			c.Repositories().Operations,
 			c.Repositories().Transactions,

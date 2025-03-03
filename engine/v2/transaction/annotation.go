@@ -22,7 +22,7 @@ type InputAnnotation struct {
 }
 
 // OutputsAnnotations represents the metadata for chosen outputs. The key is the index of the output.
-type OutputsAnnotations map[int]*OutputAnnotation
+type OutputsAnnotations map[uint32]*OutputAnnotation
 
 // OutputAnnotation represents the metadata for the output.
 type OutputAnnotation struct {
@@ -30,6 +30,8 @@ type OutputAnnotation struct {
 	Bucket bucket.Name
 	// Paymail is available if the output is the paymail output.
 	Paymail *PaymailAnnotation
+	// CustomInstructions has instructions about how to unlock this output.
+	CustomInstructions *bsv.CustomInstructions
 }
 
 // PaymailAnnotation is the metadata for the paymail output.

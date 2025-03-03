@@ -171,18 +171,24 @@ func Test_GetP2PDestinations(t *testing.T) {
 
 	t.Run("successfully get destination", func(t *testing.T) {
 		given := testabilities.Given(t)
+		then := testabilities.Then(t, given.MockedPaymailClient())
 
 		// given:
-		paymailHostResponse := given.ExternalPaymailHost().WillRespondWithP2PDestinationsWithSats(satoshis)
-
 		paymailClient := given.NewPaymailClientService()
+
+		// and:
+		given.ExternalPaymailHost().WillRespondWithP2PCapabilities()
 
 		// when:
 		destinations, err := paymailClient.GetP2PDestinations(context.Background(), paymailAddress, satoshis)
+
+		// then:
+		paymailHostResponse := then.ReceivedP2PDestinationRequest(satoshis)
+
 		require.NoError(t, err)
 		assert.Equal(t, paymailHostResponse.Reference, destinations.Reference)
 		require.Len(t, destinations.Outputs, 1)
-		assert.Equal(t, paymailHostResponse.Scripts[0], destinations.Outputs[0].Script)
+		assert.Equal(t, paymailHostResponse.Outputs[0].Script, destinations.Outputs[0].Script)
 		assert.EqualValues(t, satoshis, destinations.Outputs[0].Satoshis)
 	})
 }

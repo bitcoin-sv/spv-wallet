@@ -79,6 +79,7 @@ type ContactService interface {
 	AdminConfirmContacts(ctx context.Context, paymailA string, paymailB string) error
 	UpdateContact(ctx context.Context, id, fullName string, metadata *Metadata) (*Contact, error)
 	DeleteContactByID(ctx context.Context, id string) error
+	AdminUnconfirmContact(ctx context.Context, id string) error
 
 	DeleteContact(ctx context.Context, xPubID, paymail string) error
 	AcceptContact(ctx context.Context, xPubID, paymail string) error

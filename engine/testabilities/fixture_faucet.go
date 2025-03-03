@@ -6,6 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures/txtestability"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
@@ -14,19 +15,20 @@ import (
 )
 
 type faucetFixture struct {
-	engine  engine.ClientInterface
-	user    fixtures.User
-	t       testing.TB
-	assert  *assert.Assertions
-	require *require.Assertions
-	arc     ARCFixture
-	bhs     BlockHeadersServiceFixture
+	engine    engine.ClientInterface
+	user      fixtures.User
+	t         testing.TB
+	assert    *assert.Assertions
+	require   *require.Assertions
+	arc       ARCFixture
+	bhs       BlockHeadersServiceFixture
+	txFixture txtestability.TransactionsFixtures
 }
 
-func (f *faucetFixture) TopUp(satoshis bsv.Satoshis) fixtures.GivenTXSpec {
+func (f *faucetFixture) TopUp(satoshis bsv.Satoshis) txtestability.TransactionSpec {
 	f.t.Helper()
 
-	txSpec := fixtures.GivenTX(f.t).
+	txSpec := f.txFixture.Tx().
 		WithSender(fixtures.ExternalFaucet).
 		WithInput(uint64(satoshis + 1)).
 		WithRecipient(f.user).
@@ -60,7 +62,7 @@ func (f *faucetFixture) TopUp(satoshis bsv.Satoshis) fixtures.GivenTXSpec {
 		UserID: f.user.ID(),
 
 		Type:  "incoming",
-		Value: int64(satoshis), //nolint:gosec // This is a test fixture, values won't exceed int64
+		Value: int64(satoshis),
 
 		Transaction: transaction,
 	}
@@ -78,10 +80,10 @@ func (f *faucetFixture) TopUp(satoshis bsv.Satoshis) fixtures.GivenTXSpec {
 	return txSpec
 }
 
-func (f *faucetFixture) StoreData(data string) (fixtures.GivenTXSpec, string) {
+func (f *faucetFixture) StoreData(data string) (txtestability.TransactionSpec, string) {
 	f.t.Helper()
 
-	txSpec := fixtures.GivenTX(f.t).
+	txSpec := f.txFixture.Tx().
 		WithSender(fixtures.ExternalFaucet).
 		WithInput(uint64(1000)).
 		WithOPReturn(data)

@@ -9,6 +9,7 @@ import (
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures/txtestability"
 	"github.com/bitcoin-sv/spv-wallet/server"
 	"github.com/go-resty/resty/v2"
 	"github.com/rs/zerolog"
@@ -38,6 +39,9 @@ type SPVWalletApplicationFixture interface {
 	Faucet(user fixtures.User) testengine.FaucetFixture
 
 	EngineFixture() testengine.EngineFixture
+
+	// Tx creates a new mocked transaction builder
+	Tx() txtestability.TransactionSpec
 }
 
 type BlockHeadersServiceFixture interface {
@@ -91,6 +95,8 @@ func (f *appFixture) NewTest(t testing.TB) SPVWalletApplicationFixture {
 	newFixture.t = t
 	newFixture.logger = tester.Logger(t)
 	newFixture.engineFixture = f.engineFixture.NewTest(t)
+
+	newFixture.engineFixture.PaymailClient().RedirectTransportIfDomain(fixtures.PaymailDomain, f.server)
 	return &newFixture
 }
 
@@ -152,6 +158,10 @@ func (f *appFixture) Paymail() testpaymail.PaymailClientFixture {
 
 func (f *appFixture) Faucet(user fixtures.User) testengine.FaucetFixture {
 	return f.engineFixture.Faucet(user)
+}
+
+func (f *appFixture) Tx() txtestability.TransactionSpec {
+	return f.engineFixture.Tx()
 }
 
 func (f *appFixture) EngineFixture() testengine.EngineFixture {

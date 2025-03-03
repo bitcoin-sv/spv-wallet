@@ -22,7 +22,7 @@ type PaymailClientFixture interface {
 // PaymailHostFixture is a test fixture - used for setting up paymail host responses for test.
 type PaymailHostFixture interface {
 	MockedPaymailClient() *paymailmock.PaymailClientMock
-	WillRespondWithP2PDestinationsWithSats(satoshis bsv.Satoshis, moreSatoshis ...bsv.Satoshis) *paymailmock.MockedP2PDestinationResponse
+	WillRespondWithP2PDestinationsWithSats(satoshis bsv.Satoshis, moreSatoshis ...bsv.Satoshis)
 	WillRespondWithBasicCapabilities()
 	WillRespondWithP2PCapabilities()
 	WillRespondWithP2PWithBEEFCapabilities()
@@ -77,13 +77,9 @@ func (a *paymailServiceClientAbility) WillRespondWithErrorOnP2PDestinations() {
 	a.PaymailClientMock.WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).WithInternalServerError()
 }
 
-func (a *paymailServiceClientAbility) WillRespondWithP2PDestinationsWithSats(satoshis bsv.Satoshis, moreSatoshis ...bsv.Satoshis) *paymailmock.MockedP2PDestinationResponse {
-	paymailHostResponse := paymailmock.P2PDestinationsForSats(satoshis, moreSatoshis...)
-
+func (a *paymailServiceClientAbility) WillRespondWithP2PDestinationsWithSats(satoshis bsv.Satoshis, moreSatoshis ...bsv.Satoshis) {
 	a.PaymailClientMock.WillRespondWithP2PCapabilities()
 	a.PaymailClientMock.
 		WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
-		With(paymailHostResponse)
-
-	return paymailHostResponse
+		With(paymailmock.P2PDestinationsForSats(satoshis, moreSatoshis...))
 }

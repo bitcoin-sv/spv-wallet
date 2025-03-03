@@ -3,6 +3,7 @@ package paymailmock
 import (
 	"net"
 	"net/http"
+	"regexp"
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -20,6 +21,9 @@ type PaymailClientMock struct {
 
 	mockTransport *httpmock.MockTransport
 	sniffer       *httpSniffer
+
+	localDomain    string
+	localTransport http.RoundTripper
 }
 
 // MockClient will return a client for testing purposes
@@ -86,9 +90,29 @@ func MockClient(mockTransport *httpmock.MockTransport, domain string, moreDomain
 	}
 }
 
+// RedirectTransportIfDomain is configuring a client to redirect all requests to a given domain to a custom transport.
+func (c *PaymailClientMock) RedirectTransportIfDomain(domain string, transport http.RoundTripper) {
+	c.localDomain = domain
+	c.localTransport = transport
+	urlReg := regexp.MustCompile(`^(http|https)\:\/\/` + domain + `.*`)
+	c.mockTransport.RegisterRegexpResponder("POST", urlReg, transport.RoundTrip)
+	c.mockTransport.RegisterRegexpResponder("GET", urlReg, transport.RoundTrip)
+	c.mockTransport.RegisterRegexpResponder("PUT", urlReg, transport.RoundTrip)
+	c.mockTransport.RegisterRegexpResponder("DELETE", urlReg, transport.RoundTrip)
+	c.mockTransport.RegisterRegexpResponder("PATCH", urlReg, transport.RoundTrip)
+	c.mockTransport.RegisterRegexpResponder("OPTIONS", urlReg, transport.RoundTrip)
+}
+
+func (c *PaymailClientMock) reset() {
+	c.mockTransport.Reset()
+	if c.localDomain != "" && c.localTransport != nil {
+		c.RedirectTransportIfDomain(c.localDomain, c.localTransport)
+	}
+}
+
 // WillRespondWithBasicCapabilities is configuring a client to respond with basic capabilities for all mocked domains.
 func (c *PaymailClientMock) WillRespondWithBasicCapabilities() {
-	c.mockTransport.Reset()
+	c.reset()
 	c.useBasicCapabilities()
 	for _, domain := range c.domains {
 		c.exposeCapabilities(domain)
@@ -97,7 +121,7 @@ func (c *PaymailClientMock) WillRespondWithBasicCapabilities() {
 
 // WillRespondWithP2PCapabilities is configuring a client to respond with basic and P2P capabilities for all mocked domains.
 func (c *PaymailClientMock) WillRespondWithP2PCapabilities() {
-	c.mockTransport.Reset()
+	c.reset()
 	c.useBasicCapabilities()
 	c.useP2PCapabilities()
 	for _, domain := range c.domains {
@@ -107,7 +131,7 @@ func (c *PaymailClientMock) WillRespondWithP2PCapabilities() {
 
 // WillRespondWithP2PWithBEEFCapabilities is configuring a client to respond with basic, P2P and BEEF capabilities for all mocked domains.
 func (c *PaymailClientMock) WillRespondWithP2PWithBEEFCapabilities() {
-	c.mockTransport.Reset()
+	c.reset()
 	c.useBasicCapabilities()
 	c.useP2PCapabilities()
 	c.useBEEFCapabilities()
@@ -118,7 +142,7 @@ func (c *PaymailClientMock) WillRespondWithP2PWithBEEFCapabilities() {
 
 // WillRespondWithNotFoundOnCapabilities is configuring a client to respond with not found on capabilities for all mocked domains.
 func (c *PaymailClientMock) WillRespondWithNotFoundOnCapabilities() {
-	c.mockTransport.Reset()
+	c.reset()
 	for _, domain := range c.domains {
 		c.exposeErrorOnCapabilities(http.StatusNotFound, domain)
 	}
@@ -126,7 +150,7 @@ func (c *PaymailClientMock) WillRespondWithNotFoundOnCapabilities() {
 
 // WillRespondWithErrorOnCapabilities is configuring a client to respond with an error on capabilities for all mocked domains.
 func (c *PaymailClientMock) WillRespondWithErrorOnCapabilities() {
-	c.mockTransport.Reset()
+	c.reset()
 	for _, domain := range c.domains {
 		c.exposeErrorOnCapabilities(http.StatusInternalServerError, domain)
 	}

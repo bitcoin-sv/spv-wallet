@@ -272,6 +272,7 @@ components:
         - $ref: "#/components/schemas/BucketAnnotation"
         - $ref: "#/components/schemas/DataAnnotation"
         - $ref: "#/components/schemas/PaymailAnnotation"
+        - $ref: "#/components/schemas/ChangeAnnotation"
 
     BucketAnnotation:
       type: object
@@ -305,6 +306,12 @@ components:
               example: "bsv"
             paymail:
               $ref: "#/components/schemas/PaymailAnnotationDetails"
+
+    ChangeAnnotation:
+      type: object
+      properties:
+        customInstructions:
+          $ref: "#/components/schemas/SPVWalletCustomInstructions"
 
     PaymailAnnotationDetails:
       type: object

@@ -5,6 +5,7 @@ import (
 	"iter"
 
 	"github.com/bitcoin-sv/go-paymail"
+	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses/addressesmodels"
@@ -16,6 +17,11 @@ import (
 // AddressesService is an interface for addresses service.
 type AddressesService interface {
 	FindByStringAddresses(ctx context.Context, addresses iter.Seq[string]) ([]addressesmodels.Address, error)
+}
+
+// UsersService is an interface for users service.
+type UsersService interface {
+	GetPubKey(ctx context.Context, userID string) (*primitives.PublicKey, error)
 }
 
 // OutputsRepo is an interface for outputs repository.

@@ -81,6 +81,7 @@ linters-settings:
       - name: exported
         exclude:
           - "**/testabilities/**"
+          - "**/tester/**"
 
 issues:
   # List of regexps of issue texts to exclude, empty list by default.
@@ -96,8 +97,13 @@ issues:
     # Exclude some linters from running on tests files.
     - path: _test\.go
       linters:
-        - gocyclo
         - errcheck
+        - gosec
+        - wrapcheck
+        - bodyclose
+
+    - path: /testabilities/
+      linters:
         - gosec
         - wrapcheck
         - bodyclose

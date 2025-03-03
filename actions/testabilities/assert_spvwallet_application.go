@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
+	testpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/jsonrequire"
@@ -19,7 +20,7 @@ import (
 type SPVWalletApplicationAssertions interface {
 	Response(response *resty.Response) SPVWalletResponseAssertions
 	User(user fixtures.User) SPVWalletAppUserAssertions
-	ExternalPaymailHost() testengine.PaymailExternalAssertions
+	ExternalPaymailHost() testpaymail.PaymailExternalAssertions
 }
 
 type SPVWalletResponseAssertions interface {
@@ -40,6 +41,8 @@ type SPVWalletResponseAssertions interface {
 
 type JsonValueGetter interface {
 	GetString(xpath string) string
+	GetAsType(xpath string, target any)
+	GetField(xpath string) any
 }
 
 func Then(t testing.TB, app SPVWalletApplicationFixture) SPVWalletApplicationAssertions {
@@ -73,7 +76,7 @@ func (a *appAssertions) User(user fixtures.User) SPVWalletAppUserAssertions {
 	}
 }
 
-func (a *appAssertions) ExternalPaymailHost() testengine.PaymailExternalAssertions {
+func (a *appAssertions) ExternalPaymailHost() testpaymail.PaymailExternalAssertions {
 	return a.engineAssertions.ExternalPaymailHost()
 }
 

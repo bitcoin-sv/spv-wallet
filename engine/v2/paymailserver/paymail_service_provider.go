@@ -13,8 +13,6 @@ import (
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses/addressesmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/keys/type42"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
@@ -211,17 +209,12 @@ func (s *serviceProvider) createDestinationForUser(ctx context.Context, alias, d
 		return nil, err
 	}
 
-	referenceID, err := utils.RandomHex(16)
-	if err != nil {
-		return nil, spverrors.Wrapf(err, "cannot generate reference id")
-	}
-
-	dest, destDerivationKey, err := type42.Destination(pki, referenceID)
+	dest, err := type42.NewDestinationWithRandomReference(pki)
 	if err != nil {
 		return nil, pmerrors.ErrPaymentDestination.Wrap(err)
 	}
 
-	address, err := script.NewAddressFromPublicKey(dest, true)
+	address, err := script.NewAddressFromPublicKey(dest.PubKey, true)
 	if err != nil {
 		return nil, pmerrors.ErrPaymentDestination.Wrap(err)
 	}
@@ -241,7 +234,7 @@ func (s *serviceProvider) createDestinationForUser(ctx context.Context, alias, d
 			},
 			{
 				Type:        "type42",
-				Instruction: destDerivationKey,
+				Instruction: dest.DerivationKey,
 			},
 		},
 	})
@@ -252,6 +245,6 @@ func (s *serviceProvider) createDestinationForUser(ctx context.Context, alias, d
 	return &destinationData{
 		address:       address.AddressString,
 		lockingScript: lockingScript.String(),
-		referenceID:   referenceID,
+		referenceID:   dest.ReferenceID,
 	}, nil
 }

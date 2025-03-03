@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/go-sdk/script"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
@@ -82,7 +83,7 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 
 	t.Run("step 2 - call receive-transaction capability", func(t *testing.T) {
 		// given:
-		txSpec := fixtures.GivenTX(t).
+		txSpec := given.Tx().
 			WithInput(satoshis+1).
 			WithOutputScript(satoshis, testState.lockingScript)
 
@@ -239,7 +240,7 @@ func TestIncomingPaymailBeef(t *testing.T) {
 
 	t.Run("step 2 - call beef capability", func(t *testing.T) {
 		// given:
-		txSpec := fixtures.GivenTX(t).
+		txSpec := given.Tx().
 			WithInput(satoshis+1).
 			WithOutputScript(satoshis, testState.lockingScript)
 
@@ -354,9 +355,11 @@ func TestIncomingPaymailBeef(t *testing.T) {
 			Post("/api/v2/transactions/outlines")
 
 		//  then:
-		thenResponse := testabilities.NewTransactionsEndpointAssertions(t, given).Response(res)
-		thenResponse.IsOK()
-		thenResponse.ContainsValidBEEFHexInField("hex")
+		then.Response(res).IsOK()
+
+		// and:
+		_, err := trx.NewTransactionFromBEEFHex(then.Response(res).JSONValue().GetString("hex"))
+		require.NoError(t, err)
 	})
 }
 

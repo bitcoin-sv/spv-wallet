@@ -1,199 +1,11 @@
 openapi: 3.0.0
 info:
     license:
-        name: Open BSV Licence
-        url: xyz
+        name: MIT
+        url: https://github.com/bitcoin-sv/spv-wallet/blob/main/LICENSE
     title: SPV Wallet API
-    version: development
+    version: main
 paths:
-    /api/v2/admin/contacts:
-        get:
-            description: This endpoint returns all contacts.
-            operationId: adminGetContacts
-            parameters:
-                - $ref: '#/components/parameters/requests_PageNumber'
-                - $ref: '#/components/parameters/requests_PageSize'
-                - $ref: '#/components/parameters/requests_Sort'
-                - $ref: '#/components/parameters/requests_SortBy'
-                - $ref: '#/components/parameters/requests_FullName'
-                - $ref: '#/components/parameters/requests_Paymail'
-                - $ref: '#/components/parameters/requests_ID'
-                - $ref: '#/components/parameters/requests_PubKey'
-                - $ref: '#/components/parameters/requests_Status'
-            responses:
-                "200":
-                    $ref: '#/components/responses/responses_SearchContactsSuccess'
-                "401":
-                    $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
-                "500":
-                    $ref: '#/components/responses/responses_ContactSearchInternalServerError'
-            security:
-                - XPubAuth:
-                    - admin
-            summary: Get contacts
-            tags:
-                - Admin endpoints
-    /api/v2/admin/contacts/{id}:
-        delete:
-            description: This endpoint deletes contact.
-            operationId: adminDeleteContact
-            parameters:
-                - description: Contact ID
-                  in: path
-                  name: id
-                  required: true
-                  schema:
-                    type: integer
-            responses:
-                "200":
-                    description: Contact deleted
-                "401":
-                    $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
-                "500":
-                    $ref: '#/components/responses/responses_DeleteContactInternalServerError'
-            security:
-                - XPubAuth:
-                    - admin
-            summary: Delete contact
-            tags:
-                - Admin endpoints
-        put:
-            description: This endpoint updates contact.
-            operationId: adminUpdateContact
-            parameters:
-                - description: Contact ID
-                  in: path
-                  name: id
-                  required: true
-                  schema:
-                    type: integer
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/requests_UpdateContact'
-                required: true
-            responses:
-                "200":
-                    $ref: '#/components/responses/responses_ContactSuccess'
-                "401":
-                    $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
-                "500":
-                    $ref: '#/components/responses/responses_AdminUpdateContactStatusInternalServerError'
-            security:
-                - XPubAuth:
-                    - admin
-            summary: Update contact
-            tags:
-                - Admin endpoints
-    /api/v2/admin/contacts/{paymail}:
-        post:
-            description: This endpoint creates contact.
-            operationId: adminCreateContact
-            parameters:
-                - description: Contact paymail
-                  in: path
-                  name: paymail
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/requests_AdminCreateContact'
-                required: true
-            responses:
-                "200":
-                    $ref: '#/components/responses/responses_ContactSuccess'
-                "400":
-                    $ref: '#/components/responses/responses_AdminCreateContactBadRequest'
-                "401":
-                    $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
-                "404":
-                    $ref: '#/components/responses/responses_AdminCreateContactNotFound'
-                "409":
-                    $ref: '#/components/responses/responses_AdminCreateContactConflict'
-                "500":
-                    $ref: '#/components/responses/responses_AdminCreateContactInternalServerError'
-            security:
-                - XPubAuth:
-                    - admin
-            summary: Create contact
-            tags:
-                - Admin endpoints
-    /api/v2/admin/contacts/confirmations:
-        post:
-            description: This endpoint confirms contact.
-            operationId: adminConfirmContact
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/requests_AdminConfirmContact'
-                required: true
-            responses:
-                "200":
-                    description: Contact confirmed
-                "400":
-                    $ref: '#/components/responses/responses_AdminUserBadRequest'
-                "401":
-                    $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
-                "500":
-                    $ref: '#/components/responses/responses_AdminConfirmContactInternalServerError'
-            security:
-                - XPubAuth:
-                    - admin
-            summary: Confirm contact
-            tags:
-                - Admin endpoints
-    /api/v2/admin/invitations/{id}:
-        delete:
-            description: This endpoint allows to reject invitation for selected ID
-            operationId: adminRejectInvitation
-            parameters:
-                - description: ID of the contact that the admin would like to reject
-                  in: path
-                  name: id
-                  required: true
-                  schema:
-                    type: integer
-            responses:
-                "200":
-                    description: Invitation rejected
-                "401":
-                    $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
-                "500":
-                    $ref: '#/components/responses/responses_AdminUpdateContactStatusInternalServerError'
-            security:
-                - XPubAuth:
-                    - user
-            summary: Reject invitation
-            tags:
-                - Admin endpoints
-        post:
-            description: This endpoint allows to accept invitation for selected ID
-            operationId: adminAcceptInvitation
-            parameters:
-                - description: ID of the contact that the admin would like to accept
-                  in: path
-                  name: id
-                  required: true
-                  schema:
-                    type: integer
-            responses:
-                "200":
-                    $ref: '#/components/responses/responses_ContactSuccess'
-                "401":
-                    $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
-                "500":
-                    $ref: '#/components/responses/responses_AdminUpdateContactStatusInternalServerError'
-            security:
-                - XPubAuth:
-                    - user
-            summary: Accept invitation
-            tags:
-                - Admin endpoints
     /api/v2/admin/status:
         get:
             description: This endpoint returns admin status. It is used to check if authorization header contain admin xpub.
@@ -303,226 +115,6 @@ paths:
             tags:
                 - Admin endpoints
                 - Configurations
-    /api/v2/contacts:
-        get:
-            description: This endpoint allows to get contacts for authenticated user
-            operationId: getContacts
-            parameters:
-                - $ref: '#/components/parameters/requests_PageNumber'
-                - $ref: '#/components/parameters/requests_PageSize'
-                - $ref: '#/components/parameters/requests_Sort'
-                - $ref: '#/components/parameters/requests_SortBy'
-                - $ref: '#/components/parameters/requests_FullName'
-                - $ref: '#/components/parameters/requests_Paymail'
-                - $ref: '#/components/parameters/requests_ID'
-                - $ref: '#/components/parameters/requests_PubKey'
-                - $ref: '#/components/parameters/requests_Status'
-            responses:
-                "200":
-                    $ref: '#/components/responses/responses_SearchContactsSuccess'
-                "401":
-                    $ref: '#/components/responses/responses_UserNotAuthorized'
-                "500":
-                    $ref: '#/components/responses/responses_ContactSearchInternalServerError'
-            security:
-                - XPubAuth:
-                    - user
-            summary: Get contacts
-            tags:
-                - Contacts
-    /api/v2/contacts/{paymail}:
-        delete:
-            description: This endpoint allows to remove contact for authenticated user
-            operationId: removeContact
-            parameters:
-                - description: Paymail address of the contact that the user would like to remove
-                  in: path
-                  name: paymail
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: Success - contact removed
-                "401":
-                    $ref: '#/components/responses/responses_UserNotAuthorized'
-                "500":
-                    $ref: '#/components/responses/responses_DeleteContactInternalServerError'
-            security:
-                - XPubAuth:
-                    - user
-            summary: Remove contact
-            tags:
-                - Contacts
-        get:
-            description: This endpoint allows to get contact for authenticated user
-            operationId: getContact
-            parameters:
-                - description: Paymail address of the contact that the user would like to get
-                  in: path
-                  name: paymail
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    $ref: '#/components/responses/responses_ContactSuccess'
-                "401":
-                    $ref: '#/components/responses/responses_UserNotAuthorized'
-                "404":
-                    $ref: '#/components/responses/responses_ContactNotFound'
-                "500":
-                    $ref: '#/components/responses/responses_GetContactInternalServerError'
-            security:
-                - XPubAuth:
-                    - user
-            summary: Get contact
-            tags:
-                - Contacts
-        put:
-            description: Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
-            operationId: upsertContact
-            parameters:
-                - description: Paymail address of the contact that the user would like to add/modify
-                  in: path
-                  name: paymail
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/requests_UpsertContact'
-                required: true
-            responses:
-                "200":
-                    $ref: '#/components/responses/responses_ContactSuccess'
-                "400":
-                    $ref: '#/components/responses/responses_UpsertContactBadRequest'
-                "401":
-                    $ref: '#/components/responses/responses_UserNotAuthorized'
-                "404":
-                    $ref: '#/components/responses/responses_UpsertContactNotFound'
-                "500":
-                    $ref: '#/components/responses/responses_ContactUpsertInternalServerError'
-            security:
-                - XPubAuth:
-                    - user
-            summary: Add contact
-            tags:
-                - Contacts
-    /api/v2/contacts/{paymail}/confirmation:
-        delete:
-            description: Unconfirm contact. For contact with status "confirmed" change status to "unconfirmed"
-            operationId: unconfirmContact
-            parameters:
-                - description: Paymail address of the contact that the user would like to unconfirm
-                  in: path
-                  name: paymail
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: Success - contact removed
-                "400":
-                    $ref: '#/components/responses/responses_UpdateContactBadRequest'
-                "401":
-                    $ref: '#/components/responses/responses_UserNotAuthorized'
-                "404":
-                    $ref: '#/components/responses/responses_ContactNotFound'
-                "500":
-                    $ref: '#/components/responses/responses_InternalServerError'
-            security:
-                - XPubAuth:
-                    - user
-            summary: Unconfirm contact
-            tags:
-                - Contacts
-        post:
-            description: This endpoint allows to confirm contact for authenticated user
-            operationId: confirmContact
-            parameters:
-                - description: Paymail address of the contact that the user would like to confirm
-                  in: path
-                  name: paymail
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: Success - contact confirmed
-                "400":
-                    $ref: '#/components/responses/responses_UpdateContactBadRequest'
-                "401":
-                    $ref: '#/components/responses/responses_UserNotAuthorized'
-                "404":
-                    $ref: '#/components/responses/responses_ContactNotFound'
-                "500":
-                    $ref: '#/components/responses/responses_InternalServerError'
-            security:
-                - XPubAuth:
-                    - user
-            summary: Confirm contact
-            tags:
-                - Contacts
-    /api/v2/contacts/invitations/{paymail}:
-        delete:
-            description: This endpoint allows to reject invitation for authenticated user
-            operationId: rejectInvitation
-            parameters:
-                - description: Paymail address of the contact that the user would like to reject
-                  in: path
-                  name: paymail
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: Success - invitation removed
-                "400":
-                    $ref: '#/components/responses/responses_UpdateContactBadRequest'
-                "401":
-                    $ref: '#/components/responses/responses_UserNotAuthorized'
-                "404":
-                    $ref: '#/components/responses/responses_ContactNotFound'
-                "500":
-                    $ref: '#/components/responses/responses_InternalServerError'
-            security:
-                - XPubAuth:
-                    - user
-            summary: Reject invitation
-            tags:
-                - Contacts
-    /api/v2/contacts/invitations/{paymail}/contacts:
-        post:
-            description: This endpoint allows to accept invitation for authenticated user
-            operationId: acceptInvitation
-            parameters:
-                - description: Paymail address of the contact that the user would like to accept
-                  in: path
-                  name: paymail
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: Success - invitation accepted
-                "400":
-                    $ref: '#/components/responses/responses_UpdateContactBadRequest'
-                "401":
-                    $ref: '#/components/responses/responses_UserNotAuthorized'
-                "404":
-                    $ref: '#/components/responses/responses_ContactNotFound'
-                "500":
-                    $ref: '#/components/responses/responses_InternalServerError'
-            security:
-                - XPubAuth:
-                    - user
-            summary: Accept invitation
-            tags:
-                - Contacts
     /api/v2/data/{id}:
         get:
             description: This endpoint gets data by its id for authenticated user
@@ -657,20 +249,6 @@ paths:
                 - User
 components:
     parameters:
-        requests_FullName:
-            description: Full name of the contact
-            example: Test name
-            in: query
-            name: fullName
-            schema:
-                type: string
-        requests_ID:
-            description: ID of the contact
-            example: "1"
-            in: query
-            name: id
-            schema:
-                type: integer
         requests_PageNumber:
             description: Page number for pagination
             example: 1
@@ -685,20 +263,6 @@ components:
             name: size
             schema:
                 type: integer
-        requests_Paymail:
-            description: Paymail of the contact
-            example: test@spv-wallet.com
-            in: query
-            name: paymail
-            schema:
-                type: string
-        requests_PubKey:
-            description: Public key of the contact
-            example: 76a914e069bd2e2fe3ea702c40d5e65b491b734c01686788ac
-            in: query
-            name: pubKey
-            schema:
-                type: string
         requests_Sort:
             description: Sorting order (asc or desc)
             example: asc
@@ -713,13 +277,6 @@ components:
             name: sortBy
             schema:
                 type: string
-        requests_Status:
-            description: Status of the contact
-            example: confirmed
-            in: query
-            name: status
-            schema:
-                $ref: '#/components/schemas/models_ContactStatus'
     responses:
         responses_AdminAddPaymailSuccess:
             content:
@@ -727,50 +284,6 @@ components:
                     schema:
                         $ref: '#/components/schemas/models_Paymail'
             description: Paymail added to user
-        responses_AdminConfirmContactInternalServerError:
-            content:
-                application/json:
-                    schema:
-                        oneOf:
-                            - $ref: '#/components/schemas/errors_Internal'
-                            - $ref: '#/components/schemas/errors_GetContact'
-                            - $ref: '#/components/schemas/errors_UpdateContactStatus'
-            description: Confirm contact internal server error
-        responses_AdminCreateContactBadRequest:
-            content:
-                application/json:
-                    schema:
-                        oneOf:
-                            - $ref: '#/components/schemas/errors_CannotBindRequest'
-                            - $ref: '#/components/schemas/errors_MissingContactFullName'
-                            - $ref: '#/components/schemas/errors_MissingContactPaymailParam'
-                            - $ref: '#/components/schemas/errors_MissingContactCreatorPaymailParam'
-                            - $ref: '#/components/schemas/errors_RequesterContactInvalid'
-                            - $ref: '#/components/schemas/errors_GetPKIFailed'
-                            - $ref: '#/components/schemas/errors_SaveContact'
-            description: Bad request is an error that occurs when the request is malformed.
-        responses_AdminCreateContactConflict:
-            content:
-                application/json:
-                    schema:
-                        oneOf:
-                            - $ref: '#/components/schemas/errors_ContactAlreadyExists'
-            description: Conflict is an error that occurs when the request conflicts with the current state of the server.
-        responses_AdminCreateContactInternalServerError:
-            content:
-                application/json:
-                    schema:
-                        oneOf:
-                            - $ref: '#/components/schemas/errors_Internal'
-                            - $ref: '#/components/schemas/errors_GetContact'
-            description: Create contact internal server error
-        responses_AdminCreateContactNotFound:
-            content:
-                application/json:
-                    schema:
-                        oneOf:
-                            - $ref: '#/components/schemas/errors_CouldNotFindPaymail'
-            description: Not found is an error that occurs when the requested resource is not found.
         responses_AdminCreateUserInternalServerError:
             content:
                 application/json:
@@ -795,14 +308,6 @@ components:
                     schema:
                         $ref: '#/components/schemas/errors_GettingUser'
             description: Internal error while getting user
-        responses_AdminUpdateContactStatusInternalServerError:
-            content:
-                application/json:
-                    schema:
-                        oneOf:
-                            - $ref: '#/components/schemas/errors_Internal'
-                            - $ref: '#/components/schemas/errors_UpdateContactStatus'
-            description: Confirm contact internal server error
         responses_AdminUserBadRequest:
             content:
                 application/json:
@@ -814,36 +319,6 @@ components:
                             - $ref: '#/components/schemas/errors_PaymailInconsistent'
                             - $ref: '#/components/schemas/errors_InvalidDomain'
             description: Bad request is an error that occurs when the request is malformed.
-        responses_ContactNotFound:
-            content:
-                application/json:
-                    schema:
-                        $ref: '#/components/schemas/errors_ContactNotFound'
-            description: Not found is an error that occurs when the requested resource is not found.
-        responses_ContactSearchInternalServerError:
-            content:
-                application/json:
-                    schema:
-                        oneOf:
-                            - $ref: '#/components/schemas/errors_Internal'
-                            - $ref: '#/components/schemas/errors_FailedToGetPaginatedResults'
-            description: Contact search internal server error
-        responses_ContactSuccess:
-            content:
-                application/json:
-                    schema:
-                        allOf:
-                            - $ref: '#/components/schemas/models_Contact'
-            description: Contact success
-        responses_ContactUpsertInternalServerError:
-            content:
-                application/json:
-                    schema:
-                        oneOf:
-                            - $ref: '#/components/schemas/errors_Internal'
-                            - $ref: '#/components/schemas/errors_GetContact'
-                            - $ref: '#/components/schemas/errors_ContactFailedToUpdate'
-            description: Contact search internal server error
         responses_CreateTransactionOutlineBadRequest:
             content:
                 application/json:
@@ -869,22 +344,6 @@ components:
                         oneOf:
                             - $ref: '#/components/schemas/errors_TxOutlineUserHasNotEnoughFunds'
             description: Unprocessable entity is an error that occurs when the request cannot be fulfilled.
-        responses_DeleteContactInternalServerError:
-            content:
-                application/json:
-                    schema:
-                        oneOf:
-                            - $ref: '#/components/schemas/errors_Internal'
-                            - $ref: '#/components/schemas/errors_DeleteContact'
-            description: Delete contact internal server error
-        responses_GetContactInternalServerError:
-            content:
-                application/json:
-                    schema:
-                        oneOf:
-                            - $ref: '#/components/schemas/errors_Internal'
-                            - $ref: '#/components/schemas/errors_GetContact'
-            description: Get contact internal server error
         responses_GetCurrentUserSuccess:
             content:
                 application/json:
@@ -954,14 +413,6 @@ components:
                     schema:
                         $ref: '#/components/schemas/errors_InvalidDataID'
             description: Error when search request is malformed and params can not be parsed
-        responses_SearchContactsSuccess:
-            content:
-                application/json:
-                    schema:
-                        items:
-                            $ref: '#/components/schemas/models_ContactsSearchResult'
-                        type: array
-            description: Contacts success
         responses_SearchOperationsSuccess:
             content:
                 application/json:
@@ -974,31 +425,6 @@ components:
                     schema:
                         $ref: '#/components/schemas/models_SharedConfig'
             description: Shared config
-        responses_UpdateContactBadRequest:
-            content:
-                application/json:
-                    schema:
-                        oneOf:
-                            - $ref: '#/components/schemas/errors_ContactInWrongStatus'
-            description: Bad request is an error that occurs when the request is malformed.
-        responses_UpsertContactBadRequest:
-            content:
-                application/json:
-                    schema:
-                        oneOf:
-                            - $ref: '#/components/schemas/errors_CannotBindRequest'
-                            - $ref: '#/components/schemas/errors_UserDoNotOwnPaymail'
-                            - $ref: '#/components/schemas/errors_ContactInvalidPaymail'
-                            - $ref: '#/components/schemas/errors_GettingPKIFailed'
-                            - $ref: '#/components/schemas/errors_SaveContact'
-            description: Bad request is an error that occurs when the request is malformed.
-        responses_UpsertContactNotFound:
-            content:
-                application/json:
-                    schema:
-                        oneOf:
-                            - $ref: '#/components/schemas/errors_CouldNotFindPaymail'
-            description: Not found is an error that occurs when the requested resource is not found.
         responses_UserBadRequest:
             content:
                 application/json:
@@ -1065,60 +491,6 @@ components:
                     message:
                         example: cannot bind request body
                   type: object
-        errors_ContactAlreadyExists:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-contact-already-exists
-                    message:
-                        example: contact already exists
-                  type: object
-        errors_ContactFailedToUpdate:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-contact-updating-contact-failed
-                    message:
-                        example: updating contact failed
-                  type: object
-        errors_ContactInWrongStatus:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-contact-wrong-status
-                    message:
-                        example: contact is in wrong status
-                  type: object
-        errors_ContactInvalidPaymail:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-contacts-invalid-paymail
-                    message:
-                        example: invalid paymail
-                  type: object
-        errors_ContactNotFound:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-contact-not-found
-                    message:
-                        example: contact not found
-                  type: object
-        errors_CouldNotFindPaymail:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-paymail-not-found
-                    message:
-                        example: paymail not found
-                  type: object
         errors_CreatingUser:
             allOf:
                 - $ref: '#/components/schemas/errors_Schema'
@@ -1137,42 +509,6 @@ components:
                     message:
                         example: data not found
                   type: object
-        errors_DeleteContact:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-contact-deleting-contact-failed
-                    message:
-                        example: deleting contact failed
-                  type: object
-        errors_FailedToGetPaginatedResults:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-contact-failed-to-get-paginated-results
-                    message:
-                        example: failed to get paginated results
-                  type: object
-        errors_GetContact:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-contact-getting-contact-failed
-                    message:
-                        example: getting contact failed
-                  type: object
-        errors_GetPKIFailed:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-contact-getting-pki-failed
-                    message:
-                        example: getting pki for contact failed
-                  type: object
         errors_GettingOutputs:
             allOf:
                 - $ref: '#/components/schemas/errors_Schema'
@@ -1181,15 +517,6 @@ components:
                         example: error-getting-outputs
                     message:
                         example: failed to get outputs
-                  type: object
-        errors_GettingPKIFailed:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-contact-getting-pki-failed
-                    message:
-                        example: getting pki for contact failed
                   type: object
         errors_GettingUser:
             allOf:
@@ -1245,33 +572,6 @@ components:
                     message:
                         example: invalid public key
                   type: object
-        errors_MissingContactCreatorPaymailParam:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-contact-creator-paymail-missing
-                    message:
-                        example: missing creator paymail parameter in request
-                  type: object
-        errors_MissingContactFullName:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-contact-full-name-missing
-                    message:
-                        example: missing full name in contact
-                  type: object
-        errors_MissingContactPaymailParam:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-contact-paymail-missing
-                    message:
-                        example: missing paymail parameter in request
-                  type: object
         errors_NoOperations:
             allOf:
                 - $ref: '#/components/schemas/errors_Schema'
@@ -1289,24 +589,6 @@ components:
                         example: error-user-inconsistent-paymail
                     message:
                         example: inconsistent paymail address and alias/domain
-                  type: object
-        errors_RequesterContactInvalid:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-contact-requested-contact-invalid
-                    message:
-                        example: requested contact paymail is invalid
-                  type: object
-        errors_SaveContact:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-contact-adding-contact-failed
-                    message:
-                        example: adding contact failed
                   type: object
         errors_Schema:
             additionalProperties: false
@@ -1415,15 +697,6 @@ components:
                     message:
                         example: unauthorized
                   type: object
-        errors_UpdateContactStatus:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-contact-updating-status-failed
-                    message:
-                        example: updating contact status failed
-                  type: object
         errors_UserAuthOnNonUserEndpoint:
             allOf:
                 - $ref: '#/components/schemas/errors_Schema'
@@ -1438,15 +711,6 @@ components:
                 - $ref: '#/components/schemas/errors_Unauthorized'
                 - $ref: '#/components/schemas/errors_AdminAuthOnNonAdminEndpoint'
                 - $ref: '#/components/schemas/errors_AuthXPubRequired'
-        errors_UserDoNotOwnPaymail:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-paymail-user-do-not-own
-                    message:
-                        example: user do not own paymail
-                  type: object
         models_AnnotatedTransactionOutline:
             allOf:
                 - $ref: '#/components/schemas/models_TransactionHex'
@@ -1463,51 +727,10 @@ components:
             required:
                 - bucket
             type: object
-        models_Contact:
-            allOf:
-                - $ref: '#/components/schemas/models_Model'
-                - properties:
-                    fullName:
-                        example: Test User
-                        type: string
-                    id:
-                        example: 1
-                        minimum: 0
-                        type: integer
-                    paymail:
-                        example: alice@spv-wallet.com
-                        type: string
-                    pubKey:
-                        example: xpub661MyMwAqRbcGpZVrSHU...
-                        type: string
-                    status:
-                        $ref: '#/components/schemas/models_ContactStatus'
-                  required:
-                    - id
-                    - fullName
-                    - pubKey
-                    - status
-                    - paymail
-                  type: object
-        models_ContactStatus:
-            enum:
-                - unconfirmed
-                - awaiting
-                - confirmed
-                - rejected
-            example: confirmed
-            type: string
-        models_ContactsSearchResult:
+        models_ChangeAnnotation:
             properties:
-                content:
-                    items:
-                        $ref: '#/components/schemas/models_Contact'
-                    type: array
-                page:
-                    $ref: '#/components/schemas/models_SearchPage'
-            required:
-                - content
-                - page
+                customInstructions:
+                    $ref: '#/components/schemas/models_SPVWalletCustomInstructions'
             type: object
         models_CustomInstructions:
             oneOf:
@@ -1557,24 +780,6 @@ components:
                     type: object
             required:
                 - inputs
-            type: object
-        models_Model:
-            properties:
-                createdAt:
-                    example: "2025-01-01T00:00:00Z"
-                    format: date-time
-                    type: string
-                deletedAt:
-                    example: "2025-01-01T00:00:00Z"
-                    format: date-time
-                    type: string
-                updatedAt:
-                    example: "2025-01-01T00:00:00Z"
-                    format: date-time
-                    type: string
-            required:
-                - createdAt
-                - updatedAt
             type: object
         models_Operation:
             properties:
@@ -1642,6 +847,7 @@ components:
                 - $ref: '#/components/schemas/models_BucketAnnotation'
                 - $ref: '#/components/schemas/models_DataAnnotation'
                 - $ref: '#/components/schemas/models_PaymailAnnotation'
+                - $ref: '#/components/schemas/models_ChangeAnnotation'
         models_OutputsAnnotations:
             properties:
                 outputs:
@@ -1867,30 +1073,6 @@ components:
                 - publicName
                 - avatarURL
             type: object
-        requests_AdminConfirmContact:
-            properties:
-                paymailA:
-                    example: alice@spv-wallet.com
-                    type: string
-                paymailB:
-                    example: bob@spv-wallet.com
-                    type: string
-            required:
-                - paymailA
-                - paymailB
-            type: object
-        requests_AdminCreateContact:
-            properties:
-                creatorPaymail:
-                    example: example@spv-wallet.com
-                    type: string
-                fullName:
-                    example: Test name
-                    type: string
-            required:
-                - fullName
-                - creatorPaymail
-            type: object
         requests_CreateUser:
             properties:
                 paymail:
@@ -1907,32 +1089,27 @@ components:
                 type: string
             type: array
         requests_OpReturnOutputSpecification:
-            allOf:
-                - discriminator:
-                    mapping:
-                        hexes: '#/components/schemas/OpReturnHexesOutput'
-                        strings: '#/components/schemas/OpReturnStringsOutput'
-                    propertyName: dataType
-                  properties:
-                    data:
-                        oneOf:
-                            - $ref: '#/components/schemas/requests_OpReturnHexesOutput'
-                            - $ref: '#/components/schemas/requests_OpReturnStringsOutput'
-                    dataType:
-                        default: strings
-                        enum:
-                            - hexes
-                            - strings
-                        example: strings
-                        type: string
-                    type:
-                        enum:
-                            - op_return
-                        example: op_return
-                        type: string
-                  required:
-                    - type
-                  type: object
+            properties:
+                data:
+                    oneOf:
+                        - $ref: '#/components/schemas/requests_OpReturnHexesOutput'
+                        - $ref: '#/components/schemas/requests_OpReturnStringsOutput'
+                dataType:
+                    default: strings
+                    enum:
+                        - hexes
+                        - strings
+                    example: strings
+                    type: string
+                type:
+                    enum:
+                        - op_return
+                    example: op_return
+                    type: string
+            required:
+                - type
+                - data
+            type: object
         requests_OpReturnStringsOutput:
             items:
                 example: hello world
@@ -1972,8 +1149,8 @@ components:
         requests_TransactionOutlineOutputSpecification:
             discriminator:
                 mapping:
-                    op_return: '#/components/schemas/OpReturnOutput'
-                    paymail: '#/components/schemas/PaymailOutput'
+                    op_return: '#/components/schemas/requests_OpReturnOutputSpecification'
+                    paymail: '#/components/schemas/requests_PaymailOutputSpecification'
                 propertyName: type
             oneOf:
                 - $ref: '#/components/schemas/requests_OpReturnOutputSpecification'
@@ -1986,27 +1163,6 @@ components:
                     type: array
             required:
                 - outputs
-            type: object
-        requests_UpdateContact:
-            properties:
-                fullName:
-                    example: Test name
-                    type: string
-            required:
-                - fullName
-            type: object
-        requests_UpsertContact:
-            properties:
-                fullName:
-                    example: Test name
-                    type: string
-                requesterPaymail:
-                    example: test@spv-wallet.com
-                    type: string
-            required:
-                - fullName
-                - requesterPaymail
-                - metadata
             type: object
     securitySchemes:
         XPubAuth:

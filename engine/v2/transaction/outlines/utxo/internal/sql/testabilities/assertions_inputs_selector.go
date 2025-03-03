@@ -6,6 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -16,6 +17,7 @@ type InputsSelectorAssertions interface {
 
 type SuccessfullySelectedInputsAssertions interface {
 	SelectedInputs(inputs []*outlines.UTXO) SelectedInputsAssertions
+	Change(change bsv.Satoshis) ChangeAssertions
 }
 
 type SelectedInputsAssertions interface {
@@ -24,7 +26,11 @@ type SelectedInputsAssertions interface {
 }
 
 type ComparingSelectedInputsAssertions interface {
-	AreEntries(expectedIndexes []int)
+	AreEntries(expectedIndexes []int) ComparingSelectedInputsAssertions
+}
+
+type ChangeAssertions interface {
+	EqualsTo(change uint)
 }
 
 type assertion struct {
@@ -66,15 +72,37 @@ func (a assertion) ComparingTo(inputs []*database.UserUTXO) ComparingSelectedInp
 	return a
 }
 
-func (a assertion) AreEntries(expectedIndexes []int) {
+func (a assertion) AreEntries(expectedIndexes []int) ComparingSelectedInputsAssertions {
 	a.t.Helper()
-	a.require.Len(a.actual, len(expectedIndexes))
+	a.assert.Len(a.actual, len(expectedIndexes))
 
-	for i, ownedIdx := range expectedIndexes {
-		selectedUTXO := a.actual[i]
-		expectedUTXO := a.comparingSource[ownedIdx]
-		a.assert.Equalf(expectedUTXO.TxID, selectedUTXO.TxID, "Selected different TxID at index %d", i)
-		a.assert.EqualValuesf(expectedUTXO.Vout, selectedUTXO.Vout, "Selected different vout at index %d", i)
-		a.assert.Equalf(bsv.CustomInstructions(expectedUTXO.CustomInstructions), selectedUTXO.CustomInstructions, "Selected different custom instructions at index %d", i)
+	expectedSelected := lo.Map(expectedIndexes, func(item int, index int) *outlines.UTXO {
+		return &outlines.UTXO{
+			TxID:               a.comparingSource[item].TxID,
+			Vout:               a.comparingSource[item].Vout,
+			CustomInstructions: bsv.CustomInstructions(a.comparingSource[item].CustomInstructions),
+		}
+	})
+
+	a.assert.ElementsMatch(expectedSelected, a.actual)
+	return a
+}
+
+type changeAssertion struct {
+	t               testing.TB
+	assert          *assert.Assertions
+	comparingChange uint
+}
+
+func (a assertion) Change(change bsv.Satoshis) ChangeAssertions {
+	return changeAssertion{
+		t:               a.t,
+		assert:          a.assert,
+		comparingChange: uint(change),
 	}
+}
+
+func (a changeAssertion) EqualsTo(change uint) {
+	a.t.Helper()
+	a.assert.EqualValues(change, a.comparingChange)
 }
