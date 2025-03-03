@@ -28,6 +28,14 @@ const (
 	ModelsAnnotatedTransactionOutlineFormatRAW  ModelsAnnotatedTransactionOutlineFormat = "RAW"
 )
 
+// Defines values for ModelsContactStatus.
+const (
+	Awaiting    ModelsContactStatus = "awaiting"
+	Confirmed   ModelsContactStatus = "confirmed"
+	Rejected    ModelsContactStatus = "rejected"
+	Unconfirmed ModelsContactStatus = "unconfirmed"
+)
+
 // Defines values for ModelsDataAnnotationBucket.
 const (
 	Data ModelsDataAnnotationBucket = "data"
@@ -132,6 +140,42 @@ type ErrorsCannotBindRequest struct {
 	Message interface{} `json:"message"`
 }
 
+// ErrorsContactAlreadyExists defines model for errors_ContactAlreadyExists.
+type ErrorsContactAlreadyExists struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsContactFailedToUpdate defines model for errors_ContactFailedToUpdate.
+type ErrorsContactFailedToUpdate struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsContactInWrongStatus defines model for errors_ContactInWrongStatus.
+type ErrorsContactInWrongStatus struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsContactInvalidPaymail defines model for errors_ContactInvalidPaymail.
+type ErrorsContactInvalidPaymail struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsContactNotFound defines model for errors_ContactNotFound.
+type ErrorsContactNotFound struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsCouldNotFindPaymail defines model for errors_CouldNotFindPaymail.
+type ErrorsCouldNotFindPaymail struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ErrorsCreatingUser defines model for errors_CreatingUser.
 type ErrorsCreatingUser struct {
 	Code    interface{} `json:"code"`
@@ -144,8 +188,38 @@ type ErrorsDataNotFound struct {
 	Message interface{} `json:"message"`
 }
 
+// ErrorsDeleteContact defines model for errors_DeleteContact.
+type ErrorsDeleteContact struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsFailedToGetPaginatedResults defines model for errors_FailedToGetPaginatedResults.
+type ErrorsFailedToGetPaginatedResults struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsGetContact defines model for errors_GetContact.
+type ErrorsGetContact struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsGetPKIFailed defines model for errors_GetPKIFailed.
+type ErrorsGetPKIFailed struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ErrorsGettingOutputs defines model for errors_GettingOutputs.
 type ErrorsGettingOutputs struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsGettingPKIFailed defines model for errors_GettingPKIFailed.
+type ErrorsGettingPKIFailed struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
@@ -186,6 +260,24 @@ type ErrorsInvalidPubKey struct {
 	Message interface{} `json:"message"`
 }
 
+// ErrorsMissingContactCreatorPaymailParam defines model for errors_MissingContactCreatorPaymailParam.
+type ErrorsMissingContactCreatorPaymailParam struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsMissingContactFullName defines model for errors_MissingContactFullName.
+type ErrorsMissingContactFullName struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsMissingContactPaymailParam defines model for errors_MissingContactPaymailParam.
+type ErrorsMissingContactPaymailParam struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ErrorsNoOperations defines model for errors_NoOperations.
 type ErrorsNoOperations struct {
 	Code    interface{} `json:"code"`
@@ -194,6 +286,18 @@ type ErrorsNoOperations struct {
 
 // ErrorsPaymailInconsistent defines model for errors_PaymailInconsistent.
 type ErrorsPaymailInconsistent struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsRequesterContactInvalid defines model for errors_RequesterContactInvalid.
+type ErrorsRequesterContactInvalid struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsSaveContact defines model for errors_SaveContact.
+type ErrorsSaveContact struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
@@ -267,6 +371,12 @@ type ErrorsUnauthorized struct {
 	Message interface{} `json:"message"`
 }
 
+// ErrorsUpdateContactStatus defines model for errors_UpdateContactStatus.
+type ErrorsUpdateContactStatus struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ErrorsUserAuthOnNonUserEndpoint defines model for errors_UserAuthOnNonUserEndpoint.
 type ErrorsUserAuthOnNonUserEndpoint struct {
 	Code    interface{} `json:"code"`
@@ -276,6 +386,12 @@ type ErrorsUserAuthOnNonUserEndpoint struct {
 // ErrorsUserAuthorization defines model for errors_UserAuthorization.
 type ErrorsUserAuthorization struct {
 	union json.RawMessage
+}
+
+// ErrorsUserDoNotOwnPaymail defines model for errors_UserDoNotOwnPaymail.
+type ErrorsUserDoNotOwnPaymail struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
 }
 
 // ModelsAnnotatedTransactionOutline defines model for models_AnnotatedTransactionOutline.
@@ -301,6 +417,27 @@ type ModelsBucketAnnotation struct {
 // ModelsChangeAnnotation defines model for models_ChangeAnnotation.
 type ModelsChangeAnnotation struct {
 	CustomInstructions *ModelsSPVWalletCustomInstructions `json:"customInstructions,omitempty"`
+}
+
+// ModelsContact defines model for models_Contact.
+type ModelsContact struct {
+	CreatedAt time.Time           `json:"createdAt"`
+	DeletedAt *time.Time          `json:"deletedAt,omitempty"`
+	FullName  string              `json:"fullName"`
+	Id        int                 `json:"id"`
+	Paymail   string              `json:"paymail"`
+	PubKey    string              `json:"pubKey"`
+	Status    ModelsContactStatus `json:"status"`
+	UpdatedAt time.Time           `json:"updatedAt"`
+}
+
+// ModelsContactStatus defines model for models_ContactStatus.
+type ModelsContactStatus string
+
+// ModelsContactsSearchResult defines model for models_ContactsSearchResult.
+type ModelsContactsSearchResult struct {
+	Content []ModelsContact  `json:"content"`
+	Page    ModelsSearchPage `json:"page"`
 }
 
 // ModelsCustomInstructions defines model for models_CustomInstructions.
@@ -334,6 +471,13 @@ type ModelsInputAnnotation struct {
 type ModelsInputsAnnotations struct {
 	// Inputs Map of input annotations
 	Inputs map[string]ModelsInputAnnotation `json:"inputs"`
+}
+
+// ModelsModel defines model for models_Model.
+type ModelsModel struct {
+	CreatedAt time.Time  `json:"createdAt"`
+	DeletedAt *time.Time `json:"deletedAt,omitempty"`
+	UpdatedAt time.Time  `json:"updatedAt"`
 }
 
 // ModelsOperation defines model for models_Operation.
@@ -503,6 +647,18 @@ type RequestsAddPaymail struct {
 	PublicName string `json:"publicName"`
 }
 
+// RequestsAdminConfirmContact defines model for requests_AdminConfirmContact.
+type RequestsAdminConfirmContact struct {
+	PaymailA string `json:"paymailA"`
+	PaymailB string `json:"paymailB"`
+}
+
+// RequestsAdminCreateContact defines model for requests_AdminCreateContact.
+type RequestsAdminCreateContact struct {
+	CreatorPaymail string `json:"creatorPaymail"`
+	FullName       string `json:"fullName"`
+}
+
 // RequestsCreateUser defines model for requests_CreateUser.
 type RequestsCreateUser struct {
 	Paymail   *RequestsAddPaymail `json:"paymail,omitempty"`
@@ -568,11 +724,34 @@ type RequestsTransactionSpecification struct {
 	Outputs []RequestsTransactionOutlineOutputSpecification `json:"outputs"`
 }
 
+// RequestsUpdateContact defines model for requests_UpdateContact.
+type RequestsUpdateContact struct {
+	FullName string `json:"fullName"`
+}
+
+// RequestsUpsertContact defines model for requests_UpsertContact.
+type RequestsUpsertContact struct {
+	FullName         string `json:"fullName"`
+	RequesterPaymail string `json:"requesterPaymail"`
+}
+
+// RequestsFullName defines model for requests_FullName.
+type RequestsFullName = string
+
+// RequestsID defines model for requests_ID.
+type RequestsID = int
+
 // RequestsPageNumber defines model for requests_PageNumber.
 type RequestsPageNumber = int
 
 // RequestsPageSize defines model for requests_PageSize.
 type RequestsPageSize = int
+
+// RequestsPaymail defines model for requests_Paymail.
+type RequestsPaymail = string
+
+// RequestsPubKey defines model for requests_PubKey.
+type RequestsPubKey = string
 
 // RequestsSort defines model for requests_Sort.
 type RequestsSort = string
@@ -580,8 +759,36 @@ type RequestsSort = string
 // RequestsSortBy defines model for requests_SortBy.
 type RequestsSortBy = string
 
+// RequestsStatus defines model for requests_Status.
+type RequestsStatus = ModelsContactStatus
+
 // ResponsesAdminAddPaymailSuccess defines model for responses_AdminAddPaymailSuccess.
 type ResponsesAdminAddPaymailSuccess = ModelsPaymail
+
+// ResponsesAdminConfirmContactInternalServerError defines model for responses_AdminConfirmContactInternalServerError.
+type ResponsesAdminConfirmContactInternalServerError struct {
+	union json.RawMessage
+}
+
+// ResponsesAdminCreateContactBadRequest defines model for responses_AdminCreateContactBadRequest.
+type ResponsesAdminCreateContactBadRequest struct {
+	union json.RawMessage
+}
+
+// ResponsesAdminCreateContactConflict defines model for responses_AdminCreateContactConflict.
+type ResponsesAdminCreateContactConflict struct {
+	union json.RawMessage
+}
+
+// ResponsesAdminCreateContactInternalServerError defines model for responses_AdminCreateContactInternalServerError.
+type ResponsesAdminCreateContactInternalServerError struct {
+	union json.RawMessage
+}
+
+// ResponsesAdminCreateContactNotFound defines model for responses_AdminCreateContactNotFound.
+type ResponsesAdminCreateContactNotFound struct {
+	union json.RawMessage
+}
 
 // ResponsesAdminCreateUserInternalServerError defines model for responses_AdminCreateUserInternalServerError.
 type ResponsesAdminCreateUserInternalServerError = ErrorsCreatingUser
@@ -595,8 +802,29 @@ type ResponsesAdminGetUser = ModelsUser
 // ResponsesAdminGetUserInternalServerError defines model for responses_AdminGetUserInternalServerError.
 type ResponsesAdminGetUserInternalServerError = ErrorsGettingUser
 
+// ResponsesAdminUpdateContactStatusInternalServerError defines model for responses_AdminUpdateContactStatusInternalServerError.
+type ResponsesAdminUpdateContactStatusInternalServerError struct {
+	union json.RawMessage
+}
+
 // ResponsesAdminUserBadRequest defines model for responses_AdminUserBadRequest.
 type ResponsesAdminUserBadRequest struct {
+	union json.RawMessage
+}
+
+// ResponsesContactNotFound defines model for responses_ContactNotFound.
+type ResponsesContactNotFound = ErrorsContactNotFound
+
+// ResponsesContactSearchInternalServerError defines model for responses_ContactSearchInternalServerError.
+type ResponsesContactSearchInternalServerError struct {
+	union json.RawMessage
+}
+
+// ResponsesContactSuccess defines model for responses_ContactSuccess.
+type ResponsesContactSuccess = ModelsContact
+
+// ResponsesContactUpsertInternalServerError defines model for responses_ContactUpsertInternalServerError.
+type ResponsesContactUpsertInternalServerError struct {
 	union json.RawMessage
 }
 
@@ -610,6 +838,16 @@ type ResponsesCreateTransactionOutlineSuccess = ModelsAnnotatedTransactionOutlin
 
 // ResponsesCreateTransactionOutlineUnprocessable defines model for responses_CreateTransactionOutlineUnprocessable.
 type ResponsesCreateTransactionOutlineUnprocessable struct {
+	union json.RawMessage
+}
+
+// ResponsesDeleteContactInternalServerError defines model for responses_DeleteContactInternalServerError.
+type ResponsesDeleteContactInternalServerError struct {
+	union json.RawMessage
+}
+
+// ResponsesGetContactInternalServerError defines model for responses_GetContactInternalServerError.
+type ResponsesGetContactInternalServerError struct {
 	union json.RawMessage
 }
 
@@ -649,17 +887,95 @@ type ResponsesRecordTransactionSuccess = ModelsRecordedOutline
 // ResponsesSearchBadRequest defines model for responses_SearchBadRequest.
 type ResponsesSearchBadRequest = ErrorsInvalidDataID
 
+// ResponsesSearchContactsSuccess defines model for responses_SearchContactsSuccess.
+type ResponsesSearchContactsSuccess = []ModelsContactsSearchResult
+
 // ResponsesSearchOperationsSuccess defines model for responses_SearchOperationsSuccess.
 type ResponsesSearchOperationsSuccess = ModelsOperationsSearchResult
 
 // ResponsesSharedConfig Shared config
 type ResponsesSharedConfig = ModelsSharedConfig
 
+// ResponsesUpdateContactBadRequest defines model for responses_UpdateContactBadRequest.
+type ResponsesUpdateContactBadRequest struct {
+	union json.RawMessage
+}
+
+// ResponsesUpsertContactBadRequest defines model for responses_UpsertContactBadRequest.
+type ResponsesUpsertContactBadRequest struct {
+	union json.RawMessage
+}
+
+// ResponsesUpsertContactNotFound defines model for responses_UpsertContactNotFound.
+type ResponsesUpsertContactNotFound struct {
+	union json.RawMessage
+}
+
 // ResponsesUserBadRequest defines model for responses_UserBadRequest.
 type ResponsesUserBadRequest = ErrorsInvalidDataID
 
 // ResponsesUserNotAuthorized defines model for responses_UserNotAuthorized.
 type ResponsesUserNotAuthorized = ErrorsUserAuthorization
+
+// AdminGetContactsParams defines parameters for AdminGetContacts.
+type AdminGetContactsParams struct {
+	// Page Page number for pagination
+	Page *RequestsPageNumber `form:"page,omitempty" json:"page,omitempty"`
+
+	// Size Number of items per page
+	Size *RequestsPageSize `form:"size,omitempty" json:"size,omitempty"`
+
+	// Sort Sorting order (asc or desc)
+	Sort *RequestsSort `form:"sort,omitempty" json:"sort,omitempty"`
+
+	// SortBy Field to sort by
+	SortBy *RequestsSortBy `form:"sortBy,omitempty" json:"sortBy,omitempty"`
+
+	// FullName Full name of the contact
+	FullName *RequestsFullName `form:"fullName,omitempty" json:"fullName,omitempty"`
+
+	// Paymail Paymail of the contact
+	Paymail *RequestsPaymail `form:"paymail,omitempty" json:"paymail,omitempty"`
+
+	// Id ID of the contact
+	Id *RequestsID `form:"id,omitempty" json:"id,omitempty"`
+
+	// PubKey Public key of the contact
+	PubKey *RequestsPubKey `form:"pubKey,omitempty" json:"pubKey,omitempty"`
+
+	// Status Status of the contact
+	Status *RequestsStatus `form:"status,omitempty" json:"status,omitempty"`
+}
+
+// GetContactsParams defines parameters for GetContacts.
+type GetContactsParams struct {
+	// Page Page number for pagination
+	Page *RequestsPageNumber `form:"page,omitempty" json:"page,omitempty"`
+
+	// Size Number of items per page
+	Size *RequestsPageSize `form:"size,omitempty" json:"size,omitempty"`
+
+	// Sort Sorting order (asc or desc)
+	Sort *RequestsSort `form:"sort,omitempty" json:"sort,omitempty"`
+
+	// SortBy Field to sort by
+	SortBy *RequestsSortBy `form:"sortBy,omitempty" json:"sortBy,omitempty"`
+
+	// FullName Full name of the contact
+	FullName *RequestsFullName `form:"fullName,omitempty" json:"fullName,omitempty"`
+
+	// Paymail Paymail of the contact
+	Paymail *RequestsPaymail `form:"paymail,omitempty" json:"paymail,omitempty"`
+
+	// Id ID of the contact
+	Id *RequestsID `form:"id,omitempty" json:"id,omitempty"`
+
+	// PubKey Public key of the contact
+	PubKey *RequestsPubKey `form:"pubKey,omitempty" json:"pubKey,omitempty"`
+
+	// Status Status of the contact
+	Status *RequestsStatus `form:"status,omitempty" json:"status,omitempty"`
+}
 
 // SearchOperationsParams defines parameters for SearchOperations.
 type SearchOperationsParams struct {
@@ -685,11 +1001,23 @@ type CreateTransactionOutlineParams struct {
 // CreateTransactionOutlineParamsFormat defines parameters for CreateTransactionOutline.
 type CreateTransactionOutlineParamsFormat string
 
+// AdminConfirmContactJSONRequestBody defines body for AdminConfirmContact for application/json ContentType.
+type AdminConfirmContactJSONRequestBody = RequestsAdminConfirmContact
+
+// AdminUpdateContactJSONRequestBody defines body for AdminUpdateContact for application/json ContentType.
+type AdminUpdateContactJSONRequestBody = RequestsUpdateContact
+
+// AdminCreateContactJSONRequestBody defines body for AdminCreateContact for application/json ContentType.
+type AdminCreateContactJSONRequestBody = RequestsAdminCreateContact
+
 // CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
 type CreateUserJSONRequestBody = RequestsCreateUser
 
 // AddPaymailToUserJSONRequestBody defines body for AddPaymailToUser for application/json ContentType.
 type AddPaymailToUserJSONRequestBody = RequestsAddPaymail
+
+// UpsertContactJSONRequestBody defines body for UpsertContact for application/json ContentType.
+type UpsertContactJSONRequestBody = RequestsUpsertContact
 
 // RecordTransactionOutlineJSONRequestBody defines body for RecordTransactionOutline for application/json ContentType.
 type RecordTransactionOutlineJSONRequestBody = RequestsTransactionOutline
@@ -1122,6 +1450,482 @@ func (t *RequestsTransactionOutlineOutputSpecification) UnmarshalJSON(b []byte) 
 	return err
 }
 
+// AsErrorsInternal returns the union data inside the ResponsesAdminConfirmContactInternalServerError as a ErrorsInternal
+func (t ResponsesAdminConfirmContactInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
+	var body ErrorsInternal
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInternal overwrites any union data inside the ResponsesAdminConfirmContactInternalServerError as the provided ErrorsInternal
+func (t *ResponsesAdminConfirmContactInternalServerError) FromErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInternal performs a merge with any union data inside the ResponsesAdminConfirmContactInternalServerError, using the provided ErrorsInternal
+func (t *ResponsesAdminConfirmContactInternalServerError) MergeErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsGetContact returns the union data inside the ResponsesAdminConfirmContactInternalServerError as a ErrorsGetContact
+func (t ResponsesAdminConfirmContactInternalServerError) AsErrorsGetContact() (ErrorsGetContact, error) {
+	var body ErrorsGetContact
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsGetContact overwrites any union data inside the ResponsesAdminConfirmContactInternalServerError as the provided ErrorsGetContact
+func (t *ResponsesAdminConfirmContactInternalServerError) FromErrorsGetContact(v ErrorsGetContact) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsGetContact performs a merge with any union data inside the ResponsesAdminConfirmContactInternalServerError, using the provided ErrorsGetContact
+func (t *ResponsesAdminConfirmContactInternalServerError) MergeErrorsGetContact(v ErrorsGetContact) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsUpdateContactStatus returns the union data inside the ResponsesAdminConfirmContactInternalServerError as a ErrorsUpdateContactStatus
+func (t ResponsesAdminConfirmContactInternalServerError) AsErrorsUpdateContactStatus() (ErrorsUpdateContactStatus, error) {
+	var body ErrorsUpdateContactStatus
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsUpdateContactStatus overwrites any union data inside the ResponsesAdminConfirmContactInternalServerError as the provided ErrorsUpdateContactStatus
+func (t *ResponsesAdminConfirmContactInternalServerError) FromErrorsUpdateContactStatus(v ErrorsUpdateContactStatus) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsUpdateContactStatus performs a merge with any union data inside the ResponsesAdminConfirmContactInternalServerError, using the provided ErrorsUpdateContactStatus
+func (t *ResponsesAdminConfirmContactInternalServerError) MergeErrorsUpdateContactStatus(v ErrorsUpdateContactStatus) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesAdminConfirmContactInternalServerError) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesAdminConfirmContactInternalServerError) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsCannotBindRequest returns the union data inside the ResponsesAdminCreateContactBadRequest as a ErrorsCannotBindRequest
+func (t ResponsesAdminCreateContactBadRequest) AsErrorsCannotBindRequest() (ErrorsCannotBindRequest, error) {
+	var body ErrorsCannotBindRequest
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsCannotBindRequest overwrites any union data inside the ResponsesAdminCreateContactBadRequest as the provided ErrorsCannotBindRequest
+func (t *ResponsesAdminCreateContactBadRequest) FromErrorsCannotBindRequest(v ErrorsCannotBindRequest) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsCannotBindRequest performs a merge with any union data inside the ResponsesAdminCreateContactBadRequest, using the provided ErrorsCannotBindRequest
+func (t *ResponsesAdminCreateContactBadRequest) MergeErrorsCannotBindRequest(v ErrorsCannotBindRequest) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsMissingContactFullName returns the union data inside the ResponsesAdminCreateContactBadRequest as a ErrorsMissingContactFullName
+func (t ResponsesAdminCreateContactBadRequest) AsErrorsMissingContactFullName() (ErrorsMissingContactFullName, error) {
+	var body ErrorsMissingContactFullName
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsMissingContactFullName overwrites any union data inside the ResponsesAdminCreateContactBadRequest as the provided ErrorsMissingContactFullName
+func (t *ResponsesAdminCreateContactBadRequest) FromErrorsMissingContactFullName(v ErrorsMissingContactFullName) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsMissingContactFullName performs a merge with any union data inside the ResponsesAdminCreateContactBadRequest, using the provided ErrorsMissingContactFullName
+func (t *ResponsesAdminCreateContactBadRequest) MergeErrorsMissingContactFullName(v ErrorsMissingContactFullName) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsMissingContactPaymailParam returns the union data inside the ResponsesAdminCreateContactBadRequest as a ErrorsMissingContactPaymailParam
+func (t ResponsesAdminCreateContactBadRequest) AsErrorsMissingContactPaymailParam() (ErrorsMissingContactPaymailParam, error) {
+	var body ErrorsMissingContactPaymailParam
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsMissingContactPaymailParam overwrites any union data inside the ResponsesAdminCreateContactBadRequest as the provided ErrorsMissingContactPaymailParam
+func (t *ResponsesAdminCreateContactBadRequest) FromErrorsMissingContactPaymailParam(v ErrorsMissingContactPaymailParam) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsMissingContactPaymailParam performs a merge with any union data inside the ResponsesAdminCreateContactBadRequest, using the provided ErrorsMissingContactPaymailParam
+func (t *ResponsesAdminCreateContactBadRequest) MergeErrorsMissingContactPaymailParam(v ErrorsMissingContactPaymailParam) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsMissingContactCreatorPaymailParam returns the union data inside the ResponsesAdminCreateContactBadRequest as a ErrorsMissingContactCreatorPaymailParam
+func (t ResponsesAdminCreateContactBadRequest) AsErrorsMissingContactCreatorPaymailParam() (ErrorsMissingContactCreatorPaymailParam, error) {
+	var body ErrorsMissingContactCreatorPaymailParam
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsMissingContactCreatorPaymailParam overwrites any union data inside the ResponsesAdminCreateContactBadRequest as the provided ErrorsMissingContactCreatorPaymailParam
+func (t *ResponsesAdminCreateContactBadRequest) FromErrorsMissingContactCreatorPaymailParam(v ErrorsMissingContactCreatorPaymailParam) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsMissingContactCreatorPaymailParam performs a merge with any union data inside the ResponsesAdminCreateContactBadRequest, using the provided ErrorsMissingContactCreatorPaymailParam
+func (t *ResponsesAdminCreateContactBadRequest) MergeErrorsMissingContactCreatorPaymailParam(v ErrorsMissingContactCreatorPaymailParam) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsRequesterContactInvalid returns the union data inside the ResponsesAdminCreateContactBadRequest as a ErrorsRequesterContactInvalid
+func (t ResponsesAdminCreateContactBadRequest) AsErrorsRequesterContactInvalid() (ErrorsRequesterContactInvalid, error) {
+	var body ErrorsRequesterContactInvalid
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsRequesterContactInvalid overwrites any union data inside the ResponsesAdminCreateContactBadRequest as the provided ErrorsRequesterContactInvalid
+func (t *ResponsesAdminCreateContactBadRequest) FromErrorsRequesterContactInvalid(v ErrorsRequesterContactInvalid) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsRequesterContactInvalid performs a merge with any union data inside the ResponsesAdminCreateContactBadRequest, using the provided ErrorsRequesterContactInvalid
+func (t *ResponsesAdminCreateContactBadRequest) MergeErrorsRequesterContactInvalid(v ErrorsRequesterContactInvalid) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsGetPKIFailed returns the union data inside the ResponsesAdminCreateContactBadRequest as a ErrorsGetPKIFailed
+func (t ResponsesAdminCreateContactBadRequest) AsErrorsGetPKIFailed() (ErrorsGetPKIFailed, error) {
+	var body ErrorsGetPKIFailed
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsGetPKIFailed overwrites any union data inside the ResponsesAdminCreateContactBadRequest as the provided ErrorsGetPKIFailed
+func (t *ResponsesAdminCreateContactBadRequest) FromErrorsGetPKIFailed(v ErrorsGetPKIFailed) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsGetPKIFailed performs a merge with any union data inside the ResponsesAdminCreateContactBadRequest, using the provided ErrorsGetPKIFailed
+func (t *ResponsesAdminCreateContactBadRequest) MergeErrorsGetPKIFailed(v ErrorsGetPKIFailed) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsSaveContact returns the union data inside the ResponsesAdminCreateContactBadRequest as a ErrorsSaveContact
+func (t ResponsesAdminCreateContactBadRequest) AsErrorsSaveContact() (ErrorsSaveContact, error) {
+	var body ErrorsSaveContact
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsSaveContact overwrites any union data inside the ResponsesAdminCreateContactBadRequest as the provided ErrorsSaveContact
+func (t *ResponsesAdminCreateContactBadRequest) FromErrorsSaveContact(v ErrorsSaveContact) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsSaveContact performs a merge with any union data inside the ResponsesAdminCreateContactBadRequest, using the provided ErrorsSaveContact
+func (t *ResponsesAdminCreateContactBadRequest) MergeErrorsSaveContact(v ErrorsSaveContact) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesAdminCreateContactBadRequest) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesAdminCreateContactBadRequest) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsContactAlreadyExists returns the union data inside the ResponsesAdminCreateContactConflict as a ErrorsContactAlreadyExists
+func (t ResponsesAdminCreateContactConflict) AsErrorsContactAlreadyExists() (ErrorsContactAlreadyExists, error) {
+	var body ErrorsContactAlreadyExists
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsContactAlreadyExists overwrites any union data inside the ResponsesAdminCreateContactConflict as the provided ErrorsContactAlreadyExists
+func (t *ResponsesAdminCreateContactConflict) FromErrorsContactAlreadyExists(v ErrorsContactAlreadyExists) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsContactAlreadyExists performs a merge with any union data inside the ResponsesAdminCreateContactConflict, using the provided ErrorsContactAlreadyExists
+func (t *ResponsesAdminCreateContactConflict) MergeErrorsContactAlreadyExists(v ErrorsContactAlreadyExists) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesAdminCreateContactConflict) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesAdminCreateContactConflict) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsInternal returns the union data inside the ResponsesAdminCreateContactInternalServerError as a ErrorsInternal
+func (t ResponsesAdminCreateContactInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
+	var body ErrorsInternal
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInternal overwrites any union data inside the ResponsesAdminCreateContactInternalServerError as the provided ErrorsInternal
+func (t *ResponsesAdminCreateContactInternalServerError) FromErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInternal performs a merge with any union data inside the ResponsesAdminCreateContactInternalServerError, using the provided ErrorsInternal
+func (t *ResponsesAdminCreateContactInternalServerError) MergeErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsGetContact returns the union data inside the ResponsesAdminCreateContactInternalServerError as a ErrorsGetContact
+func (t ResponsesAdminCreateContactInternalServerError) AsErrorsGetContact() (ErrorsGetContact, error) {
+	var body ErrorsGetContact
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsGetContact overwrites any union data inside the ResponsesAdminCreateContactInternalServerError as the provided ErrorsGetContact
+func (t *ResponsesAdminCreateContactInternalServerError) FromErrorsGetContact(v ErrorsGetContact) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsGetContact performs a merge with any union data inside the ResponsesAdminCreateContactInternalServerError, using the provided ErrorsGetContact
+func (t *ResponsesAdminCreateContactInternalServerError) MergeErrorsGetContact(v ErrorsGetContact) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesAdminCreateContactInternalServerError) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesAdminCreateContactInternalServerError) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsCouldNotFindPaymail returns the union data inside the ResponsesAdminCreateContactNotFound as a ErrorsCouldNotFindPaymail
+func (t ResponsesAdminCreateContactNotFound) AsErrorsCouldNotFindPaymail() (ErrorsCouldNotFindPaymail, error) {
+	var body ErrorsCouldNotFindPaymail
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsCouldNotFindPaymail overwrites any union data inside the ResponsesAdminCreateContactNotFound as the provided ErrorsCouldNotFindPaymail
+func (t *ResponsesAdminCreateContactNotFound) FromErrorsCouldNotFindPaymail(v ErrorsCouldNotFindPaymail) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsCouldNotFindPaymail performs a merge with any union data inside the ResponsesAdminCreateContactNotFound, using the provided ErrorsCouldNotFindPaymail
+func (t *ResponsesAdminCreateContactNotFound) MergeErrorsCouldNotFindPaymail(v ErrorsCouldNotFindPaymail) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesAdminCreateContactNotFound) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesAdminCreateContactNotFound) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsInternal returns the union data inside the ResponsesAdminUpdateContactStatusInternalServerError as a ErrorsInternal
+func (t ResponsesAdminUpdateContactStatusInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
+	var body ErrorsInternal
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInternal overwrites any union data inside the ResponsesAdminUpdateContactStatusInternalServerError as the provided ErrorsInternal
+func (t *ResponsesAdminUpdateContactStatusInternalServerError) FromErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInternal performs a merge with any union data inside the ResponsesAdminUpdateContactStatusInternalServerError, using the provided ErrorsInternal
+func (t *ResponsesAdminUpdateContactStatusInternalServerError) MergeErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsUpdateContactStatus returns the union data inside the ResponsesAdminUpdateContactStatusInternalServerError as a ErrorsUpdateContactStatus
+func (t ResponsesAdminUpdateContactStatusInternalServerError) AsErrorsUpdateContactStatus() (ErrorsUpdateContactStatus, error) {
+	var body ErrorsUpdateContactStatus
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsUpdateContactStatus overwrites any union data inside the ResponsesAdminUpdateContactStatusInternalServerError as the provided ErrorsUpdateContactStatus
+func (t *ResponsesAdminUpdateContactStatusInternalServerError) FromErrorsUpdateContactStatus(v ErrorsUpdateContactStatus) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsUpdateContactStatus performs a merge with any union data inside the ResponsesAdminUpdateContactStatusInternalServerError, using the provided ErrorsUpdateContactStatus
+func (t *ResponsesAdminUpdateContactStatusInternalServerError) MergeErrorsUpdateContactStatus(v ErrorsUpdateContactStatus) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesAdminUpdateContactStatusInternalServerError) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesAdminUpdateContactStatusInternalServerError) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
 // AsErrorsCannotBindRequest returns the union data inside the ResponsesAdminUserBadRequest as a ErrorsCannotBindRequest
 func (t ResponsesAdminUserBadRequest) AsErrorsCannotBindRequest() (ErrorsCannotBindRequest, error) {
 	var body ErrorsCannotBindRequest
@@ -1258,6 +2062,156 @@ func (t ResponsesAdminUserBadRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (t *ResponsesAdminUserBadRequest) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsInternal returns the union data inside the ResponsesContactSearchInternalServerError as a ErrorsInternal
+func (t ResponsesContactSearchInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
+	var body ErrorsInternal
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInternal overwrites any union data inside the ResponsesContactSearchInternalServerError as the provided ErrorsInternal
+func (t *ResponsesContactSearchInternalServerError) FromErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInternal performs a merge with any union data inside the ResponsesContactSearchInternalServerError, using the provided ErrorsInternal
+func (t *ResponsesContactSearchInternalServerError) MergeErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsFailedToGetPaginatedResults returns the union data inside the ResponsesContactSearchInternalServerError as a ErrorsFailedToGetPaginatedResults
+func (t ResponsesContactSearchInternalServerError) AsErrorsFailedToGetPaginatedResults() (ErrorsFailedToGetPaginatedResults, error) {
+	var body ErrorsFailedToGetPaginatedResults
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsFailedToGetPaginatedResults overwrites any union data inside the ResponsesContactSearchInternalServerError as the provided ErrorsFailedToGetPaginatedResults
+func (t *ResponsesContactSearchInternalServerError) FromErrorsFailedToGetPaginatedResults(v ErrorsFailedToGetPaginatedResults) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsFailedToGetPaginatedResults performs a merge with any union data inside the ResponsesContactSearchInternalServerError, using the provided ErrorsFailedToGetPaginatedResults
+func (t *ResponsesContactSearchInternalServerError) MergeErrorsFailedToGetPaginatedResults(v ErrorsFailedToGetPaginatedResults) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesContactSearchInternalServerError) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesContactSearchInternalServerError) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsInternal returns the union data inside the ResponsesContactUpsertInternalServerError as a ErrorsInternal
+func (t ResponsesContactUpsertInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
+	var body ErrorsInternal
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInternal overwrites any union data inside the ResponsesContactUpsertInternalServerError as the provided ErrorsInternal
+func (t *ResponsesContactUpsertInternalServerError) FromErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInternal performs a merge with any union data inside the ResponsesContactUpsertInternalServerError, using the provided ErrorsInternal
+func (t *ResponsesContactUpsertInternalServerError) MergeErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsGetContact returns the union data inside the ResponsesContactUpsertInternalServerError as a ErrorsGetContact
+func (t ResponsesContactUpsertInternalServerError) AsErrorsGetContact() (ErrorsGetContact, error) {
+	var body ErrorsGetContact
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsGetContact overwrites any union data inside the ResponsesContactUpsertInternalServerError as the provided ErrorsGetContact
+func (t *ResponsesContactUpsertInternalServerError) FromErrorsGetContact(v ErrorsGetContact) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsGetContact performs a merge with any union data inside the ResponsesContactUpsertInternalServerError, using the provided ErrorsGetContact
+func (t *ResponsesContactUpsertInternalServerError) MergeErrorsGetContact(v ErrorsGetContact) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsContactFailedToUpdate returns the union data inside the ResponsesContactUpsertInternalServerError as a ErrorsContactFailedToUpdate
+func (t ResponsesContactUpsertInternalServerError) AsErrorsContactFailedToUpdate() (ErrorsContactFailedToUpdate, error) {
+	var body ErrorsContactFailedToUpdate
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsContactFailedToUpdate overwrites any union data inside the ResponsesContactUpsertInternalServerError as the provided ErrorsContactFailedToUpdate
+func (t *ResponsesContactUpsertInternalServerError) FromErrorsContactFailedToUpdate(v ErrorsContactFailedToUpdate) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsContactFailedToUpdate performs a merge with any union data inside the ResponsesContactUpsertInternalServerError, using the provided ErrorsContactFailedToUpdate
+func (t *ResponsesContactUpsertInternalServerError) MergeErrorsContactFailedToUpdate(v ErrorsContactFailedToUpdate) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesContactUpsertInternalServerError) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesContactUpsertInternalServerError) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
@@ -1460,6 +2414,130 @@ func (t ResponsesCreateTransactionOutlineUnprocessable) MarshalJSON() ([]byte, e
 }
 
 func (t *ResponsesCreateTransactionOutlineUnprocessable) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsInternal returns the union data inside the ResponsesDeleteContactInternalServerError as a ErrorsInternal
+func (t ResponsesDeleteContactInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
+	var body ErrorsInternal
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInternal overwrites any union data inside the ResponsesDeleteContactInternalServerError as the provided ErrorsInternal
+func (t *ResponsesDeleteContactInternalServerError) FromErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInternal performs a merge with any union data inside the ResponsesDeleteContactInternalServerError, using the provided ErrorsInternal
+func (t *ResponsesDeleteContactInternalServerError) MergeErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsDeleteContact returns the union data inside the ResponsesDeleteContactInternalServerError as a ErrorsDeleteContact
+func (t ResponsesDeleteContactInternalServerError) AsErrorsDeleteContact() (ErrorsDeleteContact, error) {
+	var body ErrorsDeleteContact
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsDeleteContact overwrites any union data inside the ResponsesDeleteContactInternalServerError as the provided ErrorsDeleteContact
+func (t *ResponsesDeleteContactInternalServerError) FromErrorsDeleteContact(v ErrorsDeleteContact) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsDeleteContact performs a merge with any union data inside the ResponsesDeleteContactInternalServerError, using the provided ErrorsDeleteContact
+func (t *ResponsesDeleteContactInternalServerError) MergeErrorsDeleteContact(v ErrorsDeleteContact) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesDeleteContactInternalServerError) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesDeleteContactInternalServerError) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsInternal returns the union data inside the ResponsesGetContactInternalServerError as a ErrorsInternal
+func (t ResponsesGetContactInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
+	var body ErrorsInternal
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInternal overwrites any union data inside the ResponsesGetContactInternalServerError as the provided ErrorsInternal
+func (t *ResponsesGetContactInternalServerError) FromErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInternal performs a merge with any union data inside the ResponsesGetContactInternalServerError, using the provided ErrorsInternal
+func (t *ResponsesGetContactInternalServerError) MergeErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsGetContact returns the union data inside the ResponsesGetContactInternalServerError as a ErrorsGetContact
+func (t ResponsesGetContactInternalServerError) AsErrorsGetContact() (ErrorsGetContact, error) {
+	var body ErrorsGetContact
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsGetContact overwrites any union data inside the ResponsesGetContactInternalServerError as the provided ErrorsGetContact
+func (t *ResponsesGetContactInternalServerError) FromErrorsGetContact(v ErrorsGetContact) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsGetContact performs a merge with any union data inside the ResponsesGetContactInternalServerError, using the provided ErrorsGetContact
+func (t *ResponsesGetContactInternalServerError) MergeErrorsGetContact(v ErrorsGetContact) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesGetContactInternalServerError) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesGetContactInternalServerError) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
@@ -1728,6 +2806,218 @@ func (t *ResponsesRecordTransactionInternalServerError) UnmarshalJSON(b []byte) 
 	return err
 }
 
+// AsErrorsContactInWrongStatus returns the union data inside the ResponsesUpdateContactBadRequest as a ErrorsContactInWrongStatus
+func (t ResponsesUpdateContactBadRequest) AsErrorsContactInWrongStatus() (ErrorsContactInWrongStatus, error) {
+	var body ErrorsContactInWrongStatus
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsContactInWrongStatus overwrites any union data inside the ResponsesUpdateContactBadRequest as the provided ErrorsContactInWrongStatus
+func (t *ResponsesUpdateContactBadRequest) FromErrorsContactInWrongStatus(v ErrorsContactInWrongStatus) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsContactInWrongStatus performs a merge with any union data inside the ResponsesUpdateContactBadRequest, using the provided ErrorsContactInWrongStatus
+func (t *ResponsesUpdateContactBadRequest) MergeErrorsContactInWrongStatus(v ErrorsContactInWrongStatus) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesUpdateContactBadRequest) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesUpdateContactBadRequest) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsCannotBindRequest returns the union data inside the ResponsesUpsertContactBadRequest as a ErrorsCannotBindRequest
+func (t ResponsesUpsertContactBadRequest) AsErrorsCannotBindRequest() (ErrorsCannotBindRequest, error) {
+	var body ErrorsCannotBindRequest
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsCannotBindRequest overwrites any union data inside the ResponsesUpsertContactBadRequest as the provided ErrorsCannotBindRequest
+func (t *ResponsesUpsertContactBadRequest) FromErrorsCannotBindRequest(v ErrorsCannotBindRequest) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsCannotBindRequest performs a merge with any union data inside the ResponsesUpsertContactBadRequest, using the provided ErrorsCannotBindRequest
+func (t *ResponsesUpsertContactBadRequest) MergeErrorsCannotBindRequest(v ErrorsCannotBindRequest) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsUserDoNotOwnPaymail returns the union data inside the ResponsesUpsertContactBadRequest as a ErrorsUserDoNotOwnPaymail
+func (t ResponsesUpsertContactBadRequest) AsErrorsUserDoNotOwnPaymail() (ErrorsUserDoNotOwnPaymail, error) {
+	var body ErrorsUserDoNotOwnPaymail
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsUserDoNotOwnPaymail overwrites any union data inside the ResponsesUpsertContactBadRequest as the provided ErrorsUserDoNotOwnPaymail
+func (t *ResponsesUpsertContactBadRequest) FromErrorsUserDoNotOwnPaymail(v ErrorsUserDoNotOwnPaymail) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsUserDoNotOwnPaymail performs a merge with any union data inside the ResponsesUpsertContactBadRequest, using the provided ErrorsUserDoNotOwnPaymail
+func (t *ResponsesUpsertContactBadRequest) MergeErrorsUserDoNotOwnPaymail(v ErrorsUserDoNotOwnPaymail) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsContactInvalidPaymail returns the union data inside the ResponsesUpsertContactBadRequest as a ErrorsContactInvalidPaymail
+func (t ResponsesUpsertContactBadRequest) AsErrorsContactInvalidPaymail() (ErrorsContactInvalidPaymail, error) {
+	var body ErrorsContactInvalidPaymail
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsContactInvalidPaymail overwrites any union data inside the ResponsesUpsertContactBadRequest as the provided ErrorsContactInvalidPaymail
+func (t *ResponsesUpsertContactBadRequest) FromErrorsContactInvalidPaymail(v ErrorsContactInvalidPaymail) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsContactInvalidPaymail performs a merge with any union data inside the ResponsesUpsertContactBadRequest, using the provided ErrorsContactInvalidPaymail
+func (t *ResponsesUpsertContactBadRequest) MergeErrorsContactInvalidPaymail(v ErrorsContactInvalidPaymail) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsGettingPKIFailed returns the union data inside the ResponsesUpsertContactBadRequest as a ErrorsGettingPKIFailed
+func (t ResponsesUpsertContactBadRequest) AsErrorsGettingPKIFailed() (ErrorsGettingPKIFailed, error) {
+	var body ErrorsGettingPKIFailed
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsGettingPKIFailed overwrites any union data inside the ResponsesUpsertContactBadRequest as the provided ErrorsGettingPKIFailed
+func (t *ResponsesUpsertContactBadRequest) FromErrorsGettingPKIFailed(v ErrorsGettingPKIFailed) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsGettingPKIFailed performs a merge with any union data inside the ResponsesUpsertContactBadRequest, using the provided ErrorsGettingPKIFailed
+func (t *ResponsesUpsertContactBadRequest) MergeErrorsGettingPKIFailed(v ErrorsGettingPKIFailed) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsSaveContact returns the union data inside the ResponsesUpsertContactBadRequest as a ErrorsSaveContact
+func (t ResponsesUpsertContactBadRequest) AsErrorsSaveContact() (ErrorsSaveContact, error) {
+	var body ErrorsSaveContact
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsSaveContact overwrites any union data inside the ResponsesUpsertContactBadRequest as the provided ErrorsSaveContact
+func (t *ResponsesUpsertContactBadRequest) FromErrorsSaveContact(v ErrorsSaveContact) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsSaveContact performs a merge with any union data inside the ResponsesUpsertContactBadRequest, using the provided ErrorsSaveContact
+func (t *ResponsesUpsertContactBadRequest) MergeErrorsSaveContact(v ErrorsSaveContact) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesUpsertContactBadRequest) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesUpsertContactBadRequest) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsCouldNotFindPaymail returns the union data inside the ResponsesUpsertContactNotFound as a ErrorsCouldNotFindPaymail
+func (t ResponsesUpsertContactNotFound) AsErrorsCouldNotFindPaymail() (ErrorsCouldNotFindPaymail, error) {
+	var body ErrorsCouldNotFindPaymail
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsCouldNotFindPaymail overwrites any union data inside the ResponsesUpsertContactNotFound as the provided ErrorsCouldNotFindPaymail
+func (t *ResponsesUpsertContactNotFound) FromErrorsCouldNotFindPaymail(v ErrorsCouldNotFindPaymail) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsCouldNotFindPaymail performs a merge with any union data inside the ResponsesUpsertContactNotFound, using the provided ErrorsCouldNotFindPaymail
+func (t *ResponsesUpsertContactNotFound) MergeErrorsCouldNotFindPaymail(v ErrorsCouldNotFindPaymail) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesUpsertContactNotFound) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesUpsertContactNotFound) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
 
@@ -1801,6 +3091,33 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+	// AdminGetContacts request
+	AdminGetContacts(ctx context.Context, params *AdminGetContactsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AdminConfirmContactWithBody request with any body
+	AdminConfirmContactWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AdminConfirmContact(ctx context.Context, body AdminConfirmContactJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AdminDeleteContact request
+	AdminDeleteContact(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AdminUpdateContactWithBody request with any body
+	AdminUpdateContactWithBody(ctx context.Context, id int, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AdminUpdateContact(ctx context.Context, id int, body AdminUpdateContactJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AdminCreateContactWithBody request with any body
+	AdminCreateContactWithBody(ctx context.Context, paymail string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AdminCreateContact(ctx context.Context, paymail string, body AdminCreateContactJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AdminRejectInvitation request
+	AdminRejectInvitation(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AdminAcceptInvitation request
+	AdminAcceptInvitation(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// AdminStatus request
 	AdminStatus(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -1820,6 +3137,32 @@ type ClientInterface interface {
 	// SharedConfig request
 	SharedConfig(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// GetContacts request
+	GetContacts(ctx context.Context, params *GetContactsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RejectInvitation request
+	RejectInvitation(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AcceptInvitation request
+	AcceptInvitation(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RemoveContact request
+	RemoveContact(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetContact request
+	GetContact(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpsertContactWithBody request with any body
+	UpsertContactWithBody(ctx context.Context, paymail string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpsertContact(ctx context.Context, paymail string, body UpsertContactJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UnconfirmContact request
+	UnconfirmContact(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ConfirmContact request
+	ConfirmContact(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// DataById request
 	DataById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -1838,6 +3181,126 @@ type ClientInterface interface {
 
 	// CurrentUser request
 	CurrentUser(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+}
+
+func (c *Client) AdminGetContacts(ctx context.Context, params *AdminGetContactsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminGetContactsRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminConfirmContactWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminConfirmContactRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminConfirmContact(ctx context.Context, body AdminConfirmContactJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminConfirmContactRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminDeleteContact(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminDeleteContactRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminUpdateContactWithBody(ctx context.Context, id int, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminUpdateContactRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminUpdateContact(ctx context.Context, id int, body AdminUpdateContactJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminUpdateContactRequest(c.Server, id, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminCreateContactWithBody(ctx context.Context, paymail string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminCreateContactRequestWithBody(c.Server, paymail, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminCreateContact(ctx context.Context, paymail string, body AdminCreateContactJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminCreateContactRequest(c.Server, paymail, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminRejectInvitation(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminRejectInvitationRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminAcceptInvitation(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminAcceptInvitationRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
 }
 
 func (c *Client) AdminStatus(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -1914,6 +3377,114 @@ func (c *Client) AddPaymailToUser(ctx context.Context, id string, body AddPaymai
 
 func (c *Client) SharedConfig(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewSharedConfigRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetContacts(ctx context.Context, params *GetContactsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetContactsRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RejectInvitation(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRejectInvitationRequest(c.Server, paymail)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AcceptInvitation(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAcceptInvitationRequest(c.Server, paymail)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RemoveContact(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRemoveContactRequest(c.Server, paymail)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetContact(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetContactRequest(c.Server, paymail)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpsertContactWithBody(ctx context.Context, paymail string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpsertContactRequestWithBody(c.Server, paymail, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpsertContact(ctx context.Context, paymail string, body UpsertContactJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpsertContactRequest(c.Server, paymail, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UnconfirmContact(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnconfirmContactRequest(c.Server, paymail)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ConfirmContact(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewConfirmContactRequest(c.Server, paymail)
 	if err != nil {
 		return nil, err
 	}
@@ -2006,6 +3577,419 @@ func (c *Client) CurrentUser(ctx context.Context, reqEditors ...RequestEditorFn)
 		return nil, err
 	}
 	return c.Client.Do(req)
+}
+
+// NewAdminGetContactsRequest generates requests for AdminGetContacts
+func NewAdminGetContactsRequest(server string, params *AdminGetContactsParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/admin/contacts")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Size != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "size", runtime.ParamLocationQuery, *params.Size); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Sort != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sort", runtime.ParamLocationQuery, *params.Sort); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SortBy != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortBy", runtime.ParamLocationQuery, *params.SortBy); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.FullName != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fullName", runtime.ParamLocationQuery, *params.FullName); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Paymail != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "paymail", runtime.ParamLocationQuery, *params.Paymail); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Id != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "id", runtime.ParamLocationQuery, *params.Id); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.PubKey != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "pubKey", runtime.ParamLocationQuery, *params.PubKey); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Status != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "status", runtime.ParamLocationQuery, *params.Status); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAdminConfirmContactRequest calls the generic AdminConfirmContact builder with application/json body
+func NewAdminConfirmContactRequest(server string, body AdminConfirmContactJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAdminConfirmContactRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewAdminConfirmContactRequestWithBody generates requests for AdminConfirmContact with any type of body
+func NewAdminConfirmContactRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/admin/contacts/confirmations")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewAdminDeleteContactRequest generates requests for AdminDeleteContact
+func NewAdminDeleteContactRequest(server string, id int) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/admin/contacts/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAdminUpdateContactRequest calls the generic AdminUpdateContact builder with application/json body
+func NewAdminUpdateContactRequest(server string, id int, body AdminUpdateContactJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAdminUpdateContactRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewAdminUpdateContactRequestWithBody generates requests for AdminUpdateContact with any type of body
+func NewAdminUpdateContactRequestWithBody(server string, id int, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/admin/contacts/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewAdminCreateContactRequest calls the generic AdminCreateContact builder with application/json body
+func NewAdminCreateContactRequest(server string, paymail string, body AdminCreateContactJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAdminCreateContactRequestWithBody(server, paymail, "application/json", bodyReader)
+}
+
+// NewAdminCreateContactRequestWithBody generates requests for AdminCreateContact with any type of body
+func NewAdminCreateContactRequestWithBody(server string, paymail string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "paymail", runtime.ParamLocationPath, paymail)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/admin/contacts/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewAdminRejectInvitationRequest generates requests for AdminRejectInvitation
+func NewAdminRejectInvitationRequest(server string, id int) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/admin/invitations/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAdminAcceptInvitationRequest generates requests for AdminAcceptInvitation
+func NewAdminAcceptInvitationRequest(server string, id int) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/admin/invitations/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
 }
 
 // NewAdminStatusRequest generates requests for AdminStatus
@@ -2176,6 +4160,434 @@ func NewSharedConfigRequest(server string) (*http.Request, error) {
 	}
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetContactsRequest generates requests for GetContacts
+func NewGetContactsRequest(server string, params *GetContactsParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/contacts")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Size != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "size", runtime.ParamLocationQuery, *params.Size); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Sort != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sort", runtime.ParamLocationQuery, *params.Sort); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SortBy != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortBy", runtime.ParamLocationQuery, *params.SortBy); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.FullName != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fullName", runtime.ParamLocationQuery, *params.FullName); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Paymail != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "paymail", runtime.ParamLocationQuery, *params.Paymail); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Id != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "id", runtime.ParamLocationQuery, *params.Id); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.PubKey != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "pubKey", runtime.ParamLocationQuery, *params.PubKey); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Status != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "status", runtime.ParamLocationQuery, *params.Status); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRejectInvitationRequest generates requests for RejectInvitation
+func NewRejectInvitationRequest(server string, paymail string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "paymail", runtime.ParamLocationPath, paymail)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/contacts/invitations/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAcceptInvitationRequest generates requests for AcceptInvitation
+func NewAcceptInvitationRequest(server string, paymail string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "paymail", runtime.ParamLocationPath, paymail)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/contacts/invitations/%s/contacts", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRemoveContactRequest generates requests for RemoveContact
+func NewRemoveContactRequest(server string, paymail string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "paymail", runtime.ParamLocationPath, paymail)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/contacts/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetContactRequest generates requests for GetContact
+func NewGetContactRequest(server string, paymail string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "paymail", runtime.ParamLocationPath, paymail)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/contacts/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpsertContactRequest calls the generic UpsertContact builder with application/json body
+func NewUpsertContactRequest(server string, paymail string, body UpsertContactJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpsertContactRequestWithBody(server, paymail, "application/json", bodyReader)
+}
+
+// NewUpsertContactRequestWithBody generates requests for UpsertContact with any type of body
+func NewUpsertContactRequestWithBody(server string, paymail string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "paymail", runtime.ParamLocationPath, paymail)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/contacts/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewUnconfirmContactRequest generates requests for UnconfirmContact
+func NewUnconfirmContactRequest(server string, paymail string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "paymail", runtime.ParamLocationPath, paymail)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/contacts/%s/confirmation", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewConfirmContactRequest generates requests for ConfirmContact
+func NewConfirmContactRequest(server string, paymail string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "paymail", runtime.ParamLocationPath, paymail)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/contacts/%s/confirmation", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -2486,6 +4898,33 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// AdminGetContactsWithResponse request
+	AdminGetContactsWithResponse(ctx context.Context, params *AdminGetContactsParams, reqEditors ...RequestEditorFn) (*AdminGetContactsResponse, error)
+
+	// AdminConfirmContactWithBodyWithResponse request with any body
+	AdminConfirmContactWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminConfirmContactResponse, error)
+
+	AdminConfirmContactWithResponse(ctx context.Context, body AdminConfirmContactJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminConfirmContactResponse, error)
+
+	// AdminDeleteContactWithResponse request
+	AdminDeleteContactWithResponse(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*AdminDeleteContactResponse, error)
+
+	// AdminUpdateContactWithBodyWithResponse request with any body
+	AdminUpdateContactWithBodyWithResponse(ctx context.Context, id int, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminUpdateContactResponse, error)
+
+	AdminUpdateContactWithResponse(ctx context.Context, id int, body AdminUpdateContactJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminUpdateContactResponse, error)
+
+	// AdminCreateContactWithBodyWithResponse request with any body
+	AdminCreateContactWithBodyWithResponse(ctx context.Context, paymail string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminCreateContactResponse, error)
+
+	AdminCreateContactWithResponse(ctx context.Context, paymail string, body AdminCreateContactJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminCreateContactResponse, error)
+
+	// AdminRejectInvitationWithResponse request
+	AdminRejectInvitationWithResponse(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*AdminRejectInvitationResponse, error)
+
+	// AdminAcceptInvitationWithResponse request
+	AdminAcceptInvitationWithResponse(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*AdminAcceptInvitationResponse, error)
+
 	// AdminStatusWithResponse request
 	AdminStatusWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AdminStatusResponse, error)
 
@@ -2505,6 +4944,32 @@ type ClientWithResponsesInterface interface {
 	// SharedConfigWithResponse request
 	SharedConfigWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*SharedConfigResponse, error)
 
+	// GetContactsWithResponse request
+	GetContactsWithResponse(ctx context.Context, params *GetContactsParams, reqEditors ...RequestEditorFn) (*GetContactsResponse, error)
+
+	// RejectInvitationWithResponse request
+	RejectInvitationWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*RejectInvitationResponse, error)
+
+	// AcceptInvitationWithResponse request
+	AcceptInvitationWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*AcceptInvitationResponse, error)
+
+	// RemoveContactWithResponse request
+	RemoveContactWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*RemoveContactResponse, error)
+
+	// GetContactWithResponse request
+	GetContactWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*GetContactResponse, error)
+
+	// UpsertContactWithBodyWithResponse request with any body
+	UpsertContactWithBodyWithResponse(ctx context.Context, paymail string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpsertContactResponse, error)
+
+	UpsertContactWithResponse(ctx context.Context, paymail string, body UpsertContactJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertContactResponse, error)
+
+	// UnconfirmContactWithResponse request
+	UnconfirmContactWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*UnconfirmContactResponse, error)
+
+	// ConfirmContactWithResponse request
+	ConfirmContactWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*ConfirmContactResponse, error)
+
 	// DataByIdWithResponse request
 	DataByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DataByIdResponse, error)
 
@@ -2523,6 +4988,245 @@ type ClientWithResponsesInterface interface {
 
 	// CurrentUserWithResponse request
 	CurrentUserWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CurrentUserResponse, error)
+}
+
+type AdminGetContactsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ResponsesSearchContactsSuccess
+	JSON401      *ResponsesNotAuthorizedToAdminEndpoint
+	JSON500      *ResponsesContactSearchInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AdminGetContactsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AdminGetContactsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r AdminGetContactsResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r AdminGetContactsResponse) Bytes() []byte {
+	return r.Body
+}
+
+type AdminConfirmContactResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ResponsesAdminUserBadRequest
+	JSON401      *ResponsesNotAuthorizedToAdminEndpoint
+	JSON500      *ResponsesAdminConfirmContactInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AdminConfirmContactResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AdminConfirmContactResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r AdminConfirmContactResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r AdminConfirmContactResponse) Bytes() []byte {
+	return r.Body
+}
+
+type AdminDeleteContactResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON401      *ResponsesNotAuthorizedToAdminEndpoint
+	JSON500      *ResponsesDeleteContactInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AdminDeleteContactResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AdminDeleteContactResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r AdminDeleteContactResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r AdminDeleteContactResponse) Bytes() []byte {
+	return r.Body
+}
+
+type AdminUpdateContactResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ResponsesContactSuccess
+	JSON401      *ResponsesNotAuthorizedToAdminEndpoint
+	JSON500      *ResponsesAdminUpdateContactStatusInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AdminUpdateContactResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AdminUpdateContactResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r AdminUpdateContactResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r AdminUpdateContactResponse) Bytes() []byte {
+	return r.Body
+}
+
+type AdminCreateContactResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ResponsesContactSuccess
+	JSON400      *ResponsesAdminCreateContactBadRequest
+	JSON401      *ResponsesNotAuthorizedToAdminEndpoint
+	JSON404      *ResponsesAdminCreateContactNotFound
+	JSON409      *ResponsesAdminCreateContactConflict
+	JSON500      *ResponsesAdminCreateContactInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AdminCreateContactResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AdminCreateContactResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r AdminCreateContactResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r AdminCreateContactResponse) Bytes() []byte {
+	return r.Body
+}
+
+type AdminRejectInvitationResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON401      *ResponsesNotAuthorizedToAdminEndpoint
+	JSON500      *ResponsesAdminUpdateContactStatusInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AdminRejectInvitationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AdminRejectInvitationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r AdminRejectInvitationResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r AdminRejectInvitationResponse) Bytes() []byte {
+	return r.Body
+}
+
+type AdminAcceptInvitationResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ResponsesContactSuccess
+	JSON401      *ResponsesNotAuthorizedToAdminEndpoint
+	JSON500      *ResponsesAdminUpdateContactStatusInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AdminAcceptInvitationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AdminAcceptInvitationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r AdminAcceptInvitationResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r AdminAcceptInvitationResponse) Bytes() []byte {
+	return r.Body
 }
 
 type AdminStatusResponse struct {
@@ -2689,6 +5393,284 @@ func (r SharedConfigResponse) Response() *http.Response {
 
 // Bytes is a convenience method to retrieve the raw bytes from the HTTP response
 func (r SharedConfigResponse) Bytes() []byte {
+	return r.Body
+}
+
+type GetContactsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ResponsesSearchContactsSuccess
+	JSON401      *ResponsesUserNotAuthorized
+	JSON500      *ResponsesContactSearchInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r GetContactsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetContactsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r GetContactsResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r GetContactsResponse) Bytes() []byte {
+	return r.Body
+}
+
+type RejectInvitationResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ResponsesUpdateContactBadRequest
+	JSON401      *ResponsesUserNotAuthorized
+	JSON404      *ResponsesContactNotFound
+	JSON500      *ResponsesInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RejectInvitationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RejectInvitationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r RejectInvitationResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r RejectInvitationResponse) Bytes() []byte {
+	return r.Body
+}
+
+type AcceptInvitationResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ResponsesUpdateContactBadRequest
+	JSON401      *ResponsesUserNotAuthorized
+	JSON404      *ResponsesContactNotFound
+	JSON500      *ResponsesInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AcceptInvitationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AcceptInvitationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r AcceptInvitationResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r AcceptInvitationResponse) Bytes() []byte {
+	return r.Body
+}
+
+type RemoveContactResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON401      *ResponsesUserNotAuthorized
+	JSON500      *ResponsesDeleteContactInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RemoveContactResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RemoveContactResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r RemoveContactResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r RemoveContactResponse) Bytes() []byte {
+	return r.Body
+}
+
+type GetContactResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ResponsesContactSuccess
+	JSON401      *ResponsesUserNotAuthorized
+	JSON404      *ResponsesContactNotFound
+	JSON500      *ResponsesGetContactInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r GetContactResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetContactResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r GetContactResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r GetContactResponse) Bytes() []byte {
+	return r.Body
+}
+
+type UpsertContactResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ResponsesContactSuccess
+	JSON400      *ResponsesUpsertContactBadRequest
+	JSON401      *ResponsesUserNotAuthorized
+	JSON404      *ResponsesUpsertContactNotFound
+	JSON500      *ResponsesContactUpsertInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r UpsertContactResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpsertContactResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r UpsertContactResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r UpsertContactResponse) Bytes() []byte {
+	return r.Body
+}
+
+type UnconfirmContactResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ResponsesUpdateContactBadRequest
+	JSON401      *ResponsesUserNotAuthorized
+	JSON404      *ResponsesContactNotFound
+	JSON500      *ResponsesInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r UnconfirmContactResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UnconfirmContactResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r UnconfirmContactResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r UnconfirmContactResponse) Bytes() []byte {
+	return r.Body
+}
+
+type ConfirmContactResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ResponsesUpdateContactBadRequest
+	JSON401      *ResponsesUserNotAuthorized
+	JSON404      *ResponsesContactNotFound
+	JSON500      *ResponsesInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r ConfirmContactResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ConfirmContactResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r ConfirmContactResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r ConfirmContactResponse) Bytes() []byte {
 	return r.Body
 }
 
@@ -2868,6 +5850,93 @@ func (r CurrentUserResponse) Bytes() []byte {
 	return r.Body
 }
 
+// AdminGetContactsWithResponse request returning *AdminGetContactsResponse
+func (c *ClientWithResponses) AdminGetContactsWithResponse(ctx context.Context, params *AdminGetContactsParams, reqEditors ...RequestEditorFn) (*AdminGetContactsResponse, error) {
+	rsp, err := c.AdminGetContacts(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminGetContactsResponse(rsp)
+}
+
+// AdminConfirmContactWithBodyWithResponse request with arbitrary body returning *AdminConfirmContactResponse
+func (c *ClientWithResponses) AdminConfirmContactWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminConfirmContactResponse, error) {
+	rsp, err := c.AdminConfirmContactWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminConfirmContactResponse(rsp)
+}
+
+func (c *ClientWithResponses) AdminConfirmContactWithResponse(ctx context.Context, body AdminConfirmContactJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminConfirmContactResponse, error) {
+	rsp, err := c.AdminConfirmContact(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminConfirmContactResponse(rsp)
+}
+
+// AdminDeleteContactWithResponse request returning *AdminDeleteContactResponse
+func (c *ClientWithResponses) AdminDeleteContactWithResponse(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*AdminDeleteContactResponse, error) {
+	rsp, err := c.AdminDeleteContact(ctx, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminDeleteContactResponse(rsp)
+}
+
+// AdminUpdateContactWithBodyWithResponse request with arbitrary body returning *AdminUpdateContactResponse
+func (c *ClientWithResponses) AdminUpdateContactWithBodyWithResponse(ctx context.Context, id int, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminUpdateContactResponse, error) {
+	rsp, err := c.AdminUpdateContactWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminUpdateContactResponse(rsp)
+}
+
+func (c *ClientWithResponses) AdminUpdateContactWithResponse(ctx context.Context, id int, body AdminUpdateContactJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminUpdateContactResponse, error) {
+	rsp, err := c.AdminUpdateContact(ctx, id, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminUpdateContactResponse(rsp)
+}
+
+// AdminCreateContactWithBodyWithResponse request with arbitrary body returning *AdminCreateContactResponse
+func (c *ClientWithResponses) AdminCreateContactWithBodyWithResponse(ctx context.Context, paymail string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminCreateContactResponse, error) {
+	rsp, err := c.AdminCreateContactWithBody(ctx, paymail, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminCreateContactResponse(rsp)
+}
+
+func (c *ClientWithResponses) AdminCreateContactWithResponse(ctx context.Context, paymail string, body AdminCreateContactJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminCreateContactResponse, error) {
+	rsp, err := c.AdminCreateContact(ctx, paymail, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminCreateContactResponse(rsp)
+}
+
+// AdminRejectInvitationWithResponse request returning *AdminRejectInvitationResponse
+func (c *ClientWithResponses) AdminRejectInvitationWithResponse(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*AdminRejectInvitationResponse, error) {
+	rsp, err := c.AdminRejectInvitation(ctx, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminRejectInvitationResponse(rsp)
+}
+
+// AdminAcceptInvitationWithResponse request returning *AdminAcceptInvitationResponse
+func (c *ClientWithResponses) AdminAcceptInvitationWithResponse(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*AdminAcceptInvitationResponse, error) {
+	rsp, err := c.AdminAcceptInvitation(ctx, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminAcceptInvitationResponse(rsp)
+}
+
 // AdminStatusWithResponse request returning *AdminStatusResponse
 func (c *ClientWithResponses) AdminStatusWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AdminStatusResponse, error) {
 	rsp, err := c.AdminStatus(ctx, reqEditors...)
@@ -2929,6 +5998,86 @@ func (c *ClientWithResponses) SharedConfigWithResponse(ctx context.Context, reqE
 	return ParseSharedConfigResponse(rsp)
 }
 
+// GetContactsWithResponse request returning *GetContactsResponse
+func (c *ClientWithResponses) GetContactsWithResponse(ctx context.Context, params *GetContactsParams, reqEditors ...RequestEditorFn) (*GetContactsResponse, error) {
+	rsp, err := c.GetContacts(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetContactsResponse(rsp)
+}
+
+// RejectInvitationWithResponse request returning *RejectInvitationResponse
+func (c *ClientWithResponses) RejectInvitationWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*RejectInvitationResponse, error) {
+	rsp, err := c.RejectInvitation(ctx, paymail, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRejectInvitationResponse(rsp)
+}
+
+// AcceptInvitationWithResponse request returning *AcceptInvitationResponse
+func (c *ClientWithResponses) AcceptInvitationWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*AcceptInvitationResponse, error) {
+	rsp, err := c.AcceptInvitation(ctx, paymail, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAcceptInvitationResponse(rsp)
+}
+
+// RemoveContactWithResponse request returning *RemoveContactResponse
+func (c *ClientWithResponses) RemoveContactWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*RemoveContactResponse, error) {
+	rsp, err := c.RemoveContact(ctx, paymail, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRemoveContactResponse(rsp)
+}
+
+// GetContactWithResponse request returning *GetContactResponse
+func (c *ClientWithResponses) GetContactWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*GetContactResponse, error) {
+	rsp, err := c.GetContact(ctx, paymail, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetContactResponse(rsp)
+}
+
+// UpsertContactWithBodyWithResponse request with arbitrary body returning *UpsertContactResponse
+func (c *ClientWithResponses) UpsertContactWithBodyWithResponse(ctx context.Context, paymail string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpsertContactResponse, error) {
+	rsp, err := c.UpsertContactWithBody(ctx, paymail, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpsertContactResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpsertContactWithResponse(ctx context.Context, paymail string, body UpsertContactJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertContactResponse, error) {
+	rsp, err := c.UpsertContact(ctx, paymail, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpsertContactResponse(rsp)
+}
+
+// UnconfirmContactWithResponse request returning *UnconfirmContactResponse
+func (c *ClientWithResponses) UnconfirmContactWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*UnconfirmContactResponse, error) {
+	rsp, err := c.UnconfirmContact(ctx, paymail, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUnconfirmContactResponse(rsp)
+}
+
+// ConfirmContactWithResponse request returning *ConfirmContactResponse
+func (c *ClientWithResponses) ConfirmContactWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*ConfirmContactResponse, error) {
+	rsp, err := c.ConfirmContact(ctx, paymail, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseConfirmContactResponse(rsp)
+}
+
 // DataByIdWithResponse request returning *DataByIdResponse
 func (c *ClientWithResponses) DataByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DataByIdResponse, error) {
 	rsp, err := c.DataById(ctx, id, reqEditors...)
@@ -2988,6 +6137,293 @@ func (c *ClientWithResponses) CurrentUserWithResponse(ctx context.Context, reqEd
 		return nil, err
 	}
 	return ParseCurrentUserResponse(rsp)
+}
+
+// ParseAdminGetContactsResponse parses an HTTP response from a AdminGetContactsWithResponse call
+func ParseAdminGetContactsResponse(rsp *http.Response) (*AdminGetContactsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AdminGetContactsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ResponsesSearchContactsSuccess
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesNotAuthorizedToAdminEndpoint
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesContactSearchInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAdminConfirmContactResponse parses an HTTP response from a AdminConfirmContactWithResponse call
+func ParseAdminConfirmContactResponse(rsp *http.Response) (*AdminConfirmContactResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AdminConfirmContactResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ResponsesAdminUserBadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesNotAuthorizedToAdminEndpoint
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesAdminConfirmContactInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAdminDeleteContactResponse parses an HTTP response from a AdminDeleteContactWithResponse call
+func ParseAdminDeleteContactResponse(rsp *http.Response) (*AdminDeleteContactResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AdminDeleteContactResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesNotAuthorizedToAdminEndpoint
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesDeleteContactInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAdminUpdateContactResponse parses an HTTP response from a AdminUpdateContactWithResponse call
+func ParseAdminUpdateContactResponse(rsp *http.Response) (*AdminUpdateContactResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AdminUpdateContactResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ResponsesContactSuccess
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesNotAuthorizedToAdminEndpoint
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesAdminUpdateContactStatusInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAdminCreateContactResponse parses an HTTP response from a AdminCreateContactWithResponse call
+func ParseAdminCreateContactResponse(rsp *http.Response) (*AdminCreateContactResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AdminCreateContactResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ResponsesContactSuccess
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ResponsesAdminCreateContactBadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesNotAuthorizedToAdminEndpoint
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ResponsesAdminCreateContactNotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest ResponsesAdminCreateContactConflict
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesAdminCreateContactInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAdminRejectInvitationResponse parses an HTTP response from a AdminRejectInvitationWithResponse call
+func ParseAdminRejectInvitationResponse(rsp *http.Response) (*AdminRejectInvitationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AdminRejectInvitationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesNotAuthorizedToAdminEndpoint
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesAdminUpdateContactStatusInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAdminAcceptInvitationResponse parses an HTTP response from a AdminAcceptInvitationWithResponse call
+func ParseAdminAcceptInvitationResponse(rsp *http.Response) (*AdminAcceptInvitationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AdminAcceptInvitationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ResponsesContactSuccess
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesNotAuthorizedToAdminEndpoint
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesAdminUpdateContactStatusInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
 }
 
 // ParseAdminStatusResponse parses an HTTP response from a AdminStatusWithResponse call
@@ -3163,6 +6599,368 @@ func ParseSharedConfigResponse(rsp *http.Response) (*SharedConfigResponse, error
 			return nil, err
 		}
 		response.JSON401 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetContactsResponse parses an HTTP response from a GetContactsWithResponse call
+func ParseGetContactsResponse(rsp *http.Response) (*GetContactsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetContactsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ResponsesSearchContactsSuccess
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesUserNotAuthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesContactSearchInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRejectInvitationResponse parses an HTTP response from a RejectInvitationWithResponse call
+func ParseRejectInvitationResponse(rsp *http.Response) (*RejectInvitationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RejectInvitationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ResponsesUpdateContactBadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesUserNotAuthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ResponsesContactNotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAcceptInvitationResponse parses an HTTP response from a AcceptInvitationWithResponse call
+func ParseAcceptInvitationResponse(rsp *http.Response) (*AcceptInvitationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AcceptInvitationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ResponsesUpdateContactBadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesUserNotAuthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ResponsesContactNotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRemoveContactResponse parses an HTTP response from a RemoveContactWithResponse call
+func ParseRemoveContactResponse(rsp *http.Response) (*RemoveContactResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RemoveContactResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesUserNotAuthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesDeleteContactInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetContactResponse parses an HTTP response from a GetContactWithResponse call
+func ParseGetContactResponse(rsp *http.Response) (*GetContactResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetContactResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ResponsesContactSuccess
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesUserNotAuthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ResponsesContactNotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesGetContactInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpsertContactResponse parses an HTTP response from a UpsertContactWithResponse call
+func ParseUpsertContactResponse(rsp *http.Response) (*UpsertContactResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpsertContactResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ResponsesContactSuccess
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ResponsesUpsertContactBadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesUserNotAuthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ResponsesUpsertContactNotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesContactUpsertInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUnconfirmContactResponse parses an HTTP response from a UnconfirmContactWithResponse call
+func ParseUnconfirmContactResponse(rsp *http.Response) (*UnconfirmContactResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UnconfirmContactResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ResponsesUpdateContactBadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesUserNotAuthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ResponsesContactNotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseConfirmContactResponse parses an HTTP response from a ConfirmContactWithResponse call
+func ParseConfirmContactResponse(rsp *http.Response) (*ConfirmContactResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ConfirmContactResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ResponsesUpdateContactBadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesUserNotAuthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ResponsesContactNotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
 
 	}
 
