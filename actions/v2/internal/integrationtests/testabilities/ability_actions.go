@@ -10,6 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures/txtestability"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/require"
 )
@@ -77,6 +78,7 @@ func (a *actions) Charlie() ActorsActions {
 
 type user struct {
 	fixtures.User
+	txFixture      txtestability.TransactionsFixtures
 	app            testabilities.SPVWalletApplicationFixture
 	t              testing.TB
 	outlineBuilder *outlineBuilder
@@ -249,7 +251,7 @@ func (u *user) ReceivesFromExternal(amount bsv.Satoshis) string {
 	lockingScript, err := script.NewFromHex(getter.GetString("outputs[0]/script"))
 	require.NoError(u.t, err)
 
-	txSpec := fixtures.GivenTX(u.t).
+	txSpec := u.txFixture.Tx().
 		WithInput(uint64(amount+1)).
 		WithOutputScript(uint64(amount), lockingScript)
 

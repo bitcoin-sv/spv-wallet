@@ -40,7 +40,6 @@ func getDataFromOpReturn(lockingScript *script.Script) ([]byte, error) {
 func processDataOutputs(tx *trx.Transaction, userID string, annotations *transaction.Annotations) ([]txmodels.NewOutput, error) {
 	txID := tx.TxID().String()
 
-	var err error
 	var dataOutputs []txmodels.NewOutput //nolint: prealloc
 
 	for vout, annotation := range annotations.Outputs {
@@ -48,14 +47,12 @@ func processDataOutputs(tx *trx.Transaction, userID string, annotations *transac
 			continue
 		}
 
-		if vout >= len(tx.Outputs) {
+		if len32, err := conv.IntToUint32(len(tx.Outputs)); err != nil {
+			return nil, txerrors.ErrAnnotationIndexOutOfRange.Wrap(err)
+		} else if vout >= len32 {
 			return nil, txerrors.ErrAnnotationIndexOutOfRange
 		}
-		outpoint := bsv.Outpoint{TxID: txID}
-		outpoint.Vout, err = conv.IntToUint32(vout)
-		if err != nil {
-			return nil, txerrors.ErrAnnotationIndexConversion.Wrap(err)
-		}
+		outpoint := bsv.Outpoint{TxID: txID, Vout: vout}
 
 		lockingScript := tx.Outputs[vout].LockingScript
 

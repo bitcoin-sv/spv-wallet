@@ -27,13 +27,13 @@ func TestSpendExternalFundsInternally(t *testing.T) {
 	internalTxID := when.Alice().SendsFundsTo(given.Bob(), 5)
 
 	// then:
-	then.Alice().Balance().IsEqualTo(0)
+	then.Alice().Balance().IsEqualTo(4)
 	then.Bob().Balance().IsEqualTo(5)
 
 	then.Alice().Operations().Last().
 		WithTxID(internalTxID).
 		WithTxStatus("BROADCASTED").
-		WithValue(-10).
+		WithValue(-6).
 		WithType("outgoing").
 		WithCounterparty(given.Bob().DefaultPaymail().Address())
 

@@ -52,7 +52,7 @@ func TestErrorCases(t *testing.T) {
 	defer cleanup()
 
 	// and
-	mockTx := fixtures.GivenTX(t).WithInput(1).WithP2PKHOutput(1)
+	mockTx := givenForAllTests.Tx().WithInput(1).WithP2PKHOutput(1)
 	mockOutpoint := bsv.Outpoint{
 		TxID: mockTx.ID(),
 		Vout: 0,
@@ -94,7 +94,7 @@ func TestErrorCases(t *testing.T) {
 		client := given.HttpClient().ForUser()
 
 		// and:
-		wrongID := "wrong_id" //doesn't match the outpoint format "<txID>-<vout>"
+		wrongID := "wrong_id" // doesn't match the outpoint format "<txID>-<vout>"
 
 		// when:
 		res, _ := client.R().Get("/api/v2/data/" + wrongID)

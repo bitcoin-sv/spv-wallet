@@ -7,6 +7,7 @@ import (
 	testpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures/txtestability"
 )
 
 type IntegrationTestFixtures interface {
@@ -27,23 +28,28 @@ type fixture struct {
 }
 
 func newFixture(t testing.TB, appFixture testabilities.SPVWalletApplicationFixture) *fixture {
+	txFixture := txtestability.Given(t)
+
 	return &fixture{
 		t:                           t,
 		SPVWalletApplicationFixture: appFixture,
 		alice: &user{
-			User: fixtures.Sender,
-			app:  appFixture,
-			t:    t,
+			User:      fixtures.Sender,
+			app:       appFixture,
+			txFixture: txFixture,
+			t:         t,
 		},
 		bob: &user{
-			User: fixtures.RecipientInternal,
-			app:  appFixture,
-			t:    t,
+			User:      fixtures.RecipientInternal,
+			app:       appFixture,
+			txFixture: txFixture,
+			t:         t,
 		},
 		charlie: &user{
-			User: fixtures.RecipientExternal,
-			app:  appFixture,
-			t:    t,
+			User:      fixtures.RecipientExternal,
+			app:       appFixture,
+			txFixture: txFixture,
+			t:         t,
 		},
 	}
 }
