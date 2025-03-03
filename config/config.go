@@ -2,10 +2,13 @@
 package config
 
 import (
+	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
 )
@@ -92,6 +95,37 @@ type CallbackConfig struct {
 	Token string `json:"token" mapstructure:"token"`
 	// Enabled is the flag that enables callbacks.
 	Enabled bool `json:"enabled" mapstructure:"enabled"`
+
+	url *url.URL
+}
+
+func (cc *CallbackConfig) ShouldGetURL() (*url.URL, error) {
+	if cc.Enabled == false {
+		return nil, spverrors.ErrInternal.Wrap(spverrors.Newf("callback is disabled"))
+	}
+
+	if cc.url != nil {
+		return cc.url, nil
+	}
+
+	var err error
+	cc.url, err = url.Parse(cc.Host + BroadcastCallbackRoute)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to parse callback URL %s", cc.Host+BroadcastCallbackRoute)
+	}
+
+	return cc.url, nil
+}
+
+func (cc *CallbackConfig) MustGetURL() *url.URL {
+	callbackURL, err := cc.ShouldGetURL()
+	if err != nil {
+		panic(fmt.Sprintf(`couldn't get callback URL from configuration: %v
+SUGGESTION: ensure that the callback is enabled and validate configuration before using it`,
+			err.Error()))
+	}
+
+	return callbackURL
 }
 
 // ClusterConfig is a configuration for the SPV Wallet cluster

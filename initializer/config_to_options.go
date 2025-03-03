@@ -291,8 +291,14 @@ func addARCOpts(c *config.AppConfig, options []engine.ClientOps) ([]engine.Clien
 				return nil, spverrors.Wrapf(err, "error while generating callback token")
 			}
 		}
+
+		callbackURL, err := c.ARC.Callback.ShouldGetURL()
+		if err != nil {
+			return nil, spverrors.Wrapf(err, "error getting callback URL")
+		}
+
 		arcCfg.Callback = &chainmodels.ARCCallbackConfig{
-			URL:   c.ARC.Callback.Host + config.BroadcastCallbackRoute,
+			URL:   callbackURL.String(),
 			Token: c.ARC.Callback.Token,
 		}
 	}

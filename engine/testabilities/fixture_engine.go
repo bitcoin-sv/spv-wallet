@@ -28,6 +28,8 @@ import (
 const inMemoryDbConnectionString = "file:spv-wallet-test.db?mode=memory"
 const fileDbConnectionString = "file:spv-wallet-test.db"
 
+const CallbackTestToken = "arc-test-token"
+
 type EngineFixture interface {
 	Engine() (walletEngine EngineWithConfig, cleanup func())
 	EngineWithConfiguration(opts ...ConfigOpts) (walletEngine EngineWithConfig, cleanup func())
@@ -260,6 +262,10 @@ func getConfigForTests() *config.AppConfig {
 		Satoshis: 1,
 		Bytes:    1000,
 	}
+
+	cfg.ARC.Callback.Enabled = true
+	cfg.ARC.Callback.Host = "https://" + fixtures.PaymailDomain
+	cfg.ARC.Callback.Token = CallbackTestToken
 
 	cfg.Paymail.Domains = []string{fixtures.PaymailDomain}
 
