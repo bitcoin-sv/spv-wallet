@@ -23,6 +23,7 @@ func NewTransactions(db *gorm.DB) *Transactions {
 	return &Transactions{db: db}
 }
 
+// UpdateTransaction updates the tracked transaction with the given transaction data and makes cleanup of the input sources.
 func (t *Transactions) UpdateTransaction(ctx context.Context, trackedTx *txmodels.TrackedTransaction) error {
 	toUpdate := map[string]any{
 		"block_hash":   trackedTx.BlockHash,
@@ -60,6 +61,7 @@ func (t *Transactions) UpdateTransaction(ctx context.Context, trackedTx *txmodel
 	return nil
 }
 
+// GetTransaction retrieves the tracked transaction with the given transaction ID.
 func (t *Transactions) GetTransaction(ctx context.Context, txID string) (transaction *txmodels.TrackedTransaction, err error) {
 	var record database.TrackedTransaction
 	err = t.db.

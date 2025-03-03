@@ -7,6 +7,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
+// TrackedTransaction represents a transaction that is being tracked by the wallet.
 type TrackedTransaction struct {
 	ID       string
 	TxStatus TxStatus
@@ -21,6 +22,7 @@ type TrackedTransaction struct {
 	RawHex  *string
 }
 
+// TX returns the transaction object for the tracked transaction based on the hex representation (either BEEF or raw).
 func (tt *TrackedTransaction) TX() (*trx.Transaction, error) {
 	var tx *trx.Transaction
 	var err error
@@ -39,6 +41,7 @@ func (tt *TrackedTransaction) TX() (*trx.Transaction, error) {
 	return tx, nil
 }
 
+// Mined marks the transaction as mined with the given block hash and height, and the given bump.
 func (tt *TrackedTransaction) Mined(blockHash string, blockHeight int64, bump *trx.MerklePath) error {
 	tx, err := tt.TX()
 	if err != nil {
