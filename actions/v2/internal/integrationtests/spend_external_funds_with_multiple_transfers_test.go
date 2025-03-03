@@ -1,8 +1,9 @@
 package integrationtests
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/integrationtests/testabilities"
 	"testing"
+
+	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/integrationtests/testabilities"
 )
 
 func TestSpendInternalFundsWithMultipleTransfers(t *testing.T) {
@@ -41,9 +42,7 @@ func TestSpendInternalFundsWithMultipleTransfers(t *testing.T) {
 		WithCounterparty(given.Alice().DefaultPaymail().Address())
 
 	// when:
-	secondTxID := when.Bob().SendsTo(given.Charlie(), 20)
-
-	// add opreturn
+	secondTxID := when.Bob().SendsFundsTo(given.Charlie(), 20)
 
 	// then:
 	then.Bob().Balance().IsEqualTo(0)
