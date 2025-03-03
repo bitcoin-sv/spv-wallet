@@ -24,11 +24,10 @@ func TestSpendExternalFundsWithMultipleOutputs(t *testing.T) {
 		WithType("incoming")
 
 	// when:
-	when.Alice().AddPaymailOutput(given.Bob(), 1)
-	when.Alice().AddOpReturnOutput([]string{"Hello", "Bob!"})
-	when.Alice().CreateOutline()
-	when.Alice().SignOutline()
-	internalTxID := when.Alice().SendTransaction()
+	internalTxID := when.Alice().CreatesOutline().
+		WithPaymailOutput(given.Bob(), 1).
+		WithOpReturnOutput([]string{"Hello", "Bob!"}).
+		SignsAndRecord()
 
 	// then:
 	then.Alice().Balance().IsEqualTo(0)

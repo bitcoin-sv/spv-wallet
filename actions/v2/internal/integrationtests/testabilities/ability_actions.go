@@ -20,18 +20,16 @@ const (
 	newOutlineURL        = "/api/v2/transactions/outlines"
 )
 
-type outlineBuilder struct {
+// outline represents a transaction outline that can be modified
+type outline struct {
 	outputs []map[string]any
 }
 
-type outlineResult struct {
-	hex         string
-	annotations map[string]any
-}
-
-func (r *outlineResult) reset() {
-	r.hex = ""
-	r.annotations = nil
+// OutlineBuilder interface defines methods for building a transaction outline
+type OutlineBuilder interface {
+	WithOpReturnOutput(data []string) OutlineBuilder
+	WithPaymailOutput(recipient *fixtures.User, amount bsv.Satoshis) OutlineBuilder
+	SignsAndRecord() string
 }
 
 type IntegrationTestAction interface {
@@ -45,11 +43,7 @@ type ActorsActions interface {
 	SendsFundsTo(recipient *fixtures.User, amount bsv.Satoshis) string
 	SendsData(data []string) string
 
-	AddPaymailOutput(recipient *fixtures.User, amount bsv.Satoshis)
-	AddOpReturnOutput(data []string)
-	CreateOutline()
-	SignOutline()
-	SendTransaction() string
+	CreatesOutline() OutlineBuilder
 }
 
 type actions struct {
@@ -81,20 +75,26 @@ type user struct {
 	txFixture      txtestability.TransactionsFixtures
 	app            testabilities.SPVWalletApplicationFixture
 	t              testing.TB
-	outlineBuilder *outlineBuilder
-	currentOutline *outlineResult
+	currentOutline *outline
 }
 
-func (u *user) initOutlineBuilder() {
-	u.outlineBuilder = &outlineBuilder{
+// resetOutline clears the current outline
+func (u *user) resetOutline() {
+	u.currentOutline = nil
+}
+
+// CreatesOutline initializes a new outline
+func (u *user) CreatesOutline() OutlineBuilder {
+	u.currentOutline = &outline{
 		outputs: make([]map[string]any, 0),
 	}
+	return u
 }
 
-// AddPaymailOutput adds a paymail output to the outline
-func (u *user) AddPaymailOutput(recipient *fixtures.User, amount bsv.Satoshis) {
-	if u.outlineBuilder == nil {
-		u.initOutlineBuilder()
+// WithPaymailOutput adds a paymail output to the outline
+func (u *user) WithPaymailOutput(recipient *fixtures.User, amount bsv.Satoshis) OutlineBuilder {
+	if u.currentOutline == nil {
+		u.CreatesOutline()
 	}
 
 	output := map[string]any{
@@ -103,13 +103,14 @@ func (u *user) AddPaymailOutput(recipient *fixtures.User, amount bsv.Satoshis) {
 		"satoshis": uint64(amount),
 	}
 
-	u.outlineBuilder.outputs = append(u.outlineBuilder.outputs, output)
+	u.currentOutline.outputs = append(u.currentOutline.outputs, output)
+	return u
 }
 
-// AddOpReturnOutput adds an OP_RETURN output to the outline
-func (u *user) AddOpReturnOutput(data []string) {
-	if u.outlineBuilder == nil {
-		u.initOutlineBuilder()
+// WithOpReturnOutput adds an OP_RETURN output to the outline
+func (u *user) WithOpReturnOutput(data []string) OutlineBuilder {
+	if u.currentOutline == nil {
+		u.CreatesOutline()
 	}
 
 	output := map[string]any{
@@ -117,20 +118,21 @@ func (u *user) AddOpReturnOutput(data []string) {
 		"data": data,
 	}
 
-	u.outlineBuilder.outputs = append(u.outlineBuilder.outputs, output)
+	u.currentOutline.outputs = append(u.currentOutline.outputs, output)
+	return u
 }
 
-// CreateOutline creates an outline from the current outputs
-func (u *user) CreateOutline() {
-	if u.outlineBuilder == nil || len(u.outlineBuilder.outputs) == 0 {
-		u.t.Fatal("No outputs added to outline builder")
+// SignsAndRecord creates, signs and records the transaction
+func (u *user) SignsAndRecord() string {
+	if u.currentOutline == nil || len(u.currentOutline.outputs) == 0 {
+		u.t.Fatal("No outputs added to outline")
 	}
 
 	_, then := testabilities.NewOf(u.app, u.t)
 
 	outlineClient := u.app.HttpClient().ForGivenUser(u.User)
 	outlineBody := map[string]any{
-		"outputs": u.outlineBuilder.outputs,
+		"outputs": u.currentOutline.outputs,
 	}
 
 	outlineRes, _ := outlineClient.R().
@@ -148,29 +150,18 @@ func (u *user) CreateOutline() {
 
 	getter := then.Response(outlineRes).JSONValue()
 
-	u.currentOutline = &outlineResult{
-		hex: getter.GetString("hex"),
-	}
+	hex := getter.GetString("hex")
+	annotations := make(map[string]any)
+	getter.GetAsType("annotations", &annotations)
 
-	getter.GetAsType("annotations", &u.currentOutline.annotations)
-
-	u.outlineBuilder = nil
-}
-
-// SignOutline signs the current outline
-func (u *user) SignOutline() {
-	if u.currentOutline == nil {
-		u.t.Fatal("No outline available to sign")
-	}
-
-	tx, err := trx.NewTransactionFromBEEFHex(u.currentOutline.hex)
+	tx, err := trx.NewTransactionFromBEEFHex(hex)
 	require.NoError(u.t, err)
 
 	inputAnnotations := map[string]struct {
 		CustomInstructions bsv.CustomInstructions `json:"customInstructions"`
 	}{}
 
-	inputs, ok := u.currentOutline.annotations["inputs"]
+	inputs, ok := annotations["inputs"]
 	if ok {
 		inputsJSON, err := json.Marshal(inputs)
 		require.NoError(u.t, err)
@@ -193,36 +184,23 @@ func (u *user) SignOutline() {
 	signedHex, err := tx.BEEFHex()
 	require.NoError(u.t, err)
 
-	u.currentOutline.hex = signedHex
-}
-
-// SendTransaction sends the signed transaction
-func (u *user) SendTransaction() string {
-	if u.currentOutline == nil {
-		u.t.Fatal("No signed transaction available to send")
-	}
-
-	tx, err := trx.NewTransactionFromBEEFHex(u.currentOutline.hex)
-	require.NoError(u.t, err)
-
-	_, then := testabilities.NewOf(u.app, u.t)
-
 	u.app.ARC().WillRespondForBroadcastWithSeenOnNetwork(tx.TxID().String())
 
 	recordClient := u.app.HttpClient().ForGivenUser(u.User)
 	recordRes, _ := recordClient.R().
 		SetHeader("Content-Type", "application/json").
 		SetBody(map[string]any{
-			"hex":         u.currentOutline.hex,
+			"hex":         signedHex,
 			"format":      "BEEF",
-			"annotations": u.currentOutline.annotations,
+			"annotations": annotations,
 		}).
 		Post(transactionRecordURL)
 
 	then.Response(recordRes).IsCreated()
 
 	txID := tx.TxID().String()
-	u.currentOutline.reset()
+
+	u.resetOutline()
 
 	return txID
 }
@@ -285,18 +263,14 @@ func (u *user) ReceivesFromExternal(amount bsv.Satoshis) string {
 
 // SendsFundsTo sends funds to the recipient
 func (u *user) SendsFundsTo(recipient *fixtures.User, amount bsv.Satoshis) string {
-	u.AddPaymailOutput(recipient, amount)
-	u.CreateOutline()
-	u.SignOutline()
-
-	return u.SendTransaction()
+	return u.CreatesOutline().
+		WithPaymailOutput(recipient, amount).
+		SignsAndRecord()
 }
 
 // SendsData sends data output
 func (u *user) SendsData(data []string) string {
-	u.AddOpReturnOutput(data)
-	u.CreateOutline()
-	u.SignOutline()
-
-	return u.SendTransaction()
+	return u.CreatesOutline().
+		WithOpReturnOutput(data).
+		SignsAndRecord()
 }
