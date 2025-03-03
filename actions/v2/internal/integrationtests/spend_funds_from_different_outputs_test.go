@@ -31,14 +31,14 @@ func TestSpendingFromMultipleSourceOutputs(t *testing.T) {
 	txID4 := when.Alice().SendsFundsTo(given.Bob(), 41)
 
 	// then:
-	then.Alice().Balance().IsEqualTo(0)
+	then.Alice().Balance().IsEqualTo(8)
 	then.Bob().Balance().IsEqualTo(41)
 
 	// and:
 	then.Alice().Operations().Last().
 		WithTxID(txID4).
 		WithTxStatus("BROADCASTED").
-		WithValue(-50).
+		WithValue(-42).
 		WithType("outgoing").
 		WithCounterparty(given.Bob().DefaultPaymail().Address())
 

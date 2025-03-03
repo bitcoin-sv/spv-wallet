@@ -27,12 +27,11 @@ func TestSpendExternalFundsOpReturn(t *testing.T) {
 	internalTxID := when.Alice().SendsData([]string{"Hello", "Bob!"})
 
 	// then:
-	then.Alice().Balance().IsEqualTo(0)
+	then.Alice().Balance().IsEqualTo(1)
 
 	then.Alice().Operations().Last().
 		WithTxID(internalTxID).
 		WithTxStatus("BROADCASTED").
-		WithValue(-2).
+		WithValue(-1).
 		WithType("outgoing")
-
 }

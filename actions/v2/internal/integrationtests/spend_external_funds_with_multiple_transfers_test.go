@@ -22,14 +22,14 @@ func TestSpendInternalFundsWithMultipleTransfers(t *testing.T) {
 	firstTxID := when.Alice().SendsFundsTo(given.Bob(), 30)
 
 	// then:
-	then.Alice().Balance().IsEqualTo(0)
+	then.Alice().Balance().IsEqualTo(19)
 	then.Bob().Balance().IsEqualTo(30)
 
 	// and:
 	then.Alice().Operations().Last().
 		WithTxID(firstTxID).
 		WithTxStatus("BROADCASTED").
-		WithValue(-50).
+		WithValue(-31).
 		WithType("outgoing").
 		WithCounterparty(given.Bob().DefaultPaymail().Address())
 
@@ -45,13 +45,13 @@ func TestSpendInternalFundsWithMultipleTransfers(t *testing.T) {
 	secondTxID := when.Bob().SendsFundsTo(given.Charlie(), 20)
 
 	// then:
-	then.Bob().Balance().IsEqualTo(0)
+	then.Bob().Balance().IsEqualTo(9)
 
 	// and:
 	then.Bob().Operations().Last().
 		WithTxID(secondTxID).
 		WithTxStatus("BROADCASTED").
-		WithValue(-30).
+		WithValue(-21).
 		WithType("outgoing").
 		WithCounterparty(given.Charlie().DefaultPaymail().Address())
 
