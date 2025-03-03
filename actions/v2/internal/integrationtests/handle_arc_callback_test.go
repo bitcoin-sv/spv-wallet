@@ -22,9 +22,10 @@ func TestHandlingARCCallback(t *testing.T) {
 			txInfo: chainmodels.TXInfo{
 				TXStatus:    chainmodels.Mined,
 				BlockHeight: 885803,
+				BlockHash:   "00000000000000000f0905597b6cac80031f0f56834e74dce1a714c682a9ed38",
 				Timestamp:   time.Now(),
 			},
-			beforeCallback: calcBumpAndBlockHash,
+			beforeCallback: calcBump,
 			expectStatus:   txmodels.TxStatusMined,
 		},
 		"On SentToNetwork do nothing": {
@@ -112,7 +113,7 @@ func minimalTxInfo(txStatus chainmodels.TXStatus) chainmodels.TXInfo {
 	}
 }
 
-func calcBumpAndBlockHash(t *testing.T, txInfo *chainmodels.TXInfo) {
+func calcBump(t *testing.T, txInfo *chainmodels.TXInfo) {
 	t.Helper()
 
 	txID, _ := chainhash.NewHashFromHex(txInfo.TxID)
@@ -123,5 +124,4 @@ func calcBumpAndBlockHash(t *testing.T, txInfo *chainmodels.TXInfo) {
 		},
 	}})
 	txInfo.MerklePath = bump.Hex()
-	txInfo.BlockHash, _ = bump.ComputeRootHex(&txInfo.TxID)
 }

@@ -23,56 +23,66 @@ func NewTransactions(db *gorm.DB) *Transactions {
 	return &Transactions{db: db}
 }
 
-// SetStatus updates the transaction status in the database.
-// NOTE: For MINED status use SetAsMined instead.
-func (t *Transactions) SetStatus(ctx context.Context, txID string, status txmodels.TxStatus) error {
-	err := t.db.
-		Model(&database.TrackedTransaction{}).
-		WithContext(ctx).
-		Where("id = ?", txID).
-		Update("tx_status", status).Error
+func (t *Transactions) UpdateTransaction(ctx context.Context, trackedTx *txmodels.TrackedTransaction) error {
+	toUpdate := map[string]any{
+		"block_hash":   trackedTx.BlockHash,
+		"block_height": trackedTx.BlockHeight,
+		"tx_status":    trackedTx.TxStatus,
+	}
+	if trackedTx.BeefHex != nil {
+		toUpdate["beef_hex"] = trackedTx.BeefHex
+		toUpdate["raw_hex"] = nil
+	} else if trackedTx.RawHex != nil {
+		toUpdate["raw_hex"] = trackedTx.RawHex
+		toUpdate["beef_hex"] = nil
+	} else {
+		return spverrors.Newf("tracked transaction %s has no transaction hex", trackedTx.ID)
+	}
+
+	err := t.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		err := tx.
+			Model(&database.TrackedTransaction{}).
+			Where("id = ?", trackedTx.ID).
+			Updates(toUpdate).Error
+
+		if err != nil {
+			return err
+		}
+
+		return tx.
+			Where("tx_id = ?", trackedTx.ID).
+			Delete(&database.TxInput{}).Error
+	})
+
 	if err != nil {
-		return spverrors.Wrapf(err, "failed to update transaction status for %s", txID)
+		return spverrors.Wrapf(err, "failed to update transaction as mined for %s", trackedTx.ID)
 	}
 	return nil
 }
 
-// SetAsMined updates the transaction status to Mined and sets the block hash, height, and BEEF hex.
-func (t *Transactions) SetAsMined(ctx context.Context, txID string, blockHash string, blockHeight int64, beefHex string) error {
-	err := t.db.
-		Model(&database.TrackedTransaction{}).
-		WithContext(ctx).
-		Where("id = ?", txID).
-		Updates(map[string]any{
-			"block_hash":   blockHash,
-			"block_height": blockHeight,
-			"tx_status":    txmodels.TxStatusMined,
-			"beef_hex":     beefHex,
-		}).Error
-	if err != nil {
-		return spverrors.Wrapf(err, "failed to update transaction as mined for %s", txID)
-	}
-	return nil
-}
-
-// GetTransactionHex retrieves the serialized transaction data in HEX format and determines if it is in BEEF format or Raw.
-func (t *Transactions) GetTransactionHex(ctx context.Context, txID string) (hex string, isBEEF bool, err error) {
+func (t *Transactions) GetTransaction(ctx context.Context, txID string) (transaction *txmodels.TrackedTransaction, err error) {
 	var record database.TrackedTransaction
 	err = t.db.
 		WithContext(ctx).
 		Where("id = ?", txID).
 		First(&record).Error
 	if err != nil {
-		return "", false, spverrors.Wrapf(err, "failed to query transaction hex for %s", txID)
+		return nil, spverrors.Wrapf(err, "failed to query transaction hex for %s", txID)
 	}
 
-	if record.HasBeefHex() {
-		return *record.BeefHex, true, nil
-	}
-	if record.HasRawHex() {
-		return *record.RawHex, false, nil
-	}
-	return "", false, spverrors.Newf("transaction %s has no hex data", txID)
+	return &txmodels.TrackedTransaction{
+		ID:       record.ID,
+		TxStatus: txmodels.TxStatus(record.TxStatus),
+
+		CreatedAt: record.CreatedAt,
+		UpdatedAt: record.UpdatedAt,
+
+		BlockHeight: record.BlockHeight,
+		BlockHash:   record.BlockHash,
+
+		BeefHex: record.BeefHex,
+		RawHex:  record.RawHex,
+	}, nil
 }
 
 // HasTransactionInputSources checks if all the provided input source transaction IDs exist in the database.

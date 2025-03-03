@@ -30,15 +30,24 @@ func (s *Service) Handle(ctx context.Context, txInfo chainmodels.TXInfo) error {
 		return spverrors.Newf("Received ARC callback with empty transaction ID")
 	}
 
+	trackedTx, err := s.transactionsRepo.GetTransaction(ctx, txInfo.TxID)
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to get transaction %s", txInfo.TxID)
+	}
+
+	if trackedTx.UpdatedAt.Before(txInfo.Timestamp) {
+		s.logger.Info().Msgf("Tx %s has already been updated", txInfo.TxID)
+		return nil
+	}
+
 	if txInfo.TXStatus.IsProblematic() {
-		err := s.transactionsRepo.SetStatus(ctx, txInfo.TxID, txmodels.TxStatusProblematic)
+		trackedTx.TxStatus = txmodels.TxStatusProblematic
+		err = s.transactionsRepo.UpdateTransaction(ctx, trackedTx)
 		if err != nil {
 			return spverrors.Wrapf(err, "failed to set PROBLEMATIC status for transaction %s", txInfo.TxID)
 		}
 		return nil
-	}
-
-	if !txInfo.TXStatus.IsMined() {
+	} else if !txInfo.TXStatus.IsMined() {
 		s.logger.Info().
 			Str("TxID", txInfo.TxID).
 			Msgf("Received ARC callback with transaction which is not mined yet")
@@ -49,28 +58,22 @@ func (s *Service) Handle(ctx context.Context, txInfo chainmodels.TXInfo) error {
 		return err
 	}
 
-	hex, isBEEF, err := s.transactionsRepo.GetTransactionHex(ctx, txInfo.TxID)
-	if err != nil {
-		return spverrors.Wrapf(err, "failed to get transaction hex for transaction %s", txInfo.TxID)
-	}
-	var tx *trx.Transaction
-	if isBEEF {
-		tx, err = trx.NewTransactionFromBEEFHex(hex)
-	} else {
-		tx, err = trx.NewTransactionFromHex(hex)
-	}
-	if err != nil {
-		return spverrors.Wrapf(err, "failed to parse transaction hex for transaction %s", txInfo.TxID)
+	if int64(bump.BlockHeight) != txInfo.BlockHeight {
+		return spverrors.Newf("Block height in BUMP doesn't match the block height in the callback")
 	}
 
-	tx.MerklePath = bump
-
-	beefHex, err := tx.BEEFHex()
-	if err != nil {
-		return spverrors.Wrapf(err, "failed to get BEEF hex for transaction %s", txInfo.TxID)
+	if trackedTx.BlockHash != nil && *trackedTx.BlockHash != txInfo.BlockHash {
+		s.logger.Info().
+			Str("TxID", txInfo.TxID).
+			Msg("Received callback for already MINED transaction with different BUMP. Reorg could happen")
 	}
 
-	err = s.transactionsRepo.SetAsMined(ctx, txInfo.TxID, txInfo.BlockHash, txInfo.BlockHeight, beefHex)
+	err = trackedTx.Mined(txInfo.BlockHash, txInfo.BlockHeight, bump)
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to set MINED status for transaction %s", txInfo.TxID)
+	}
+
+	err = s.transactionsRepo.UpdateTransaction(ctx, trackedTx)
 	if err != nil {
 		return spverrors.Wrapf(err, "failed to set MINED status for transaction %s", txInfo.TxID)
 	}
