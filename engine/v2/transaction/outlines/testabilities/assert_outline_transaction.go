@@ -6,6 +6,7 @@ import (
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	testpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures/txtestability"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
@@ -39,15 +40,17 @@ type WithParseableBEEFTransactionOutlineAssertion interface {
 	HasInputs(count int) WithParseableBEEFTransactionOutlineAssertion
 	Input(index int) InputAssertion
 	HasOutputs(count int) WithParseableBEEFTransactionOutlineAssertion
-	Output(index int) OutputAssertion
+	Output(index uint32) OutputAssertion
 }
 
 func Then(t testing.TB, fixture TransactionOutlineFixture) TransactionOutlineAssertion {
+	// TODO: move some methods from this package to txtestability.TransactionAssertion, to make it reusable
 	return &assertion{
 		t:                 t,
 		require:           require.New(t),
 		assert:            assert.New(t),
 		paymailAssertions: testpaymail.Then(t, fixture.ExternalRecipientHost().MockedPaymailClient()),
+		txFixture:         txtestability.Given(t),
 	}
 }
 
@@ -59,6 +62,7 @@ type assertion struct {
 	tx                *sdk.Transaction
 	err               error
 	paymailAssertions testpaymail.PaymailExternalAssertions
+	txFixture         txtestability.TransactionsFixtures
 }
 
 func (a *assertion) Created(transaction *outlines.Transaction) CreatedTransactionOutlineAssertion {
@@ -146,9 +150,9 @@ func (a *assertion) HasOutputs(count int) WithParseableBEEFTransactionOutlineAss
 	return a
 }
 
-func (a *assertion) Output(index int) OutputAssertion {
+func (a *assertion) Output(index uint32) OutputAssertion {
 	a.t.Helper()
-	a.require.Greater(len(a.tx.Outputs), index, "Transaction Outputs doesn't have output %d", index)
+	a.require.Greater(uint32(len(a.tx.Outputs)), index, "Transaction Outputs doesn't have output %d", index)
 
 	return &txOutputAssertion{
 		parent:     a,
@@ -158,6 +162,7 @@ func (a *assertion) Output(index int) OutputAssertion {
 		txout:      a.tx.Outputs[index],
 		annotation: a.txOutline.Annotations.Outputs[index],
 		index:      index,
+		txFixture:  a.txFixture,
 	}
 }
 
