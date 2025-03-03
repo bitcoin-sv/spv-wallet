@@ -11,8 +11,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var blockHeight uint32 = 1000
-
 // grandparentTXIDs are used to indicate prevTXID for parentTXs(source transactions)
 // [grandparentTX] -> [parentTX] -> [tx]
 // tx is the actual transaction that is being created
