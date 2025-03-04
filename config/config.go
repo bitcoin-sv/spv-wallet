@@ -99,8 +99,9 @@ type CallbackConfig struct {
 	url *url.URL
 }
 
+// ShouldGetURL returns the URL for the callback if it's enabled and is a valid URL.
 func (cc *CallbackConfig) ShouldGetURL() (*url.URL, error) {
-	if cc.Enabled == false {
+	if !cc.Enabled {
 		return nil, spverrors.ErrInternal.Wrap(spverrors.Newf("callback is disabled"))
 	}
 
@@ -117,6 +118,7 @@ func (cc *CallbackConfig) ShouldGetURL() (*url.URL, error) {
 	return cc.url, nil
 }
 
+// MustGetURL returns the URL for the callback if it's enabled and is a valid URL, panics if it's not.
 func (cc *CallbackConfig) MustGetURL() *url.URL {
 	callbackURL, err := cc.ShouldGetURL()
 	if err != nil {
