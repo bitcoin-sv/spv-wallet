@@ -191,6 +191,12 @@ var ErrContactFailedToGetPaginatedResults = models.SPVError{Message: "failed to 
 // ErrContactInWrongStatus is when contact is in wrong status to perform operation
 var ErrContactInWrongStatus = models.SPVError{Message: "contact is in wrong status", StatusCode: 400, Code: "error-contact-wrong-status"}
 
+// ErrCannotGetUpdatedContact is when error occurred during getting updated contact
+var ErrCannotGetUpdatedContact = models.SPVError{Message: "cannot get updated contact", StatusCode: 500, Code: "error-get-updated-contact"}
+
+// ErrContactNotUpdated is when contact could not be updated
+var ErrContactNotUpdated = models.SPVError{Message: "contact could not be  updated", StatusCode: 500, Code: "error-contact-not-updated"}
+
 // ////////////////////////////////// PAYMAIL ERRORS
 
 // ErrCouldNotFindPaymail is when paymail could not be found

@@ -298,7 +298,7 @@ func (siw *ServerInterfaceWrapper) AdminRejectInvitation(c *gin.Context) {
 		return
 	}
 
-	c.Set(XPubAuthScopes, []string{"user"})
+	c.Set(XPubAuthScopes, []string{"admin"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -324,7 +324,7 @@ func (siw *ServerInterfaceWrapper) AdminAcceptInvitation(c *gin.Context) {
 		return
 	}
 
-	c.Set(XPubAuthScopes, []string{"user"})
+	c.Set(XPubAuthScopes, []string{"admin"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)

@@ -264,7 +264,7 @@ paths:
       operationId: adminAcceptInvitation
       security:
         - XPubAuth:
-            - "user"
+            - "admin"
       tags:
         - Admin endpoints
       summary: Accept invitation
@@ -290,7 +290,7 @@ paths:
       operationId: adminRejectInvitation
       security:
         - XPubAuth:
-            - "user"
+            - "admin"
       tags:
         - Admin endpoints
       summary: Reject invitation

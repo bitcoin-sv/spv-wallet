@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
-
+	"fmt"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
@@ -71,27 +71,23 @@ func (r *Contacts) UpdateStatus(ctx context.Context, userID, paymail, status str
 // UpdateByID updates contact full name using its ID.
 func (r *Contacts) UpdateByID(ctx context.Context, contactID uint, fullName string) (*contactsmodels.Contact, error) {
 	row := database.UserContact{FullName: fullName}
-	if err := r.db.WithContext(ctx).
+	result := r.db.WithContext(ctx).
 		Model(&database.UserContact{}).
 		Where("id = ?", contactID).
-		Updates(row).Error; err != nil {
-		return nil, spverrors.Wrapf(err, "failed to update contact")
-	}
+		Updates(row)
 
-	return newContactModel(row), nil
+	return r.checkUpdateResultAndReturnContact(ctx, result, contactID)
 }
 
 // UpdateStatusByID updates contact status using its ID.
 func (r *Contacts) UpdateStatusByID(ctx context.Context, contactID uint, status string) (*contactsmodels.Contact, error) {
 	row := database.UserContact{Status: status}
-	if err := r.db.WithContext(ctx).
+	result := r.db.WithContext(ctx).
 		Model(&database.UserContact{}).
 		Where("id = ?", contactID).
-		Updates(row).Error; err != nil {
-		return nil, spverrors.Wrapf(err, "failed to update contact")
-	}
+		Updates(&row)
 
-	return newContactModel(row), nil
+	return r.checkUpdateResultAndReturnContact(ctx, result, contactID)
 }
 
 // Delete removes a contact from the database.
@@ -114,23 +110,28 @@ func (r *Contacts) DeleteByID(ctx context.Context, contactID uint) error {
 
 // Find retrieves a contact from the database.
 func (r *Contacts) Find(ctx context.Context, userID, paymail string) (*contactsmodels.Contact, error) {
-	var row = &database.UserContact{}
-	if err := r.db.WithContext(ctx).Where("user_id = ? AND paymail = ?", userID, paymail).First(row).Error; err != nil {
+	var row = database.UserContact{}
+	if err := r.db.WithContext(ctx).Where("user_id = ? AND paymail = ?", userID, paymail).First(&row).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, spverrors.Wrapf(err, "failed to find contact")
 	}
 
-	return &contactsmodels.Contact{
-		ID:        row.ID,
-		UserID:    row.UserID,
-		FullName:  row.FullName,
-		Paymail:   row.Paymail,
-		Status:    row.Status,
-		CreatedAt: row.CreatedAt,
-		UpdatedAt: row.UpdatedAt,
-	}, nil
+	return newContactModel(row), nil
+}
+
+// FindByID retrieves a contact from the database by id.
+func (r *Contacts) FindByID(ctx context.Context, contactID uint) (*contactsmodels.Contact, error) {
+	var row = database.UserContact{}
+	if err := r.db.WithContext(ctx).Where("id = ?", contactID).First(&row).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, spverrors.Wrapf(err, "failed to find contact")
+	}
+
+	return newContactModel(row), nil
 }
 
 func (r *Contacts) PaginatedForUser(ctx context.Context, userID string, page filter.Page, conditions map[string]interface{}) (*models.PagedResult[contactsmodels.Contact], error) {
@@ -151,17 +152,7 @@ func (r *Contacts) PaginatedForUser(ctx context.Context, userID string, page fil
 	return &models.PagedResult[contactsmodels.Contact]{
 		PageDescription: rows.PageDescription,
 		Content: lo.Map(rows.Content, func(contact *database.UserContact, _ int) *contactsmodels.Contact {
-			return &contactsmodels.Contact{
-				ID:        contact.ID,
-				UserID:    contact.UserID,
-				FullName:  contact.FullName,
-				Paymail:   contact.Paymail,
-				PubKey:    contact.PubKey,
-				Status:    contact.Status,
-				CreatedAt: contact.CreatedAt,
-				UpdatedAt: contact.UpdatedAt,
-				DeletedAt: &contact.DeletedAt.Time,
-			}
+			return newContactModel(*contact)
 		}),
 	}, nil
 }
@@ -183,29 +174,47 @@ func (r *Contacts) PaginatedForAdmin(ctx context.Context, page filter.Page, cond
 	return &models.PagedResult[contactsmodels.Contact]{
 		PageDescription: rows.PageDescription,
 		Content: lo.Map(rows.Content, func(contact *database.UserContact, _ int) *contactsmodels.Contact {
-			return &contactsmodels.Contact{
-				ID:        contact.ID,
-				UserID:    contact.UserID,
-				FullName:  contact.FullName,
-				Paymail:   contact.Paymail,
-				PubKey:    contact.PubKey,
-				Status:    contact.Status,
-				CreatedAt: contact.CreatedAt,
-				UpdatedAt: contact.UpdatedAt,
-				DeletedAt: &contact.DeletedAt.Time,
-			}
+			return newContactModel(*contact)
 		}),
 	}, nil
 }
 
+func (r *Contacts) checkUpdateResultAndReturnContact(ctx context.Context, result *gorm.DB, contactID uint) (*contactsmodels.Contact, error) {
+	fmt.Println("checkUpdateResultAndReturnContact")
+	fmt.Println(result.Error)
+	fmt.Println(result.RowsAffected)
+
+	if result.Error != nil {
+		return nil, spverrors.Wrapf(result.Error, "failed to update contact")
+	}
+
+	if result.RowsAffected == 0 {
+		return nil, spverrors.ErrUpdateContactStatus
+	}
+
+	contact, err := r.FindByID(ctx, contactID)
+	if err != nil {
+		return nil, spverrors.ErrCannotGetUpdatedContact
+	}
+
+	return contact, nil
+}
+
 func newContactModel(row database.UserContact) *contactsmodels.Contact {
-	return &contactsmodels.Contact{
+	contact := &contactsmodels.Contact{
 		ID:        row.ID,
 		UserID:    row.UserID,
 		FullName:  row.FullName,
 		Paymail:   row.Paymail,
 		Status:    row.Status,
+		PubKey:    row.PubKey,
 		CreatedAt: row.CreatedAt,
 		UpdatedAt: row.UpdatedAt,
 	}
+
+	if row.DeletedAt.Valid {
+		contact.DeletedAt = &row.DeletedAt.Time
+	}
+
+	return contact
 }

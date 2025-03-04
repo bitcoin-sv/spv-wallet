@@ -3,6 +3,7 @@ package paymailserver
 import (
 	"context"
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 
 	paymailserver "github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"

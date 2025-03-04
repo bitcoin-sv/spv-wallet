@@ -3,6 +3,7 @@ package testabilities
 import (
 	"context"
 	"errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
@@ -49,6 +50,9 @@ type EngineFixture interface {
 	// Faucet creates a new test fixture for Faucet
 	Faucet(user fixtures.User) FaucetFixture
 
+	// User creates a new test fixture for Contacts
+	User(user fixtures.User) ContactsFixture
+
 	// Tx creates a new mocked transaction builder
 	Tx() txtestability.TransactionSpec
 }
@@ -57,6 +61,15 @@ type EngineFixture interface {
 type FaucetFixture interface {
 	TopUp(satoshis bsv.Satoshis) txtestability.TransactionSpec
 	StoreData(data string) (txtestability.TransactionSpec, string)
+}
+
+// ContactsFixture is a test fixture for the contacts service
+type ContactsFixture interface {
+	HasContactTo(userB fixtures.User) *contactsmodels.Contact
+	HasConfirmedContactTo(userB fixtures.User) *contactsmodels.Contact
+	HasRejectedContactTo(userB fixtures.User) *contactsmodels.Contact
+	HasAwaitingContactTo(userB fixtures.User) *contactsmodels.Contact
+	HasInvitationFrom(userB fixtures.User) *contactsmodels.Contact
 }
 
 type EngineWithConfig struct {
@@ -153,6 +166,17 @@ func (f *engineFixture) Faucet(user fixtures.User) FaucetFixture {
 	}
 }
 
+func (f *engineFixture) User(user fixtures.User) ContactsFixture {
+	return &contactFixture{
+		engine:        f.engine,
+		user:          user,
+		t:             f.t,
+		assert:        assert.New(f.t),
+		require:       require.New(f.t),
+		paymailClient: f.paymailClient,
+	}
+}
+
 func (f *engineFixture) Tx() txtestability.TransactionSpec {
 	return f.txFixture.Tx()
 }
@@ -196,6 +220,24 @@ func (f *engineFixture) initialiseFixtures() {
 
 	f.paymailClient.WillRespondWithP2PCapabilities()
 	f.mockBHSGetMerkleRoots()
+
+	//// initialize with one contact for tests
+	//if f.config.ExperimentalFeatures.V2 {
+	//	fmt.Println("creating contact")
+	//	_, err := f.engine.ContactService().AdminCreateContact(context.Background(), contactsmodels.NewContact{
+	//		FullName:          fixtures.RecipientInternal.DefaultPaymail().PublicName(),
+	//		NewContactPaymail: fixtures.RecipientInternal.DefaultPaymail().String(),
+	//		RequesterPaymail:  fixtures.Sender.DefaultPaymail().String(),
+	//		UserID:            fixtures.Sender.ID(),
+	//	})
+	//
+	//	if err != nil {
+	//		fmt.Println("START ERROR", err)
+	//		require.NoError(f.t, err)
+	//	}
+	//
+	//	fmt.Println("contact created")
+	//}
 }
 
 func (f *engineFixture) addMockedExternalDependenciesOptions(options []engine.ClientOps) []engine.ClientOps {

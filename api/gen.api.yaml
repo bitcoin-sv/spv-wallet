@@ -167,7 +167,7 @@ paths:
                     $ref: '#/components/responses/responses_AdminUpdateContactStatusInternalServerError'
             security:
                 - XPubAuth:
-                    - user
+                    - admin
             summary: Reject invitation
             tags:
                 - Admin endpoints
@@ -190,7 +190,7 @@ paths:
                     $ref: '#/components/responses/responses_AdminUpdateContactStatusInternalServerError'
             security:
                 - XPubAuth:
-                    - user
+                    - admin
             summary: Accept invitation
             tags:
                 - Admin endpoints

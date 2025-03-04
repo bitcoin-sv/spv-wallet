@@ -2,7 +2,6 @@ package contacts
 
 import (
 	"context"
-
 	goPaymail "github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -365,12 +364,16 @@ func (s *Service) retrieveContacts(ctx context.Context, paymailA, paymailB strin
 	aPaymail, err := s.paymailAddressService.Find(ctx, aAlias, aDomain)
 	if err != nil {
 		return nil, nil, err
+	} else if aPaymail == nil {
+		return nil, nil, spverrors.ErrCouldNotFindPaymail
 	}
 
 	bAlias, bDomain, _ := goPaymail.SanitizePaymail(paymailB)
 	bPaymail, err := s.paymailAddressService.Find(ctx, bAlias, bDomain)
 	if err != nil {
 		return nil, nil, err
+	} else if bPaymail == nil {
+		return nil, nil, spverrors.ErrCouldNotFindPaymail
 	}
 
 	contactA, err := s.Find(ctx, aPaymail.UserID, paymailB)

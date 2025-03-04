@@ -18,6 +18,7 @@ type ContactRepo interface {
 	Delete(ctx context.Context, userID, paymail string) error
 	DeleteByID(ctx context.Context, contactID uint) error
 	Find(ctx context.Context, userID, paymail string) (*contactsmodels.Contact, error)
+	FindByID(ctx context.Context, contactID uint) (*contactsmodels.Contact, error)
 	PaginatedForUser(ctx context.Context, userID string, page filter.Page, conditions map[string]interface{}) (*models.PagedResult[contactsmodels.Contact], error)
 	PaginatedForAdmin(ctx context.Context, page filter.Page, conditions map[string]interface{}) (*models.PagedResult[contactsmodels.Contact], error)
 }
