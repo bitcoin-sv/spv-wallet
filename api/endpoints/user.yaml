@@ -172,7 +172,7 @@ paths:
           required: false
           schema:
             type: string
-          example: "00000000000000000216b36abb2f8a55bec9bb7c35c268781e77d85c98a90189"
+          example: "ac973196d58e42da6ad030dc39f5fcc343bd040e1db29b30c146e9aea9354bab"
       responses:
         200:
           $ref: "../components/responses.yaml#/components/responses/GetMerklerootsSuccess"

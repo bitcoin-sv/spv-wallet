@@ -45,8 +45,7 @@ func TestGETMerkleRootsSuccess(t *testing.T) {
 
 	for name, tt := range testCases {
 		t.Run(name, func(t *testing.T) {
-
-			// given
+			// given:
 			expResponseJSON, err := json.Marshal(tt.expectedResponse)
 			require.NoError(t, err, "Failed to marshall expected response")
 			url := merklerootsURL
@@ -58,12 +57,12 @@ func TestGETMerkleRootsSuccess(t *testing.T) {
 			client := given.HttpClient().ForUser()
 			url = url + tt.query
 
-			// when
+			// when:
 			res, _ := client.R().
 				SetHeader("Content-Type", "application/json").
 				Get(url)
 
-			// then
+			// then:
 			then.Response(res).IsOK().WithJSONf(string(expResponseJSON))
 		})
 	}
@@ -96,23 +95,23 @@ func TestGETMerkleRootsFailure(t *testing.T) {
 
 	for name, tt := range testCases {
 		t.Run(name, func(t *testing.T) {
-			// given
+			// given:
 			given, then := testabilities.New(t)
 
-			// and
+			// and:
 			cleanup := given.StartedSPVWallet()
 			defer cleanup()
 			client := given.HttpClient().ForUser()
 			given.BHS().WillRespondForMerkleRoots(tt.responseCode, tt.response)
 
-			// when
+			// when:
 			resErr := &models.ResponseError{}
 			res, _ := client.R().
 				SetHeader("Content-Type", "application/json").
 				SetError(resErr).
 				Get(merklerootsURL)
 
-			// then
+			// then:
 			then.Response(res).HasStatus(tt.responseCode).WithJSONf(tt.expectErr)
 		})
 	}

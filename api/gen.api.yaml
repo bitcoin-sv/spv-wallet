@@ -160,7 +160,7 @@ paths:
                     minimum: 0
                     type: integer
                 - description: Last processed merkleroot in client's database
-                  example: 00000000000000000216b36abb2f8a55bec9bb7c35c268781e77d85c98a90189
+                  example: ac973196d58e42da6ad030dc39f5fcc343bd040e1db29b30c146e9aea9354bab
                   in: query
                   name: lastEvaluatedKey
                   schema:
@@ -947,7 +947,7 @@ components:
             properties:
                 lastEvaluatedKey:
                     description: Last evaluated key
-                    example: 00000000000000000216b36abb2f8a55bec9bb7c35c268781e77d85c98a90189
+                    example: ac973196d58e42da6ad030dc39f5fcc343bd040e1db29b30c146e9aea9354bab
                     type: string
                 size:
                     description: Number of items in returned data
