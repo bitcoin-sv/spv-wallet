@@ -31,6 +31,8 @@ type LastOperationAssertions interface {
 	WithCounterparty(counterparty string) LastOperationAssertions
 	WithNoCounterparty() LastOperationAssertions
 	WithTxStatus(txStatus string) LastOperationAssertions
+	WithBlockHeight(blockHeight int64) LastOperationAssertions
+	WithBlockHash(blockHash string) LastOperationAssertions
 }
 
 type userAssertions struct {
@@ -129,5 +131,19 @@ func (l *lastOperationAssertions) WithNoCounterparty() LastOperationAssertions {
 func (l *lastOperationAssertions) WithTxStatus(txStatus string) LastOperationAssertions {
 	l.t.Helper()
 	l.require.EqualValues(txStatus, l.content.TxStatus)
+	return l
+}
+
+func (l *lastOperationAssertions) WithBlockHeight(blockHeight int64) LastOperationAssertions {
+	l.t.Helper()
+	l.require.NotNil(l.content.BlockHeight)
+	l.require.EqualValues(blockHeight, *l.content.BlockHeight)
+	return l
+}
+
+func (l *lastOperationAssertions) WithBlockHash(blockHash string) LastOperationAssertions {
+	l.t.Helper()
+	l.require.NotNil(l.content.BlockHash)
+	l.require.Equal(blockHash, *l.content.BlockHash)
 	return l
 }

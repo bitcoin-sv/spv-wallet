@@ -101,7 +101,13 @@ func TestHandlingARCCallback(t *testing.T) {
 				WithTxID(receiveTxID).
 				WithTxStatus(string(test.expectStatus))
 
-			// TODO: Assert for tx block height/hash and BEEF after Searching Transactions is implemented
+			if test.expectStatus == txmodels.TxStatusMined {
+				then.Alice().Operations().Last().
+					WithBlockHash(test.txInfo.BlockHash).
+					WithBlockHeight(test.txInfo.BlockHeight)
+			}
+
+			// TODO: Assert for BEEF after Searching Transactions is implemented
 		})
 	}
 }

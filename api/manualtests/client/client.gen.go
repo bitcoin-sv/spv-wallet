@@ -338,6 +338,12 @@ type ModelsInputsAnnotations struct {
 
 // ModelsOperation defines model for models_Operation.
 type ModelsOperation struct {
+	// BlockHash Block hash of underlying transaction
+	BlockHash *string `json:"blockHash,omitempty"`
+
+	// BlockHeight Block height of underlying transaction
+	BlockHeight *int64 `json:"blockHeight,omitempty"`
+
 	// Counterparty Counterparty of operation
 	Counterparty string `json:"counterparty"`
 
