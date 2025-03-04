@@ -167,6 +167,9 @@ func TestTransactionToTopUpRegressionTests(t *testing.T) {
 
 	api := manualtests.APICallForCurrentUser(t)
 
+	logger.Info().Msg("Balance before top up")
+	TestCurrentUser(t)
+
 	for i := range times {
 		logger.Info().Msgf("iteration %d - step 1: Create Transaction Outline with External paymail", i)
 		storedOutline, callForOutline := manualtests.StoreResponse(RequestTopUpToRegressionTests(multiplier))
@@ -182,7 +185,6 @@ func TestTransactionToTopUpRegressionTests(t *testing.T) {
 
 		logger.Info().Msgf("iteration %d - step 4: State of Sender", i)
 		TestCurrentUser(t)
-		TestSearchOperations(t)
 	}
 
 }
