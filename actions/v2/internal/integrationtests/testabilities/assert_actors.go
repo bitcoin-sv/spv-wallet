@@ -9,6 +9,7 @@ import (
 type IntegrationTestAssertion interface {
 	Alice() SpvWalletActorsStateAssertions
 	Bob() SpvWalletActorsStateAssertions
+	Charlie() SpvWalletActorsStateAssertions
 }
 
 // SpvWalletActorsStateAssertions about spv-wallet users
@@ -32,6 +33,12 @@ func (a *assertions) Alice() SpvWalletActorsStateAssertions {
 func (a *assertions) Bob() SpvWalletActorsStateAssertions {
 	return &actorAssertions{
 		userAssertions: a.User(a.fixture.bob.User),
+	}
+}
+
+func (a *assertions) Charlie() SpvWalletActorsStateAssertions {
+	return &actorAssertions{
+		userAssertions: a.User(a.fixture.charlie.User),
 	}
 }
 
