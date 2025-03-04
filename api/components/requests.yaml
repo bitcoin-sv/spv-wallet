@@ -114,9 +114,19 @@ components:
           example: "bob@example.com"
         satoshis:
           type: integer
-          format: int64
+          format: uint
           x-go-type: uint64
           example: 1000
+        splits:
+          description: |
+            The number of outputs to be created from the satoshis. <br>
+            Warning: The satoshis must be evenly divisible by the number of splits. <br>
+            Warning: If the recipient responds with more than one output, the number of splits must be 1.
+          type: integer
+          format: uint64
+          x-go-type: uint64
+          default: 1
+          example: 1
         from:
           type: string
           example: "bob@example.com"
