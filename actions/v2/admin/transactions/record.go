@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin/binding"
 )
 
-// RecordTransactionOutline records transaction outline
+// RecordTransactionOutlineForUser records transaction outline for given user
 func (s *APIAdminTransactions) RecordTransactionOutlineForUser(c *gin.Context) {
 	var requestBody api.RequestsRecordTransactionOutlineForUser
 	err := c.ShouldBindWith(&requestBody, binding.JSON)
