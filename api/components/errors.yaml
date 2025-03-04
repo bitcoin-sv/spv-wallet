@@ -337,7 +337,7 @@ components:
             code:
               example: "error-bhs-unreachable"
             message:
-              example: "Block Header Service cannot be requested"
+              example: "Block Headers Service cannot be requested"
 
     BHSNoSuccessResponse:
       allOf:
@@ -347,7 +347,7 @@ components:
             code:
               example: "error-bhs-no-success-response"
             message:
-              example: "Block Header Service request did not return a success response"
+              example: "Block Headers Service request did not return a success response"
 
     BHSUnauthorized:
       allOf:
@@ -357,7 +357,7 @@ components:
             code:
               example: "error-bhs-unauthorized"
             message:
-              example: "BHS returned unauthorized"
+              example: "Block Headers Service returned unauthorized"
 
     BHSBadRequest:
       allOf:
@@ -367,7 +367,7 @@ components:
             code:
               example: "error-bhs-bad-request"
             message:
-              example: "BHS bad request"
+              example: "Block Headers Service bad request"
 
     BHSUnhealthy:
       allOf:
@@ -377,7 +377,7 @@ components:
             code:
               example: "error-bhs-unhealthy"
             message:
-              example: "Block Header Service is unhealthy"
+              example: "Block Headers Service is unhealthy"
 
     BHSBadURL:
       allOf:
@@ -387,7 +387,7 @@ components:
             code:
               example: "error-bhs-bad-url"
             message:
-              example: "cannot create Block Header Service url. Please check your configuration"
+              example: "cannot create Block Headers Service url. Please check your configuration"
 
     BHSParsingResponse:
       allOf:
@@ -397,7 +397,7 @@ components:
             code:
               example: "error-bhs-parse-response"
             message:
-              example: "cannot parse Block Header Service response"
+              example: "cannot parse Block Headers Service response"
 
     InvalidBatchSize:
       allOf:

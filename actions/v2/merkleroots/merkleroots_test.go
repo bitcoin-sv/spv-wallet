@@ -15,7 +15,6 @@ const merklerootsURL = "/api/v1/merkleroots"
 type jsonObject = map[string]any
 
 func TestGETMerkleRootsSuccess(t *testing.T) {
-
 	testCases := map[string]struct {
 		query            string
 		expectedResponse jsonObject
@@ -57,10 +56,7 @@ func TestGETMerkleRootsSuccess(t *testing.T) {
 			cleanup := given.StartedSPVWallet()
 			defer cleanup()
 			client := given.HttpClient().ForUser()
-
-			if tt.query != "" {
-				url = url + tt.query
-			}
+			url = url + tt.query
 
 			// when
 			res, _ := client.R().
@@ -75,7 +71,6 @@ func TestGETMerkleRootsSuccess(t *testing.T) {
 }
 
 func TestGETMerkleRootsFailure(t *testing.T) {
-
 	testCases := map[string]struct {
 		expectErr       string
 		response        string
@@ -83,22 +78,19 @@ func TestGETMerkleRootsFailure(t *testing.T) {
 		expResponseCode int
 	}{
 		"Get MerkleRoots with wrong batch size": {
-			responseCode:    400,
-			response:        "{\"code\": \"ErrInvalidBatchSize\",\"message\": \"batchSize must be 0 or a positive integer\"}",
-			expResponseCode: 400,
-			expectErr:       "{\"code\":\"error-invalid-batch-size\",\"message\":\"batchSize must be 0 or a positive integer\"}",
+			responseCode: 400,
+			response:     "{\"code\": \"ErrInvalidBatchSize\",\"message\": \"batchSize must be 0 or a positive integer\"}",
+			expectErr:    "{\"code\":\"error-invalid-batch-size\",\"message\":\"batchSize must be 0 or a positive integer\"}",
 		},
 		"Get MerkleRoots with invalid merkleroot": {
-			responseCode:    404,
-			response:        "{\"code\": \"ErrMerkleRootNotFound\",\"message\": \"No block with provided merkleroot was found\"}",
-			expResponseCode: 404,
-			expectErr:       "{\"code\":\"error-merkleroot-not-found\",\"message\":\"No block with provided merkleroot was found\"}",
+			responseCode: 404,
+			response:     "{\"code\": \"ErrMerkleRootNotFound\",\"message\": \"No block with provided merkleroot was found\"}",
+			expectErr:    "{\"code\":\"error-merkleroot-not-found\",\"message\":\"No block with provided merkleroot was found\"}",
 		},
 		"Get MerkleRoots with stale merkleroot": {
-			responseCode:    409,
-			response:        "{\"code\": \"ErrMerkleRootNotInLC\",\"message\": \"Provided merkleroot is not part of the longest chain\"}",
-			expResponseCode: 409,
-			expectErr:       "{\"code\":\"error-merkleroot-not-part-of-longest-chain\",\"message\":\"Provided merkleroot is not part of the longest chain\"}",
+			responseCode: 409,
+			response:     "{\"code\": \"ErrMerkleRootNotInLC\",\"message\": \"Provided merkleroot is not part of the longest chain\"}",
+			expectErr:    "{\"code\":\"error-merkleroot-not-part-of-longest-chain\",\"message\":\"Provided merkleroot is not part of the longest chain\"}",
 		},
 	}
 
@@ -121,7 +113,7 @@ func TestGETMerkleRootsFailure(t *testing.T) {
 				Get(merklerootsURL)
 
 			// then
-			then.Response(res).HasStatus(tt.expResponseCode).WithJSONf(tt.expectErr)
+			then.Response(res).HasStatus(tt.responseCode).WithJSONf(tt.expectErr)
 		})
 	}
 

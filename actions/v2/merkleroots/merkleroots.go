@@ -12,7 +12,6 @@ import (
 // GetMerkleRoots returns merkleroots from block headers service according to given query params
 func (s *APIMerkleRoots) GetMerkleRoots(c *gin.Context, params api.GetMerkleRootsParams) {
 	res, err := s.engine.Chain().GetMerkleRoots(c.Request.Context(), c.Request.URL.Query())
-
 	if err != nil {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
