@@ -39,6 +39,7 @@ func (c *AppConfig) ARCCallbackEnabled() bool {
 	return c.ARC != nil && c.ARC.Callback != nil && c.ARC.Callback.Enabled
 }
 
+// ShouldGetURL returns the URL for the ARC callback or an error if it is disabled or invalid
 func (cc *CallbackConfig) ShouldGetURL() (*url.URL, error) {
 	if cc == nil || !cc.Enabled {
 		return nil, spverrors.Newf("ARC callback is disabled")
