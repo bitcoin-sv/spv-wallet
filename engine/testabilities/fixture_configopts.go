@@ -21,11 +21,3 @@ func WithNotificationsEnabled() ConfigOpts {
 		c.Notifications.Enabled = true
 	}
 }
-
-func WithARCCallback(host, token string) ConfigOpts {
-	return func(c *config.AppConfig) {
-		c.ARC.Callback.Enabled = true
-		c.ARC.Callback.Host = host
-		c.ARC.Callback.Token = token
-	}
-}

@@ -1,6 +1,7 @@
 package integrationtests
 
 import (
+	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"testing"
 	"time"
 
@@ -8,7 +9,6 @@ import (
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/integrationtests/testabilities"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
-	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 )
 
@@ -66,7 +66,7 @@ func TestHandlingARCCallback(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// given:
 			given, when, then := testabilities.New(t)
-			cleanup := given.StartedSPVWalletV2(testengine.WithARCCallback("https://example.com", testabilities.ARCCallbackToken))
+			cleanup := given.StartedSPVWalletV2()
 			defer cleanup()
 
 			// when:
@@ -76,7 +76,7 @@ func TestHandlingARCCallback(t *testing.T) {
 			then.ARC().Broadcasted().
 				WithTxID(receiveTxID).
 				WithCallbackURL("https://example.com/transaction/broadcast/callback").
-				WithCallbackToken(testabilities.ARCCallbackToken)
+				WithCallbackToken(testengine.CallbackTestToken)
 
 			// and:
 			then.Alice().Operations().Last().

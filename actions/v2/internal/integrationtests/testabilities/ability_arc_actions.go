@@ -7,8 +7,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const ARCCallbackToken = "arc-test-token"
-
 type arcActions struct {
 	t       testing.TB
 	fixture *fixture
