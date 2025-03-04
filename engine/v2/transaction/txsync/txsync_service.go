@@ -35,7 +35,7 @@ func (s *Service) Handle(ctx context.Context, txInfo chainmodels.TXInfo) error {
 		return spverrors.Wrapf(err, "failed to get transaction %s", txInfo.TxID)
 	}
 
-	if trackedTx.UpdatedAt.Before(txInfo.Timestamp) {
+	if trackedTx.UpdatedAt.After(txInfo.Timestamp) {
 		s.logger.Info().Msgf("Tx %s has already been updated", txInfo.TxID)
 		return nil
 	}
@@ -51,6 +51,7 @@ func (s *Service) Handle(ctx context.Context, txInfo chainmodels.TXInfo) error {
 		s.logger.Info().
 			Str("TxID", txInfo.TxID).
 			Msgf("Received ARC callback with transaction which is not mined yet")
+		return nil
 	}
 
 	bump, err := parseMerklePath(txInfo.MerklePath, txInfo.TxID)
@@ -68,7 +69,7 @@ func (s *Service) Handle(ctx context.Context, txInfo chainmodels.TXInfo) error {
 			Msg("Received callback for already MINED transaction with different BUMP. Reorg could happen")
 	}
 
-	err = trackedTx.Mined(txInfo.BlockHash, txInfo.BlockHeight, bump)
+	err = trackedTx.Mined(txInfo.BlockHash, bump)
 	if err != nil {
 		return spverrors.Wrapf(err, "failed to set MINED status for transaction %s", txInfo.TxID)
 	}

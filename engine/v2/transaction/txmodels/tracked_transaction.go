@@ -1,6 +1,7 @@
 package txmodels
 
 import (
+	"github.com/samber/lo"
 	"time"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
@@ -42,7 +43,7 @@ func (tt *TrackedTransaction) TX() (*trx.Transaction, error) {
 }
 
 // Mined marks the transaction as mined with the given block hash and height, and the given bump.
-func (tt *TrackedTransaction) Mined(blockHash string, blockHeight int64, bump *trx.MerklePath) error {
+func (tt *TrackedTransaction) Mined(blockHash string, bump *trx.MerklePath) error {
 	tx, err := tt.TX()
 	if err != nil {
 		return err
@@ -58,7 +59,7 @@ func (tt *TrackedTransaction) Mined(blockHash string, blockHeight int64, bump *t
 	tt.BeefHex = &beefHex
 	tt.RawHex = nil
 	tt.BlockHash = &blockHash
-	tt.BlockHeight = &blockHeight
+	tt.BlockHeight = lo.ToPtr(int64(bump.BlockHeight))
 	tt.TxStatus = TxStatusMined
 
 	return nil

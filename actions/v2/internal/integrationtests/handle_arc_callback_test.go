@@ -23,7 +23,7 @@ func TestHandlingARCCallback(t *testing.T) {
 				TXStatus:    chainmodels.Mined,
 				BlockHeight: 885803,
 				BlockHash:   "00000000000000000f0905597b6cac80031f0f56834e74dce1a714c682a9ed38",
-				Timestamp:   time.Now(),
+				Timestamp:   time.Now().Add(10 * time.Minute),
 			},
 			beforeCallback: calcBump,
 			expectStatus:   txmodels.TxStatusMined,
@@ -41,7 +41,7 @@ func TestHandlingARCCallback(t *testing.T) {
 				TXStatus:    chainmodels.Mined,
 				BlockHash:   "00000000000000000f0905597b6cac80031f0f56834e74dce1a714c682a9ed38",
 				BlockHeight: 885803,
-				Timestamp:   time.Now(),
+				Timestamp:   time.Now().Add(10 * time.Minute),
 			},
 			expectStatus: txmodels.TxStatusBroadcasted,
 		},
@@ -115,7 +115,7 @@ func TestHandlingARCCallback(t *testing.T) {
 func minimalTxInfo(txStatus chainmodels.TXStatus) chainmodels.TXInfo {
 	return chainmodels.TXInfo{
 		TXStatus:  txStatus,
-		Timestamp: time.Now(),
+		Timestamp: time.Now().Add(10 * time.Minute),
 	}
 }
 
