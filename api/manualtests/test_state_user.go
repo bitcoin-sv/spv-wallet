@@ -50,20 +50,22 @@ func (u *User) IsEmpty() bool {
 }
 
 func (u *User) new(xpriv string, xpub string) error {
-	u.Xpriv = xpriv
-	u.Xpub = xpub
-	u.AdditionalAliases = make([]AdditionalAlias, 0)
+	now := time.Now()
 
-	err := u.init()
+	user := &User{
+		Xpriv:             xpriv,
+		Xpub:              xpub,
+		AdditionalAliases: make([]AdditionalAlias, 0),
+		// format now to yymmddhhmmss
+		Alias:  "test" + now.Format("060102150405"),
+		Domain: u.state.Domain,
+	}
+
+	err := user.init()
 	if err != nil {
 		return err
 	}
-
-	now := time.Now()
-
-	// format now to yymmddhhmmss
-	u.Alias = "test" + now.Format("060102150405")
-	u.Domain = u.state.Domain
+	*u = *user
 
 	return nil
 }

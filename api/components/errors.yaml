@@ -21,23 +21,33 @@ components:
 
     AnyAuthorization:
       oneOf:
-        - $ref: '#/components/schemas/Unauthorized'
-        - $ref: '#/components/schemas/AuthXPubRequired'
+        - $ref: "#/components/schemas/Unauthorized"
+        - $ref: "#/components/schemas/AuthXPubRequired"
 
     AdminAuthorization:
       oneOf:
-        - $ref: '#/components/schemas/UserAuthOnNonUserEndpoint'
-        - $ref: '#/components/schemas/AuthXPubRequired'
+        - $ref: "#/components/schemas/UserAuthOnNonUserEndpoint"
+        - $ref: "#/components/schemas/AuthXPubRequired"
 
     UserAuthorization:
       oneOf:
-        - $ref: '#/components/schemas/Unauthorized'
-        - $ref: '#/components/schemas/AdminAuthOnNonAdminEndpoint'
-        - $ref: '#/components/schemas/AuthXPubRequired'
+        - $ref: "#/components/schemas/Unauthorized"
+        - $ref: "#/components/schemas/AdminAuthOnNonAdminEndpoint"
+        - $ref: "#/components/schemas/AuthXPubRequired"
+
+    InvalidAvatarURL:
+      allOf:
+        - $ref: "#/components/schemas/Schema"
+        - type: object
+          properties:
+            code:
+              example: "error-user-invalid-avatar-url"
+            message:
+              example: "invalid avatar url"
 
     Unauthorized:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -47,7 +57,7 @@ components:
 
     AdminAuthOnNonAdminEndpoint:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -57,7 +67,7 @@ components:
 
     UserAuthOnNonUserEndpoint:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -67,7 +77,7 @@ components:
 
     AuthXPubRequired:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -77,7 +87,7 @@ components:
 
     CannotParseQueryParams:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -87,7 +97,7 @@ components:
 
     CannotBindRequest:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -97,7 +107,7 @@ components:
 
     Internal:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -107,7 +117,7 @@ components:
 
     InvalidDataID:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -117,7 +127,7 @@ components:
 
     DataNotFound:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -127,7 +137,7 @@ components:
 
     InvalidPubKey:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -137,7 +147,7 @@ components:
 
     InvalidPaymail:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -147,7 +157,7 @@ components:
 
     PaymailInconsistent:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -157,7 +167,7 @@ components:
 
     InvalidDomain:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -167,7 +177,7 @@ components:
 
     CreatingUser:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -177,7 +187,7 @@ components:
 
     GettingUser:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -187,7 +197,7 @@ components:
 
     TxSpecNoDefaultPaymailAddress:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -197,7 +207,7 @@ components:
 
     TxSpecOutputsRequired:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -207,7 +217,7 @@ components:
 
     TxSpecOpReturnDataRequired:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -217,7 +227,7 @@ components:
 
     TxSpecFailedToDecodeHex:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -227,7 +237,7 @@ components:
 
     TxSpecInvalidPaymailReceiver:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -237,7 +247,7 @@ components:
 
     TxSpecInvalidPaymailSender:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -247,7 +257,7 @@ components:
 
     TxOutlineUserHasNotEnoughFunds:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -257,7 +267,7 @@ components:
 
     TxValidation:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -267,7 +277,7 @@ components:
 
     GettingOutputs:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -277,7 +287,7 @@ components:
 
     UTXOSpent:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -291,7 +301,7 @@ components:
 
     AnnotationIndexOutOfRange:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -301,7 +311,7 @@ components:
 
     AnnotationIndexConversion:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -311,7 +321,7 @@ components:
 
     NoOperations:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:
@@ -321,7 +331,7 @@ components:
 
     TxBroadcast:
       allOf:
-        - $ref: '#/components/schemas/Schema'
+        - $ref: "#/components/schemas/Schema"
         - type: object
           properties:
             code:

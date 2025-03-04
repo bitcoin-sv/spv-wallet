@@ -7,6 +7,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/api/manualtests"
 	"github.com/bitcoin-sv/spv-wallet/api/manualtests/client"
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 )
 
@@ -43,7 +44,7 @@ func TestUnauthorized(t *testing.T) {
 					client.RequestsAddPaymail{
 						Alias:      "unauthorized",
 						Domain:     state.Domain,
-						PublicName: "Unauthorized",
+						PublicName: lo.ToPtr("Unauthorized"),
 					},
 				)
 			},

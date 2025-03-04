@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
@@ -110,8 +111,8 @@ func mapToDomainUser(user *database.User) *usersmodels.User {
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 		PublicKey: user.PubKey,
-		Paymails: lo.Map(user.Paymails, func(p *database.Paymail, _ int) *usersmodels.Paymail {
-			return &usersmodels.Paymail{
+		Paymails: lo.Map(user.Paymails, func(p *database.Paymail, _ int) *paymailsmodels.Paymail {
+			return &paymailsmodels.Paymail{
 				ID:        p.ID,
 				CreatedAt: p.CreatedAt,
 				UpdatedAt: p.UpdatedAt,
