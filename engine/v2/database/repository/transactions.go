@@ -56,7 +56,7 @@ func (t *Transactions) UpdateTransaction(ctx context.Context, trackedTx *txmodel
 	})
 
 	if err != nil {
-		return spverrors.Wrapf(err, "failed to update transaction as mined for %s", trackedTx.ID)
+		return spverrors.Wrapf(err, "failed to update transaction %s", trackedTx.ID)
 	}
 	return nil
 }
