@@ -3,6 +3,7 @@ package testabilities
 import (
 	"context"
 	"errors"
+	"os"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
@@ -168,6 +169,14 @@ func (f *engineFixture) prepareDBConfigForTests() {
 		f.config.Db.SQL.Password = "postgres"
 		f.config.Db.SQL.Name = dbName
 		f.config.Db.SQL.Host = "localhost"
+
+		// check if we are running in a testcontainer
+		if os.Getenv(testmode.EnvDBContainer) == "true" {
+			f.config.Db.SQL.Host = os.Getenv(testmode.EnvDBHost)
+			f.config.Db.SQL.Port = os.Getenv(testmode.EnvDBPort)
+		} else {
+			f.config.Db.SQL.Host = "localhost"
+		}
 		return
 	}
 
