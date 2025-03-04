@@ -2,11 +2,11 @@ package config
 
 import (
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"net/url"
 	"slices"
 
 	configerrors "github.com/bitcoin-sv/spv-wallet/config/errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // CheckDomain will check if the domain is allowed

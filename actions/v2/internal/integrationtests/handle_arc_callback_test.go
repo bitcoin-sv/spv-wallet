@@ -1,7 +1,6 @@
 package integrationtests
 
 import (
-	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"testing"
 	"time"
 
@@ -9,6 +8,7 @@ import (
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/integrationtests/testabilities"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 )
 
