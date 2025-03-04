@@ -17,12 +17,15 @@ import (
 
 // Paymail represents a paymail output
 type Paymail struct {
-	To       string                 `json:"to"`
-	Satoshis bsv.Satoshis           `json:"satoshis"`
-	From     optional.Param[string] `json:"from,omitempty"`
+	To       string
+	Satoshis bsv.Satoshis
+	Splits   uint64
+	From     optional.Param[string]
 }
 
 func (p *Paymail) evaluate(ctx *evaluationContext) (annotatedOutputs, error) {
+	p.ensureDefaults()
+
 	paymailClient := ctx.Paymail()
 
 	receiverAddress, err := paymailClient.GetSanitizedPaymail(p.To)
@@ -30,8 +33,9 @@ func (p *Paymail) evaluate(ctx *evaluationContext) (annotatedOutputs, error) {
 		return nil, txerrors.ErrReceiverPaymailAddressIsInvalid.Wrap(err)
 	}
 
-	if p.Satoshis == 0 {
-		return nil, txerrors.ErrOutputValueTooLow
+	err = p.validate()
+	if err != nil {
+		return nil, err
 	}
 
 	sender, err := p.sender(ctx)
@@ -44,15 +48,45 @@ func (p *Paymail) evaluate(ctx *evaluationContext) (annotatedOutputs, error) {
 		return nil, spverrors.Wrapf(err, "failed to get P2P destinations for paymail %s", p.To)
 	}
 
-	result := make(annotatedOutputs, len(destinations.Outputs))
-	for i, output := range destinations.Outputs {
-		result[i], err = p.createBsvPaymailOutput(output, destinations.Reference, sender)
+	if p.wantToSplit() {
+		result, err := p.mapToSplitOutputs(destinations, sender)
 		if err != nil {
 			return nil, err
 		}
+		return result, nil
 	}
 
+	result, err := p.mapToAnnotatedOutputs(destinations, sender)
+	if err != nil {
+		return nil, err
+	}
 	return result, nil
+}
+
+func (p *Paymail) ensureDefaults() {
+	if p.Splits == 0 {
+		p.Splits = 1
+	}
+}
+
+func (p *Paymail) validate() error {
+	err := p.validateSatoshis()
+	if err != nil {
+		return err
+	}
+	err = p.validateSplits()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *Paymail) validateSatoshis() error {
+	if p.Satoshis == 0 {
+		return txerrors.ErrOutputValueTooLow
+	}
+	return nil
 }
 
 func (p *Paymail) createBsvPaymailOutput(output *paymail.PaymentOutput, reference string, from string) (*annotatedOutput, error) {
@@ -90,6 +124,14 @@ func (p *Paymail) sender(ctx *evaluationContext) (string, error) {
 	return *p.From, nil
 }
 
+func (p *Paymail) validateSplits() error {
+	if p.Splits > 1 && uint64(p.Satoshis)%p.Splits != 0 {
+		return txerrors.ErrTxOutlinePaymailSatoshisMustBeDivisibleBySplits
+	}
+
+	return nil
+}
+
 func (p *Paymail) validateProvidedSenderPaymail(ctx *evaluationContext) error {
 	var sender = *p.From
 	_, err := ctx.Paymail().GetSanitizedPaymail(sender)
@@ -117,4 +159,41 @@ func (p *Paymail) defaultSenderAddress(ctx *evaluationContext) (string, error) {
 		return "", txerrors.ErrTxOutlineSenderPaymailAddressNoDefault.Wrap(err)
 	}
 	return sender, nil
+}
+
+func (p *Paymail) wantToSplit() bool {
+	return p.Splits > 1
+}
+
+func (p *Paymail) mapToAnnotatedOutputs(destinations *paymail.PaymentDestinationPayload, sender string) (annotatedOutputs, error) {
+	var err error
+	result := make(annotatedOutputs, len(destinations.Outputs))
+	for i, output := range destinations.Outputs {
+		result[i], err = p.createBsvPaymailOutput(output, destinations.Reference, sender)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return result, nil
+}
+
+func (p *Paymail) mapToSplitOutputs(destinations *paymail.PaymentDestinationPayload, sender string) (annotatedOutputs, error) {
+	if len(destinations.Outputs) != 1 {
+		return nil, txerrors.ErrTxOutlinePaymailCannotSplitWhenRecipientSplitting
+	}
+
+	output := destinations.Outputs[0]
+	satoshisPart := uint64(p.Satoshis) / p.Splits
+
+	var err error
+	result := make(annotatedOutputs, p.Splits)
+	for i := range p.Splits {
+		output.Satoshis = satoshisPart
+		result[i], err = p.createBsvPaymailOutput(output, destinations.Reference, sender)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return result, nil
 }
