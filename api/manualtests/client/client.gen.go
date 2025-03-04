@@ -64,6 +64,12 @@ const (
 	ModelsTransactionHexFormatRAW  ModelsTransactionHexFormat = "RAW"
 )
 
+// Defines values for ModelsTransactionOutlineFormat.
+const (
+	ModelsTransactionOutlineFormatBEEF ModelsTransactionOutlineFormat = "BEEF"
+	ModelsTransactionOutlineFormatRAW  ModelsTransactionOutlineFormat = "RAW"
+)
+
 // Defines values for RequestsOpReturnOutputSpecificationDataType.
 const (
 	Hexes   RequestsOpReturnOutputSpecificationDataType = "hexes"
@@ -78,6 +84,12 @@ const (
 // Defines values for RequestsPaymailOutputSpecificationType.
 const (
 	Paymail RequestsPaymailOutputSpecificationType = "paymail"
+)
+
+// Defines values for RequestsRecordTransactionOutlineForUserFormat.
+const (
+	RequestsRecordTransactionOutlineForUserFormatBEEF RequestsRecordTransactionOutlineForUserFormat = "BEEF"
+	RequestsRecordTransactionOutlineForUserFormatRAW  RequestsRecordTransactionOutlineForUserFormat = "RAW"
 )
 
 // Defines values for RequestsTransactionOutlineFormat.
@@ -476,6 +488,20 @@ type ModelsTransactionHex struct {
 // ModelsTransactionHexFormat Transaction format
 type ModelsTransactionHexFormat string
 
+// ModelsTransactionOutline defines model for models_TransactionOutline.
+type ModelsTransactionOutline struct {
+	Annotations *ModelsOutputsAnnotations `json:"annotations,omitempty"`
+
+	// Format Transaction format
+	Format ModelsTransactionOutlineFormat `json:"format"`
+
+	// Hex Transaction hex
+	Hex string `json:"hex"`
+}
+
+// ModelsTransactionOutlineFormat Transaction format
+type ModelsTransactionOutlineFormat string
+
 // ModelsUser defines model for models_User.
 type ModelsUser struct {
 	CreatedAt time.Time       `json:"createdAt"`
@@ -544,6 +570,23 @@ type RequestsPaymailOutputSpecification struct {
 // RequestsPaymailOutputSpecificationType defines model for RequestsPaymailOutputSpecification.Type.
 type RequestsPaymailOutputSpecificationType string
 
+// RequestsRecordTransactionOutlineForUser defines model for requests_RecordTransactionOutlineForUser.
+type RequestsRecordTransactionOutlineForUser struct {
+	Annotations *ModelsOutputsAnnotations `json:"annotations,omitempty"`
+
+	// Format Transaction format
+	Format RequestsRecordTransactionOutlineForUserFormat `json:"format"`
+
+	// Hex Transaction hex
+	Hex string `json:"hex"`
+
+	// UserID User ID for which admin records transaction outline
+	UserID string `json:"userID"`
+}
+
+// RequestsRecordTransactionOutlineForUserFormat Transaction format
+type RequestsRecordTransactionOutlineForUserFormat string
+
 // RequestsTransactionOutline defines model for requests_TransactionOutline.
 type RequestsTransactionOutline struct {
 	Annotations *ModelsOutputsAnnotations `json:"annotations,omitempty"`
@@ -594,6 +637,19 @@ type ResponsesAdminGetUser = ModelsUser
 
 // ResponsesAdminGetUserInternalServerError defines model for responses_AdminGetUserInternalServerError.
 type ResponsesAdminGetUserInternalServerError = ErrorsGettingUser
+
+// ResponsesAdminRecordTransactionOutlineForUserBadRequest defines model for responses_AdminRecordTransactionOutlineForUserBadRequest.
+type ResponsesAdminRecordTransactionOutlineForUserBadRequest struct {
+	union json.RawMessage
+}
+
+// ResponsesAdminRecordTransactionOutlineForUserInternalServerError defines model for responses_AdminRecordTransactionOutlineForUserInternalServerError.
+type ResponsesAdminRecordTransactionOutlineForUserInternalServerError struct {
+	union json.RawMessage
+}
+
+// ResponsesAdminRecordTransactionOutlineForUserSuccess defines model for responses_AdminRecordTransactionOutlineForUserSuccess.
+type ResponsesAdminRecordTransactionOutlineForUserSuccess = ModelsRecordedOutline
 
 // ResponsesAdminUserBadRequest defines model for responses_AdminUserBadRequest.
 type ResponsesAdminUserBadRequest struct {
@@ -684,6 +740,9 @@ type CreateTransactionOutlineParams struct {
 
 // CreateTransactionOutlineParamsFormat defines parameters for CreateTransactionOutline.
 type CreateTransactionOutlineParamsFormat string
+
+// RecordTransactionOutlineForUserJSONRequestBody defines body for RecordTransactionOutlineForUser for application/json ContentType.
+type RecordTransactionOutlineForUserJSONRequestBody = RequestsRecordTransactionOutlineForUser
 
 // CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
 type CreateUserJSONRequestBody = RequestsCreateUser
@@ -1118,6 +1177,260 @@ func (t RequestsTransactionOutlineOutputSpecification) MarshalJSON() ([]byte, er
 }
 
 func (t *RequestsTransactionOutlineOutputSpecification) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsCannotBindRequest returns the union data inside the ResponsesAdminRecordTransactionOutlineForUserBadRequest as a ErrorsCannotBindRequest
+func (t ResponsesAdminRecordTransactionOutlineForUserBadRequest) AsErrorsCannotBindRequest() (ErrorsCannotBindRequest, error) {
+	var body ErrorsCannotBindRequest
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsCannotBindRequest overwrites any union data inside the ResponsesAdminRecordTransactionOutlineForUserBadRequest as the provided ErrorsCannotBindRequest
+func (t *ResponsesAdminRecordTransactionOutlineForUserBadRequest) FromErrorsCannotBindRequest(v ErrorsCannotBindRequest) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsCannotBindRequest performs a merge with any union data inside the ResponsesAdminRecordTransactionOutlineForUserBadRequest, using the provided ErrorsCannotBindRequest
+func (t *ResponsesAdminRecordTransactionOutlineForUserBadRequest) MergeErrorsCannotBindRequest(v ErrorsCannotBindRequest) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsInvalidDataID returns the union data inside the ResponsesAdminRecordTransactionOutlineForUserBadRequest as a ErrorsInvalidDataID
+func (t ResponsesAdminRecordTransactionOutlineForUserBadRequest) AsErrorsInvalidDataID() (ErrorsInvalidDataID, error) {
+	var body ErrorsInvalidDataID
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInvalidDataID overwrites any union data inside the ResponsesAdminRecordTransactionOutlineForUserBadRequest as the provided ErrorsInvalidDataID
+func (t *ResponsesAdminRecordTransactionOutlineForUserBadRequest) FromErrorsInvalidDataID(v ErrorsInvalidDataID) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInvalidDataID performs a merge with any union data inside the ResponsesAdminRecordTransactionOutlineForUserBadRequest, using the provided ErrorsInvalidDataID
+func (t *ResponsesAdminRecordTransactionOutlineForUserBadRequest) MergeErrorsInvalidDataID(v ErrorsInvalidDataID) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsAnnotationIndexOutOfRange returns the union data inside the ResponsesAdminRecordTransactionOutlineForUserBadRequest as a ErrorsAnnotationIndexOutOfRange
+func (t ResponsesAdminRecordTransactionOutlineForUserBadRequest) AsErrorsAnnotationIndexOutOfRange() (ErrorsAnnotationIndexOutOfRange, error) {
+	var body ErrorsAnnotationIndexOutOfRange
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsAnnotationIndexOutOfRange overwrites any union data inside the ResponsesAdminRecordTransactionOutlineForUserBadRequest as the provided ErrorsAnnotationIndexOutOfRange
+func (t *ResponsesAdminRecordTransactionOutlineForUserBadRequest) FromErrorsAnnotationIndexOutOfRange(v ErrorsAnnotationIndexOutOfRange) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsAnnotationIndexOutOfRange performs a merge with any union data inside the ResponsesAdminRecordTransactionOutlineForUserBadRequest, using the provided ErrorsAnnotationIndexOutOfRange
+func (t *ResponsesAdminRecordTransactionOutlineForUserBadRequest) MergeErrorsAnnotationIndexOutOfRange(v ErrorsAnnotationIndexOutOfRange) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsUTXOSpent returns the union data inside the ResponsesAdminRecordTransactionOutlineForUserBadRequest as a ErrorsUTXOSpent
+func (t ResponsesAdminRecordTransactionOutlineForUserBadRequest) AsErrorsUTXOSpent() (ErrorsUTXOSpent, error) {
+	var body ErrorsUTXOSpent
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsUTXOSpent overwrites any union data inside the ResponsesAdminRecordTransactionOutlineForUserBadRequest as the provided ErrorsUTXOSpent
+func (t *ResponsesAdminRecordTransactionOutlineForUserBadRequest) FromErrorsUTXOSpent(v ErrorsUTXOSpent) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsUTXOSpent performs a merge with any union data inside the ResponsesAdminRecordTransactionOutlineForUserBadRequest, using the provided ErrorsUTXOSpent
+func (t *ResponsesAdminRecordTransactionOutlineForUserBadRequest) MergeErrorsUTXOSpent(v ErrorsUTXOSpent) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsAnnotationIndexConversion returns the union data inside the ResponsesAdminRecordTransactionOutlineForUserBadRequest as a ErrorsAnnotationIndexConversion
+func (t ResponsesAdminRecordTransactionOutlineForUserBadRequest) AsErrorsAnnotationIndexConversion() (ErrorsAnnotationIndexConversion, error) {
+	var body ErrorsAnnotationIndexConversion
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsAnnotationIndexConversion overwrites any union data inside the ResponsesAdminRecordTransactionOutlineForUserBadRequest as the provided ErrorsAnnotationIndexConversion
+func (t *ResponsesAdminRecordTransactionOutlineForUserBadRequest) FromErrorsAnnotationIndexConversion(v ErrorsAnnotationIndexConversion) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsAnnotationIndexConversion performs a merge with any union data inside the ResponsesAdminRecordTransactionOutlineForUserBadRequest, using the provided ErrorsAnnotationIndexConversion
+func (t *ResponsesAdminRecordTransactionOutlineForUserBadRequest) MergeErrorsAnnotationIndexConversion(v ErrorsAnnotationIndexConversion) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsNoOperations returns the union data inside the ResponsesAdminRecordTransactionOutlineForUserBadRequest as a ErrorsNoOperations
+func (t ResponsesAdminRecordTransactionOutlineForUserBadRequest) AsErrorsNoOperations() (ErrorsNoOperations, error) {
+	var body ErrorsNoOperations
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsNoOperations overwrites any union data inside the ResponsesAdminRecordTransactionOutlineForUserBadRequest as the provided ErrorsNoOperations
+func (t *ResponsesAdminRecordTransactionOutlineForUserBadRequest) FromErrorsNoOperations(v ErrorsNoOperations) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsNoOperations performs a merge with any union data inside the ResponsesAdminRecordTransactionOutlineForUserBadRequest, using the provided ErrorsNoOperations
+func (t *ResponsesAdminRecordTransactionOutlineForUserBadRequest) MergeErrorsNoOperations(v ErrorsNoOperations) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesAdminRecordTransactionOutlineForUserBadRequest) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesAdminRecordTransactionOutlineForUserBadRequest) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsInternal returns the union data inside the ResponsesAdminRecordTransactionOutlineForUserInternalServerError as a ErrorsInternal
+func (t ResponsesAdminRecordTransactionOutlineForUserInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
+	var body ErrorsInternal
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInternal overwrites any union data inside the ResponsesAdminRecordTransactionOutlineForUserInternalServerError as the provided ErrorsInternal
+func (t *ResponsesAdminRecordTransactionOutlineForUserInternalServerError) FromErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInternal performs a merge with any union data inside the ResponsesAdminRecordTransactionOutlineForUserInternalServerError, using the provided ErrorsInternal
+func (t *ResponsesAdminRecordTransactionOutlineForUserInternalServerError) MergeErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsGettingOutputs returns the union data inside the ResponsesAdminRecordTransactionOutlineForUserInternalServerError as a ErrorsGettingOutputs
+func (t ResponsesAdminRecordTransactionOutlineForUserInternalServerError) AsErrorsGettingOutputs() (ErrorsGettingOutputs, error) {
+	var body ErrorsGettingOutputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsGettingOutputs overwrites any union data inside the ResponsesAdminRecordTransactionOutlineForUserInternalServerError as the provided ErrorsGettingOutputs
+func (t *ResponsesAdminRecordTransactionOutlineForUserInternalServerError) FromErrorsGettingOutputs(v ErrorsGettingOutputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsGettingOutputs performs a merge with any union data inside the ResponsesAdminRecordTransactionOutlineForUserInternalServerError, using the provided ErrorsGettingOutputs
+func (t *ResponsesAdminRecordTransactionOutlineForUserInternalServerError) MergeErrorsGettingOutputs(v ErrorsGettingOutputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsTxBroadcast returns the union data inside the ResponsesAdminRecordTransactionOutlineForUserInternalServerError as a ErrorsTxBroadcast
+func (t ResponsesAdminRecordTransactionOutlineForUserInternalServerError) AsErrorsTxBroadcast() (ErrorsTxBroadcast, error) {
+	var body ErrorsTxBroadcast
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsTxBroadcast overwrites any union data inside the ResponsesAdminRecordTransactionOutlineForUserInternalServerError as the provided ErrorsTxBroadcast
+func (t *ResponsesAdminRecordTransactionOutlineForUserInternalServerError) FromErrorsTxBroadcast(v ErrorsTxBroadcast) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsTxBroadcast performs a merge with any union data inside the ResponsesAdminRecordTransactionOutlineForUserInternalServerError, using the provided ErrorsTxBroadcast
+func (t *ResponsesAdminRecordTransactionOutlineForUserInternalServerError) MergeErrorsTxBroadcast(v ErrorsTxBroadcast) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesAdminRecordTransactionOutlineForUserInternalServerError) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesAdminRecordTransactionOutlineForUserInternalServerError) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
@@ -1804,6 +2117,11 @@ type ClientInterface interface {
 	// AdminStatus request
 	AdminStatus(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// RecordTransactionOutlineForUserWithBody request with any body
+	RecordTransactionOutlineForUserWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	RecordTransactionOutlineForUser(ctx context.Context, body RecordTransactionOutlineForUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// CreateUserWithBody request with any body
 	CreateUserWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -1842,6 +2160,30 @@ type ClientInterface interface {
 
 func (c *Client) AdminStatus(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAdminStatusRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RecordTransactionOutlineForUserWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRecordTransactionOutlineForUserRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RecordTransactionOutlineForUser(ctx context.Context, body RecordTransactionOutlineForUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRecordTransactionOutlineForUserRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -2031,6 +2373,46 @@ func NewAdminStatusRequest(server string) (*http.Request, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	return req, nil
+}
+
+// NewRecordTransactionOutlineForUserRequest calls the generic RecordTransactionOutlineForUser builder with application/json body
+func NewRecordTransactionOutlineForUserRequest(server string, body RecordTransactionOutlineForUserJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRecordTransactionOutlineForUserRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewRecordTransactionOutlineForUserRequestWithBody generates requests for RecordTransactionOutlineForUser with any type of body
+func NewRecordTransactionOutlineForUserRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/admin/transactions/record")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -2489,6 +2871,11 @@ type ClientWithResponsesInterface interface {
 	// AdminStatusWithResponse request
 	AdminStatusWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AdminStatusResponse, error)
 
+	// RecordTransactionOutlineForUserWithBodyWithResponse request with any body
+	RecordTransactionOutlineForUserWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RecordTransactionOutlineForUserResponse, error)
+
+	RecordTransactionOutlineForUserWithResponse(ctx context.Context, body RecordTransactionOutlineForUserJSONRequestBody, reqEditors ...RequestEditorFn) (*RecordTransactionOutlineForUserResponse, error)
+
 	// CreateUserWithBodyWithResponse request with any body
 	CreateUserWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateUserResponse, error)
 
@@ -2554,6 +2941,41 @@ func (r AdminStatusResponse) Response() *http.Response {
 
 // Bytes is a convenience method to retrieve the raw bytes from the HTTP response
 func (r AdminStatusResponse) Bytes() []byte {
+	return r.Body
+}
+
+type RecordTransactionOutlineForUserResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *ResponsesAdminRecordTransactionOutlineForUserSuccess
+	JSON400      *ResponsesAdminRecordTransactionOutlineForUserBadRequest
+	JSON401      *ResponsesNotAuthorizedToAdminEndpoint
+	JSON500      *ResponsesAdminRecordTransactionOutlineForUserInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RecordTransactionOutlineForUserResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RecordTransactionOutlineForUserResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r RecordTransactionOutlineForUserResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r RecordTransactionOutlineForUserResponse) Bytes() []byte {
 	return r.Body
 }
 
@@ -2877,6 +3299,23 @@ func (c *ClientWithResponses) AdminStatusWithResponse(ctx context.Context, reqEd
 	return ParseAdminStatusResponse(rsp)
 }
 
+// RecordTransactionOutlineForUserWithBodyWithResponse request with arbitrary body returning *RecordTransactionOutlineForUserResponse
+func (c *ClientWithResponses) RecordTransactionOutlineForUserWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RecordTransactionOutlineForUserResponse, error) {
+	rsp, err := c.RecordTransactionOutlineForUserWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRecordTransactionOutlineForUserResponse(rsp)
+}
+
+func (c *ClientWithResponses) RecordTransactionOutlineForUserWithResponse(ctx context.Context, body RecordTransactionOutlineForUserJSONRequestBody, reqEditors ...RequestEditorFn) (*RecordTransactionOutlineForUserResponse, error) {
+	rsp, err := c.RecordTransactionOutlineForUser(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRecordTransactionOutlineForUserResponse(rsp)
+}
+
 // CreateUserWithBodyWithResponse request with arbitrary body returning *CreateUserResponse
 func (c *ClientWithResponses) CreateUserWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateUserResponse, error) {
 	rsp, err := c.CreateUserWithBody(ctx, contentType, body, reqEditors...)
@@ -3010,6 +3449,53 @@ func ParseAdminStatusResponse(rsp *http.Response) (*AdminStatusResponse, error) 
 			return nil, err
 		}
 		response.JSON401 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRecordTransactionOutlineForUserResponse parses an HTTP response from a RecordTransactionOutlineForUserWithResponse call
+func ParseRecordTransactionOutlineForUserResponse(rsp *http.Response) (*RecordTransactionOutlineForUserResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RecordTransactionOutlineForUserResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest ResponsesAdminRecordTransactionOutlineForUserSuccess
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ResponsesAdminRecordTransactionOutlineForUserBadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesNotAuthorizedToAdminEndpoint
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesAdminRecordTransactionOutlineForUserInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
 
 	}
 

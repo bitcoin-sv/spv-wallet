@@ -41,6 +41,18 @@ components:
         - publicName
         - avatarURL
 
+    RecordTransactionOutlineForUser:
+      allOf:
+        - $ref: "../components/models.yaml#/components/schemas/TransactionOutline"
+        - type: object
+          properties:
+            userID:
+              type: string
+              description: "User ID for which admin records transaction outline"
+              example: "1"
+          required:
+            - userID
+
     TransactionOutline:
       allOf:
         - $ref: '../components/models.yaml#/components/schemas/TransactionHex'
