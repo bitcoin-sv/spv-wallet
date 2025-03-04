@@ -282,7 +282,7 @@ func addARCOpts(c *config.AppConfig, options []engine.ClientOps) ([]engine.Clien
 		WaitFor:      c.ARC.WaitForStatus,
 	}
 
-	if c.ARC.Callback.Enabled {
+	if c.ARCCallbackEnabled() {
 		var err error
 		if c.ARC.Callback.Token == "" {
 			// This also sets the token to the config reference and, it is used in the callbacktoken_middleware
@@ -290,8 +290,12 @@ func addARCOpts(c *config.AppConfig, options []engine.ClientOps) ([]engine.Clien
 				return nil, spverrors.Wrapf(err, "error while generating callback token")
 			}
 		}
+		utl, err := c.ARC.Callback.ShouldGetURL()
+		if err != nil {
+			return nil, spverrors.Wrapf(err, "error while getting callback url")
+		}
 		arcCfg.Callback = &chainmodels.ARCCallbackConfig{
-			URL:   c.ARC.Callback.Host + config.BroadcastCallbackRoute,
+			URL:   utl.String(),
 			Token: c.ARC.Callback.Token,
 		}
 	}

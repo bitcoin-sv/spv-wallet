@@ -9,7 +9,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"github.com/gin-gonic/gin"
 )
 
 // ARCService for querying ARC server.
@@ -17,7 +16,6 @@ type ARCService interface {
 	QueryTransaction(ctx context.Context, txID string) (*chainmodels.TXInfo, error)
 	GetFeeUnit(ctx context.Context) (*bsv.FeeUnit, error)
 	Broadcast(ctx context.Context, tx *sdk.Transaction) (*chainmodels.TXInfo, error)
-	RegisterCallback(handler chainmodels.TXInfoHandler, router *gin.Engine)
 }
 
 // BHSService for querying BHS server.

@@ -75,7 +75,7 @@ func TestHandlingARCCallback(t *testing.T) {
 			// then:
 			then.ARC().Broadcasted().
 				WithTxID(receiveTxID).
-				WithCallbackURL("https://example.com/arc/broadcast/callback").
+				WithCallbackURL("https://example.com/transaction/broadcast/callback").
 				WithCallbackToken(testabilities.ARCCallbackToken)
 
 			// and:

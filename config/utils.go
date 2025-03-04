@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"net/url"
 	"slices"
 
 	configerrors "github.com/bitcoin-sv/spv-wallet/config/errors"
@@ -35,4 +37,18 @@ func (c *AppConfig) IsBeefEnabled() bool {
 // ARCCallbackEnabled returns true if the ARC callback is enabled
 func (c *AppConfig) ARCCallbackEnabled() bool {
 	return c.ARC != nil && c.ARC.Callback != nil && c.ARC.Callback.Enabled
+}
+
+func (cc *CallbackConfig) ShouldGetURL() (*url.URL, error) {
+	if cc == nil || !cc.Enabled {
+		return nil, spverrors.Newf("ARC callback is disabled")
+	}
+
+	host, err := url.Parse(cc.Host)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to parse ARC callback URL: %s", cc.Host)
+	}
+
+	hostURL := host.JoinPath(BroadcastCallbackRoute)
+	return hostURL, nil
 }

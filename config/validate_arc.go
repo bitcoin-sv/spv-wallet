@@ -2,7 +2,6 @@ package config
 
 import (
 	"net"
-	"net/url"
 	"regexp"
 	"strings"
 
@@ -39,7 +38,7 @@ func (n *ARCConfig) isValidCallbackURL() bool {
 	if !explicitHTTPURLRegex.MatchString(callbackUrl) {
 		return false
 	}
-	u, err := url.Parse(callbackUrl)
+	u, err := n.Callback.ShouldGetURL()
 	if err != nil {
 		return false
 	}

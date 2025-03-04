@@ -22,7 +22,7 @@ func (a *arcActions) SendsCallback(txInfo chainmodels.TXInfo) {
 		SetHeader("Content-Type", "application/json").
 		SetBody(txInfo).
 		SetAuthToken(token).
-		Post("/arc/broadcast/callback")
+		Post("/transaction/broadcast/callback")
 
 	require.Equal(a.t, 200, res.StatusCode())
 }
