@@ -171,6 +171,21 @@ paths:
             summary: Get operations for user
             tags:
                 - Operations
+    /api/v2/test/errors:
+        get:
+            parameters:
+                - description: Fail
+                  in: query
+                  name: fail
+                  schema:
+                    $ref: '#/components/schemas/models_FailingPoint'
+            responses:
+                "200":
+                    description: Success
+                default:
+                    $ref: '#/components/responses/responses_ProblemDetails'
+            tags:
+                - Test errors
     /api/v2/transactions:
         post:
             description: This endpoint allows to record transaction outline for authenticated user
@@ -392,6 +407,12 @@ components:
                     schema:
                         $ref: '#/components/schemas/errors_AdminAuthorization'
             description: Security requirements failed
+        responses_ProblemDetails:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/errors_ProblemDetails'
+            description: Internal server error
         responses_RecordTransactionBadRequest:
             content:
                 application/json:
@@ -610,6 +631,24 @@ components:
                     message:
                         example: inconsistent paymail address and alias/domain
                   type: object
+        errors_ProblemDetails:
+            properties:
+                detail:
+                    description: A human-readable explanation specific to this occurrence of the problem
+                    type: string
+                instance:
+                    description: A URI reference that identifies the specific occurrence of the problem
+                    type: string
+                status:
+                    description: The HTTP status code
+                    type: integer
+                title:
+                    description: A short, human-readable summary of the problem type
+                    type: string
+                type:
+                    description: A URI reference that identifies the problem type
+                    type: string
+            type: object
         errors_Schema:
             additionalProperties: false
             properties:
@@ -779,6 +818,17 @@ components:
             required:
                 - bucket
             type: object
+        models_FailingPoint:
+            enum:
+                - db_connection
+                - db_query
+                - domain_illegal_argument
+                - client_wrong_input
+                - client_auth_wrong
+                - client_auth_missing
+                - internal_during_auth
+                - arc_double_spent_attempt
+            type: string
         models_InputAnnotation:
             properties:
                 customInstructions:
