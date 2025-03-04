@@ -539,9 +539,9 @@ type RequestsPaymailOutputSpecification struct {
 	From     *string `json:"from"`
 	Satoshis uint64  `json:"satoshis"`
 
-	// Splits Number of outputs that will be created from the satoshis <br>
-	// Warning: satoshis must be divisible by splits without remainder <br>
-	// Warning: if recipient will respond with more then 1 output, then splits must be 1
+	// Splits The number of outputs to be created from the satoshis. <br>
+	// Warning: The satoshis must be evenly divisible by the number of splits. <br>
+	// Warning: If the recipient responds with more than one output, the number of splits must be 1.
 	Splits *uint64                                `json:"splits,omitempty"`
 	To     string                                 `json:"to"`
 	Type   RequestsPaymailOutputSpecificationType `json:"type"`
