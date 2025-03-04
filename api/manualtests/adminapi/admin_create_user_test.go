@@ -8,6 +8,7 @@ import (
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	"github.com/bitcoin-sv/spv-wallet/api/manualtests"
 	"github.com/bitcoin-sv/spv-wallet/api/manualtests/client"
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 )
 
@@ -25,8 +26,8 @@ func TestCreateUser(t *testing.T) {
 			return c.CreateUserWithResponse(context.Background(), client.CreateUserJSONRequestBody{
 				Paymail: &client.RequestsAddPaymail{
 					Address:    user.PaymailAddress(),
-					AvatarURL:  user.AvatarURL(),
-					PublicName: user.PublicName(),
+					AvatarURL:  lo.ToPtr(user.AvatarURL()),
+					PublicName: lo.ToPtr(user.PublicName()),
 				},
 				PublicKey: user.PublicKey,
 			})

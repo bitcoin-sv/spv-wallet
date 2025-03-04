@@ -31,6 +31,7 @@ components:
         publicName:
           type: string
           example: "Test"
+          description: "If not provided will default to the same value as alias"
         avatarURL:
           type: string
           example: "https://spv-wallet.com/avatar.png"
@@ -38,8 +39,6 @@ components:
         - address
         - alias
         - domain
-        - publicName
-        - avatarURL
 
     RecordTransactionOutlineForUser:
       allOf:
@@ -55,11 +54,11 @@ components:
 
     TransactionOutline:
       allOf:
-        - $ref: '../components/models.yaml#/components/schemas/TransactionHex'
+        - $ref: "../components/models.yaml#/components/schemas/TransactionHex"
         - type: object
           properties:
             annotations:
-              $ref: '../components/models.yaml#/components/schemas/OutputsAnnotations'
+              $ref: "../components/models.yaml#/components/schemas/OutputsAnnotations"
 
     TransactionSpecification:
       type: object
@@ -79,8 +78,8 @@ components:
         propertyName: type
         mapping:
           # Note: unfortunately we need to refer the type name after merging the schemas.
-          op_return: '#/components/schemas/requests_OpReturnOutputSpecification'
-          paymail: '#/components/schemas/requests_PaymailOutputSpecification'
+          op_return: "#/components/schemas/requests_OpReturnOutputSpecification"
+          paymail: "#/components/schemas/requests_PaymailOutputSpecification"
 
     OpReturnOutputSpecification:
       type: object
@@ -126,9 +125,19 @@ components:
           example: "bob@example.com"
         satoshis:
           type: integer
-          format: int64
+          format: uint
           x-go-type: uint64
           example: 1000
+        splits:
+          description: |
+            The number of outputs to be created from the satoshis. <br>
+            Warning: The satoshis must be evenly divisible by the number of splits. <br>
+            Warning: If the recipient responds with more than one output, the number of splits must be 1.
+          type: integer
+          format: uint64
+          x-go-type: uint64
+          default: 1
+          example: 1
         from:
           type: string
           example: "bob@example.com"

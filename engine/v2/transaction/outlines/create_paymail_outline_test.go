@@ -62,6 +62,68 @@ func TestCreatePaymailTransactionOutlineBEEF(t *testing.T) {
 
 	t.Run("return transaction outline with payment with multiple outputs from valid paymail address", func(t *testing.T) {
 		given, then := testabilities.New(t)
+		satoshisToSplit := bsv.Satoshis(33)
+		var splits uint64 = 3
+		expectedSplitValue := bsv.Satoshis(11)
+
+		// given:
+		given.ExternalRecipientHost().WillRespondWithP2PCapabilities()
+
+		// and:
+		service := given.NewTransactionOutlinesService()
+
+		// and:
+		spec := &outlines.TransactionSpec{
+			UserID: fixtures.Sender.ID(),
+			Outputs: outlines.NewOutputsSpecs(&outlines.Paymail{
+				To:       recipient,
+				Satoshis: satoshisToSplit,
+				Splits:   splits,
+				From:     optional.Of(sender),
+			}),
+		}
+
+		// when:
+		tx, err := service.CreateBEEF(context.Background(), spec)
+
+		// then:
+		paymailHostResponse := then.ExternalPaymailHost().ReceivedP2PDestinationRequest(satoshisToSplit)
+
+		thenTx := then.Created(tx).WithNoError(err).WithParseableBEEFHex()
+
+		thenTx.HasOutputs(3)
+
+		thenTx.Output(0).
+			HasBucket(bucket.BSV).
+			HasSatoshis(expectedSplitValue).
+			HasLockingScript(paymailHostResponse.Outputs[0].Script).
+			IsPaymail().
+			HasReceiver(recipient).
+			HasSender(sender).
+			HasReference(paymailHostResponse.Reference)
+
+		thenTx.Output(1).
+			HasBucket(bucket.BSV).
+			HasSatoshis(expectedSplitValue).
+			HasLockingScript(paymailHostResponse.Outputs[0].Script).
+			IsPaymail().
+			HasReceiver(recipient).
+			HasSender(sender).
+			HasReference(paymailHostResponse.Reference)
+
+		thenTx.Output(2).
+			HasBucket(bucket.BSV).
+			HasSatoshis(expectedSplitValue).
+			HasLockingScript(paymailHostResponse.Outputs[0].Script).
+			IsPaymail().
+			HasReceiver(recipient).
+			HasSender(sender).
+			HasReference(paymailHostResponse.Reference)
+
+	})
+
+	t.Run("return transaction outline with payment split in multiple outputs", func(t *testing.T) {
+		given, then := testabilities.New(t)
 
 		// given:
 		const firstOutputSatoshiValue = bsv.Satoshis(1)
@@ -265,6 +327,15 @@ func TestCreatePaymailTransactionOutlineBEEF(t *testing.T) {
 			},
 			expectedError: txerrors.ErrTxOutlineSenderPaymailAddressNoDefault,
 		},
+		"return error when satoshis are not divisible by splits": {
+			user: fixtures.UserWithoutPaymail,
+			spec: &outlines.Paymail{
+				To:       recipient,
+				Satoshis: 7,
+				Splits:   3,
+			},
+			expectedError: txerrors.ErrTxOutlinePaymailSatoshisMustBeDivisibleBySplits,
+		},
 	}
 	for name, test := range errorTests {
 		t.Run(name, func(t *testing.T) {
@@ -289,6 +360,32 @@ func TestCreatePaymailTransactionOutlineBEEF(t *testing.T) {
 			then.Created(tx).WithError(err).ThatIs(test.expectedError)
 		})
 	}
+
+	t.Run("return error when want to split paymail payment but recipient split it by himself", func(t *testing.T) {
+		given, then := testabilities.New(t)
+
+		// given:
+		given.ExternalRecipientHost().WillRespondWithP2PDestinationsWithSats(2, 4)
+
+		// given:
+		service := given.NewTransactionOutlinesService()
+
+		// and:
+		spec := &outlines.TransactionSpec{
+			UserID: fixtures.Sender.ID(),
+			Outputs: outlines.NewOutputsSpecs(&outlines.Paymail{
+				To:       recipient,
+				Satoshis: 6,
+				Splits:   2,
+			}),
+		}
+
+		// when:
+		tx, err := service.CreateBEEF(context.Background(), spec)
+
+		// then:
+		then.Created(tx).WithError(err).ThatIs(txerrors.ErrTxOutlinePaymailCannotSplitWhenRecipientSplitting)
+	})
 
 	paymailErrorTests := map[string]struct {
 		paymailHostScenario func(tpaymail.PaymailHostFixture)

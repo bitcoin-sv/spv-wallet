@@ -128,6 +128,7 @@ func paymailSpecFromRequest(req api.RequestsTransactionOutlineOutputSpecificatio
 		To:       specification.To,
 		Satoshis: bsv.Satoshis(specification.Satoshis),
 		From:     specification.From,
+		Splits:   lo.IfF(lo.IsNotNil(specification.Splits), func() uint64 { return *specification.Splits }).Else(1),
 	}, nil
 }
 

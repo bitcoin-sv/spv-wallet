@@ -5,10 +5,11 @@ import "github.com/joomcode/errorx"
 var PaymentConfigError = StateError.NewSubtype("payment")
 
 type Payment struct {
-	Amount          uint64 `mapstructure:"amount" yaml:"amount"`
-	RecipientID     string `mapstructure:"recipient_id" yaml:"recipient_id"`
-	ExternalPaymail string `mapstructure:"external_paymail" yaml:"external_paymail"`
-	state           *State
+	Amount                 uint64 `mapstructure:"amount" yaml:"amount"`
+	RecipientID            string `mapstructure:"recipient_id" yaml:"recipient_id"`
+	ExternalPaymail        string `mapstructure:"external_paymail" yaml:"external_paymail"`
+	RegressionTestsPaymail string `mapstructure:"regression_tests_paymail" yaml:"regression_tests_paymail"`
+	state                  *State
 }
 
 func (p *Payment) ShouldGetInternalRecipient() (*User, error) {
@@ -41,6 +42,14 @@ func (p *Payment) ShouldGetExternalRecipientPaymail() (string, error) {
 	}
 
 	return p.ExternalPaymail, nil
+}
+
+func (p *Payment) ShouldGetRegressionTestsFaucetPaymail() (string, error) {
+	if p.RegressionTestsPaymail == "" || p.RegressionTestsPaymail == notConfiguredRegressionPaymail {
+		return "", PaymentConfigError.New("Configure payment.regression_tests_paymail in file://%s", p.state.configFilePath)
+	}
+
+	return p.RegressionTestsPaymail, nil
 }
 
 func (p *Payment) validateInternalRecipient() error {

@@ -40,6 +40,13 @@ func (s *Service) Create(ctx context.Context, newPaymail *paymailsmodels.NewPaym
 		return nil, spverrors.Newf("user does not exist")
 	}
 
+	if err := newPaymail.ValidateAvatar(); err != nil {
+		return nil, spverrors.Wrapf(err, "invalid avatar url during paymail creation")
+	}
+	if newPaymail.PublicName == "" {
+		newPaymail.PublicName = newPaymail.Alias
+	}
+
 	createdPaymail, err := s.paymailsRepo.Create(ctx, newPaymail)
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "failed to append paymail")
