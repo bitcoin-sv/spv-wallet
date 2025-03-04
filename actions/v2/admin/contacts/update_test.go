@@ -5,6 +5,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
 	"strconv"
 	"testing"
 )
@@ -46,7 +47,7 @@ func TestUpdateContact(t *testing.T) {
 			}`, map[string]any{
 				"fullName": fullNameForUpdate,
 				"paymail":  fixtures.RecipientInternal.DefaultPaymail().String(),
-				"status":   "unconfirmed",
+				"status":   contactsmodels.ContactNotConfirmed,
 			})
 	})
 

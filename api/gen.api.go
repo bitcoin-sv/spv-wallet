@@ -52,12 +52,6 @@ type ServerInterface interface {
 	// Get contacts
 	// (GET /api/v2/contacts)
 	GetContacts(c *gin.Context, params GetContactsParams)
-	// Reject invitation
-	// (DELETE /api/v2/contacts/invitations/{paymail})
-	RejectInvitation(c *gin.Context, paymail string)
-	// Accept invitation
-	// (POST /api/v2/contacts/invitations/{paymail}/contacts)
-	AcceptInvitation(c *gin.Context, paymail string)
 	// Remove contact
 	// (DELETE /api/v2/contacts/{paymail})
 	RemoveContact(c *gin.Context, paymail string)
@@ -76,6 +70,12 @@ type ServerInterface interface {
 	// Get data for user
 	// (GET /api/v2/data/{id})
 	DataById(c *gin.Context, id string)
+	// Reject invitation
+	// (DELETE /api/v2/invitations/{paymail})
+	RejectInvitation(c *gin.Context, paymail string)
+	// Accept invitation
+	// (POST /api/v2/invitations/{paymail}/contacts)
+	AcceptInvitation(c *gin.Context, paymail string)
 	// Get operations for user
 	// (GET /api/v2/operations/search)
 	SearchOperations(c *gin.Context, params SearchOperationsParams)
@@ -525,58 +525,6 @@ func (siw *ServerInterfaceWrapper) GetContacts(c *gin.Context) {
 	siw.Handler.GetContacts(c, params)
 }
 
-// RejectInvitation operation middleware
-func (siw *ServerInterfaceWrapper) RejectInvitation(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "paymail" -------------
-	var paymail string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "paymail", c.Param("paymail"), &paymail, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter paymail: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	c.Set(XPubAuthScopes, []string{"user"})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.RejectInvitation(c, paymail)
-}
-
-// AcceptInvitation operation middleware
-func (siw *ServerInterfaceWrapper) AcceptInvitation(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "paymail" -------------
-	var paymail string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "paymail", c.Param("paymail"), &paymail, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter paymail: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	c.Set(XPubAuthScopes, []string{"user"})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.AcceptInvitation(c, paymail)
-}
-
 // RemoveContact operation middleware
 func (siw *ServerInterfaceWrapper) RemoveContact(c *gin.Context) {
 
@@ -733,6 +681,58 @@ func (siw *ServerInterfaceWrapper) DataById(c *gin.Context) {
 	siw.Handler.DataById(c, id)
 }
 
+// RejectInvitation operation middleware
+func (siw *ServerInterfaceWrapper) RejectInvitation(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "paymail" -------------
+	var paymail string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "paymail", c.Param("paymail"), &paymail, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter paymail: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(XPubAuthScopes, []string{"user"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.RejectInvitation(c, paymail)
+}
+
+// AcceptInvitation operation middleware
+func (siw *ServerInterfaceWrapper) AcceptInvitation(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "paymail" -------------
+	var paymail string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "paymail", c.Param("paymail"), &paymail, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter paymail: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(XPubAuthScopes, []string{"user"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.AcceptInvitation(c, paymail)
+}
+
 // SearchOperations operation middleware
 func (siw *ServerInterfaceWrapper) SearchOperations(c *gin.Context) {
 
@@ -883,14 +883,14 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/api/v2/admin/users/:id/paymails", wrapper.AddPaymailToUser)
 	router.GET(options.BaseURL+"/api/v2/configs/shared", wrapper.SharedConfig)
 	router.GET(options.BaseURL+"/api/v2/contacts", wrapper.GetContacts)
-	router.DELETE(options.BaseURL+"/api/v2/contacts/invitations/:paymail", wrapper.RejectInvitation)
-	router.POST(options.BaseURL+"/api/v2/contacts/invitations/:paymail/contacts", wrapper.AcceptInvitation)
 	router.DELETE(options.BaseURL+"/api/v2/contacts/:paymail", wrapper.RemoveContact)
 	router.GET(options.BaseURL+"/api/v2/contacts/:paymail", wrapper.GetContact)
 	router.PUT(options.BaseURL+"/api/v2/contacts/:paymail", wrapper.UpsertContact)
 	router.DELETE(options.BaseURL+"/api/v2/contacts/:paymail/confirmation", wrapper.UnconfirmContact)
 	router.POST(options.BaseURL+"/api/v2/contacts/:paymail/confirmation", wrapper.ConfirmContact)
 	router.GET(options.BaseURL+"/api/v2/data/:id", wrapper.DataById)
+	router.DELETE(options.BaseURL+"/api/v2/invitations/:paymail", wrapper.RejectInvitation)
+	router.POST(options.BaseURL+"/api/v2/invitations/:paymail/contacts", wrapper.AcceptInvitation)
 	router.GET(options.BaseURL+"/api/v2/operations/search", wrapper.SearchOperations)
 	router.POST(options.BaseURL+"/api/v2/transactions", wrapper.RecordTransactionOutline)
 	router.POST(options.BaseURL+"/api/v2/transactions/outlines", wrapper.CreateTransactionOutline)

@@ -26,6 +26,8 @@ const (
 )
 
 func (f *contactFixture) HasContactTo(userB fixtures.User) *contactsmodels.Contact {
+	f.removeContactIfExists(userB)
+
 	newContact := contactsmodels.NewContact{
 		UserID:            f.user.ID(),
 		FullName:          userB.DefaultPaymail().PublicName(),
@@ -41,17 +43,57 @@ func (f *contactFixture) HasContactTo(userB fixtures.User) *contactsmodels.Conta
 }
 
 func (f *contactFixture) HasConfirmedContactTo(userB fixtures.User) *contactsmodels.Contact {
-	return nil
+	f.removeContactIfExists(userB)
+
+	newContact := contactsmodels.NewContact{
+		UserID:            f.user.ID(),
+		FullName:          userB.DefaultPaymail().PublicName(),
+		NewContactPaymail: userB.DefaultPaymail().String(),
+		NewContactPubKey:  examplePubKey1,
+		Status:            contactsmodels.ContactConfirmed,
+	}
+
+	contact, err := f.engine.Repositories().Contacts.Create(context.Background(), newContact)
+	f.require.NoError(err)
+
+	return contact
 }
 
 func (f *contactFixture) HasRejectedContactTo(userB fixtures.User) *contactsmodels.Contact {
-	return nil
+	f.removeContactIfExists(userB)
+
+	newContact := contactsmodels.NewContact{
+		UserID:            f.user.ID(),
+		FullName:          userB.DefaultPaymail().PublicName(),
+		NewContactPaymail: userB.DefaultPaymail().String(),
+		NewContactPubKey:  examplePubKey1,
+		Status:            contactsmodels.ContactRejected,
+	}
+
+	contact, err := f.engine.Repositories().Contacts.Create(context.Background(), newContact)
+	f.require.NoError(err)
+
+	return contact
 }
 
 func (f *contactFixture) HasAwaitingContactTo(userB fixtures.User) *contactsmodels.Contact {
-	return nil
+	f.removeContactIfExists(userB)
+
+	newContact := contactsmodels.NewContact{
+		UserID:            f.user.ID(),
+		FullName:          userB.DefaultPaymail().PublicName(),
+		NewContactPaymail: userB.DefaultPaymail().String(),
+		NewContactPubKey:  examplePubKey1,
+		Status:            contactsmodels.ContactAwaitAccept,
+	}
+
+	contact, err := f.engine.Repositories().Contacts.Create(context.Background(), newContact)
+	f.require.NoError(err)
+
+	return contact
 }
 
-func (f *contactFixture) HasInvitationFrom(userB fixtures.User) *contactsmodels.Contact {
-	return nil
+func (f *contactFixture) removeContactIfExists(userB fixtures.User) {
+	err := f.engine.Repositories().Contacts.Delete(context.Background(), f.user.ID(), userB.DefaultPaymail().String())
+	f.require.NoError(err)
 }

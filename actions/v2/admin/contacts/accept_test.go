@@ -5,6 +5,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
 	"strconv"
 	"testing"
 )
@@ -41,7 +42,7 @@ func TestAcceptContact(t *testing.T) {
 			}`, map[string]any{
 				"fullName": fixtures.RecipientInternal.DefaultPaymail().PublicName(),
 				"paymail":  fixtures.RecipientInternal.DefaultPaymail().String(),
-				"status":   "unconfirmed",
+				"status":   contactsmodels.ContactNotConfirmed,
 			})
 	})
 
@@ -69,7 +70,7 @@ func TestAcceptContact(t *testing.T) {
 			}`, map[string]any{
 				"fullName": fixtures.RecipientInternal.DefaultPaymail().PublicName(),
 				"paymail":  fixtures.RecipientInternal.DefaultPaymail().String(),
-				"status":   "unconfirmed",
+				"status":   contactsmodels.ContactNotConfirmed,
 			})
 
 		// and:
@@ -91,7 +92,7 @@ func TestAcceptContact(t *testing.T) {
 			}`, map[string]any{
 				"fullName": fixtures.RecipientInternal.DefaultPaymail().PublicName(),
 				"paymail":  fixtures.RecipientInternal.DefaultPaymail().String(),
-				"status":   "unconfirmed",
+				"status":   contactsmodels.ContactNotConfirmed,
 			})
 	})
 

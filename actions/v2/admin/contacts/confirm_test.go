@@ -84,7 +84,7 @@ func TestConfirmContact(t *testing.T) {
 			Post("/api/v2/admin/contacts/confirmations")
 
 		// then:
-		then.Response(res).HasStatus(200)
+		then.Response(res).IsOK()
 	})
 
 	t.Run("Confirm already confirmed contact", func(t *testing.T) {
@@ -104,7 +104,7 @@ func TestConfirmContact(t *testing.T) {
 			Post("/api/v2/admin/contacts/confirmations")
 
 		// then:
-		then.Response(res).HasStatus(200)
+		then.Response(res).IsOK()
 
 		// and:
 		// when:
@@ -116,7 +116,7 @@ func TestConfirmContact(t *testing.T) {
 			Post("/api/v2/admin/contacts/confirmations")
 
 		// then:
-		then.Response(res).HasStatus(200)
+		then.Response(res).IsOK()
 	})
 
 	t.Run("Confirm contact with user xpub", func(t *testing.T) {

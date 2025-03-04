@@ -3,6 +3,7 @@ package contacts_test
 import (
 	"fmt"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -26,7 +27,7 @@ func TestCreateContact(t *testing.T) {
 
 		client := given.HttpClient().ForAdmin()
 
-		//// when:
+		// when:
 		res, _ := client.R().
 			SetBody(map[string]any{
 				"creatorPaymail": fixtures.Sender.DefaultPaymail().String(),
@@ -48,7 +49,7 @@ func TestCreateContact(t *testing.T) {
 			}`, map[string]any{
 				"fullName": fixtures.RecipientInternal.DefaultPaymail().PublicName(),
 				"paymail":  fixtures.RecipientInternal.DefaultPaymail().String(),
-				"status":   "unconfirmed",
+				"status":   contactsmodels.ContactNotConfirmed,
 			})
 	})
 
@@ -179,8 +180,6 @@ func TestCreateContact(t *testing.T) {
 			}).
 			Post("/api/v2/admin/contacts/unknown-paymail@exmaple.com")
 
-		fmt.Println(res.String())
-
 		// then:
 		then.Response(res).
 			HasStatus(400).
@@ -192,50 +191,4 @@ func TestCreateContact(t *testing.T) {
 				"message": spverrors.ErrMissingContactFullName.Message,
 			})
 	})
-}
-
-func createContactForSenderAndExternalRecipient(t *testing.T, givenForAllTests testabilities.SPVWalletApplicationFixture) int {
-	// given:
-	given, then := testabilities.NewOf(givenForAllTests, t)
-	given.Paymail().MockedPaymailClient().WillRespondWithP2PCapabilities()
-	given.Paymail().ExternalPaymailHost().WillRespondWithBasicCapabilities()
-
-	client := given.HttpClient().ForAdmin()
-
-	//// when:
-	//res, _ := client.R().
-	//	SetBody(map[string]any{
-	//		"creatorPaymail": fixtures.Sender.DefaultPaymail().String(),
-	//		"fullName":       fixtures.RecipientExternal.DefaultPaymail().PublicName(),
-	//	}).
-	//	Post("/api/v2/admin/contacts/" + fixtures.RecipientExternal.DefaultPaymail().String())
-	// when:
-	res, _ := client.R().
-		SetBody(map[string]any{
-			"creatorPaymail": fixtures.Sender.DefaultPaymail().String(),
-			"fullName":       fixtures.RecipientInternal.DefaultPaymail().PublicName(),
-		}).
-		Post("/api/v2/admin/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
-
-	// then:
-	then.Response(res).
-		HasStatus(200).
-		WithJSONMatching(`{
-				"id": "{{ matchNumber }}",
-				"createdAt": "{{ matchTimestamp }}",
-				"updatedAt": "{{ matchTimestamp }}",
-				"fullName": "{{ .fullName }}",
-				"paymail": "{{ .paymail }}",
-				"pubKey": "{{ matchHexWithLength 66 }}",
-				"status": "{{ .status }}"
-			}`, map[string]any{
-			"fullName": fixtures.RecipientInternal.DefaultPaymail().PublicName(),
-			//"fullName": fixtures.RecipientExternal.DefaultPaymail().PublicName(),
-			"paymail": fixtures.RecipientInternal.DefaultPaymail().String(),
-			//"paymail":  fixtures.RecipientExternal.DefaultPaymail().String(),
-			"status": "unconfirmed",
-		})
-
-	getter := then.Response(res).JSONValue()
-	return getter.GetInt("id")
 }

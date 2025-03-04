@@ -467,62 +467,6 @@ paths:
             summary: Confirm contact
             tags:
                 - Contacts
-    /api/v2/contacts/invitations/{paymail}:
-        delete:
-            description: This endpoint allows to reject invitation for authenticated user
-            operationId: rejectInvitation
-            parameters:
-                - description: Paymail address of the contact that the user would like to reject
-                  in: path
-                  name: paymail
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: Success - invitation removed
-                "400":
-                    $ref: '#/components/responses/responses_UpdateContactBadRequest'
-                "401":
-                    $ref: '#/components/responses/responses_UserNotAuthorized'
-                "404":
-                    $ref: '#/components/responses/responses_ContactNotFound'
-                "500":
-                    $ref: '#/components/responses/responses_InternalServerError'
-            security:
-                - XPubAuth:
-                    - user
-            summary: Reject invitation
-            tags:
-                - Contacts
-    /api/v2/contacts/invitations/{paymail}/contacts:
-        post:
-            description: This endpoint allows to accept invitation for authenticated user
-            operationId: acceptInvitation
-            parameters:
-                - description: Paymail address of the contact that the user would like to accept
-                  in: path
-                  name: paymail
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: Success - invitation accepted
-                "400":
-                    $ref: '#/components/responses/responses_UpdateContactBadRequest'
-                "401":
-                    $ref: '#/components/responses/responses_UserNotAuthorized'
-                "404":
-                    $ref: '#/components/responses/responses_ContactNotFound'
-                "500":
-                    $ref: '#/components/responses/responses_InternalServerError'
-            security:
-                - XPubAuth:
-                    - user
-            summary: Accept invitation
-            tags:
-                - Contacts
     /api/v2/data/{id}:
         get:
             description: This endpoint gets data by its id for authenticated user
@@ -551,6 +495,62 @@ paths:
             summary: Get data for user
             tags:
                 - Data
+    /api/v2/invitations/{paymail}:
+        delete:
+            description: This endpoint allows to reject invitation for authenticated user
+            operationId: rejectInvitation
+            parameters:
+                - description: Paymail address of the contact that the user would like to reject
+                  in: path
+                  name: paymail
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: Success - invitation removed
+                "400":
+                    $ref: '#/components/responses/responses_UpdateContactBadRequest'
+                "401":
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
+                "404":
+                    $ref: '#/components/responses/responses_ContactNotFound'
+                "500":
+                    $ref: '#/components/responses/responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Reject invitation
+            tags:
+                - Contacts
+    /api/v2/invitations/{paymail}/contacts:
+        post:
+            description: This endpoint allows to accept invitation for authenticated user
+            operationId: acceptInvitation
+            parameters:
+                - description: Paymail address of the contact that the user would like to accept
+                  in: path
+                  name: paymail
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: Success - invitation accepted
+                "400":
+                    $ref: '#/components/responses/responses_UpdateContactBadRequest'
+                "401":
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
+                "404":
+                    $ref: '#/components/responses/responses_ContactNotFound'
+                "500":
+                    $ref: '#/components/responses/responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Accept invitation
+            tags:
+                - Contacts
     /api/v2/operations/search:
         get:
             description: This endpoint allows to search operations for authenticated user

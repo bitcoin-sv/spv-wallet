@@ -329,7 +329,7 @@ paths:
         500:
           $ref: "../components/responses.yaml#/components/responses/InternalServerError"
 
-  /api/v2/contacts/invitations/{paymail}:
+  /api/v2/invitations/{paymail}:
     delete:
       operationId: rejectInvitation
       security:
@@ -360,7 +360,7 @@ paths:
         500:
           $ref: "../components/responses.yaml#/components/responses/InternalServerError"
 
-  /api/v2/contacts/invitations/{paymail}/contacts:
+  /api/v2/invitations/{paymail}/contacts:
     post:
       operationId: acceptInvitation
       security:

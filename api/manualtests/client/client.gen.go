@@ -3140,12 +3140,6 @@ type ClientInterface interface {
 	// GetContacts request
 	GetContacts(ctx context.Context, params *GetContactsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// RejectInvitation request
-	RejectInvitation(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// AcceptInvitation request
-	AcceptInvitation(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// RemoveContact request
 	RemoveContact(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -3165,6 +3159,12 @@ type ClientInterface interface {
 
 	// DataById request
 	DataById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RejectInvitation request
+	RejectInvitation(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AcceptInvitation request
+	AcceptInvitation(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// SearchOperations request
 	SearchOperations(ctx context.Context, params *SearchOperationsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -3399,30 +3399,6 @@ func (c *Client) GetContacts(ctx context.Context, params *GetContactsParams, req
 	return c.Client.Do(req)
 }
 
-func (c *Client) RejectInvitation(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewRejectInvitationRequest(c.Server, paymail)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) AcceptInvitation(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewAcceptInvitationRequest(c.Server, paymail)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
 func (c *Client) RemoveContact(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRemoveContactRequest(c.Server, paymail)
 	if err != nil {
@@ -3497,6 +3473,30 @@ func (c *Client) ConfirmContact(ctx context.Context, paymail string, reqEditors 
 
 func (c *Client) DataById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDataByIdRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RejectInvitation(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRejectInvitationRequest(c.Server, paymail)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AcceptInvitation(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAcceptInvitationRequest(c.Server, paymail)
 	if err != nil {
 		return nil, err
 	}
@@ -4344,74 +4344,6 @@ func NewGetContactsRequest(server string, params *GetContactsParams) (*http.Requ
 	return req, nil
 }
 
-// NewRejectInvitationRequest generates requests for RejectInvitation
-func NewRejectInvitationRequest(server string, paymail string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "paymail", runtime.ParamLocationPath, paymail)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v2/contacts/invitations/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewAcceptInvitationRequest generates requests for AcceptInvitation
-func NewAcceptInvitationRequest(server string, paymail string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "paymail", runtime.ParamLocationPath, paymail)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v2/contacts/invitations/%s/contacts", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
 // NewRemoveContactRequest generates requests for RemoveContact
 func NewRemoveContactRequest(server string, paymail string) (*http.Request, error) {
 	var err error
@@ -4622,6 +4554,74 @@ func NewDataByIdRequest(server string, id string) (*http.Request, error) {
 	}
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRejectInvitationRequest generates requests for RejectInvitation
+func NewRejectInvitationRequest(server string, paymail string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "paymail", runtime.ParamLocationPath, paymail)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/invitations/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAcceptInvitationRequest generates requests for AcceptInvitation
+func NewAcceptInvitationRequest(server string, paymail string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "paymail", runtime.ParamLocationPath, paymail)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/invitations/%s/contacts", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -4947,12 +4947,6 @@ type ClientWithResponsesInterface interface {
 	// GetContactsWithResponse request
 	GetContactsWithResponse(ctx context.Context, params *GetContactsParams, reqEditors ...RequestEditorFn) (*GetContactsResponse, error)
 
-	// RejectInvitationWithResponse request
-	RejectInvitationWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*RejectInvitationResponse, error)
-
-	// AcceptInvitationWithResponse request
-	AcceptInvitationWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*AcceptInvitationResponse, error)
-
 	// RemoveContactWithResponse request
 	RemoveContactWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*RemoveContactResponse, error)
 
@@ -4972,6 +4966,12 @@ type ClientWithResponsesInterface interface {
 
 	// DataByIdWithResponse request
 	DataByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DataByIdResponse, error)
+
+	// RejectInvitationWithResponse request
+	RejectInvitationWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*RejectInvitationResponse, error)
+
+	// AcceptInvitationWithResponse request
+	AcceptInvitationWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*AcceptInvitationResponse, error)
 
 	// SearchOperationsWithResponse request
 	SearchOperationsWithResponse(ctx context.Context, params *SearchOperationsParams, reqEditors ...RequestEditorFn) (*SearchOperationsResponse, error)
@@ -5430,76 +5430,6 @@ func (r GetContactsResponse) Bytes() []byte {
 	return r.Body
 }
 
-type RejectInvitationResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON400      *ResponsesUpdateContactBadRequest
-	JSON401      *ResponsesUserNotAuthorized
-	JSON404      *ResponsesContactNotFound
-	JSON500      *ResponsesInternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r RejectInvitationResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r RejectInvitationResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// HTTPResponse returns http.Response from which this response was parsed.
-func (r RejectInvitationResponse) Response() *http.Response {
-	return r.HTTPResponse
-}
-
-// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
-func (r RejectInvitationResponse) Bytes() []byte {
-	return r.Body
-}
-
-type AcceptInvitationResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON400      *ResponsesUpdateContactBadRequest
-	JSON401      *ResponsesUserNotAuthorized
-	JSON404      *ResponsesContactNotFound
-	JSON500      *ResponsesInternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r AcceptInvitationResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r AcceptInvitationResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// HTTPResponse returns http.Response from which this response was parsed.
-func (r AcceptInvitationResponse) Response() *http.Response {
-	return r.HTTPResponse
-}
-
-// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
-func (r AcceptInvitationResponse) Bytes() []byte {
-	return r.Body
-}
-
 type RemoveContactResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -5707,6 +5637,76 @@ func (r DataByIdResponse) Response() *http.Response {
 
 // Bytes is a convenience method to retrieve the raw bytes from the HTTP response
 func (r DataByIdResponse) Bytes() []byte {
+	return r.Body
+}
+
+type RejectInvitationResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ResponsesUpdateContactBadRequest
+	JSON401      *ResponsesUserNotAuthorized
+	JSON404      *ResponsesContactNotFound
+	JSON500      *ResponsesInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RejectInvitationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RejectInvitationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r RejectInvitationResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r RejectInvitationResponse) Bytes() []byte {
+	return r.Body
+}
+
+type AcceptInvitationResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ResponsesUpdateContactBadRequest
+	JSON401      *ResponsesUserNotAuthorized
+	JSON404      *ResponsesContactNotFound
+	JSON500      *ResponsesInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AcceptInvitationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AcceptInvitationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r AcceptInvitationResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r AcceptInvitationResponse) Bytes() []byte {
 	return r.Body
 }
 
@@ -6007,24 +6007,6 @@ func (c *ClientWithResponses) GetContactsWithResponse(ctx context.Context, param
 	return ParseGetContactsResponse(rsp)
 }
 
-// RejectInvitationWithResponse request returning *RejectInvitationResponse
-func (c *ClientWithResponses) RejectInvitationWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*RejectInvitationResponse, error) {
-	rsp, err := c.RejectInvitation(ctx, paymail, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseRejectInvitationResponse(rsp)
-}
-
-// AcceptInvitationWithResponse request returning *AcceptInvitationResponse
-func (c *ClientWithResponses) AcceptInvitationWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*AcceptInvitationResponse, error) {
-	rsp, err := c.AcceptInvitation(ctx, paymail, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseAcceptInvitationResponse(rsp)
-}
-
 // RemoveContactWithResponse request returning *RemoveContactResponse
 func (c *ClientWithResponses) RemoveContactWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*RemoveContactResponse, error) {
 	rsp, err := c.RemoveContact(ctx, paymail, reqEditors...)
@@ -6085,6 +6067,24 @@ func (c *ClientWithResponses) DataByIdWithResponse(ctx context.Context, id strin
 		return nil, err
 	}
 	return ParseDataByIdResponse(rsp)
+}
+
+// RejectInvitationWithResponse request returning *RejectInvitationResponse
+func (c *ClientWithResponses) RejectInvitationWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*RejectInvitationResponse, error) {
+	rsp, err := c.RejectInvitation(ctx, paymail, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRejectInvitationResponse(rsp)
+}
+
+// AcceptInvitationWithResponse request returning *AcceptInvitationResponse
+func (c *ClientWithResponses) AcceptInvitationWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*AcceptInvitationResponse, error) {
+	rsp, err := c.AcceptInvitation(ctx, paymail, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAcceptInvitationResponse(rsp)
 }
 
 // SearchOperationsWithResponse request returning *SearchOperationsResponse
@@ -6645,100 +6645,6 @@ func ParseGetContactsResponse(rsp *http.Response) (*GetContactsResponse, error) 
 	return response, nil
 }
 
-// ParseRejectInvitationResponse parses an HTTP response from a RejectInvitationWithResponse call
-func ParseRejectInvitationResponse(rsp *http.Response) (*RejectInvitationResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &RejectInvitationResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ResponsesUpdateContactBadRequest
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ResponsesUserNotAuthorized
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest ResponsesContactNotFound
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ResponsesInternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseAcceptInvitationResponse parses an HTTP response from a AcceptInvitationWithResponse call
-func ParseAcceptInvitationResponse(rsp *http.Response) (*AcceptInvitationResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &AcceptInvitationResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ResponsesUpdateContactBadRequest
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ResponsesUserNotAuthorized
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest ResponsesContactNotFound
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ResponsesInternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
 // ParseRemoveContactResponse parses an HTTP response from a RemoveContactWithResponse call
 func ParseRemoveContactResponse(rsp *http.Response) (*RemoveContactResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -7004,6 +6910,100 @@ func ParseDataByIdResponse(rsp *http.Response) (*DataByIdResponse, error) {
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest ResponsesGetDataNotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRejectInvitationResponse parses an HTTP response from a RejectInvitationWithResponse call
+func ParseRejectInvitationResponse(rsp *http.Response) (*RejectInvitationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RejectInvitationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ResponsesUpdateContactBadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesUserNotAuthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ResponsesContactNotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAcceptInvitationResponse parses an HTTP response from a AcceptInvitationWithResponse call
+func ParseAcceptInvitationResponse(rsp *http.Response) (*AcceptInvitationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AcceptInvitationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ResponsesUpdateContactBadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesUserNotAuthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ResponsesContactNotFound
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

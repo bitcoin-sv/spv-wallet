@@ -69,7 +69,6 @@ type ContactsFixture interface {
 	HasConfirmedContactTo(userB fixtures.User) *contactsmodels.Contact
 	HasRejectedContactTo(userB fixtures.User) *contactsmodels.Contact
 	HasAwaitingContactTo(userB fixtures.User) *contactsmodels.Contact
-	HasInvitationFrom(userB fixtures.User) *contactsmodels.Contact
 }
 
 type EngineWithConfig struct {
