@@ -6,6 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/api/manualtests"
 	"github.com/bitcoin-sv/spv-wallet/api/manualtests/client"
+	"github.com/samber/lo"
 )
 
 func TestAddPaymail(t *testing.T) {
@@ -23,8 +24,8 @@ func TestAddPaymail(t *testing.T) {
 				client.RequestsAddPaymail{
 					Alias:      additionalAlias.String(),
 					Domain:     user.Domain,
-					AvatarURL:  user.AvatarURL(),
-					PublicName: additionalAlias.PublicName(),
+					AvatarURL:  lo.ToPtr(user.AvatarURL()),
+					PublicName: lo.ToPtr(additionalAlias.PublicName()),
 				},
 			)
 		}).

@@ -38,6 +38,8 @@ paths:
                     $ref: '#/components/responses/responses_AdminUserBadRequest'
                 "401":
                     $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
+                "422":
+                    $ref: '#/components/responses/responses_AdminInvalidAvatarURL'
                 "500":
                     $ref: '#/components/responses/responses_AdminCreateUserInternalServerError'
             security:
@@ -92,6 +94,8 @@ paths:
                     $ref: '#/components/responses/responses_AdminUserBadRequest'
                 "401":
                     $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
+                "422":
+                    $ref: '#/components/responses/responses_AdminInvalidAvatarURL'
             security:
                 - XPubAuth:
                     - admin
@@ -308,6 +312,13 @@ components:
                     schema:
                         $ref: '#/components/schemas/errors_GettingUser'
             description: Internal error while getting user
+        responses_AdminInvalidAvatarURL:
+            content:
+                application/json:
+                    schema:
+                        oneOf:
+                            - $ref: '#/components/schemas/errors_InvalidAvatarURL'
+            description: Unprocessable entity is an error that occurs when the request cannot be fulfilled.
         responses_AdminUserBadRequest:
             content:
                 application/json:
@@ -535,6 +546,15 @@ components:
                         example: error-internal-server-error
                     message:
                         example: internal server error
+                  type: object
+        errors_InvalidAvatarURL:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-user-invalid-avatar-url
+                    message:
+                        example: invalid avatar url
                   type: object
         errors_InvalidDataID:
             allOf:
@@ -1064,14 +1084,13 @@ components:
                     example: spv-wallet.com
                     type: string
                 publicName:
+                    description: If not provided will default to the same value as alias
                     example: Test
                     type: string
             required:
                 - address
                 - alias
                 - domain
-                - publicName
-                - avatarURL
             type: object
         requests_CreateUser:
             properties:
@@ -1129,9 +1148,9 @@ components:
                 splits:
                     default: 1
                     description: |
-                        Number of outputs that will be created from the satoshis <br>
-                        Warning: satoshis must be divisible by splits without remainder <br>
-                        Warning: if recipient will respond with more then 1 output, then splits must be 1
+                        The number of outputs to be created from the satoshis. <br>
+                        Warning: The satoshis must be evenly divisible by the number of splits. <br>
+                        Warning: If the recipient responds with more than one output, the number of splits must be 1.
                     example: 1
                     format: uint64
                     type: integer

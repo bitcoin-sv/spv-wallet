@@ -31,6 +31,7 @@ components:
         publicName:
           type: string
           example: "Test"
+          description: "If not provided will default to the same value as alias"
         avatarURL:
           type: string
           example: "https://spv-wallet.com/avatar.png"
@@ -38,16 +39,14 @@ components:
         - address
         - alias
         - domain
-        - publicName
-        - avatarURL
 
     TransactionOutline:
       allOf:
-        - $ref: '../components/models.yaml#/components/schemas/TransactionHex'
+        - $ref: "../components/models.yaml#/components/schemas/TransactionHex"
         - type: object
           properties:
             annotations:
-              $ref: '../components/models.yaml#/components/schemas/OutputsAnnotations'
+              $ref: "../components/models.yaml#/components/schemas/OutputsAnnotations"
 
     TransactionSpecification:
       type: object
@@ -67,8 +66,8 @@ components:
         propertyName: type
         mapping:
           # Note: unfortunately we need to refer the type name after merging the schemas.
-          op_return: '#/components/schemas/requests_OpReturnOutputSpecification'
-          paymail: '#/components/schemas/requests_PaymailOutputSpecification'
+          op_return: "#/components/schemas/requests_OpReturnOutputSpecification"
+          paymail: "#/components/schemas/requests_PaymailOutputSpecification"
 
     OpReturnOutputSpecification:
       type: object
