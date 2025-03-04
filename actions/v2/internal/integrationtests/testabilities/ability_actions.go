@@ -1,6 +1,7 @@
 package testabilities
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -19,14 +20,31 @@ const (
 	newOutlineURL        = "/api/v2/transactions/outlines"
 )
 
+// outline represents a transaction outline that can be modified
+type outline struct {
+	outputs []map[string]any
+}
+
+// OutlineBuilder interface defines methods for building a transaction outline
+type OutlineBuilder interface {
+	WithOpReturnOutput(data []string) OutlineBuilder
+	WithPaymailOutput(recipient *fixtures.User, amount bsv.Satoshis) OutlineBuilder
+	SignsAndRecord() string
+}
+
 type IntegrationTestAction interface {
 	Alice() ActorsActions
+	Bob() ActorsActions
+	Charlie() ActorsActions
 	ARC() ARCActions
 }
 
 type ActorsActions interface {
 	ReceivesFromExternal(amount bsv.Satoshis) (txID string)
-	SendsTo(recipient *fixtures.User, amount bsv.Satoshis) (txID string)
+	SendsFundsTo(recipient *fixtures.User, amount bsv.Satoshis) string
+	SendsData(data []string) string
+
+	CreatesOutline() OutlineBuilder
 }
 
 type ARCActions interface {
@@ -56,14 +74,150 @@ func (a *actions) ARC() ARCActions {
 	}
 }
 
-type user struct {
-	fixtures.User
-	app       testabilities.SPVWalletApplicationFixture
-	txFixture txtestability.TransactionsFixtures
-	t         testing.TB
+func (a *actions) Bob() ActorsActions {
+	return a.fixture.bob
 }
 
-// ReceivesFromExternal simulates receiving funds from an external source
+func (a *actions) Charlie() ActorsActions {
+	return a.fixture.charlie
+}
+
+type user struct {
+	fixtures.User
+	txFixture      txtestability.TransactionsFixtures
+	app            testabilities.SPVWalletApplicationFixture
+	t              testing.TB
+	currentOutline *outline
+}
+
+// resetOutline clears the current outline
+func (u *user) resetOutline() {
+	u.currentOutline = nil
+}
+
+// CreatesOutline initializes a new outline
+func (u *user) CreatesOutline() OutlineBuilder {
+	u.currentOutline = &outline{
+		outputs: make([]map[string]any, 0),
+	}
+	return u
+}
+
+// WithPaymailOutput adds a paymail output to the outline
+func (u *user) WithPaymailOutput(recipient *fixtures.User, amount bsv.Satoshis) OutlineBuilder {
+	if u.currentOutline == nil {
+		u.CreatesOutline()
+	}
+
+	output := map[string]any{
+		"type":     "paymail",
+		"to":       recipient.DefaultPaymail(),
+		"satoshis": uint64(amount),
+	}
+
+	u.currentOutline.outputs = append(u.currentOutline.outputs, output)
+	return u
+}
+
+// WithOpReturnOutput adds an OP_RETURN output to the outline
+func (u *user) WithOpReturnOutput(data []string) OutlineBuilder {
+	if u.currentOutline == nil {
+		u.CreatesOutline()
+	}
+
+	output := map[string]any{
+		"type": "op_return",
+		"data": data,
+	}
+
+	u.currentOutline.outputs = append(u.currentOutline.outputs, output)
+	return u
+}
+
+// SignsAndRecord creates, signs and records the transaction
+func (u *user) SignsAndRecord() string {
+	if u.currentOutline == nil || len(u.currentOutline.outputs) == 0 {
+		u.t.Fatal("No outputs added to outline")
+	}
+
+	_, then := testabilities.NewOf(u.app, u.t)
+
+	outlineClient := u.app.HttpClient().ForGivenUser(u.User)
+	outlineBody := map[string]any{
+		"outputs": u.currentOutline.outputs,
+	}
+
+	outlineRes, _ := outlineClient.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(outlineBody).
+		Post(newOutlineURL)
+
+	then.Response(outlineRes).
+		IsOK().
+		WithJSONMatching(`{
+          "format": "BEEF",
+          "hex": "{{ matchBEEF }}",
+          "annotations": {{ anything }}
+       }`, nil)
+
+	getter := then.Response(outlineRes).JSONValue()
+
+	hex := getter.GetString("hex")
+	annotations := make(map[string]any)
+	getter.GetAsType("annotations", &annotations)
+
+	tx, err := trx.NewTransactionFromBEEFHex(hex)
+	require.NoError(u.t, err)
+
+	inputAnnotations := map[string]struct {
+		CustomInstructions bsv.CustomInstructions `json:"customInstructions"`
+	}{}
+
+	inputs, ok := annotations["inputs"]
+	if ok {
+		inputsJSON, err := json.Marshal(inputs)
+		require.NoError(u.t, err)
+
+		err = json.Unmarshal(inputsJSON, &inputAnnotations)
+		require.NoError(u.t, err)
+	}
+
+	for i, input := range tx.Inputs {
+		var customInstr bsv.CustomInstructions
+		if annotation, ok := inputAnnotations[fmt.Sprintf("%d", i)]; ok {
+			customInstr = annotation.CustomInstructions
+		}
+		input.UnlockingScriptTemplate = u.P2PKHUnlockingScriptTemplate(customInstr...)
+	}
+
+	err = tx.Sign()
+	require.NoError(u.t, err)
+
+	signedHex, err := tx.BEEFHex()
+	require.NoError(u.t, err)
+
+	u.app.ARC().WillRespondForBroadcastWithSeenOnNetwork(tx.TxID().String())
+
+	recordClient := u.app.HttpClient().ForGivenUser(u.User)
+	recordRes, _ := recordClient.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(map[string]any{
+			"hex":         signedHex,
+			"format":      "BEEF",
+			"annotations": annotations,
+		}).
+		Post(transactionRecordURL)
+
+	then.Response(recordRes).IsCreated()
+
+	txID := tx.TxID().String()
+
+	u.resetOutline()
+
+	return txID
+}
+
+// ReceivesFromExternal receives funds from external source
 func (u *user) ReceivesFromExternal(amount bsv.Satoshis) string {
 	client := u.app.HttpClient().ForAnonymous()
 	_, then := testabilities.NewOf(u.app, u.t)
@@ -119,70 +273,16 @@ func (u *user) ReceivesFromExternal(amount bsv.Satoshis) string {
 	return txSpec.ID()
 }
 
-// SendsTo simulates sending funds to another user
-func (u *user) SendsTo(recipient *fixtures.User, amount bsv.Satoshis) string {
-	_, then := testabilities.NewOf(u.app, u.t)
+// SendsFundsTo sends funds to the recipient
+func (u *user) SendsFundsTo(recipient *fixtures.User, amount bsv.Satoshis) string {
+	return u.CreatesOutline().
+		WithPaymailOutput(recipient, amount).
+		SignsAndRecord()
+}
 
-	outlineClient := u.app.HttpClient().ForGivenUser(u.User)
-	outlineBody := map[string]any{
-		"outputs": []map[string]any{
-			{
-				"type":     "paymail",
-				"to":       recipient.DefaultPaymail(),
-				"satoshis": uint64(amount),
-			},
-		},
-	}
-
-	outlineRes, _ := outlineClient.R().
-		SetHeader("Content-Type", "application/json").
-		SetBody(outlineBody).
-		Post(newOutlineURL)
-
-	then.Response(outlineRes).
-		IsOK().
-		WithJSONMatching(`{
-          "format": "BEEF",
-          "hex": "{{ matchBEEF }}",
-          "annotations": {{ anything }}
-       }`, nil)
-
-	getter := then.Response(outlineRes).JSONValue()
-
-	tx, err := trx.NewTransactionFromBEEFHex(getter.GetString("hex"))
-	require.NoError(u.t, err)
-
-	inputAnnotations := map[string]struct {
-		CustomInstructions bsv.CustomInstructions `json:"customInstructions"`
-	}{}
-	getter.GetAsType("annotations/inputs", &inputAnnotations)
-
-	for i, input := range tx.Inputs {
-		var customInstr bsv.CustomInstructions
-		if annotation, ok := inputAnnotations[fmt.Sprintf("%d", i)]; ok {
-			customInstr = annotation.CustomInstructions
-		}
-		input.UnlockingScriptTemplate = u.P2PKHUnlockingScriptTemplate(customInstr...)
-	}
-
-	err = tx.Sign()
-	require.NoError(u.t, err)
-
-	signedBeefHex, err := tx.BEEFHex()
-	require.NoError(u.t, err)
-
-	u.app.ARC().WillRespondForBroadcastWithSeenOnNetwork(tx.TxID().String())
-
-	recordRes, _ := outlineClient.R().
-		SetHeader("Content-Type", "application/json").
-		SetBody(map[string]any{
-			"hex":         signedBeefHex,
-			"format":      "BEEF",
-			"annotations": getter.GetField("annotations"),
-		}).
-		Post(transactionRecordURL)
-
-	then.Response(recordRes).IsCreated()
-
-	return tx.TxID().String()
+// SendsData sends data output
+func (u *user) SendsData(data []string) string {
+	return u.CreatesOutline().
+		WithOpReturnOutput(data).
+		SignsAndRecord()
 }
