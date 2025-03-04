@@ -290,7 +290,7 @@ func addARCOpts(c *config.AppConfig, options []engine.ClientOps) ([]engine.Clien
 				return nil, spverrors.Wrapf(err, "error while generating callback token")
 			}
 		}
-		utl, err := c.ARC.Callback.ShouldGetURL()
+		callbackURL, err := c.ARC.Callback.ShouldGetURL()
 		if err != nil {
 			return nil, spverrors.Wrapf(err, "error while getting callback url")
 		}
