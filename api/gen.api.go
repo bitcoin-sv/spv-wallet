@@ -33,7 +33,7 @@ type ServerInterface interface {
 	DataById(c *gin.Context, id string)
 	// Get Merkleroots
 	// (GET /api/v2/merkleroots)
-	GetMerkleRoots(c *gin.Context, params GetMerkleRootsParams)
+	MerkleRoots(c *gin.Context, params MerkleRootsParams)
 	// Get operations for user
 	// (GET /api/v2/operations/search)
 	SearchOperations(c *gin.Context, params SearchOperationsParams)
@@ -180,15 +180,15 @@ func (siw *ServerInterfaceWrapper) DataById(c *gin.Context) {
 	siw.Handler.DataById(c, id)
 }
 
-// GetMerkleRoots operation middleware
-func (siw *ServerInterfaceWrapper) GetMerkleRoots(c *gin.Context) {
+// MerkleRoots operation middleware
+func (siw *ServerInterfaceWrapper) MerkleRoots(c *gin.Context) {
 
 	var err error
 
 	c.Set(XPubAuthScopes, []string{"user"})
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params GetMerkleRootsParams
+	var params MerkleRootsParams
 
 	// ------------- Optional query parameter "batchSize" -------------
 
@@ -213,7 +213,7 @@ func (siw *ServerInterfaceWrapper) GetMerkleRoots(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetMerkleRoots(c, params)
+	siw.Handler.MerkleRoots(c, params)
 }
 
 // SearchOperations operation middleware
@@ -359,7 +359,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/api/v2/admin/users/:id/paymails", wrapper.AddPaymailToUser)
 	router.GET(options.BaseURL+"/api/v2/configs/shared", wrapper.SharedConfig)
 	router.GET(options.BaseURL+"/api/v2/data/:id", wrapper.DataById)
-	router.GET(options.BaseURL+"/api/v2/merkleroots", wrapper.GetMerkleRoots)
+	router.GET(options.BaseURL+"/api/v2/merkleroots", wrapper.MerkleRoots)
 	router.GET(options.BaseURL+"/api/v2/operations/search", wrapper.SearchOperations)
 	router.POST(options.BaseURL+"/api/v2/transactions", wrapper.RecordTransactionOutline)
 	router.POST(options.BaseURL+"/api/v2/transactions/outlines", wrapper.CreateTransactionOutline)

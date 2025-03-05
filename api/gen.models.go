@@ -776,8 +776,8 @@ type ResponsesUserBadRequest = ErrorsInvalidDataID
 // ResponsesUserNotAuthorized defines model for responses_UserNotAuthorized.
 type ResponsesUserNotAuthorized = ErrorsUserAuthorization
 
-// GetMerkleRootsParams defines parameters for GetMerkleRoots.
-type GetMerkleRootsParams struct {
+// MerkleRootsParams defines parameters for MerkleRoots.
+type MerkleRootsParams struct {
 	// BatchSize Batch size of merkleroots to be returned
 	BatchSize *int `form:"batchSize,omitempty" json:"batchSize,omitempty"`
 

@@ -150,13 +150,14 @@ paths:
     /api/v2/merkleroots:
         get:
             description: This endpoint fetches merkleroots from block header service according to the given query parameters.
-            operationId: getMerkleRoots
+            operationId: merkleRoots
             parameters:
                 - description: Batch size of merkleroots to be returned
                   example: 100
                   in: query
                   name: batchSize
                   schema:
+                    default: 2000
                     minimum: 0
                     type: integer
                 - description: Last processed merkleroot in client's database
@@ -164,6 +165,7 @@ paths:
                   in: query
                   name: lastEvaluatedKey
                   schema:
+                    default: ""
                     type: string
             responses:
                 "200":

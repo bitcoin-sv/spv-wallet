@@ -783,8 +783,8 @@ type ResponsesUserBadRequest = ErrorsInvalidDataID
 // ResponsesUserNotAuthorized defines model for responses_UserNotAuthorized.
 type ResponsesUserNotAuthorized = ErrorsUserAuthorization
 
-// GetMerkleRootsParams defines parameters for GetMerkleRoots.
-type GetMerkleRootsParams struct {
+// MerkleRootsParams defines parameters for MerkleRoots.
+type MerkleRootsParams struct {
 	// BatchSize Batch size of merkleroots to be returned
 	BatchSize *int `form:"batchSize,omitempty" json:"batchSize,omitempty"`
 
@@ -2182,8 +2182,8 @@ type ClientInterface interface {
 	// DataById request
 	DataById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetMerkleRoots request
-	GetMerkleRoots(ctx context.Context, params *GetMerkleRootsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// MerkleRoots request
+	MerkleRoots(ctx context.Context, params *MerkleRootsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// SearchOperations request
 	SearchOperations(ctx context.Context, params *SearchOperationsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -2298,8 +2298,8 @@ func (c *Client) DataById(ctx context.Context, id string, reqEditors ...RequestE
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetMerkleRoots(ctx context.Context, params *GetMerkleRootsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetMerkleRootsRequest(c.Server, params)
+func (c *Client) MerkleRoots(ctx context.Context, params *MerkleRootsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewMerkleRootsRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -2591,8 +2591,8 @@ func NewDataByIdRequest(server string, id string) (*http.Request, error) {
 	return req, nil
 }
 
-// NewGetMerkleRootsRequest generates requests for GetMerkleRoots
-func NewGetMerkleRootsRequest(server string, params *GetMerkleRootsParams) (*http.Request, error) {
+// NewMerkleRootsRequest generates requests for MerkleRoots
+func NewMerkleRootsRequest(server string, params *MerkleRootsParams) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -2947,8 +2947,8 @@ type ClientWithResponsesInterface interface {
 	// DataByIdWithResponse request
 	DataByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DataByIdResponse, error)
 
-	// GetMerkleRootsWithResponse request
-	GetMerkleRootsWithResponse(ctx context.Context, params *GetMerkleRootsParams, reqEditors ...RequestEditorFn) (*GetMerkleRootsResponse, error)
+	// MerkleRootsWithResponse request
+	MerkleRootsWithResponse(ctx context.Context, params *MerkleRootsParams, reqEditors ...RequestEditorFn) (*MerkleRootsResponse, error)
 
 	// SearchOperationsWithResponse request
 	SearchOperationsWithResponse(ctx context.Context, params *SearchOperationsParams, reqEditors ...RequestEditorFn) (*SearchOperationsResponse, error)
@@ -3172,7 +3172,7 @@ func (r DataByIdResponse) Bytes() []byte {
 	return r.Body
 }
 
-type GetMerkleRootsResponse struct {
+type MerkleRootsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ResponsesGetMerklerootsSuccess
@@ -3184,7 +3184,7 @@ type GetMerkleRootsResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r GetMerkleRootsResponse) Status() string {
+func (r MerkleRootsResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -3192,7 +3192,7 @@ func (r GetMerkleRootsResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetMerkleRootsResponse) StatusCode() int {
+func (r MerkleRootsResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -3200,12 +3200,12 @@ func (r GetMerkleRootsResponse) StatusCode() int {
 }
 
 // HTTPResponse returns http.Response from which this response was parsed.
-func (r GetMerkleRootsResponse) Response() *http.Response {
+func (r MerkleRootsResponse) Response() *http.Response {
 	return r.HTTPResponse
 }
 
 // Bytes is a convenience method to retrieve the raw bytes from the HTTP response
-func (r GetMerkleRootsResponse) Bytes() []byte {
+func (r MerkleRootsResponse) Bytes() []byte {
 	return r.Body
 }
 
@@ -3419,13 +3419,13 @@ func (c *ClientWithResponses) DataByIdWithResponse(ctx context.Context, id strin
 	return ParseDataByIdResponse(rsp)
 }
 
-// GetMerkleRootsWithResponse request returning *GetMerkleRootsResponse
-func (c *ClientWithResponses) GetMerkleRootsWithResponse(ctx context.Context, params *GetMerkleRootsParams, reqEditors ...RequestEditorFn) (*GetMerkleRootsResponse, error) {
-	rsp, err := c.GetMerkleRoots(ctx, params, reqEditors...)
+// MerkleRootsWithResponse request returning *MerkleRootsResponse
+func (c *ClientWithResponses) MerkleRootsWithResponse(ctx context.Context, params *MerkleRootsParams, reqEditors ...RequestEditorFn) (*MerkleRootsResponse, error) {
+	rsp, err := c.MerkleRoots(ctx, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetMerkleRootsResponse(rsp)
+	return ParseMerkleRootsResponse(rsp)
 }
 
 // SearchOperationsWithResponse request returning *SearchOperationsResponse
@@ -3727,15 +3727,15 @@ func ParseDataByIdResponse(rsp *http.Response) (*DataByIdResponse, error) {
 	return response, nil
 }
 
-// ParseGetMerkleRootsResponse parses an HTTP response from a GetMerkleRootsWithResponse call
-func ParseGetMerkleRootsResponse(rsp *http.Response) (*GetMerkleRootsResponse, error) {
+// ParseMerkleRootsResponse parses an HTTP response from a MerkleRootsWithResponse call
+func ParseMerkleRootsResponse(rsp *http.Response) (*MerkleRootsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetMerkleRootsResponse{
+	response := &MerkleRootsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
