@@ -31,6 +31,9 @@ type ServerInterface interface {
 	// Get data for user
 	// (GET /api/v2/data/{id})
 	DataById(c *gin.Context, id string)
+	// Get Merkleroots
+	// (GET /api/v2/merkleroots)
+	MerkleRoots(c *gin.Context, params MerkleRootsParams)
 	// Get operations for user
 	// (GET /api/v2/operations/search)
 	SearchOperations(c *gin.Context, params SearchOperationsParams)
@@ -177,6 +180,42 @@ func (siw *ServerInterfaceWrapper) DataById(c *gin.Context) {
 	siw.Handler.DataById(c, id)
 }
 
+// MerkleRoots operation middleware
+func (siw *ServerInterfaceWrapper) MerkleRoots(c *gin.Context) {
+
+	var err error
+
+	c.Set(XPubAuthScopes, []string{"user"})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params MerkleRootsParams
+
+	// ------------- Optional query parameter "batchSize" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "batchSize", c.Request.URL.Query(), &params.BatchSize)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter batchSize: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "lastEvaluatedKey" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "lastEvaluatedKey", c.Request.URL.Query(), &params.LastEvaluatedKey)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter lastEvaluatedKey: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.MerkleRoots(c, params)
+}
+
 // SearchOperations operation middleware
 func (siw *ServerInterfaceWrapper) SearchOperations(c *gin.Context) {
 
@@ -320,6 +359,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/api/v2/admin/users/:id/paymails", wrapper.AddPaymailToUser)
 	router.GET(options.BaseURL+"/api/v2/configs/shared", wrapper.SharedConfig)
 	router.GET(options.BaseURL+"/api/v2/data/:id", wrapper.DataById)
+	router.GET(options.BaseURL+"/api/v2/merkleroots", wrapper.MerkleRoots)
 	router.GET(options.BaseURL+"/api/v2/operations/search", wrapper.SearchOperations)
 	router.POST(options.BaseURL+"/api/v2/transactions", wrapper.RecordTransactionOutline)
 	router.POST(options.BaseURL+"/api/v2/transactions/outlines", wrapper.CreateTransactionOutline)
