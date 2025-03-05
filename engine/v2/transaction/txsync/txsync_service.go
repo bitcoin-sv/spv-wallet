@@ -26,6 +26,8 @@ func NewService(logger zerolog.Logger, transactionsRepo TransactionsRepo) *Servi
 
 // Handle processes the ARC callback and updates the transaction status in the database.
 func (s *Service) Handle(ctx context.Context, txInfo chainmodels.TXInfo) error {
+	s.logger.Info().Msgf("handling tx callback from ARC for TX: %v", txInfo.TxID)
+
 	if txInfo.TxID == "" {
 		return spverrors.Newf("Received ARC callback with empty transaction ID")
 	}
