@@ -3,11 +3,11 @@ package txsync_test
 import (
 	"context"
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"testing"
 	"time"
 
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txsync/testabilities"
 )
 

@@ -1,11 +1,11 @@
 package txmodels
 
 import (
-	"github.com/samber/lo"
 	"time"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/samber/lo"
 )
 
 // TrackedTransaction represents a transaction that is being tracked by the wallet.

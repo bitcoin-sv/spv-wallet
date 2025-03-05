@@ -2,20 +2,20 @@ package testabilities
 
 import (
 	"context"
+	"testing"
+	"time"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures/txtestability"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
 )
 
 type MockRepo struct {
 	t                testing.TB
 	subjectTx        txtestability.TransactionSpec
 	row              *txmodels.TrackedTransaction
-	fixture          *fixtureTXsync
 	updated          *txmodels.TrackedTransaction
 	willFailOnGet    bool
 	willFailOnUpdate bool

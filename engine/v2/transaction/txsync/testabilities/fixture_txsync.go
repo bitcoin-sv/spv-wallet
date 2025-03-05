@@ -1,6 +1,9 @@
 package testabilities
 
 import (
+	"testing"
+	"time"
+
 	"github.com/bitcoin-sv/go-sdk/chainhash"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
@@ -9,8 +12,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txsync"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
 )
 
 const mockBlockHash = "00000000000000000f0905597b6cac80031f0f56834e74dce1a714c682a9ed38"
