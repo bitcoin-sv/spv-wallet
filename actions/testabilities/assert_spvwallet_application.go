@@ -29,6 +29,7 @@ type SPVWalletResponseAssertions interface {
 	HasStatus(status int) SPVWalletResponseAssertions
 	WithJSONf(expectedFormat string, args ...any)
 	WithJSONMatching(expectedTemplateFormat string, params map[string]any)
+	WithProblemDetails(status int, errType string, containDetails ...string)
 	JSONValue() JsonValueGetter
 	// IsUnauthorized asserts that the response status code is 401 and the error is about lack of authorization.
 	IsUnauthorized()
@@ -150,6 +151,23 @@ func (a *responseAssertions) JSONValue() JsonValueGetter {
 	a.t.Helper()
 	a.assertJSONContentType()
 	return jsonrequire.NewGetterWithJSON(a.t, a.response.String())
+}
+
+func (a *responseAssertions) WithProblemDetails(status int, errType string, containDetails ...string) {
+	a.t.Helper()
+	a.assert.Equal(status, a.response.StatusCode())
+
+	a.WithJSONMatching(`{
+		"detail": "{{ containsAll .detailsParts }}",
+		"instance": {{ anything }},
+		"status": {{ .status }},
+		"title": {{ anything }},
+		"type": "bad_request"
+	}`, map[string]any{
+		"status":       status,
+		"type":         errType,
+		"detailsParts": containDetails,
+	})
 }
 
 func (a *responseAssertions) assertJSONContentType() {

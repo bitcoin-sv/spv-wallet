@@ -1,6 +1,7 @@
 package users
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/errdef/clienterr"
 	"net/http"
 
 	adminerrors "github.com/bitcoin-sv/spv-wallet/actions/v2/admin/errors"
@@ -16,13 +17,13 @@ import (
 func (s *APIAdminUsers) AddPaymailToUser(c *gin.Context, id string) {
 	var request api.RequestsAddPaymail
 	if err := c.Bind(&request); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), s.logger)
+		clienterr.UnprocessableEntity.Wrap(err, "cannot bind request").Response(c, s.logger)
 		return
 	}
 
 	newPaymail, err := mapping.RequestAddPaymailToNewPaymailModel(&request, id)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, s.logger)
+		clienterr.Response(c, err, s.logger)
 		return
 	}
 

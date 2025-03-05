@@ -286,6 +286,6 @@ func TestAddPaymailWithBothPaymailAndAliasDomainPair(t *testing.T) {
 		// then:
 		then.Response(res).
 			HasStatus(400).
-			WithJSONf(apierror.ExpectedJSON("error-user-inconsistent-paymail", "inconsistent paymail address and alias/domain"))
+			WithProblemDetails(400, "bad_request", "inconsistent")
 	})
 }

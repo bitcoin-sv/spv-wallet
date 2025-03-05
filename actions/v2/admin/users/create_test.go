@@ -464,5 +464,27 @@ func TestAddUserWithWrongPaymailDomain(t *testing.T) {
 			HasStatus(400).
 			WithJSONf(apierror.ExpectedJSON("error-invalid-domain", "invalid domain"))
 	})
+}
 
+func TestTryToAddWithWrongPubKey(t *testing.T) {
+	// given:
+	given, then := testabilities.New(t)
+	cleanup := given.StartedSPVWalletWithConfiguration(
+		testengine.WithV2(),
+	)
+	defer cleanup()
+
+	// and:
+	client := given.HttpClient().ForAdmin()
+
+	// when:
+	res, _ := client.R().
+		SetBody(map[string]any{
+			"publicKey": "wrong",
+		}).
+		Post("/api/v2/admin/users")
+
+	// then:
+	then.Response(res).
+		WithProblemDetails(400, "bad_request", "Cannot parse public key")
 }
