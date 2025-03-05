@@ -1,12 +1,13 @@
 package contacts
 
 import (
+	"net/http"
+
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/mapping"
 	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"net/http"
 )
 
 // AdminUpdateContact updates a contact.

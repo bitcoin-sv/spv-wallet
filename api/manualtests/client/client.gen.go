@@ -925,6 +925,11 @@ type ResponsesUpdateContactBadRequest struct {
 	union json.RawMessage
 }
 
+// ResponsesUpdateContactInternalServerError defines model for responses_UpdateContactInternalServerError.
+type ResponsesUpdateContactInternalServerError struct {
+	union json.RawMessage
+}
+
 // ResponsesUpsertContactBadRequest defines model for responses_UpsertContactBadRequest.
 type ResponsesUpsertContactBadRequest struct {
 	union json.RawMessage
@@ -2898,6 +2903,68 @@ func (t ResponsesUpdateContactBadRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (t *ResponsesUpdateContactBadRequest) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsInternal returns the union data inside the ResponsesUpdateContactInternalServerError as a ErrorsInternal
+func (t ResponsesUpdateContactInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
+	var body ErrorsInternal
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInternal overwrites any union data inside the ResponsesUpdateContactInternalServerError as the provided ErrorsInternal
+func (t *ResponsesUpdateContactInternalServerError) FromErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInternal performs a merge with any union data inside the ResponsesUpdateContactInternalServerError, using the provided ErrorsInternal
+func (t *ResponsesUpdateContactInternalServerError) MergeErrorsInternal(v ErrorsInternal) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsUpdateContactStatus returns the union data inside the ResponsesUpdateContactInternalServerError as a ErrorsUpdateContactStatus
+func (t ResponsesUpdateContactInternalServerError) AsErrorsUpdateContactStatus() (ErrorsUpdateContactStatus, error) {
+	var body ErrorsUpdateContactStatus
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsUpdateContactStatus overwrites any union data inside the ResponsesUpdateContactInternalServerError as the provided ErrorsUpdateContactStatus
+func (t *ResponsesUpdateContactInternalServerError) FromErrorsUpdateContactStatus(v ErrorsUpdateContactStatus) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsUpdateContactStatus performs a merge with any union data inside the ResponsesUpdateContactInternalServerError, using the provided ErrorsUpdateContactStatus
+func (t *ResponsesUpdateContactInternalServerError) MergeErrorsUpdateContactStatus(v ErrorsUpdateContactStatus) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesUpdateContactInternalServerError) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesUpdateContactInternalServerError) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
@@ -5628,7 +5695,7 @@ type UnconfirmContactResponse struct {
 	JSON400      *ResponsesUpdateContactBadRequest
 	JSON401      *ResponsesUserNotAuthorized
 	JSON404      *ResponsesContactNotFound
-	JSON500      *ResponsesInternalServerError
+	JSON500      *ResponsesUpdateContactInternalServerError
 }
 
 // Status returns HTTPResponse.Status
@@ -5663,7 +5730,7 @@ type ConfirmContactResponse struct {
 	JSON400      *ResponsesUpdateContactBadRequest
 	JSON401      *ResponsesUserNotAuthorized
 	JSON404      *ResponsesContactNotFound
-	JSON500      *ResponsesInternalServerError
+	JSON500      *ResponsesUpdateContactInternalServerError
 }
 
 // Status returns HTTPResponse.Status
@@ -5734,7 +5801,7 @@ type RejectInvitationResponse struct {
 	JSON400      *ResponsesUpdateContactBadRequest
 	JSON401      *ResponsesUserNotAuthorized
 	JSON404      *ResponsesContactNotFound
-	JSON500      *ResponsesInternalServerError
+	JSON500      *ResponsesUpdateContactInternalServerError
 }
 
 // Status returns HTTPResponse.Status
@@ -5769,7 +5836,7 @@ type AcceptInvitationResponse struct {
 	JSON400      *ResponsesUpdateContactBadRequest
 	JSON401      *ResponsesUserNotAuthorized
 	JSON404      *ResponsesContactNotFound
-	JSON500      *ResponsesInternalServerError
+	JSON500      *ResponsesUpdateContactInternalServerError
 }
 
 // Status returns HTTPResponse.Status
@@ -6917,7 +6984,7 @@ func ParseUnconfirmContactResponse(rsp *http.Response) (*UnconfirmContactRespons
 		response.JSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ResponsesInternalServerError
+		var dest ResponsesUpdateContactInternalServerError
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -6964,7 +7031,7 @@ func ParseConfirmContactResponse(rsp *http.Response) (*ConfirmContactResponse, e
 		response.JSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ResponsesInternalServerError
+		var dest ResponsesUpdateContactInternalServerError
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -7065,7 +7132,7 @@ func ParseRejectInvitationResponse(rsp *http.Response) (*RejectInvitationRespons
 		response.JSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ResponsesInternalServerError
+		var dest ResponsesUpdateContactInternalServerError
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -7112,7 +7179,7 @@ func ParseAcceptInvitationResponse(rsp *http.Response) (*AcceptInvitationRespons
 		response.JSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ResponsesInternalServerError
+		var dest ResponsesUpdateContactInternalServerError
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

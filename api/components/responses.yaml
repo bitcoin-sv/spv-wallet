@@ -285,6 +285,15 @@ components:
             oneOf:
               - $ref: "./errors.yaml#/components/schemas/ContactInWrongStatus"
 
+    UpdateContactInternalServerError:
+      description: Update contact status internal server error
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "./errors.yaml#/components/schemas/Internal"
+              - $ref: "./errors.yaml#/components/schemas/UpdateContactStatus"
+
     AdminCreateContactBadRequest:
       description: Bad request is an error that occurs when the request is malformed.
       content:

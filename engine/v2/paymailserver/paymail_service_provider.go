@@ -3,7 +3,6 @@ package paymailserver
 import (
 	"context"
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 
 	paymailserver "github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
@@ -14,6 +13,7 @@ import (
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses/addressesmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/keys/type42"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
@@ -177,7 +177,9 @@ func (s *serviceProvider) AddContact(ctx context.Context, requesterPaymail strin
 		return spverrors.ErrCouldNotFindPaymail
 	}
 
-	_, err = s.contacts.AddContactRequest(ctx, contact.FullName, contact.Paymail, pAddress.UserID)
+	if _, err = s.contacts.AddContactRequest(ctx, contact.FullName, contact.Paymail, pAddress.UserID); err != nil {
+		return spverrors.ErrAddingContactRequest.WithTrace(err)
+	}
 	return nil
 }
 

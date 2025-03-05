@@ -2,13 +2,14 @@ package contacts_test
 
 import (
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
+
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
 )
 
 func TestCreateContact(t *testing.T) {

@@ -441,7 +441,7 @@ paths:
                 "404":
                     $ref: '#/components/responses/responses_ContactNotFound'
                 "500":
-                    $ref: '#/components/responses/responses_InternalServerError'
+                    $ref: '#/components/responses/responses_UpdateContactInternalServerError'
             security:
                 - XPubAuth:
                     - user
@@ -468,7 +468,7 @@ paths:
                 "404":
                     $ref: '#/components/responses/responses_ContactNotFound'
                 "500":
-                    $ref: '#/components/responses/responses_InternalServerError'
+                    $ref: '#/components/responses/responses_UpdateContactInternalServerError'
             security:
                 - XPubAuth:
                     - user
@@ -524,7 +524,7 @@ paths:
                 "404":
                     $ref: '#/components/responses/responses_ContactNotFound'
                 "500":
-                    $ref: '#/components/responses/responses_InternalServerError'
+                    $ref: '#/components/responses/responses_UpdateContactInternalServerError'
             security:
                 - XPubAuth:
                     - user
@@ -552,7 +552,7 @@ paths:
                 "404":
                     $ref: '#/components/responses/responses_ContactNotFound'
                 "500":
-                    $ref: '#/components/responses/responses_InternalServerError'
+                    $ref: '#/components/responses/responses_UpdateContactInternalServerError'
             security:
                 - XPubAuth:
                     - user
@@ -996,6 +996,14 @@ components:
                         oneOf:
                             - $ref: '#/components/schemas/errors_ContactInWrongStatus'
             description: Bad request is an error that occurs when the request is malformed.
+        responses_UpdateContactInternalServerError:
+            content:
+                application/json:
+                    schema:
+                        oneOf:
+                            - $ref: '#/components/schemas/errors_Internal'
+                            - $ref: '#/components/schemas/errors_UpdateContactStatus'
+            description: Update contact status internal server error
         responses_UpsertContactBadRequest:
             content:
                 application/json:

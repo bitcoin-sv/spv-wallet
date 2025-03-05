@@ -206,7 +206,12 @@ func (s *Service) ConfirmContact(ctx context.Context, userID, paymail string) er
 		return spverrors.ErrContactInWrongStatus.WithTrace(err)
 	}
 
-	return s.contactsRepo.UpdateStatus(ctx, userID, paymail, contactsmodels.ContactConfirmed)
+	err = s.contactsRepo.UpdateStatus(ctx, userID, paymail, contactsmodels.ContactConfirmed)
+	if err != nil {
+		return spverrors.ErrUpdateContactStatus.WithTrace(err)
+	}
+
+	return nil
 }
 
 // UnconfirmContact unconfirms a contact
@@ -223,7 +228,12 @@ func (s *Service) UnconfirmContact(ctx context.Context, userID, paymail string) 
 		return spverrors.ErrContactInWrongStatus.WithTrace(err)
 	}
 
-	return s.contactsRepo.UpdateStatus(ctx, userID, paymail, contactsmodels.ContactNotConfirmed)
+	err = s.contactsRepo.UpdateStatus(ctx, userID, paymail, contactsmodels.ContactNotConfirmed)
+	if err != nil {
+		return spverrors.ErrUpdateContactStatus.WithTrace(err)
+	}
+
+	return nil
 }
 
 // AcceptContact accept a contact
@@ -240,7 +250,12 @@ func (s *Service) AcceptContact(ctx context.Context, userID, paymail string) err
 		return spverrors.ErrContactInWrongStatus.WithTrace(err)
 	}
 
-	return s.contactsRepo.UpdateStatus(ctx, userID, paymail, contactsmodels.ContactNotConfirmed)
+	err = s.contactsRepo.UpdateStatus(ctx, userID, paymail, contactsmodels.ContactNotConfirmed)
+	if err != nil {
+		return spverrors.ErrUpdateContactStatus.WithTrace(err)
+	}
+
+	return nil
 }
 
 // AcceptContactByID accept a contact by ID
@@ -267,7 +282,12 @@ func (s *Service) RejectContact(ctx context.Context, userID, paymail string) err
 		return spverrors.ErrContactInWrongStatus.WithTrace(err)
 	}
 
-	return s.contactsRepo.Delete(ctx, userID, paymail)
+	err = s.contactsRepo.Delete(ctx, userID, paymail)
+	if err != nil {
+		return spverrors.ErrUpdateContactStatus.WithTrace(err)
+	}
+
+	return nil
 }
 
 // RejectContactByID reject a contact by ID
@@ -353,7 +373,7 @@ func (s *Service) updateContactPubKey(ctx context.Context, contact *contactsmode
 
 		c, err := s.contactsRepo.Update(ctx, contactToUpdate)
 		if err != nil {
-			return nil, err
+			return nil, spverrors.ErrUpdateContact.WithTrace(err)
 		}
 		return c, nil
 	}
@@ -364,17 +384,13 @@ func (s *Service) updateContactPubKey(ctx context.Context, contact *contactsmode
 func (s *Service) retrieveContacts(ctx context.Context, paymailA, paymailB string) (*contactsmodels.Contact, *contactsmodels.Contact, error) {
 	aAlias, aDomain, _ := goPaymail.SanitizePaymail(paymailA)
 	aPaymail, err := s.paymailAddressService.Find(ctx, aAlias, aDomain)
-	if err != nil {
-		return nil, nil, err
-	} else if aPaymail == nil {
+	if err != nil || aPaymail == nil {
 		return nil, nil, spverrors.ErrCouldNotFindPaymail
 	}
 
 	bAlias, bDomain, _ := goPaymail.SanitizePaymail(paymailB)
 	bPaymail, err := s.paymailAddressService.Find(ctx, bAlias, bDomain)
-	if err != nil {
-		return nil, nil, err
-	} else if bPaymail == nil {
+	if err != nil || bPaymail == nil {
 		return nil, nil, spverrors.ErrCouldNotFindPaymail
 	}
 

@@ -1,13 +1,14 @@
 package contacts_test
 
 import (
+	"strconv"
+	"testing"
+
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
-	"strconv"
-	"testing"
 )
 
 func TestAcceptContact(t *testing.T) {
