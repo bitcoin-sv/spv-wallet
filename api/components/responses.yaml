@@ -158,6 +158,13 @@ components:
             oneOf:
               - $ref: "./errors.yaml#/components/schemas/TxOutlineUserHasNotEnoughFunds"
 
+    AdminInvalidAvatarURL:
+      description: Unprocessable entity is an error that occurs when the request cannot be fulfilled.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "./errors.yaml#/components/schemas/InvalidAvatarURL"
 
     RecordTransactionSuccess:
       description: Transaction recorded

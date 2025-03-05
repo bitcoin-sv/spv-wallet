@@ -172,6 +172,57 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 			  }
 			}`,
 		},
+		"create transaction outline for paymail with splitting into multiple outputs": {
+			request: fmt.Sprintf(`{
+			  "outputs": [
+				{
+				  "type": "paymail",
+				  "to": "%s",
+				  "satoshis": 1000,
+				  "splits": 2
+				}
+			  ]
+			}`, fixtures.RecipientExternal.DefaultPaymail()),
+			outValues: []bsv.Satoshis{500, 500, initialSatoshis - 1000 - 1},
+			responseTemplate: `{
+			  "hex": "{{ matchTxByFormat .Format }}",
+			  "format": "{{ .Format }}",
+			  "annotations": {
+				"outputs": {
+				  "0": {
+					"bucket": "bsv",
+					"paymail": {
+					  "receiver": "{{ .ReceiverPaymail }}",
+					  "reference": "{{ .Reference }}",
+					  "sender": "{{ .SenderPaymail }}"
+					}
+				  },
+				  "1": {
+					"bucket": "bsv",
+					"paymail": {
+					  "receiver": "{{ .ReceiverPaymail }}",
+					  "reference": "{{ .Reference }}",
+					  "sender": "{{ .SenderPaymail }}"
+					}
+				  },
+				  "2": {
+					"bucket": "bsv",
+					"customInstructions": [
+					  {
+						"instruction": "{{ matchDestination }}",
+						"type": "type42"
+					  }
+					]
+				  }
+				},
+				"inputs": {
+				  "0": {
+				    "customInstructions": {{ .CustomInstructions }}
+				  }
+				}
+			  }
+			}`,
+		},
 		"create transaction outline for paymail with sender": {
 			request: fmt.Sprintf(`{
 			  "outputs": [

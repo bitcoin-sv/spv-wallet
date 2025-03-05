@@ -91,6 +91,9 @@ jobs:
 
       - name: Set up gotestfmt
         uses: GoTestTools/gotestfmt-action@v2
+        with:
+          # Important: pass GITHUB_TOKEN to avoid rate limiting.
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run tests
         run: make test-all-db-ci

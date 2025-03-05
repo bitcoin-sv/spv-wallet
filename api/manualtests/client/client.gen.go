@@ -242,6 +242,12 @@ type ErrorsInternal struct {
 	Message interface{} `json:"message"`
 }
 
+// ErrorsInvalidAvatarURL defines model for errors_InvalidAvatarURL.
+type ErrorsInvalidAvatarURL struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ErrorsInvalidDataID defines model for errors_InvalidDataID.
 type ErrorsInvalidDataID struct {
 	Code    interface{} `json:"code"`
@@ -646,11 +652,13 @@ type ModelsUserInfo struct {
 
 // RequestsAddPaymail defines model for requests_AddPaymail.
 type RequestsAddPaymail struct {
-	Address    string `json:"address"`
-	Alias      string `json:"alias"`
-	AvatarURL  string `json:"avatarURL"`
-	Domain     string `json:"domain"`
-	PublicName string `json:"publicName"`
+	Address   string  `json:"address"`
+	Alias     string  `json:"alias"`
+	AvatarURL *string `json:"avatarURL,omitempty"`
+	Domain    string  `json:"domain"`
+
+	// PublicName If not provided will default to the same value as alias
+	PublicName *string `json:"publicName,omitempty"`
 }
 
 // RequestsAdminConfirmContact defines model for requests_AdminConfirmContact.
@@ -697,10 +705,15 @@ type RequestsOpReturnStringsOutput = []string
 
 // RequestsPaymailOutputSpecification defines model for requests_PaymailOutputSpecification.
 type RequestsPaymailOutputSpecification struct {
-	From     *string                                `json:"from"`
-	Satoshis uint64                                 `json:"satoshis"`
-	To       string                                 `json:"to"`
-	Type     RequestsPaymailOutputSpecificationType `json:"type"`
+	From     *string `json:"from"`
+	Satoshis uint64  `json:"satoshis"`
+
+	// Splits The number of outputs to be created from the satoshis. <br>
+	// Warning: The satoshis must be evenly divisible by the number of splits. <br>
+	// Warning: If the recipient responds with more than one output, the number of splits must be 1.
+	Splits *uint64                                `json:"splits,omitempty"`
+	To     string                                 `json:"to"`
+	Type   RequestsPaymailOutputSpecificationType `json:"type"`
 }
 
 // RequestsPaymailOutputSpecificationType defines model for RequestsPaymailOutputSpecification.Type.
@@ -807,6 +820,11 @@ type ResponsesAdminGetUser = ModelsUser
 
 // ResponsesAdminGetUserInternalServerError defines model for responses_AdminGetUserInternalServerError.
 type ResponsesAdminGetUserInternalServerError = ErrorsGettingUser
+
+// ResponsesAdminInvalidAvatarURL defines model for responses_AdminInvalidAvatarURL.
+type ResponsesAdminInvalidAvatarURL struct {
+	union json.RawMessage
+}
 
 // ResponsesAdminUpdateContactStatusInternalServerError defines model for responses_AdminUpdateContactStatusInternalServerError.
 type ResponsesAdminUpdateContactStatusInternalServerError struct {
@@ -1866,6 +1884,42 @@ func (t ResponsesAdminCreateContactNotFound) MarshalJSON() ([]byte, error) {
 }
 
 func (t *ResponsesAdminCreateContactNotFound) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsInvalidAvatarURL returns the union data inside the ResponsesAdminInvalidAvatarURL as a ErrorsInvalidAvatarURL
+func (t ResponsesAdminInvalidAvatarURL) AsErrorsInvalidAvatarURL() (ErrorsInvalidAvatarURL, error) {
+	var body ErrorsInvalidAvatarURL
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInvalidAvatarURL overwrites any union data inside the ResponsesAdminInvalidAvatarURL as the provided ErrorsInvalidAvatarURL
+func (t *ResponsesAdminInvalidAvatarURL) FromErrorsInvalidAvatarURL(v ErrorsInvalidAvatarURL) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInvalidAvatarURL performs a merge with any union data inside the ResponsesAdminInvalidAvatarURL, using the provided ErrorsInvalidAvatarURL
+func (t *ResponsesAdminInvalidAvatarURL) MergeErrorsInvalidAvatarURL(v ErrorsInvalidAvatarURL) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesAdminInvalidAvatarURL) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesAdminInvalidAvatarURL) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
@@ -5299,6 +5353,7 @@ type CreateUserResponse struct {
 	JSON201      *ResponsesAdminCreateUserSuccess
 	JSON400      *ResponsesAdminUserBadRequest
 	JSON401      *ResponsesNotAuthorizedToAdminEndpoint
+	JSON422      *ResponsesAdminInvalidAvatarURL
 	JSON500      *ResponsesAdminCreateUserInternalServerError
 }
 
@@ -5367,6 +5422,7 @@ type AddPaymailToUserResponse struct {
 	JSON201      *ResponsesAdminAddPaymailSuccess
 	JSON400      *ResponsesAdminUserBadRequest
 	JSON401      *ResponsesNotAuthorizedToAdminEndpoint
+	JSON422      *ResponsesAdminInvalidAvatarURL
 }
 
 // Status returns HTTPResponse.Status
@@ -6519,6 +6575,13 @@ func ParseCreateUserResponse(rsp *http.Response) (*CreateUserResponse, error) {
 		}
 		response.JSON401 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest ResponsesAdminInvalidAvatarURL
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest ResponsesAdminCreateUserInternalServerError
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -6598,6 +6661,13 @@ func ParseAddPaymailToUserResponse(rsp *http.Response) (*AddPaymailToUserRespons
 			return nil, err
 		}
 		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest ResponsesAdminInvalidAvatarURL
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
 
 	}
 

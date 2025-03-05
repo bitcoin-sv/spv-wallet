@@ -6,12 +6,14 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/api/manualtests"
 	"github.com/bitcoin-sv/spv-wallet/api/manualtests/client"
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 )
 
-func TestCreateUserBadRequest(t *testing.T) {
+func TestCreateUserInvalidRequest(t *testing.T) {
 	badRequests := map[string]struct {
 		makeRequest func(manualtests.User, *manualtests.State, testing.TB) client.CreateUserJSONRequestBody
+		status      int
 	}{
 		"bad request: invalid public key": {
 			makeRequest: func(_ manualtests.User, _ *manualtests.State, _ testing.TB) client.CreateUserJSONRequestBody {
@@ -19,6 +21,7 @@ func TestCreateUserBadRequest(t *testing.T) {
 					PublicKey: "123",
 				}
 			},
+			status: 400,
 		},
 		"bad request: invalid paymail address": {
 			makeRequest: func(user manualtests.User, _ *manualtests.State, _ testing.TB) client.CreateUserJSONRequestBody {
@@ -29,6 +32,7 @@ func TestCreateUserBadRequest(t *testing.T) {
 					},
 				}
 			},
+			status: 400,
 		},
 		"bad request: inconsistent paymail address": {
 			makeRequest: func(user manualtests.User, _ *manualtests.State, _ testing.TB) client.CreateUserJSONRequestBody {
@@ -41,6 +45,7 @@ func TestCreateUserBadRequest(t *testing.T) {
 					},
 				}
 			},
+			status: 400,
 		},
 		"bad request: invalid domain": {
 			makeRequest: func(user manualtests.User, _ *manualtests.State, t testing.TB) client.CreateUserJSONRequestBody {
@@ -53,6 +58,19 @@ func TestCreateUserBadRequest(t *testing.T) {
 					},
 				}
 			},
+			status: 400,
+		},
+		"bad request: invalid avatar url": {
+			makeRequest: func(user manualtests.User, _ *manualtests.State, t testing.TB) client.CreateUserJSONRequestBody {
+				return client.CreateUserJSONRequestBody{
+					PublicKey: user.PublicKey,
+					Paymail: &client.RequestsAddPaymail{
+						Address:   user.PaymailAddress(),
+						AvatarURL: lo.ToPtr("https://[/]"),
+					},
+				}
+			},
+			status: 422,
 		},
 	}
 	for name, test := range badRequests {
@@ -72,7 +90,7 @@ func TestCreateUserBadRequest(t *testing.T) {
 
 			manualtests.Print(res)
 
-			require.Equal(t, 400, res.StatusCode())
+			require.Equal(t, test.status, res.StatusCode())
 
 			// IMPORTANT: DO NOT SAVE THE STATE HERE
 		})
