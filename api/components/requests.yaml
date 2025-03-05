@@ -138,7 +138,6 @@ components:
       required:
         - fullName
         - requesterPaymail
-        - metadata
 
     UpdateContact:
       type: object

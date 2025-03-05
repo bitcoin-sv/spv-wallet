@@ -89,9 +89,6 @@ func Given(t testing.TB) SPVWalletApplicationFixture {
 		engineFixture: testengine.Given(t),
 		logger:        tester.Logger(t),
 	}
-
-	//f.engineFixture.PaymailClient().RedirectTransportIfDomain(fixtures.PaymailDomain, f.server)
-
 	return f
 }
 

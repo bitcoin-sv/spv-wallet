@@ -35,6 +35,11 @@ func (s *APIContacts) UpsertContact(c *gin.Context, paymail string) {
 		return
 	}
 
+	if requestBody.FullName == "" {
+		spverrors.ErrorResponse(c, spverrors.ErrContactFullNameRequired, s.logger)
+		return
+	}
+
 	newContact := contactsmodels.NewContact{
 		FullName:          requestBody.FullName,
 		NewContactPaymail: paymail,

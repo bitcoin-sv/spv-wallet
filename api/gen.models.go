@@ -145,6 +145,12 @@ type ErrorsContactFailedToUpdate struct {
 	Message interface{} `json:"message"`
 }
 
+// ErrorsContactFullNameRequired defines model for errors_ContactFullNameRequired.
+type ErrorsContactFullNameRequired struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ErrorsContactInWrongStatus defines model for errors_ContactInWrongStatus.
 type ErrorsContactInWrongStatus struct {
 	Code    interface{} `json:"code"`
@@ -2955,6 +2961,32 @@ func (t *ResponsesUpsertContactBadRequest) FromErrorsSaveContact(v ErrorsSaveCon
 
 // MergeErrorsSaveContact performs a merge with any union data inside the ResponsesUpsertContactBadRequest, using the provided ErrorsSaveContact
 func (t *ResponsesUpsertContactBadRequest) MergeErrorsSaveContact(v ErrorsSaveContact) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsContactFullNameRequired returns the union data inside the ResponsesUpsertContactBadRequest as a ErrorsContactFullNameRequired
+func (t ResponsesUpsertContactBadRequest) AsErrorsContactFullNameRequired() (ErrorsContactFullNameRequired, error) {
+	var body ErrorsContactFullNameRequired
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsContactFullNameRequired overwrites any union data inside the ResponsesUpsertContactBadRequest as the provided ErrorsContactFullNameRequired
+func (t *ResponsesUpsertContactBadRequest) FromErrorsContactFullNameRequired(v ErrorsContactFullNameRequired) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsContactFullNameRequired performs a merge with any union data inside the ResponsesUpsertContactBadRequest, using the provided ErrorsContactFullNameRequired
+func (t *ResponsesUpsertContactBadRequest) MergeErrorsContactFullNameRequired(v ErrorsContactFullNameRequired) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err

@@ -238,6 +238,9 @@ var ErrRetrivePaymailInfo = models.SPVError{Message: "error during retrieving pa
 // ErrUserDoNotOwnPaymail is when user do not own paymail
 var ErrUserDoNotOwnPaymail = models.SPVError{Message: "user do not own paymail", StatusCode: 400, Code: "error-paymail-user-do-not-own"}
 
+// ErrContactFullNameRequired is when required full name was not provided
+var ErrContactFullNameRequired = models.SPVError{Message: "full name is required", StatusCode: 400, Code: "error-contact-full-name-required"}
+
 // ////////////////////////////////// CAPABILITIES ERRORS
 
 // ErrCapabilitiesPkiUnsupported is when PKI is not supported for given paymail domain

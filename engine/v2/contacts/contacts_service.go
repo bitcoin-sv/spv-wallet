@@ -34,8 +34,8 @@ func NewService(repo ContactRepo, paymailAddressService *paymails.Service, payma
 func (s *Service) UpsertContact(ctx context.Context, newContact contactsmodels.NewContact) (*contactsmodels.Contact, error) {
 	rAlias, rDomain, rAddress := goPaymail.SanitizePaymail(newContact.RequesterPaymail)
 	rPaymail, err := s.paymailAddressService.Find(ctx, rAlias, rDomain)
-	if err != nil {
-		return nil, spverrors.ErrCouldNotFindPaymail.WithTrace(err)
+	if err != nil || rPaymail == nil {
+		return nil, spverrors.ErrCouldNotFindPaymail
 	}
 
 	if rPaymail.UserID != newContact.UserID {

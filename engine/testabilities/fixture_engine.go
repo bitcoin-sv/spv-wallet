@@ -219,24 +219,6 @@ func (f *engineFixture) initialiseFixtures() {
 
 	f.paymailClient.WillRespondWithP2PCapabilities()
 	f.mockBHSGetMerkleRoots()
-
-	//// initialize with one contact for tests
-	//if f.config.ExperimentalFeatures.V2 {
-	//	fmt.Println("creating contact")
-	//	_, err := f.engine.ContactService().AdminCreateContact(context.Background(), contactsmodels.NewContact{
-	//		FullName:          fixtures.RecipientInternal.DefaultPaymail().PublicName(),
-	//		NewContactPaymail: fixtures.RecipientInternal.DefaultPaymail().String(),
-	//		RequesterPaymail:  fixtures.Sender.DefaultPaymail().String(),
-	//		UserID:            fixtures.Sender.ID(),
-	//	})
-	//
-	//	if err != nil {
-	//		fmt.Println("START ERROR", err)
-	//		require.NoError(f.t, err)
-	//	}
-	//
-	//	fmt.Println("contact created")
-	//}
 }
 
 func (f *engineFixture) addMockedExternalDependenciesOptions(options []engine.ClientOps) []engine.ClientOps {

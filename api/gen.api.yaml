@@ -991,6 +991,7 @@ components:
                             - $ref: '#/components/schemas/errors_ContactInvalidPaymail'
                             - $ref: '#/components/schemas/errors_GettingPKIFailed'
                             - $ref: '#/components/schemas/errors_SaveContact'
+                            - $ref: '#/components/schemas/errors_ContactFullNameRequired'
             description: Bad request is an error that occurs when the request is malformed.
         responses_UpsertContactNotFound:
             content:
@@ -1082,6 +1083,15 @@ components:
                         example: error-contact-updating-contact-failed
                     message:
                         example: updating contact failed
+                  type: object
+        errors_ContactFullNameRequired:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-contact-full-name-required
+                    message:
+                        example: full name is required
                   type: object
         errors_ContactInWrongStatus:
             allOf:
@@ -2007,7 +2017,6 @@ components:
             required:
                 - fullName
                 - requesterPaymail
-                - metadata
             type: object
     securitySchemes:
         XPubAuth:

@@ -409,6 +409,16 @@ components:
             message:
               example: "adding contact failed"
 
+    ContactFullNameRequired:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-contact-full-name-required"
+            message:
+              example: "full name is required"
+
     ContactNotFound:
       allOf:
         - $ref: '#/components/schemas/Schema'

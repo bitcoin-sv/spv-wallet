@@ -1,7 +1,6 @@
 package contacts_test
 
 import (
-	"fmt"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
 	"testing"
@@ -11,7 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 )
 
-func TestCreateContact(t *testing.T) {
+func TestUpsertContact(t *testing.T) {
 	// given:
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
@@ -23,15 +22,15 @@ func TestCreateContact(t *testing.T) {
 		// given:
 		given, then := testabilities.NewOf(givenForAllTests, t)
 
-		client := given.HttpClient().ForAdmin()
+		client := given.HttpClient().ForGivenUser(fixtures.Sender)
 
 		// when:
 		res, _ := client.R().
 			SetBody(map[string]any{
-				"creatorPaymail": fixtures.Sender.DefaultPaymail().String(),
-				"fullName":       fixtures.RecipientInternal.DefaultPaymail().PublicName(),
+				"requesterPaymail": fixtures.Sender.DefaultPaymail().String(),
+				"fullName":         fixtures.RecipientInternal.DefaultPaymail().PublicName(),
 			}).
-			Post("/api/v2/admin/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
+			Put("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
 
 		// then:
 		then.Response(res).
@@ -51,33 +50,7 @@ func TestCreateContact(t *testing.T) {
 			})
 	})
 
-	t.Run("Create contact with user xpub", func(t *testing.T) {
-		// given:
-		given, then := testabilities.NewOf(givenForAllTests, t)
-
-		client := given.HttpClient().ForUser()
-
-		// when:
-		res, _ := client.R().
-			SetBody(map[string]any{
-				"creatorPaymail": fixtures.Sender.DefaultPaymail().String(),
-				"fullName":       fixtures.RecipientInternal.DefaultPaymail().PublicName(),
-			}).
-			Post("/api/v2/admin/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
-
-		// then:
-		then.Response(res).
-			HasStatus(401).
-			WithJSONMatching(`{
-				"code": "{{ .code }}",
-				"message": "{{ .message }}"
-			}`, map[string]any{
-				"code":    spverrors.ErrNotAnAdminKey.Code,
-				"message": spverrors.ErrNotAnAdminKey.Message,
-			})
-	})
-
-	t.Run("Create contact with unknown creator paymail", func(t *testing.T) {
+	t.Run("Upsert contact with admin xpub", func(t *testing.T) {
 		// given:
 		given, then := testabilities.NewOf(givenForAllTests, t)
 
@@ -86,12 +59,36 @@ func TestCreateContact(t *testing.T) {
 		// when:
 		res, _ := client.R().
 			SetBody(map[string]any{
-				"creatorPaymail": "unknown-paymail@exmaple.com",
-				"fullName":       fixtures.RecipientInternal.DefaultPaymail().PublicName(),
+				"requesterPaymail": fixtures.Sender.DefaultPaymail().String(),
+				"fullName":         fixtures.RecipientInternal.DefaultPaymail().PublicName(),
 			}).
-			Post("/api/v2/admin/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
+			Put("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
 
-		fmt.Println(res.String())
+		// then:
+		then.Response(res).
+			HasStatus(401).
+			WithJSONMatching(`{
+				"code": "{{ .code }}",
+				"message": "{{ .message }}"
+			}`, map[string]any{
+				"code":    spverrors.ErrAdminAuthOnUserEndpoint.Code,
+				"message": spverrors.ErrAdminAuthOnUserEndpoint.Message,
+			})
+	})
+
+	t.Run("Create contact with not found requester paymail", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(givenForAllTests, t)
+
+		client := given.HttpClient().ForGivenUser(fixtures.Sender)
+
+		// when:
+		res, _ := client.R().
+			SetBody(map[string]any{
+				"requesterPaymail": fixtures.RecipientExternal.DefaultPaymail().String(),
+				"fullName":         fixtures.RecipientInternal.DefaultPaymail().PublicName(),
+			}).
+			Put("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
 
 		// then:
 		then.Response(res).
@@ -105,21 +102,19 @@ func TestCreateContact(t *testing.T) {
 			})
 	})
 
-	t.Run("Create contact with unknown requester paymail", func(t *testing.T) {
+	t.Run("Create contact with mismatching requester paymail", func(t *testing.T) {
 		// given:
 		given, then := testabilities.NewOf(givenForAllTests, t)
 
-		client := given.HttpClient().ForAdmin()
+		client := given.HttpClient().ForGivenUser(fixtures.Sender)
 
 		// when:
 		res, _ := client.R().
 			SetBody(map[string]any{
-				"creatorPaymail": fixtures.Sender.DefaultPaymail().String(),
-				"fullName":       fixtures.RecipientInternal.DefaultPaymail().PublicName(),
+				"requesterPaymail": fixtures.RecipientInternal.DefaultPaymail().String(),
+				"fullName":         fixtures.RecipientInternal.DefaultPaymail().PublicName(),
 			}).
-			Post("/api/v2/admin/contacts/unknown-paymail@exmaple.com")
-
-		fmt.Println(res.String())
+			Put("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
 
 		// then:
 		then.Response(res).
@@ -128,50 +123,50 @@ func TestCreateContact(t *testing.T) {
 				"code": "{{ .code }}",
 				"message": "{{ .message }}"
 			}`, map[string]any{
-				"code":    spverrors.ErrGettingPKIFailed.Code,
-				"message": spverrors.ErrGettingPKIFailed.Message,
+				"code":    spverrors.ErrUserDoNotOwnPaymail.Code,
+				"message": spverrors.ErrUserDoNotOwnPaymail.Message,
 			})
 	})
 
 	t.Run("Create contact without creator paymail", func(t *testing.T) {
 		// given:
 		given, then := testabilities.NewOf(givenForAllTests, t)
+		given.Paymail().ExternalPaymailHost().WillRespondWithBasicCapabilities()
 
-		client := given.HttpClient().ForAdmin()
+		client := given.HttpClient().ForGivenUser(fixtures.Sender)
 
 		// when:
 		res, _ := client.R().
 			SetBody(map[string]any{
 				"fullName": fixtures.RecipientInternal.DefaultPaymail().PublicName(),
 			}).
-			Post("/api/v2/admin/contacts/unknown-paymail@exmaple.com")
-
-		fmt.Println(res.String())
+			Put("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
 
 		// then:
 		then.Response(res).
-			HasStatus(400).
+			HasStatus(404).
 			WithJSONMatching(`{
 				"code": "{{ .code }}",
 				"message": "{{ .message }}"
 			}`, map[string]any{
-				"code":    spverrors.ErrMissingContactCreatorPaymail.Code,
-				"message": spverrors.ErrMissingContactCreatorPaymail.Message,
+				"code":    spverrors.ErrCouldNotFindPaymail.Code,
+				"message": spverrors.ErrCouldNotFindPaymail.Message,
 			})
 	})
 
-	t.Run("Create contact without contact full name", func(t *testing.T) {
+	t.Run("Create contact without full name", func(t *testing.T) {
 		// given:
 		given, then := testabilities.NewOf(givenForAllTests, t)
+		given.Paymail().ExternalPaymailHost().WillRespondWithBasicCapabilities()
 
-		client := given.HttpClient().ForAdmin()
+		client := given.HttpClient().ForGivenUser(fixtures.Sender)
 
 		// when:
 		res, _ := client.R().
 			SetBody(map[string]any{
-				"creatorPaymail": fixtures.Sender.DefaultPaymail().String(),
+				"requesterPaymail": fixtures.Sender.DefaultPaymail().String(),
 			}).
-			Post("/api/v2/admin/contacts/unknown-paymail@exmaple.com")
+			Put("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
 
 		// then:
 		then.Response(res).
@@ -180,8 +175,8 @@ func TestCreateContact(t *testing.T) {
 				"code": "{{ .code }}",
 				"message": "{{ .message }}"
 			}`, map[string]any{
-				"code":    spverrors.ErrMissingContactFullName.Code,
-				"message": spverrors.ErrMissingContactFullName.Message,
+				"code":    spverrors.ErrContactFullNameRequired.Code,
+				"message": spverrors.ErrContactFullNameRequired.Message,
 			})
 	})
 }

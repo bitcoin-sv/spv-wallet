@@ -235,6 +235,7 @@ components:
               - $ref: "./errors.yaml#/components/schemas/ContactInvalidPaymail"
               - $ref: "./errors.yaml#/components/schemas/GettingPKIFailed"
               - $ref: "./errors.yaml#/components/schemas/SaveContact"
+              - $ref: "./errors.yaml#/components/schemas/ContactFullNameRequired"
 
     UpsertContactNotFound:
       description: Not found is an error that occurs when the requested resource is not found.
