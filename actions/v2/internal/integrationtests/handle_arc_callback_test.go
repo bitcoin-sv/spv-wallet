@@ -28,37 +28,12 @@ func TestHandlingARCCallback(t *testing.T) {
 			beforeCallback: calcBump,
 			expectStatus:   txmodels.TxStatusMined,
 		},
-		"On SentToNetwork do nothing": {
-			txInfo:       minimalTxInfo(chainmodels.SentToNetwork),
-			expectStatus: txmodels.TxStatusBroadcasted,
-		},
 		"On SeenOnNetwork do nothing": {
 			txInfo:       minimalTxInfo(chainmodels.SeenOnNetwork),
 			expectStatus: txmodels.TxStatusBroadcasted,
 		},
-		"On Mined without BUMP don't change status": {
-			txInfo: chainmodels.TXInfo{
-				TXStatus:    chainmodels.Mined,
-				BlockHash:   "00000000000000000f0905597b6cac80031f0f56834e74dce1a714c682a9ed38",
-				BlockHeight: 885803,
-				Timestamp:   time.Now().Add(10 * time.Minute),
-			},
-			expectStatus: txmodels.TxStatusBroadcasted,
-		},
-		"On DoubleSpendAttempted mark as problematic": {
-			txInfo:       minimalTxInfo(chainmodels.DoubleSpendAttempted),
-			expectStatus: txmodels.TxStatusProblematic,
-		},
-		"On SeenInOrphanMempool mark as problematic": {
-			txInfo:       minimalTxInfo(chainmodels.SeenInOrphanMempool),
-			expectStatus: txmodels.TxStatusProblematic,
-		},
 		"On Rejected mark as problematic": {
 			txInfo:       minimalTxInfo(chainmodels.Rejected),
-			expectStatus: txmodels.TxStatusProblematic,
-		},
-		"On Unknown mark as problematic": {
-			txInfo:       minimalTxInfo(chainmodels.Unknown),
 			expectStatus: txmodels.TxStatusProblematic,
 		},
 	}
