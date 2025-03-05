@@ -131,6 +131,48 @@ type ErrorsAuthXPubRequired struct {
 	Message interface{} `json:"message"`
 }
 
+// ErrorsBHSBadRequest defines model for errors_BHSBadRequest.
+type ErrorsBHSBadRequest struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsBHSBadURL defines model for errors_BHSBadURL.
+type ErrorsBHSBadURL struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsBHSNoSuccessResponse defines model for errors_BHSNoSuccessResponse.
+type ErrorsBHSNoSuccessResponse struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsBHSParsingResponse defines model for errors_BHSParsingResponse.
+type ErrorsBHSParsingResponse struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsBHSUnauthorized defines model for errors_BHSUnauthorized.
+type ErrorsBHSUnauthorized struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsBHSUnhealthy defines model for errors_BHSUnhealthy.
+type ErrorsBHSUnhealthy struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsBHSUnreachable defines model for errors_BHSUnreachable.
+type ErrorsBHSUnreachable struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ErrorsCannotBindRequest defines model for errors_CannotBindRequest.
 type ErrorsCannotBindRequest struct {
 	Code    interface{} `json:"code"`
@@ -173,6 +215,12 @@ type ErrorsInvalidAvatarURL struct {
 	Message interface{} `json:"message"`
 }
 
+// ErrorsInvalidBatchSize defines model for errors_InvalidBatchSize.
+type ErrorsInvalidBatchSize struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ErrorsInvalidDataID defines model for errors_InvalidDataID.
 type ErrorsInvalidDataID struct {
 	Code    interface{} `json:"code"`
@@ -193,6 +241,18 @@ type ErrorsInvalidPaymail struct {
 
 // ErrorsInvalidPubKey defines model for errors_InvalidPubKey.
 type ErrorsInvalidPubKey struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsMerkleRootNotFound defines model for errors_MerkleRootNotFound.
+type ErrorsMerkleRootNotFound struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsMerkleRootNotInLongestChain defines model for errors_MerkleRootNotInLongestChain.
+type ErrorsMerkleRootNotInLongestChain struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
@@ -336,6 +396,24 @@ type ModelsDataAnnotation struct {
 // ModelsDataAnnotationBucket defines model for ModelsDataAnnotation.Bucket.
 type ModelsDataAnnotationBucket string
 
+// ModelsExclusiveStartKeySearchPage defines model for models_ExclusiveStartKeySearchPage.
+type ModelsExclusiveStartKeySearchPage struct {
+	// LastEvaluatedKey Last evaluated key
+	LastEvaluatedKey string `json:"lastEvaluatedKey"`
+
+	// Size Number of items in returned data
+	Size int `json:"size"`
+
+	// TotalElements Total number of items
+	TotalElements int `json:"totalElements"`
+}
+
+// ModelsGetMerkleRootResult defines model for models_GetMerkleRootResult.
+type ModelsGetMerkleRootResult struct {
+	Content []ModelsMerkleRoot                `json:"content"`
+	Page    ModelsExclusiveStartKeySearchPage `json:"page"`
+}
+
 // ModelsInputAnnotation defines model for models_InputAnnotation.
 type ModelsInputAnnotation struct {
 	CustomInstructions ModelsCustomInstructions `json:"customInstructions"`
@@ -345,6 +423,15 @@ type ModelsInputAnnotation struct {
 type ModelsInputsAnnotations struct {
 	// Inputs Map of input annotations
 	Inputs map[string]ModelsInputAnnotation `json:"inputs"`
+}
+
+// ModelsMerkleRoot defines model for models_MerkleRoot.
+type ModelsMerkleRoot struct {
+	// BlockHeight Block height
+	BlockHeight int `json:"blockHeight"`
+
+	// MerkleRoot Transaction ID
+	MerkleRoot string `json:"merkleRoot"`
 }
 
 // ModelsOperation defines model for models_Operation.
@@ -691,6 +778,23 @@ type ResponsesGetDataNotFound struct {
 // ResponsesGetDataSuccess defines model for responses_GetDataSuccess.
 type ResponsesGetDataSuccess = ModelsData
 
+// ResponsesGetMerklerootsBadRequest defines model for responses_GetMerklerootsBadRequest.
+type ResponsesGetMerklerootsBadRequest = ErrorsInvalidBatchSize
+
+// ResponsesGetMerklerootsConflict defines model for responses_GetMerklerootsConflict.
+type ResponsesGetMerklerootsConflict = ErrorsMerkleRootNotInLongestChain
+
+// ResponsesGetMerklerootsInternalServerError defines model for responses_GetMerklerootsInternalServerError.
+type ResponsesGetMerklerootsInternalServerError struct {
+	union json.RawMessage
+}
+
+// ResponsesGetMerklerootsNotFound defines model for responses_GetMerklerootsNotFound.
+type ResponsesGetMerklerootsNotFound = ErrorsMerkleRootNotFound
+
+// ResponsesGetMerklerootsSuccess defines model for responses_GetMerklerootsSuccess.
+type ResponsesGetMerklerootsSuccess = ModelsGetMerkleRootResult
+
 // ResponsesInternalServerError defines model for responses_InternalServerError.
 type ResponsesInternalServerError = ErrorsInternal
 
@@ -727,6 +831,15 @@ type ResponsesUserBadRequest = ErrorsInvalidDataID
 
 // ResponsesUserNotAuthorized defines model for responses_UserNotAuthorized.
 type ResponsesUserNotAuthorized = ErrorsUserAuthorization
+
+// MerkleRootsParams defines parameters for MerkleRoots.
+type MerkleRootsParams struct {
+	// BatchSize Batch size of merkleroots to be returned
+	BatchSize *int `form:"batchSize,omitempty" json:"batchSize,omitempty"`
+
+	// LastEvaluatedKey Last processed merkleroot in client's database
+	LastEvaluatedKey *string `form:"lastEvaluatedKey,omitempty" json:"lastEvaluatedKey,omitempty"`
+}
 
 // SearchOperationsParams defines parameters for SearchOperations.
 type SearchOperationsParams struct {
@@ -1856,6 +1969,198 @@ func (t ResponsesGetDataNotFound) MarshalJSON() ([]byte, error) {
 }
 
 func (t *ResponsesGetDataNotFound) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsBHSUnreachable returns the union data inside the ResponsesGetMerklerootsInternalServerError as a ErrorsBHSUnreachable
+func (t ResponsesGetMerklerootsInternalServerError) AsErrorsBHSUnreachable() (ErrorsBHSUnreachable, error) {
+	var body ErrorsBHSUnreachable
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsBHSUnreachable overwrites any union data inside the ResponsesGetMerklerootsInternalServerError as the provided ErrorsBHSUnreachable
+func (t *ResponsesGetMerklerootsInternalServerError) FromErrorsBHSUnreachable(v ErrorsBHSUnreachable) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsBHSUnreachable performs a merge with any union data inside the ResponsesGetMerklerootsInternalServerError, using the provided ErrorsBHSUnreachable
+func (t *ResponsesGetMerklerootsInternalServerError) MergeErrorsBHSUnreachable(v ErrorsBHSUnreachable) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsBHSNoSuccessResponse returns the union data inside the ResponsesGetMerklerootsInternalServerError as a ErrorsBHSNoSuccessResponse
+func (t ResponsesGetMerklerootsInternalServerError) AsErrorsBHSNoSuccessResponse() (ErrorsBHSNoSuccessResponse, error) {
+	var body ErrorsBHSNoSuccessResponse
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsBHSNoSuccessResponse overwrites any union data inside the ResponsesGetMerklerootsInternalServerError as the provided ErrorsBHSNoSuccessResponse
+func (t *ResponsesGetMerklerootsInternalServerError) FromErrorsBHSNoSuccessResponse(v ErrorsBHSNoSuccessResponse) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsBHSNoSuccessResponse performs a merge with any union data inside the ResponsesGetMerklerootsInternalServerError, using the provided ErrorsBHSNoSuccessResponse
+func (t *ResponsesGetMerklerootsInternalServerError) MergeErrorsBHSNoSuccessResponse(v ErrorsBHSNoSuccessResponse) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsBHSUnauthorized returns the union data inside the ResponsesGetMerklerootsInternalServerError as a ErrorsBHSUnauthorized
+func (t ResponsesGetMerklerootsInternalServerError) AsErrorsBHSUnauthorized() (ErrorsBHSUnauthorized, error) {
+	var body ErrorsBHSUnauthorized
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsBHSUnauthorized overwrites any union data inside the ResponsesGetMerklerootsInternalServerError as the provided ErrorsBHSUnauthorized
+func (t *ResponsesGetMerklerootsInternalServerError) FromErrorsBHSUnauthorized(v ErrorsBHSUnauthorized) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsBHSUnauthorized performs a merge with any union data inside the ResponsesGetMerklerootsInternalServerError, using the provided ErrorsBHSUnauthorized
+func (t *ResponsesGetMerklerootsInternalServerError) MergeErrorsBHSUnauthorized(v ErrorsBHSUnauthorized) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsBHSBadRequest returns the union data inside the ResponsesGetMerklerootsInternalServerError as a ErrorsBHSBadRequest
+func (t ResponsesGetMerklerootsInternalServerError) AsErrorsBHSBadRequest() (ErrorsBHSBadRequest, error) {
+	var body ErrorsBHSBadRequest
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsBHSBadRequest overwrites any union data inside the ResponsesGetMerklerootsInternalServerError as the provided ErrorsBHSBadRequest
+func (t *ResponsesGetMerklerootsInternalServerError) FromErrorsBHSBadRequest(v ErrorsBHSBadRequest) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsBHSBadRequest performs a merge with any union data inside the ResponsesGetMerklerootsInternalServerError, using the provided ErrorsBHSBadRequest
+func (t *ResponsesGetMerklerootsInternalServerError) MergeErrorsBHSBadRequest(v ErrorsBHSBadRequest) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsBHSUnhealthy returns the union data inside the ResponsesGetMerklerootsInternalServerError as a ErrorsBHSUnhealthy
+func (t ResponsesGetMerklerootsInternalServerError) AsErrorsBHSUnhealthy() (ErrorsBHSUnhealthy, error) {
+	var body ErrorsBHSUnhealthy
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsBHSUnhealthy overwrites any union data inside the ResponsesGetMerklerootsInternalServerError as the provided ErrorsBHSUnhealthy
+func (t *ResponsesGetMerklerootsInternalServerError) FromErrorsBHSUnhealthy(v ErrorsBHSUnhealthy) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsBHSUnhealthy performs a merge with any union data inside the ResponsesGetMerklerootsInternalServerError, using the provided ErrorsBHSUnhealthy
+func (t *ResponsesGetMerklerootsInternalServerError) MergeErrorsBHSUnhealthy(v ErrorsBHSUnhealthy) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsBHSBadURL returns the union data inside the ResponsesGetMerklerootsInternalServerError as a ErrorsBHSBadURL
+func (t ResponsesGetMerklerootsInternalServerError) AsErrorsBHSBadURL() (ErrorsBHSBadURL, error) {
+	var body ErrorsBHSBadURL
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsBHSBadURL overwrites any union data inside the ResponsesGetMerklerootsInternalServerError as the provided ErrorsBHSBadURL
+func (t *ResponsesGetMerklerootsInternalServerError) FromErrorsBHSBadURL(v ErrorsBHSBadURL) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsBHSBadURL performs a merge with any union data inside the ResponsesGetMerklerootsInternalServerError, using the provided ErrorsBHSBadURL
+func (t *ResponsesGetMerklerootsInternalServerError) MergeErrorsBHSBadURL(v ErrorsBHSBadURL) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsBHSParsingResponse returns the union data inside the ResponsesGetMerklerootsInternalServerError as a ErrorsBHSParsingResponse
+func (t ResponsesGetMerklerootsInternalServerError) AsErrorsBHSParsingResponse() (ErrorsBHSParsingResponse, error) {
+	var body ErrorsBHSParsingResponse
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsBHSParsingResponse overwrites any union data inside the ResponsesGetMerklerootsInternalServerError as the provided ErrorsBHSParsingResponse
+func (t *ResponsesGetMerklerootsInternalServerError) FromErrorsBHSParsingResponse(v ErrorsBHSParsingResponse) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsBHSParsingResponse performs a merge with any union data inside the ResponsesGetMerklerootsInternalServerError, using the provided ErrorsBHSParsingResponse
+func (t *ResponsesGetMerklerootsInternalServerError) MergeErrorsBHSParsingResponse(v ErrorsBHSParsingResponse) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesGetMerklerootsInternalServerError) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesGetMerklerootsInternalServerError) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
