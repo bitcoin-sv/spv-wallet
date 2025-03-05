@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
@@ -134,6 +135,7 @@ func (r *Contacts) FindByID(ctx context.Context, contactID uint) (*contactsmodel
 	return newContactModel(row), nil
 }
 
+// PaginatedForUser retrieves contacts for user and the provided paging options and db conditions.
 func (r *Contacts) PaginatedForUser(ctx context.Context, userID string, page filter.Page, conditions map[string]interface{}) (*models.PagedResult[contactsmodels.Contact], error) {
 	scopes := mapConditionsToScopes(conditions)
 	scopes = append(scopes, dbquery.UserID(userID))
@@ -157,6 +159,7 @@ func (r *Contacts) PaginatedForUser(ctx context.Context, userID string, page fil
 	}, nil
 }
 
+// PaginatedForAdmin retrieves contacts for admin and the provided paging options and db conditions.
 func (r *Contacts) PaginatedForAdmin(ctx context.Context, page filter.Page, conditions map[string]interface{}) (*models.PagedResult[contactsmodels.Contact], error) {
 	scopes := mapConditionsToScopes(conditions)
 	scopes = append(scopes, dbquery.Preload("User"))

@@ -11,7 +11,7 @@ import (
 // MapToContactContract maps a contact to a response
 func MapToContactContract(c *contactsmodels.Contact) api.ModelsContact {
 	return api.ModelsContact{
-		Id:        int(c.ID),
+		Id:        c.ID,
 		FullName:  c.FullName,
 		Paymail:   c.Paymail,
 		PubKey:    c.PubKey,
@@ -38,7 +38,7 @@ func ContactsPagedResponse(contacts *models.PagedResult[contactsmodels.Contact])
 // ContactsResponse maps an operation to a response.
 func ContactsResponse(operation *contactsmodels.Contact) api.ModelsContact {
 	return api.ModelsContact{
-		Id:        int(operation.ID),
+		Id:        operation.ID,
 		FullName:  operation.FullName,
 		Paymail:   operation.Paymail,
 		PubKey:    operation.PubKey,

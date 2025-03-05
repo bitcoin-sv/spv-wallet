@@ -436,7 +436,7 @@ type ModelsContact struct {
 	CreatedAt time.Time           `json:"createdAt"`
 	DeletedAt *time.Time          `json:"deletedAt,omitempty"`
 	FullName  string              `json:"fullName"`
-	Id        int                 `json:"id"`
+	Id        uint                `json:"id"`
 	Paymail   string              `json:"paymail"`
 	PubKey    string              `json:"pubKey"`
 	Status    ModelsContactStatus `json:"status"`
@@ -3186,12 +3186,12 @@ type ClientInterface interface {
 	AdminConfirmContact(ctx context.Context, body AdminConfirmContactJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AdminDeleteContact request
-	AdminDeleteContact(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*http.Response, error)
+	AdminDeleteContact(ctx context.Context, id uint, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AdminUpdateContactWithBody request with any body
-	AdminUpdateContactWithBody(ctx context.Context, id int, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	AdminUpdateContactWithBody(ctx context.Context, id uint, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	AdminUpdateContact(ctx context.Context, id int, body AdminUpdateContactJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	AdminUpdateContact(ctx context.Context, id uint, body AdminUpdateContactJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AdminCreateContactWithBody request with any body
 	AdminCreateContactWithBody(ctx context.Context, paymail string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -3199,10 +3199,10 @@ type ClientInterface interface {
 	AdminCreateContact(ctx context.Context, paymail string, body AdminCreateContactJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AdminRejectInvitation request
-	AdminRejectInvitation(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*http.Response, error)
+	AdminRejectInvitation(ctx context.Context, id uint, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AdminAcceptInvitation request
-	AdminAcceptInvitation(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*http.Response, error)
+	AdminAcceptInvitation(ctx context.Context, id uint, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AdminStatus request
 	AdminStatus(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -3305,7 +3305,7 @@ func (c *Client) AdminConfirmContact(ctx context.Context, body AdminConfirmConta
 	return c.Client.Do(req)
 }
 
-func (c *Client) AdminDeleteContact(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) AdminDeleteContact(ctx context.Context, id uint, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAdminDeleteContactRequest(c.Server, id)
 	if err != nil {
 		return nil, err
@@ -3317,7 +3317,7 @@ func (c *Client) AdminDeleteContact(ctx context.Context, id int, reqEditors ...R
 	return c.Client.Do(req)
 }
 
-func (c *Client) AdminUpdateContactWithBody(ctx context.Context, id int, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) AdminUpdateContactWithBody(ctx context.Context, id uint, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAdminUpdateContactRequestWithBody(c.Server, id, contentType, body)
 	if err != nil {
 		return nil, err
@@ -3329,7 +3329,7 @@ func (c *Client) AdminUpdateContactWithBody(ctx context.Context, id int, content
 	return c.Client.Do(req)
 }
 
-func (c *Client) AdminUpdateContact(ctx context.Context, id int, body AdminUpdateContactJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) AdminUpdateContact(ctx context.Context, id uint, body AdminUpdateContactJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAdminUpdateContactRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
@@ -3365,7 +3365,7 @@ func (c *Client) AdminCreateContact(ctx context.Context, paymail string, body Ad
 	return c.Client.Do(req)
 }
 
-func (c *Client) AdminRejectInvitation(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) AdminRejectInvitation(ctx context.Context, id uint, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAdminRejectInvitationRequest(c.Server, id)
 	if err != nil {
 		return nil, err
@@ -3377,7 +3377,7 @@ func (c *Client) AdminRejectInvitation(ctx context.Context, id int, reqEditors .
 	return c.Client.Do(req)
 }
 
-func (c *Client) AdminAcceptInvitation(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) AdminAcceptInvitation(ctx context.Context, id uint, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAdminAcceptInvitationRequest(c.Server, id)
 	if err != nil {
 		return nil, err
@@ -3883,7 +3883,7 @@ func NewAdminConfirmContactRequestWithBody(server string, contentType string, bo
 }
 
 // NewAdminDeleteContactRequest generates requests for AdminDeleteContact
-func NewAdminDeleteContactRequest(server string, id int) (*http.Request, error) {
+func NewAdminDeleteContactRequest(server string, id uint) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -3917,7 +3917,7 @@ func NewAdminDeleteContactRequest(server string, id int) (*http.Request, error) 
 }
 
 // NewAdminUpdateContactRequest calls the generic AdminUpdateContact builder with application/json body
-func NewAdminUpdateContactRequest(server string, id int, body AdminUpdateContactJSONRequestBody) (*http.Request, error) {
+func NewAdminUpdateContactRequest(server string, id uint, body AdminUpdateContactJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
@@ -3928,7 +3928,7 @@ func NewAdminUpdateContactRequest(server string, id int, body AdminUpdateContact
 }
 
 // NewAdminUpdateContactRequestWithBody generates requests for AdminUpdateContact with any type of body
-func NewAdminUpdateContactRequestWithBody(server string, id int, contentType string, body io.Reader) (*http.Request, error) {
+func NewAdminUpdateContactRequestWithBody(server string, id uint, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -4011,7 +4011,7 @@ func NewAdminCreateContactRequestWithBody(server string, paymail string, content
 }
 
 // NewAdminRejectInvitationRequest generates requests for AdminRejectInvitation
-func NewAdminRejectInvitationRequest(server string, id int) (*http.Request, error) {
+func NewAdminRejectInvitationRequest(server string, id uint) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -4045,7 +4045,7 @@ func NewAdminRejectInvitationRequest(server string, id int) (*http.Request, erro
 }
 
 // NewAdminAcceptInvitationRequest generates requests for AdminAcceptInvitation
-func NewAdminAcceptInvitationRequest(server string, id int) (*http.Request, error) {
+func NewAdminAcceptInvitationRequest(server string, id uint) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -4993,12 +4993,12 @@ type ClientWithResponsesInterface interface {
 	AdminConfirmContactWithResponse(ctx context.Context, body AdminConfirmContactJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminConfirmContactResponse, error)
 
 	// AdminDeleteContactWithResponse request
-	AdminDeleteContactWithResponse(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*AdminDeleteContactResponse, error)
+	AdminDeleteContactWithResponse(ctx context.Context, id uint, reqEditors ...RequestEditorFn) (*AdminDeleteContactResponse, error)
 
 	// AdminUpdateContactWithBodyWithResponse request with any body
-	AdminUpdateContactWithBodyWithResponse(ctx context.Context, id int, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminUpdateContactResponse, error)
+	AdminUpdateContactWithBodyWithResponse(ctx context.Context, id uint, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminUpdateContactResponse, error)
 
-	AdminUpdateContactWithResponse(ctx context.Context, id int, body AdminUpdateContactJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminUpdateContactResponse, error)
+	AdminUpdateContactWithResponse(ctx context.Context, id uint, body AdminUpdateContactJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminUpdateContactResponse, error)
 
 	// AdminCreateContactWithBodyWithResponse request with any body
 	AdminCreateContactWithBodyWithResponse(ctx context.Context, paymail string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminCreateContactResponse, error)
@@ -5006,10 +5006,10 @@ type ClientWithResponsesInterface interface {
 	AdminCreateContactWithResponse(ctx context.Context, paymail string, body AdminCreateContactJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminCreateContactResponse, error)
 
 	// AdminRejectInvitationWithResponse request
-	AdminRejectInvitationWithResponse(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*AdminRejectInvitationResponse, error)
+	AdminRejectInvitationWithResponse(ctx context.Context, id uint, reqEditors ...RequestEditorFn) (*AdminRejectInvitationResponse, error)
 
 	// AdminAcceptInvitationWithResponse request
-	AdminAcceptInvitationWithResponse(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*AdminAcceptInvitationResponse, error)
+	AdminAcceptInvitationWithResponse(ctx context.Context, id uint, reqEditors ...RequestEditorFn) (*AdminAcceptInvitationResponse, error)
 
 	// AdminStatusWithResponse request
 	AdminStatusWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AdminStatusResponse, error)
@@ -5965,7 +5965,7 @@ func (c *ClientWithResponses) AdminConfirmContactWithResponse(ctx context.Contex
 }
 
 // AdminDeleteContactWithResponse request returning *AdminDeleteContactResponse
-func (c *ClientWithResponses) AdminDeleteContactWithResponse(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*AdminDeleteContactResponse, error) {
+func (c *ClientWithResponses) AdminDeleteContactWithResponse(ctx context.Context, id uint, reqEditors ...RequestEditorFn) (*AdminDeleteContactResponse, error) {
 	rsp, err := c.AdminDeleteContact(ctx, id, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -5974,7 +5974,7 @@ func (c *ClientWithResponses) AdminDeleteContactWithResponse(ctx context.Context
 }
 
 // AdminUpdateContactWithBodyWithResponse request with arbitrary body returning *AdminUpdateContactResponse
-func (c *ClientWithResponses) AdminUpdateContactWithBodyWithResponse(ctx context.Context, id int, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminUpdateContactResponse, error) {
+func (c *ClientWithResponses) AdminUpdateContactWithBodyWithResponse(ctx context.Context, id uint, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminUpdateContactResponse, error) {
 	rsp, err := c.AdminUpdateContactWithBody(ctx, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -5982,7 +5982,7 @@ func (c *ClientWithResponses) AdminUpdateContactWithBodyWithResponse(ctx context
 	return ParseAdminUpdateContactResponse(rsp)
 }
 
-func (c *ClientWithResponses) AdminUpdateContactWithResponse(ctx context.Context, id int, body AdminUpdateContactJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminUpdateContactResponse, error) {
+func (c *ClientWithResponses) AdminUpdateContactWithResponse(ctx context.Context, id uint, body AdminUpdateContactJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminUpdateContactResponse, error) {
 	rsp, err := c.AdminUpdateContact(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -6008,7 +6008,7 @@ func (c *ClientWithResponses) AdminCreateContactWithResponse(ctx context.Context
 }
 
 // AdminRejectInvitationWithResponse request returning *AdminRejectInvitationResponse
-func (c *ClientWithResponses) AdminRejectInvitationWithResponse(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*AdminRejectInvitationResponse, error) {
+func (c *ClientWithResponses) AdminRejectInvitationWithResponse(ctx context.Context, id uint, reqEditors ...RequestEditorFn) (*AdminRejectInvitationResponse, error) {
 	rsp, err := c.AdminRejectInvitation(ctx, id, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -6017,7 +6017,7 @@ func (c *ClientWithResponses) AdminRejectInvitationWithResponse(ctx context.Cont
 }
 
 // AdminAcceptInvitationWithResponse request returning *AdminAcceptInvitationResponse
-func (c *ClientWithResponses) AdminAcceptInvitationWithResponse(ctx context.Context, id int, reqEditors ...RequestEditorFn) (*AdminAcceptInvitationResponse, error) {
+func (c *ClientWithResponses) AdminAcceptInvitationWithResponse(ctx context.Context, id uint, reqEditors ...RequestEditorFn) (*AdminAcceptInvitationResponse, error) {
 	rsp, err := c.AdminAcceptInvitation(ctx, id, reqEditors...)
 	if err != nil {
 		return nil, err

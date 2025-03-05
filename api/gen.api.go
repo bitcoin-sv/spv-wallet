@@ -21,19 +21,19 @@ type ServerInterface interface {
 	AdminConfirmContact(c *gin.Context)
 	// Delete contact
 	// (DELETE /api/v2/admin/contacts/{id})
-	AdminDeleteContact(c *gin.Context, id int)
+	AdminDeleteContact(c *gin.Context, id uint)
 	// Update contact
 	// (PUT /api/v2/admin/contacts/{id})
-	AdminUpdateContact(c *gin.Context, id int)
+	AdminUpdateContact(c *gin.Context, id uint)
 	// Create contact
 	// (POST /api/v2/admin/contacts/{paymail})
 	AdminCreateContact(c *gin.Context, paymail string)
 	// Reject invitation
 	// (DELETE /api/v2/admin/invitations/{id})
-	AdminRejectInvitation(c *gin.Context, id int)
+	AdminRejectInvitation(c *gin.Context, id uint)
 	// Accept invitation
 	// (POST /api/v2/admin/invitations/{id})
-	AdminAcceptInvitation(c *gin.Context, id int)
+	AdminAcceptInvitation(c *gin.Context, id uint)
 	// Get admin status
 	// (GET /api/v2/admin/status)
 	AdminStatus(c *gin.Context)
@@ -212,7 +212,7 @@ func (siw *ServerInterfaceWrapper) AdminDeleteContact(c *gin.Context) {
 	var err error
 
 	// ------------- Path parameter "id" -------------
-	var id int
+	var id uint
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
 	if err != nil {
@@ -238,7 +238,7 @@ func (siw *ServerInterfaceWrapper) AdminUpdateContact(c *gin.Context) {
 	var err error
 
 	// ------------- Path parameter "id" -------------
-	var id int
+	var id uint
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
 	if err != nil {
@@ -290,7 +290,7 @@ func (siw *ServerInterfaceWrapper) AdminRejectInvitation(c *gin.Context) {
 	var err error
 
 	// ------------- Path parameter "id" -------------
-	var id int
+	var id uint
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
 	if err != nil {
@@ -316,7 +316,7 @@ func (siw *ServerInterfaceWrapper) AdminAcceptInvitation(c *gin.Context) {
 	var err error
 
 	// ------------- Path parameter "id" -------------
-	var id int
+	var id uint
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
 	if err != nil {

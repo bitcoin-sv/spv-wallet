@@ -10,7 +10,7 @@ import (
 )
 
 // AdminUpdateContact updates a contact.
-func (s *APIAdminContacts) AdminUpdateContact(c *gin.Context, id int) {
+func (s *APIAdminContacts) AdminUpdateContact(c *gin.Context, id uint) {
 	var requestBody api.RequestsUpdateContact
 	err := c.ShouldBindWith(&requestBody, binding.JSON)
 	if err != nil {
@@ -18,7 +18,7 @@ func (s *APIAdminContacts) AdminUpdateContact(c *gin.Context, id int) {
 		return
 	}
 
-	contact, err := s.engine.ContactService().UpdateFullNameByID(c.Request.Context(), uint(id), requestBody.FullName)
+	contact, err := s.engine.ContactService().UpdateFullNameByID(c.Request.Context(), id, requestBody.FullName)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return

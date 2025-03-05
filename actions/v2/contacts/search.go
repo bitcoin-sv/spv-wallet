@@ -1,16 +1,17 @@
 package contacts
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/mapping"
 	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
+// GetContacts search for contacts with pagination and db conditions.
 func (s *APIContacts) GetContacts(c *gin.Context, params api.GetContactsParams) {
 	userContext := reqctx.GetUserContext(c)
 	userID, err := userContext.ShouldGetUserID()

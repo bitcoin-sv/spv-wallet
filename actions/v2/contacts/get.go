@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetContact gets a contact by paymail
 func (s *APIContacts) GetContact(c *gin.Context, paymail string) {
 	userContext := reqctx.GetUserContext(c)
 	userID, err := userContext.ShouldGetUserID()

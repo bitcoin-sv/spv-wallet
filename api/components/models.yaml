@@ -404,7 +404,7 @@ components:
             id:
               type: integer
               example: 1
-              minimum: 0
+              format: uint
             fullName:
               type: string
               example: "Test User"

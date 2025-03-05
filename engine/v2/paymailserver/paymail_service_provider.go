@@ -21,6 +21,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// ServiceProvider is a service provider for paymail service
 type ServiceProvider interface {
 	server.PaymailServiceProvider
 	server.PikeContactServiceProvider

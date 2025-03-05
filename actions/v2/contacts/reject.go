@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// RejectInvitation rejects a contact created by invitation.
 func (s *APIContacts) RejectInvitation(c *gin.Context, paymail string) {
 	userContext := reqctx.GetUserContext(c)
 	userID, err := userContext.ShouldGetUserID()

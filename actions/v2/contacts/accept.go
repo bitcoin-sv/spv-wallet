@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// AcceptInvitation accepts a contact created by invitation.
 func (s *APIContacts) AcceptInvitation(c *gin.Context, paymail string) {
 	userContext := reqctx.GetUserContext(c)
 	userID, err := userContext.ShouldGetUserID()

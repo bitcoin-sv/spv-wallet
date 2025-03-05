@@ -3,7 +3,6 @@ package testabilities
 import (
 	"context"
 	"errors"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
@@ -15,6 +14,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures/txtestability"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
 	"github.com/bitcoin-sv/spv-wallet/initializer"

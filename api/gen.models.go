@@ -429,7 +429,7 @@ type ModelsContact struct {
 	CreatedAt time.Time           `json:"createdAt"`
 	DeletedAt *time.Time          `json:"deletedAt,omitempty"`
 	FullName  string              `json:"fullName"`
-	Id        int                 `json:"id"`
+	Id        uint                `json:"id"`
 	Paymail   string              `json:"paymail"`
 	PubKey    string              `json:"pubKey"`
 	Status    ModelsContactStatus `json:"status"`

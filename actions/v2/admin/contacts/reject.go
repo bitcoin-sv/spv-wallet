@@ -1,14 +1,15 @@
 package contacts
 
 import (
+	"net/http"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 // AdminRejectInvitation rejects an invitation from a contact.
-func (s *APIAdminContacts) AdminRejectInvitation(c *gin.Context, id int) {
-	_, err := s.engine.ContactService().RejectContactByID(c.Request.Context(), uint(id))
+func (s *APIAdminContacts) AdminRejectInvitation(c *gin.Context, id uint) {
+	_, err := s.engine.ContactService().RejectContactByID(c.Request.Context(), id)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return

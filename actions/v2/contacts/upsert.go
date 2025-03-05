@@ -14,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin/binding"
 )
 
+// UpsertContact creates new contact or updates existing one.
 func (s *APIContacts) UpsertContact(c *gin.Context, paymail string) {
 	var requestBody api.RequestsUpsertContact
 	err := c.ShouldBindWith(&requestBody, binding.JSON)

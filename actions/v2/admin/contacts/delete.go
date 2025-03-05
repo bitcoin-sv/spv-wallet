@@ -1,14 +1,15 @@
 package contacts
 
 import (
+	"net/http"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 // AdminDeleteContact deletes a contact
-func (s *APIAdminContacts) AdminDeleteContact(c *gin.Context, id int) {
-	err := s.engine.ContactService().RemoveContactByID(c.Request.Context(), uint(id))
+func (s *APIAdminContacts) AdminDeleteContact(c *gin.Context, id uint) {
+	err := s.engine.ContactService().RemoveContactByID(c.Request.Context(), id)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return

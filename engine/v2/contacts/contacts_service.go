@@ -2,6 +2,7 @@ package contacts
 
 import (
 	"context"
+
 	goPaymail "github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -125,7 +126,7 @@ func (s *Service) AddContactRequest(ctx context.Context, fullName, paymail, user
 		Status:            contactsmodels.ContactNotConfirmed,
 	})
 	if err != nil {
-		return nil, err
+		return nil, spverrors.ErrSaveContact.WithTrace(err)
 	}
 
 	return contact, nil
@@ -135,7 +136,7 @@ func (s *Service) AddContactRequest(ctx context.Context, fullName, paymail, user
 func (s *Service) Find(ctx context.Context, userID, paymail string) (*contactsmodels.Contact, error) {
 	contact, err := s.contactsRepo.Find(ctx, userID, paymail)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.ErrGetContact.WithTrace(err)
 	}
 
 	return contact, nil
@@ -161,6 +162,7 @@ func (s *Service) PaginatedForAdmin(ctx context.Context, page filter.Page, condi
 	return entities, nil
 }
 
+// UpdateFullNameByID updates the full name of a contact by ID
 func (s *Service) UpdateFullNameByID(ctx context.Context, contactID uint, fullName string) (*contactsmodels.Contact, error) {
 	c, err := s.contactsRepo.UpdateByID(ctx, contactID, fullName)
 	if err != nil {

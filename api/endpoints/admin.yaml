@@ -154,6 +154,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: uint
       requestBody:
         required: true
         content:
@@ -185,6 +186,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: uint
       responses:
         200:
           description: Contact deleted
@@ -278,6 +280,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: uint
       responses:
         200:
           $ref: "../components/responses.yaml#/components/responses/ContactSuccess"
@@ -304,6 +307,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: uint
       responses:
         200:
           description: Invitation rejected

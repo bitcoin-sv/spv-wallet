@@ -43,6 +43,7 @@ paths:
                   name: id
                   required: true
                   schema:
+                    format: uint
                     type: integer
             responses:
                 "200":
@@ -66,6 +67,7 @@ paths:
                   name: id
                   required: true
                   schema:
+                    format: uint
                     type: integer
             requestBody:
                 content:
@@ -157,6 +159,7 @@ paths:
                   name: id
                   required: true
                   schema:
+                    format: uint
                     type: integer
             responses:
                 "200":
@@ -180,6 +183,7 @@ paths:
                   name: id
                   required: true
                   schema:
+                    format: uint
                     type: integer
             responses:
                 "200":
@@ -1507,7 +1511,7 @@ components:
                         type: string
                     id:
                         example: 1
-                        minimum: 0
+                        format: uint
                         type: integer
                     paymail:
                         example: alice@spv-wallet.com
