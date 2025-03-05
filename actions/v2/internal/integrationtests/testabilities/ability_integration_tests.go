@@ -1,10 +1,10 @@
 package testabilities
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/engine/testabilities/testmode"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/engine/testabilities/testmode"
 )
 
 // DBOption represents a database configuration option for integration tests

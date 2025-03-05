@@ -66,15 +66,14 @@ type EngineWithConfig struct {
 }
 
 type engineFixture struct {
-	config             *config.AppConfig
-	engine             engine.ClientInterface
-	t                  testing.TB
-	logger             zerolog.Logger
-	dbConnectionString string
-	externalTransport  *httpmock.MockTransport
-	paymailClient      *paymailmock.PaymailClientMock
-	txFixture          txtestability.TransactionsFixtures
-	postgresContainer  *testmode.TestContainer
+	config            *config.AppConfig
+	engine            engine.ClientInterface
+	t                 testing.TB
+	logger            zerolog.Logger
+	externalTransport *httpmock.MockTransport
+	paymailClient     *paymailmock.PaymailClientMock
+	txFixture         txtestability.TransactionsFixtures
+	postgresContainer *testmode.TestContainer
 }
 
 func Given(t testing.TB) EngineFixture {
@@ -169,7 +168,7 @@ func (f *engineFixture) Tx() txtestability.TransactionSpec {
 	return f.txFixture.Tx()
 }
 
-// prepareDBConfigForTests selects the appropriate database configuration
+// prepareDBConfigForTests creates a new connection that will be used as connection for engine
 func (f *engineFixture) prepareDBConfigForTests() {
 	if f.tryDevelopmentPostgres() {
 		return
