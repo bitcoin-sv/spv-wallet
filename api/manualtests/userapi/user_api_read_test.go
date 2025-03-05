@@ -41,3 +41,12 @@ func TestDataById(t *testing.T) {
 		return c.DataByIdWithResponse(context.Background(), dataId)
 	}).RequireSuccess()
 }
+
+func TestMerkleRootsWithoutParams(t *testing.T) {
+	manualtests.APICallForCurrentUser(t).CallForSuccess(func(c *client.ClientWithResponses) (manualtests.Result, error) {
+		return c.MerkleRootsWithResponse(context.Background(), &client.MerkleRootsParams{
+			BatchSize:        lo.ToPtr(5),
+			LastEvaluatedKey: lo.ToPtr("d727e7764d395318ad17527346343532664483d9428c7afbf313a7f414bc76e2"),
+		})
+	})
+}
