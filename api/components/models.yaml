@@ -16,7 +16,7 @@ components:
           type: array
           items:
             type: string
-          example: [ "example.com" ]
+          example: ["example.com"]
         experimentalFeatures:
           type: object
           additionalProperties:
@@ -289,7 +289,7 @@ components:
       properties:
         bucket:
           type: string
-          enum: [ "data" ]
+          enum: ["data"]
           default: "data"
           example: "data"
       required:
@@ -301,7 +301,7 @@ components:
           properties:
             bucket:
               type: string
-              enum: [ "bsv" ]
+              enum: ["bsv"]
               default: "bsv"
               example: "bsv"
             paymail:

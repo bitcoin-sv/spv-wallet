@@ -77,11 +77,11 @@ components:
       properties:
         type:
           type: string
-          enum: [ op_return ]
+          enum: [op_return]
           example: op_return
         dataType:
           type: string
-          enum: [ hexes, strings ]
+          enum: [hexes, strings]
           default: strings
           example: strings
         data:

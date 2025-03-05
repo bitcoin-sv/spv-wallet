@@ -210,7 +210,7 @@ paths:
         401:
           $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
         404:
-            $ref: "../components/responses.yaml#/components/responses/UpsertContactNotFound"
+          $ref: "../components/responses.yaml#/components/responses/UpsertContactNotFound"
         500:
           $ref: "../components/responses.yaml#/components/responses/ContactUpsertInternalServerError"
 

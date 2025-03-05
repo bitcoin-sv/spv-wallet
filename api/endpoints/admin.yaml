@@ -226,9 +226,9 @@ paths:
         401:
           $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
         404:
-            $ref: "../components/responses.yaml#/components/responses/AdminCreateContactNotFound"
+          $ref: "../components/responses.yaml#/components/responses/AdminCreateContactNotFound"
         409:
-            $ref: "../components/responses.yaml#/components/responses/AdminCreateContactConflict"
+          $ref: "../components/responses.yaml#/components/responses/AdminCreateContactConflict"
         500:
           $ref: "../components/responses.yaml#/components/responses/AdminCreateContactInternalServerError"
 
