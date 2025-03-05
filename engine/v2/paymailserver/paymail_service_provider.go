@@ -170,10 +170,7 @@ func (s *serviceProvider) VerifyMerkleRoots(ctx context.Context, merkleProofs []
 func (s *serviceProvider) AddContact(ctx context.Context, requesterPaymail string, contact *paymailserver.PikeContactRequestPayload) error {
 	rAlias, rDomain, _ := paymailserver.SanitizePaymail(requesterPaymail)
 	pAddress, err := s.paymails.Find(ctx, rAlias, rDomain)
-	if err != nil {
-		return err
-	}
-	if pAddress == nil {
+	if err != nil || pAddress == nil {
 		return spverrors.ErrCouldNotFindPaymail
 	}
 

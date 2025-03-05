@@ -2,7 +2,6 @@ package contacts_test
 
 import (
 	"fmt"
-
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
