@@ -12,13 +12,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func MockTx(t testing.TB) txtestability.TransactionSpec {
+	return txtestability.Given(t).Tx().WithInput(10).WithP2PKHOutput(9)
+}
+
 type MockRepo struct {
-	t                testing.TB
-	subjectTx        txtestability.TransactionSpec
-	row              *txmodels.TrackedTransaction
-	updated          *txmodels.TrackedTransaction
-	willFailOnGet    bool
-	willFailOnUpdate bool
+	t          testing.TB
+	subjectTx  txtestability.TransactionSpec
+	row        *txmodels.TrackedTransaction
+	updated    *txmodels.TrackedTransaction
+	willFailOn FailingPoint
 }
 
 func newMockRepo(t testing.TB) *MockRepo {
@@ -27,16 +30,12 @@ func newMockRepo(t testing.TB) *MockRepo {
 	}
 }
 
-func (m *MockRepo) defaultTx() txtestability.TransactionSpec {
-	return txtestability.Given(m.t).Tx().WithInput(10).WithP2PKHOutput(9)
-}
-
 func (m *MockRepo) Updated() bool {
 	return m.updated != nil
 }
 
 func (m *MockRepo) UpdateTransaction(ctx context.Context, trackedTx *txmodels.TrackedTransaction) error {
-	if m.willFailOnUpdate {
+	if m.willFailOn == FailingPointUpdate {
 		return spverrors.Newf("UpdateTransaction failed")
 	}
 	m.updated = trackedTx
@@ -44,7 +43,7 @@ func (m *MockRepo) UpdateTransaction(ctx context.Context, trackedTx *txmodels.Tr
 }
 
 func (m *MockRepo) GetTransaction(_ context.Context, txID string) (transaction *txmodels.TrackedTransaction, err error) {
-	if m.willFailOnGet {
+	if m.willFailOn == FailingPointGet {
 		return nil, spverrors.Newf("GetTransaction failed")
 	}
 
@@ -55,7 +54,7 @@ func (m *MockRepo) GetTransaction(_ context.Context, txID string) (transaction *
 }
 
 func (m *MockRepo) createTrackedTx() *txmodels.TrackedTransaction {
-	m.subjectTx = m.defaultTx()
+	m.subjectTx = MockTx(m.t)
 
 	return &txmodels.TrackedTransaction{
 		ID:        m.subjectTx.ID(),
@@ -65,11 +64,11 @@ func (m *MockRepo) createTrackedTx() *txmodels.TrackedTransaction {
 	}
 }
 
-type Format string
+type Format int
 
 const (
-	FormatHex  Format = "hex"
-	FormatBEEF Format = "beef"
+	FormatHex Format = iota
+	FormatBEEF
 )
 
 func (m *MockRepo) ContainsBroadcastedTx(format Format) RepoFixtures {
@@ -82,12 +81,13 @@ func (m *MockRepo) ContainsBroadcastedTx(format Format) RepoFixtures {
 	return m
 }
 
-func (m *MockRepo) WillFailOnGet() RepoFixtures {
-	m.willFailOnGet = true
-	return m
-}
+type FailingPoint int
 
-func (m *MockRepo) WillFailOnUpdate() RepoFixtures {
-	m.willFailOnUpdate = true
-	return m
+const (
+	FailingPointGet = iota + 1
+	FailingPointUpdate
+)
+
+func (m *MockRepo) WillFailOn(f FailingPoint) {
+	m.willFailOn = f
 }

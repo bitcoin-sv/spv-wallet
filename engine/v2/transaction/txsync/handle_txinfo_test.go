@@ -32,10 +32,10 @@ func TestUpdateOnMinedTx(t *testing.T) {
 			given.Repo().ContainsBroadcastedTx(test.format)
 
 			// and:
-			txInfo := given.MinedTXInfo()
+			spec := testabilities.MinedTXInfo(t)
 
 			// when:
-			err := service.Handle(context.Background(), chainmodels.TXInfo(txInfo))
+			err := service.Handle(context.Background(), chainmodels.TXInfo(spec))
 
 			// then:
 			then.WithNoError(err).
@@ -69,10 +69,10 @@ func TestHandleNotUpdateOnNeutralStatuses(t *testing.T) {
 			given.Repo().ContainsBroadcastedTx(testabilities.FormatBEEF)
 
 			// and:
-			txInfo := given.TXInfo(status)
+			spec := testabilities.TXInfo(t, status)
 
 			// when:
-			err := service.Handle(context.Background(), chainmodels.TXInfo(txInfo))
+			err := service.Handle(context.Background(), chainmodels.TXInfo(spec))
 
 			// then:
 			then.WithNoError(err).
@@ -89,7 +89,7 @@ func TestHandleNotUpdateOnProblematicStatuses(t *testing.T) {
 		chainmodels.SeenInOrphanMempool,
 	}
 	for _, status := range statuses {
-		t.Run(fmt.Sprintf("not update on %v status", status), func(t *testing.T) {
+		t.Run(fmt.Sprintf("update as problematic for %v status", status), func(t *testing.T) {
 			given, then := testabilities.New(t)
 			// given:
 			service := given.Service()
@@ -98,10 +98,10 @@ func TestHandleNotUpdateOnProblematicStatuses(t *testing.T) {
 			given.Repo().ContainsBroadcastedTx(testabilities.FormatHex)
 
 			// and:
-			txInfo := given.TXInfo(status)
+			spec := testabilities.TXInfo(t, status)
 
 			// when:
-			err := service.Handle(context.Background(), chainmodels.TXInfo(txInfo))
+			err := service.Handle(context.Background(), chainmodels.TXInfo(spec))
 
 			// then:
 			then.WithNoError(err).
@@ -110,7 +110,80 @@ func TestHandleNotUpdateOnProblematicStatuses(t *testing.T) {
 	}
 }
 
-func TestEmptyTxID(t *testing.T) {
+func TestDbFails(t *testing.T) {
+	tests := map[string]struct {
+		spec         testabilities.TXInfoSpec
+		failingPoint testabilities.FailingPoint
+	}{
+		"fails on get tx from DB": {
+			spec:         testabilities.MinedTXInfo(t),
+			failingPoint: testabilities.FailingPointGet,
+		},
+		"fails on get tx from DB for problematic tx": {
+			spec:         testabilities.TXInfo(t, chainmodels.DoubleSpendAttempted),
+			failingPoint: testabilities.FailingPointGet,
+		},
+		"fails on update tx in DB": {
+			spec:         testabilities.MinedTXInfo(t),
+			failingPoint: testabilities.FailingPointUpdate,
+		},
+	}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			given, then := testabilities.New(t)
+			// given:
+			service := given.Service()
+
+			// and:
+			given.Repo().
+				ContainsBroadcastedTx(testabilities.FormatBEEF).
+				WillFailOn(test.failingPoint)
+
+			// when:
+			err := service.Handle(context.Background(), chainmodels.TXInfo(test.spec))
+
+			// then:
+			then.WithError(err)
+		})
+	}
+}
+
+func TestForWrongTxInfo(t *testing.T) {
+	tests := map[string]struct {
+		spec testabilities.TXInfoSpec
+	}{
+		"empty tx info": {
+			spec: testabilities.EmptyTXInfo(),
+		},
+		"unequal txInfo block height and the one in BUMP": {
+			spec: testabilities.MinedTXInfo(t).IncrementBlockHeight(),
+		},
+		"wrong merkle path": {
+			spec: testabilities.MinedTXInfo(t).WithWrongMerklePath(),
+		},
+		"subject tx out of merkle path": {
+			spec: testabilities.MinedTXInfo(t).WithSubjectTxOutOfMerklePath(),
+		},
+	}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			given, then := testabilities.New(t)
+			// given:
+			service := given.Service()
+
+			// and:
+			given.Repo().ContainsBroadcastedTx(testabilities.FormatBEEF)
+
+			// when:
+			err := service.Handle(context.Background(), chainmodels.TXInfo(test.spec))
+
+			// then:
+			then.WithError(err)
+		})
+	}
+}
+
+func TestDoNothingOnCallbackWithOldStatus(t *testing.T) {
 	given, then := testabilities.New(t)
 	// given:
 	service := given.Service()
@@ -119,146 +192,11 @@ func TestEmptyTxID(t *testing.T) {
 	given.Repo().ContainsBroadcastedTx(testabilities.FormatBEEF)
 
 	// and:
-	txInfo := given.EmptyTXInfo()
+	spec := testabilities.MinedTXInfo(t).WithTimestamp(time.Now().Add(-1 * time.Hour))
 
 	// when:
-	err := service.Handle(context.Background(), chainmodels.TXInfo(txInfo))
+	err := service.Handle(context.Background(), chainmodels.TXInfo(spec))
 
 	// then:
-	then.WithError(err)
-}
-
-func TestForCallbackWithOldStatus(t *testing.T) {
-	given, then := testabilities.New(t)
-	// given:
-	service := given.Service()
-
-	// and:
-	given.Repo().ContainsBroadcastedTx(testabilities.FormatBEEF)
-
-	// and:
-	txInfo := given.MinedTXInfo().
-		WithTimestamp(time.Now().Add(-1 * time.Hour))
-
-	// when:
-	err := service.Handle(context.Background(), chainmodels.TXInfo(txInfo))
-
-	// then:
-	then.WithNoError(err).
-		TransactionNotUpdated()
-}
-
-func TestForUnequalBlockHeights(t *testing.T) {
-	given, then := testabilities.New(t)
-	// given:
-	service := given.Service()
-
-	// and:
-	given.Repo().ContainsBroadcastedTx(testabilities.FormatBEEF)
-
-	// and:
-	txInfo := given.MinedTXInfo()
-	txInfo.BlockHeight++
-
-	// when:
-	err := service.Handle(context.Background(), chainmodels.TXInfo(txInfo))
-
-	// then:
-	then.WithError(err)
-}
-
-func TestDbFailsOnGet(t *testing.T) {
-	given, then := testabilities.New(t)
-	// given:
-	service := given.Service()
-
-	// and:
-	given.Repo().
-		ContainsBroadcastedTx(testabilities.FormatBEEF).
-		WillFailOnGet()
-
-	// and:
-	txInfo := given.MinedTXInfo()
-
-	// when:
-	err := service.Handle(context.Background(), chainmodels.TXInfo(txInfo))
-
-	// then:
-	then.WithError(err)
-}
-
-func TestDbFailsOnUpdateForMinedTx(t *testing.T) {
-	given, then := testabilities.New(t)
-	// given:
-	service := given.Service()
-
-	// and:
-	given.Repo().
-		ContainsBroadcastedTx(testabilities.FormatBEEF).
-		WillFailOnUpdate()
-
-	// and:
-	txInfo := given.MinedTXInfo()
-
-	// when:
-	err := service.Handle(context.Background(), chainmodels.TXInfo(txInfo))
-
-	// then:
-	then.WithError(err)
-}
-
-func TestDbFailsOnUpdateForProblematicTx(t *testing.T) {
-	given, then := testabilities.New(t)
-	// given:
-	service := given.Service()
-
-	// and:
-	given.Repo().
-		ContainsBroadcastedTx(testabilities.FormatBEEF).
-		WillFailOnUpdate()
-
-	// and:
-	txInfo := given.TXInfo(chainmodels.DoubleSpendAttempted)
-
-	// when:
-	err := service.Handle(context.Background(), chainmodels.TXInfo(txInfo))
-
-	// then:
-	then.WithError(err)
-}
-
-func TestForWrongMerklePath(t *testing.T) {
-	given, then := testabilities.New(t)
-	// given:
-	service := given.Service()
-
-	// and:
-	given.Repo().ContainsBroadcastedTx(testabilities.FormatBEEF)
-
-	// and:
-	txInfo := given.MinedTXInfo().WithWrongMerklePath()
-
-	// when:
-	err := service.Handle(context.Background(), chainmodels.TXInfo(txInfo))
-
-	// then:
-	then.WithError(err)
-}
-
-func TestForSubjectTxOutOfMerklePath(t *testing.T) {
-	given, then := testabilities.New(t)
-	// given:
-	service := given.Service()
-
-	// and:
-	given.Repo().ContainsBroadcastedTx(testabilities.FormatBEEF)
-
-	// and:
-	txInfo := given.MinedTXInfo().WithSubjectTxOutOfMerklePath()
-
-	// when:
-	err := service.Handle(context.Background(), chainmodels.TXInfo(txInfo))
-
-	// then:
-	then.WithError(err)
+	then.WithNoError(err).TransactionNotUpdated()
 }
