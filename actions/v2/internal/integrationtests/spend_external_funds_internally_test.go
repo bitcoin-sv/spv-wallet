@@ -1,15 +1,12 @@
 package integrationtests
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/engine/testabilities/testmode"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/integrationtests/testabilities"
 )
 
 func TestSpendExternalFundsInternally(t *testing.T) {
-	testmode.DevelopmentOnly_SetPostgresMode(t).WithTestcontainersMode()
-
 	// given:
 	given, when, then := testabilities.New(t)
 	cleanup := given.StartedSPVWalletV2()

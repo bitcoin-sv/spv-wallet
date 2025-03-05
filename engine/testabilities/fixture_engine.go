@@ -74,6 +74,7 @@ type engineFixture struct {
 	externalTransport  *httpmock.MockTransport
 	paymailClient      *paymailmock.PaymailClientMock
 	txFixture          txtestability.TransactionsFixtures
+	postgresContainer  *testmode.TestContainer
 }
 
 func Given(t testing.TB) EngineFixture {
@@ -107,7 +108,17 @@ func (f *engineFixture) Engine() (walletEngine EngineWithConfig, cleanup func())
 
 func (f *engineFixture) EngineWithConfiguration(opts ...ConfigOpts) (walletEngine EngineWithConfig, cleanup func()) {
 	f.config = f.ConfigForTests(opts...)
-	f.prepareDBConfigForTests()
+
+	for _, opt := range opts {
+		opt(f.config)
+	}
+
+	if os.Getenv(testmode.EnvDBMode) == "postgres" &&
+		os.Getenv(testmode.EnvDBHost) == "" {
+		f.usePostgresContainer()
+	} else {
+		f.prepareDBConfigForTests()
+	}
 
 	options, err := initializer.ToEngineOptions(f.config, f.logger)
 	require.NoError(f.t, err)
@@ -158,38 +169,79 @@ func (f *engineFixture) Tx() txtestability.TransactionSpec {
 	return f.txFixture.Tx()
 }
 
-// prepareDBConfigForTests creates a new connection that will be used as connection for engine
+// prepareDBConfigForTests selects the appropriate database configuration
 func (f *engineFixture) prepareDBConfigForTests() {
-	require.Equal(f.t, datastore.SQLite, f.config.Db.Datastore.Engine, "Other datastore engines are not supported in tests (yet)")
-
-	// It is a workaround for development purpose to check the code with postgres instance.
-	if ok, dbName := testmode.CheckPostgresMode(); ok {
-		f.config.Db.Datastore.Engine = datastore.PostgreSQL
-		f.config.Db.SQL.User = "postgres"
-		f.config.Db.SQL.Password = "postgres"
-		f.config.Db.SQL.Name = dbName
-		f.config.Db.SQL.Host = "localhost"
-
-		// check if we are running in a testcontainer
-		if os.Getenv(testmode.EnvDBContainer) == "true" {
-			f.config.Db.SQL.Host = os.Getenv(testmode.EnvDBHost)
-			f.config.Db.SQL.Port = os.Getenv(testmode.EnvDBPort)
-		} else {
-			f.config.Db.SQL.Host = "localhost"
-		}
+	if f.tryDevelopmentPostgres() {
 		return
 	}
 
-	// It is a workaround for development purpose to check what is the db state after running a tests.
-	if testmode.CheckFileSQLiteMode() {
-		f.dbConnectionString = fileDbConnectionString
-	} else {
-		f.dbConnectionString = inMemoryDbConnectionString
+	if f.tryDevelopmentSQLite() {
+		return
 	}
+
+	// Default: use SQLite in-memory
+	f.useSQLite()
+}
+
+// tryDevelopmentPostgres configures a development PostgreSQL connection if requested
+// Returns true if this configuration was applied
+func (f *engineFixture) tryDevelopmentPostgres() bool {
+	ok, dbName := testmode.CheckPostgresMode()
+	if !ok {
+		return false
+	}
+
+	f.config.Db.Datastore.Engine = datastore.PostgreSQL
+	f.config.Db.SQL.User = "postgres"
+	f.config.Db.SQL.Password = "postgres"
+	f.config.Db.SQL.Name = dbName
+
+	host, port := os.Getenv(testmode.EnvDBHost), os.Getenv(testmode.EnvDBPort)
+	if host != "" && port != "" {
+		f.config.Db.SQL.Host = host
+		f.config.Db.SQL.Port = port
+	} else {
+		f.config.Db.SQL.Host = "localhost"
+	}
+
+	return true
+}
+
+// tryDevelopmentSQLite configures a development SQLite connection if requested
+// Returns true if this configuration was applied
+func (f *engineFixture) tryDevelopmentSQLite() bool {
+	if !testmode.CheckFileSQLiteMode() {
+		return false
+	}
+
+	f.config.Db.Datastore.Engine = datastore.SQLite
 	f.config.Db.SQLite.Shared = false
 	f.config.Db.SQLite.MaxIdleConnections = 1
 	f.config.Db.SQLite.MaxOpenConnections = 1
-	f.config.Db.SQLite.DatabasePath = f.dbConnectionString
+	f.config.Db.SQLite.DatabasePath = fileDbConnectionString
+
+	return true
+}
+
+// useSQLite configures an in-memory SQLite database for testing
+func (f *engineFixture) useSQLite() {
+	f.config.Db.Datastore.Engine = datastore.SQLite
+	f.config.Db.SQLite.Shared = false
+	f.config.Db.SQLite.MaxIdleConnections = 1
+	f.config.Db.SQLite.MaxOpenConnections = 1
+	f.config.Db.SQLite.DatabasePath = inMemoryDbConnectionString
+}
+
+// usePostgresContainer configures a PostgreSQL container for testing
+func (f *engineFixture) usePostgresContainer() {
+	f.postgresContainer = testmode.GetOrCreatePostgres(f.t)
+
+	f.config.Db.Datastore.Engine = datastore.PostgreSQL
+	f.config.Db.SQL.User = "postgres"
+	f.config.Db.SQL.Password = "postgres"
+	f.config.Db.SQL.Name = "postgres"
+	f.config.Db.SQL.Host = f.postgresContainer.Host
+	f.config.Db.SQL.Port = f.postgresContainer.Port
 }
 
 func (f *engineFixture) initialiseFixtures() {

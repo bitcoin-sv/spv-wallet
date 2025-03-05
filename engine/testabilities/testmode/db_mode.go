@@ -13,18 +13,25 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"os"
+	"sync"
 	"testing"
 	"time"
 )
 
 const (
 	EnvDBMode      = "TEST_DB_MODE"
-	EnvDBContainer = "TEST_DB_CONTAINER"
 	EnvDBName      = "TEST_DB_NAME"
 	EnvDBHost      = "TEST_DB_HOST"
 	EnvDBPort      = "TEST_DB_PORT"
+	EnvSkipCleanup = "TEST_SKIP_CLEANUP"
 
 	defaultPostgresDBName = "postgres"
+)
+
+// Global container instance to be reused across tests
+var (
+	sharedContainer *TestContainer
+	containerMutex  sync.Mutex
 )
 
 // PostgresModeBuilder provides a fluent interface for configuring Postgres test mode
@@ -32,43 +39,48 @@ type PostgresModeBuilder struct {
 	t testing.TB
 }
 
-// DevelopmentOnly_SetPostgresMode sets the test mode to use actual Postgres and sets the database name.
+// WithTestcontainersMode configures PostgreSQL to run in a testcontainer
+func (b *PostgresModeBuilder) WithTestcontainersMode() *PostgresModeBuilder {
+	container := GetOrCreatePostgres(b.t)
+
+	b.t.Setenv(EnvDBHost, container.Host)
+	b.t.Setenv(EnvDBPort, container.Port)
+	b.t.Setenv(EnvDBMode, "postgres")
+
+	return b
+}
+
+// WithoutCleanup prevents the container from being cleaned up after tests
+func (b *PostgresModeBuilder) WithoutCleanup() *PostgresModeBuilder {
+	WithoutCleanup(b.t)
+	return b
+}
+
+// DevelopmentOnly_SetPostgresMode sets the test mode to use actual Postgres
+// This should be used only for development purposes
 func DevelopmentOnly_SetPostgresMode(t testing.TB) *PostgresModeBuilder {
+	t.Helper()
 	t.Setenv(EnvDBMode, "postgres")
 	return &PostgresModeBuilder{t: t}
 }
 
-// WithTestcontainersMode configures PostgreSQL to run in a testcontainer
-func (b *PostgresModeBuilder) WithTestcontainersMode() {
-	ctx := context.Background()
-	container, err := startPostgresContainer(ctx)
-	if err != nil {
-		b.t.Fatalf("Failed to start PostgreSQL container: %v", err)
-	}
-	b.t.Setenv(EnvDBHost, container.host)
-	b.t.Setenv(EnvDBPort, container.port)
-	b.t.Setenv(EnvDBContainer, "true")
-
-	b.t.Cleanup(func() {
-		ctx := context.Background()
-		if err := container.container.Terminate(ctx); err != nil {
-			b.t.Logf("Failed to stop PostgreSQL container: %v", err)
-		}
-	})
-}
-
-// DevelopmentOnly_SetPostgresModeWithName sets the test mode to use actual Postgres and sets the database name.
-func DevelopmentOnly_SetPostgresModeWithName(t testing.TB, dbName string) {
-	DevelopmentOnly_SetPostgresMode(t)
+// DevelopmentOnly_SetPostgresModeWithName sets the test mode to use actual Postgres with a specific database name
+// This should be used only for development purposes
+func DevelopmentOnly_SetPostgresModeWithName(t testing.TB, dbName string) *PostgresModeBuilder {
+	t.Helper()
+	t.Setenv(EnvDBMode, "postgres")
 	t.Setenv(EnvDBName, dbName)
+	return &PostgresModeBuilder{t: t}
 }
 
 // DevelopmentOnly_SetFileSQLiteMode sets the test mode to use SQLite file
+// This should be used only for development purposes
 func DevelopmentOnly_SetFileSQLiteMode(t testing.TB) {
+	t.Helper()
 	t.Setenv(EnvDBMode, "file")
 }
 
-// CheckPostgresMode checks if the test mode is set to use actual Postgres and returns the database name.
+// CheckPostgresMode checks if the test mode is set to use actual Postgres and returns the database name
 func CheckPostgresMode() (ok bool, dbName string) {
 	if os.Getenv(EnvDBMode) != "postgres" {
 		return false, ""
@@ -85,15 +97,59 @@ func CheckFileSQLiteMode() bool {
 	return os.Getenv(EnvDBMode) == "file"
 }
 
-// postgresContainer holds the details of a running PostgreSQL container
-type postgresContainer struct {
-	container testcontainers.Container
-	host      string
-	port      string
+// TestContainer represents a running test container
+type TestContainer struct {
+	Container testcontainers.Container
+	Host      string
+	Port      string
+}
+
+// GetOrCreatePostgres returns an existing PostgreSQL container or creates a new one if none exists
+// This helps reuse containers between tests
+func GetOrCreatePostgres(t testing.TB) *TestContainer {
+	t.Helper()
+
+	containerMutex.Lock()
+	defer containerMutex.Unlock()
+
+	if sharedContainer != nil {
+		t.Log("Reusing existing PostgreSQL container")
+		return sharedContainer
+	}
+
+	container := startPostgresContainer(t)
+	sharedContainer = container
+
+	if !ShouldSkipCleanup() {
+		t.Cleanup(func() {
+			containerMutex.Lock()
+			defer containerMutex.Unlock()
+
+			if sharedContainer != nil {
+				t.Log("Cleaning up PostgreSQL container")
+				ctx := context.Background()
+				if err := sharedContainer.Container.Terminate(ctx); err != nil {
+					t.Logf("Error terminating container: %v", err)
+				}
+				sharedContainer = nil
+			}
+		})
+	}
+
+	return container
 }
 
 // startPostgresContainer starts a PostgreSQL container
-func startPostgresContainer(ctx context.Context) (*postgresContainer, error) {
+func startPostgresContainer(t testing.TB) *TestContainer {
+	t.Helper()
+
+	skipCleanup := ShouldSkipCleanup()
+	if skipCleanup {
+		t.Log("Container cleanup will be skipped (EnvSkipCleanup=true)")
+	}
+
+	ctx := context.Background()
+
 	req := testcontainers.ContainerRequest{
 		Image:        "postgres:14",
 		ExposedPorts: []string{"5432/tcp"},
@@ -102,7 +158,12 @@ func startPostgresContainer(ctx context.Context) (*postgresContainer, error) {
 			"POSTGRES_PASSWORD": "postgres",
 			"POSTGRES_DB":       "postgres",
 		},
-		WaitingFor: wait.ForLog("database system is ready to accept connections").WithStartupTimeout(60 * time.Second),
+		WaitingFor: wait.ForAll(
+			wait.ForLog("database system is ready to accept connections").WithStartupTimeout(30*time.Second),
+			wait.ForSQL("5432/tcp", "postgres", func(host string, port nat.Port) string {
+				return fmt.Sprintf("postgres://postgres:postgres@%s:%s/postgres?sslmode=disable", host, port.Port())
+			}).WithStartupTimeout(30*time.Second),
+		),
 	}
 
 	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
@@ -110,22 +171,45 @@ func startPostgresContainer(ctx context.Context) (*postgresContainer, error) {
 		Started:          true,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to start container: %w", err)
+		t.Fatalf("Failed to start PostgreSQL container: %v", err)
 	}
 
 	host, err := container.Host(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get container host: %w", err)
+		t.Fatalf("Failed to get container host: %v", err)
 	}
 
 	mappedPort, err := container.MappedPort(ctx, nat.Port("5432/tcp"))
 	if err != nil {
-		return nil, fmt.Errorf("failed to get mapped port: %w", err)
+		t.Fatalf("Failed to get mapped port: %v", err)
 	}
 
-	return &postgresContainer{
-		container: container,
-		host:      host,
-		port:      mappedPort.Port(),
-	}, nil
+	time.Sleep(1 * time.Second)
+
+	t.Logf("Started PostgreSQL container at %s:%s", host, mappedPort.Port())
+
+	tc := &TestContainer{
+		Container: container,
+		Host:      host,
+		Port:      mappedPort.Port(),
+	}
+
+	// for debugging purposes: print a message about how to connect to this database
+	if skipCleanup {
+		t.Logf("POSTGRES KEPT ALIVE - Connect with: psql -h %s -p %s -U postgres", host, mappedPort.Port())
+	}
+
+	return tc
+}
+
+// ShouldSkipCleanup returns true if cleanup should be skipped
+func ShouldSkipCleanup() bool {
+	return os.Getenv(EnvSkipCleanup) == "true"
+}
+
+// WithoutCleanup sets the environment to skip cleanup
+func WithoutCleanup(t testing.TB) {
+	t.Helper()
+	t.Setenv(EnvSkipCleanup, "true")
+	t.Log("Database cleanup will be skipped for this test")
 }
