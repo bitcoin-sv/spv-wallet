@@ -1,18 +1,18 @@
 package data
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/engine"
+	v2 "github.com/bitcoin-sv/spv-wallet/engine/v2"
 	"github.com/rs/zerolog"
 )
 
 // APIData represents server with API endpoints
 type APIData struct {
-	engine engine.ClientInterface
+	engine v2.Engine
 	logger *zerolog.Logger
 }
 
 // NewAPIData creates a new server with API endpoints
-func NewAPIData(engine engine.ClientInterface, log *zerolog.Logger) APIData {
+func NewAPIData(engine v2.Engine, log *zerolog.Logger) APIData {
 	logger := log.With().Str("api", "data").Logger()
 
 	return APIData{

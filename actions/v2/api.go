@@ -9,7 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/users"
 	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/config"
-	"github.com/bitcoin-sv/spv-wallet/engine"
+	v2 "github.com/bitcoin-sv/spv-wallet/engine/v2"
 	"github.com/rs/zerolog"
 )
 
@@ -24,7 +24,7 @@ type apiV2 struct {
 }
 
 // NewV2API creates a new server
-func NewV2API(config *config.AppConfig, engine engine.ClientInterface, logger *zerolog.Logger) api.ServerInterface {
+func NewV2API(config *config.AppConfig, engine v2.Engine, logger *zerolog.Logger) api.ServerInterface {
 	return &apiV2{
 		admin.NewAPIAdmin(engine, logger),
 		base.NewAPIBase(config),
