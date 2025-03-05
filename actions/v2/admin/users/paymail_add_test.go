@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
-	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 )
@@ -80,8 +79,7 @@ func TestAddPaymail(t *testing.T) {
 
 		// then:
 		then.Response(res).
-			HasStatus(422).
-			WithJSONf(apierror.ExpectedJSON("error-user-invalid-avatar-url", "invalid avatar url"))
+			WithProblemDetails(422, "unprocessable_entity", "Invalid avatar url")
 	})
 
 	t.Run("Add a paymail to a user as admin using alias and domain as address", func(t *testing.T) {
@@ -205,8 +203,7 @@ func TestAddPaymailWithWrongDomain(t *testing.T) {
 
 		// then:
 		then.Response(res).
-			HasStatus(400).
-			WithJSONf(apierror.ExpectedJSON("error-invalid-domain", "invalid domain"))
+			WithProblemDetails(400, "bad_request", "Unsupported domain")
 	})
 
 	t.Run("Try to add using alias and domain as address", func(t *testing.T) {
@@ -223,8 +220,7 @@ func TestAddPaymailWithWrongDomain(t *testing.T) {
 
 		// then:
 		then.Response(res).
-			HasStatus(400).
-			WithJSONf(apierror.ExpectedJSON("error-invalid-domain", "invalid domain"))
+			WithProblemDetails(400, "bad_request", "Unsupported domain")
 	})
 
 }

@@ -2,13 +2,12 @@ package users
 
 import (
 	"github.com/bitcoin-sv/spv-wallet/errdef/clienterr"
+	"github.com/joomcode/errorx"
 	"net/http"
 
-	adminerrors "github.com/bitcoin-sv/spv-wallet/actions/v2/admin/errors"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/admin/internal/mapping"
 	"github.com/bitcoin-sv/spv-wallet/api"
 	configerrors "github.com/bitcoin-sv/spv-wallet/config/errors"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailerrors"
 	"github.com/gin-gonic/gin"
 )
@@ -29,10 +28,17 @@ func (s *APIAdminUsers) AddPaymailToUser(c *gin.Context, id string) {
 
 	createdPaymail, err := s.engine.PaymailsService().Create(c, newPaymail)
 	if err != nil {
-		spverrors.MapResponse(c, err, s.logger).
-			If(configerrors.ErrUnsupportedDomain).Then(adminerrors.ErrInvalidDomain).
-			If(paymailerrors.ErrInvalidAvatarURL).Then(adminerrors.ErrInvalidAvatarURL).
-			Else(adminerrors.ErrAddingPaymail)
+		if errorx.IsOfType(err, configerrors.UnsupportedDomain) {
+			clienterr.BadRequest.
+				Wrap(err, "Unsupported domain").
+				Response(c, s.logger)
+		} else if errorx.IsOfType(err, paymailerrors.InvalidAvatarURL) {
+			clienterr.UnprocessableEntity.
+				Wrap(err, "Invalid avatar url").
+				Response(c, s.logger)
+		} else {
+			clienterr.Response(c, err, s.logger)
+		}
 		return
 	}
 

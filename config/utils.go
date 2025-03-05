@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/errdef"
 	"slices"
 
 	configerrors "github.com/bitcoin-sv/spv-wallet/config/errors"
@@ -11,7 +12,9 @@ import (
 func (p *PaymailConfig) CheckDomain(domain string) error {
 	if p.DomainValidationEnabled {
 		if !slices.Contains(p.Domains, domain) {
-			return configerrors.ErrUnsupportedDomain
+			return configerrors.UnsupportedDomain.
+				New("domain %s is not supported", domain).
+				WithProperty(errdef.PropPublicHint, "Domain of provided paymail is not supported by this spv-wallet service")
 		}
 	}
 	return nil

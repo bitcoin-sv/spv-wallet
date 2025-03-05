@@ -162,7 +162,7 @@ func (a *responseAssertions) WithProblemDetails(status int, errType string, cont
 		"instance": {{ anything }},
 		"status": {{ .status }},
 		"title": {{ anything }},
-		"type": "bad_request"
+		"type": "{{ .type }}"
 	}`, map[string]any{
 		"status":       status,
 		"type":         errType,
