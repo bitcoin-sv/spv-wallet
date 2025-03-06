@@ -438,3 +438,53 @@ components:
               example: "error-merkleroot-not-part-of-longest-chain"
             message:
               example: "Provided merkleroot is not part of the longest chain"
+
+    WebhookNotFound:
+      allOf:
+        - $ref: "#/components/schemas/Schema"
+        - type: object
+          properties:
+            code:
+              example: "error-webhook-not-found"
+            message:
+              example: "webhook not found"
+
+    NotificationsDisabled:
+      allOf:
+        - $ref: "#/components/schemas/Schema"
+        - type: object
+          properties:
+            code:
+              example: "error-notifications-disabled"
+            message:
+              example: "notifications are disabled"
+
+    WebhookUrlRequired:
+      allOf:
+        - $ref: "#/components/schemas/Schema"
+        - type: object
+          properties:
+            code:
+              example: "error-webhook-url-required"
+            message:
+              example: "webhook url is required"
+    
+    WebhookTokenHeaderRequired:
+      allOf:
+        - $ref: "#/components/schemas/Schema"
+        - type: object
+          properties:
+            code:
+              example: "error-webhook-token-header-required"
+            message:
+              example: "webhook token header is required"
+
+    WebhookTokenValueRequired:
+      allOf:
+        - $ref: "#/components/schemas/Schema"
+        - type: object
+          properties:
+            code:
+              example: "error-webhook-token-value-required"
+            message:
+              example: "webhook token value is required"
