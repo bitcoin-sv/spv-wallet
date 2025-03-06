@@ -2,10 +2,10 @@ package contacts_test
 
 import (
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
@@ -68,13 +68,7 @@ func TestCreateContact(t *testing.T) {
 		// then:
 		then.Response(res).
 			HasStatus(401).
-			WithJSONMatching(`{
-				"code": "{{ .code }}",
-				"message": "{{ .message }}"
-			}`, map[string]any{
-				"code":    spverrors.ErrNotAnAdminKey.Code,
-				"message": spverrors.ErrNotAnAdminKey.Message,
-			})
+			WithJSONf(apierror.ExpectedJSON("error-unauthorized-xpub-not-an-admin-key", "xpub provided is not an admin key"))
 	})
 
 	t.Run("Create contact with unknown creator paymail", func(t *testing.T) {
@@ -96,13 +90,7 @@ func TestCreateContact(t *testing.T) {
 		// then:
 		then.Response(res).
 			HasStatus(404).
-			WithJSONMatching(`{
-				"code": "{{ .code }}",
-				"message": "{{ .message }}"
-			}`, map[string]any{
-				"code":    spverrors.ErrCouldNotFindPaymail.Code,
-				"message": spverrors.ErrCouldNotFindPaymail.Message,
-			})
+			WithJSONf(apierror.ExpectedJSON("error-paymail-not-found", "paymail not found"))
 	})
 
 	t.Run("Create contact with unknown requester paymail", func(t *testing.T) {
@@ -124,13 +112,7 @@ func TestCreateContact(t *testing.T) {
 		// then:
 		then.Response(res).
 			HasStatus(400).
-			WithJSONMatching(`{
-				"code": "{{ .code }}",
-				"message": "{{ .message }}"
-			}`, map[string]any{
-				"code":    spverrors.ErrGettingPKIFailed.Code,
-				"message": spverrors.ErrGettingPKIFailed.Message,
-			})
+			WithJSONf(apierror.ExpectedJSON("error-contact-getting-pki-failed", "getting PKI for contact failed"))
 	})
 
 	t.Run("Create contact without creator paymail", func(t *testing.T) {
@@ -151,13 +133,7 @@ func TestCreateContact(t *testing.T) {
 		// then:
 		then.Response(res).
 			HasStatus(400).
-			WithJSONMatching(`{
-				"code": "{{ .code }}",
-				"message": "{{ .message }}"
-			}`, map[string]any{
-				"code":    spverrors.ErrMissingContactCreatorPaymail.Code,
-				"message": spverrors.ErrMissingContactCreatorPaymail.Message,
-			})
+			WithJSONf(apierror.ExpectedJSON("error-contact-creator-paymail-missing", "missing creator paymail in contact"))
 	})
 
 	t.Run("Create contact without contact full name", func(t *testing.T) {
@@ -176,12 +152,6 @@ func TestCreateContact(t *testing.T) {
 		// then:
 		then.Response(res).
 			HasStatus(400).
-			WithJSONMatching(`{
-				"code": "{{ .code }}",
-				"message": "{{ .message }}"
-			}`, map[string]any{
-				"code":    spverrors.ErrMissingContactFullName.Code,
-				"message": spverrors.ErrMissingContactFullName.Message,
-			})
+			WithJSONf(apierror.ExpectedJSON("error-contact-full-name-missing", "missing full name in contact"))
 	})
 }

@@ -2,10 +2,10 @@ package contacts_test
 
 import (
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 )
@@ -45,21 +45,14 @@ func TestConfirmContact(t *testing.T) {
 		// then:
 		then.Response(res).IsOK()
 
-		// and:
 		// when:
 		res, _ = client.R().
 			Post(fmt.Sprintf("/api/v2/contacts/%s/confirmation", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).
-			HasStatus(spverrors.ErrContactInWrongStatus.StatusCode).
-			WithJSONMatching(`{
-				"code": "{{ .code }}",
-				"message": "{{ .message }}"
-			}`, map[string]any{
-				"code":    spverrors.ErrContactInWrongStatus.Code,
-				"message": spverrors.ErrContactInWrongStatus.Message,
-			})
+			HasStatus(400).
+			WithJSONf(apierror.ExpectedJSON("error-contact-wrong-status", "contact is in wrong status"))
 	})
 
 	t.Run("Contact in wrong status", func(t *testing.T) {
@@ -74,14 +67,8 @@ func TestConfirmContact(t *testing.T) {
 
 		// then:
 		then.Response(res).
-			HasStatus(spverrors.ErrContactInWrongStatus.StatusCode).
-			WithJSONMatching(`{
-				"code": "{{ .code }}",
-				"message": "{{ .message }}"
-			}`, map[string]any{
-				"code":    spverrors.ErrContactInWrongStatus.Code,
-				"message": spverrors.ErrContactInWrongStatus.Message,
-			})
+			HasStatus(400).
+			WithJSONf(apierror.ExpectedJSON("error-contact-wrong-status", "contact is in wrong status"))
 	})
 
 	t.Run("Confirm contact with admin xpub", func(t *testing.T) {
@@ -98,13 +85,7 @@ func TestConfirmContact(t *testing.T) {
 		// then:
 		then.Response(res).
 			HasStatus(401).
-			WithJSONMatching(`{
-				"code": "{{ .code }}",
-				"message": "{{ .message }}"
-			}`, map[string]any{
-				"code":    spverrors.ErrAdminAuthOnUserEndpoint.Code,
-				"message": spverrors.ErrAdminAuthOnUserEndpoint.Message,
-			})
+			WithJSONf(apierror.ExpectedJSON("error-admin-auth-on-user-endpoint", "cannot call user's endpoints with admin authorization"))
 	})
 
 	t.Run("No contact to confirm", func(t *testing.T) {
@@ -119,12 +100,6 @@ func TestConfirmContact(t *testing.T) {
 		// then:
 		then.Response(res).
 			HasStatus(404).
-			WithJSONMatching(`{
-				"code": "{{ .code }}",
-				"message": "{{ .message }}"
-			}`, map[string]any{
-				"code":    spverrors.ErrContactNotFound.Code,
-				"message": spverrors.ErrContactNotFound.Message,
-			})
+			WithJSONf(apierror.ExpectedJSON("error-contact-not-found", "contact not found"))
 	})
 }

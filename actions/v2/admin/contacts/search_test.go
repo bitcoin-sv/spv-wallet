@@ -2,10 +2,10 @@ package contacts_test
 
 import (
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 )
@@ -132,13 +132,7 @@ func TestSearchContact(t *testing.T) {
 		// then:
 		then.Response(res).
 			HasStatus(401).
-			WithJSONMatching(`{
-				"code": "{{ .code }}",
-				"message": "{{ .message }}"
-			}`, map[string]any{
-				"code":    spverrors.ErrNotAnAdminKey.Code,
-				"message": spverrors.ErrNotAnAdminKey.Message,
-			})
+			WithJSONf(apierror.ExpectedJSON("error-unauthorized-xpub-not-an-admin-key", "xpub provided is not an admin key"))
 	})
 
 	t.Run("Search with pagination", func(t *testing.T) {

@@ -2,10 +2,10 @@ package contacts_test
 
 import (
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 )
@@ -45,7 +45,6 @@ func TestRejectContact(t *testing.T) {
 		// then:
 		then.Response(res).IsOK()
 
-		// and:
 		// when:
 		res, _ = client.R().
 			Delete(fmt.Sprintf("/api/v2/admin/invitations/%d", contact.ID))
@@ -68,13 +67,7 @@ func TestRejectContact(t *testing.T) {
 		// then:
 		then.Response(res).
 			HasStatus(401).
-			WithJSONMatching(`{
-				"code": "{{ .code }}",
-				"message": "{{ .message }}"
-			}`, map[string]any{
-				"code":    spverrors.ErrNotAnAdminKey.Code,
-				"message": spverrors.ErrNotAnAdminKey.Message,
-			})
+			WithJSONf(apierror.ExpectedJSON("error-unauthorized-xpub-not-an-admin-key", "xpub provided is not an admin key"))
 	})
 
 	t.Run("No contact to reject", func(t *testing.T) {
@@ -89,12 +82,6 @@ func TestRejectContact(t *testing.T) {
 		// then:
 		then.Response(res).
 			HasStatus(500).
-			WithJSONMatching(`{
-				"code": "{{ .code }}",
-				"message": "{{ .message }}"
-			}`, map[string]any{
-				"code":    spverrors.ErrUpdateContactStatus.Code,
-				"message": spverrors.ErrUpdateContactStatus.Message,
-			})
+			WithJSONf(apierror.ExpectedJSON("error-contact-updating-status-failed", "updating contact status failed"))
 	})
 }

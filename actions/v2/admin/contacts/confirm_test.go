@@ -1,10 +1,10 @@
 package contacts_test
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 )
@@ -33,13 +33,7 @@ func TestConfirmContact(t *testing.T) {
 
 		// then:
 		then.Response(res).HasStatus(500).
-			WithJSONMatching(`{
-				"code": "{{ .code }}",
-				"message": "{{ .message }}"
-			}`, map[string]any{
-				"code":    spverrors.ErrGetContact.Code,
-				"message": spverrors.ErrGetContact.Message,
-			})
+			WithJSONf(apierror.ExpectedJSON("error-contact-getting-contact-failed", "getting contact failed"))
 	})
 
 	t.Run("Only one side has contact", func(t *testing.T) {
@@ -59,13 +53,7 @@ func TestConfirmContact(t *testing.T) {
 
 		// then:
 		then.Response(res).HasStatus(500).
-			WithJSONMatching(`{
-				"code": "{{ .code }}",
-				"message": "{{ .message }}"
-			}`, map[string]any{
-				"code":    spverrors.ErrGetContact.Code,
-				"message": spverrors.ErrGetContact.Message,
-			})
+			WithJSONf(apierror.ExpectedJSON("error-contact-getting-contact-failed", "getting contact failed"))
 	})
 
 	t.Run("Confirm contact", func(t *testing.T) {
@@ -107,7 +95,6 @@ func TestConfirmContact(t *testing.T) {
 		// then:
 		then.Response(res).IsOK()
 
-		// and:
 		// when:
 		res, _ = client.R().
 			SetBody(map[string]any{
@@ -137,13 +124,7 @@ func TestConfirmContact(t *testing.T) {
 		// then:
 		then.Response(res).
 			HasStatus(401).
-			WithJSONMatching(`{
-				"code": "{{ .code }}",
-				"message": "{{ .message }}"
-			}`, map[string]any{
-				"code":    spverrors.ErrNotAnAdminKey.Code,
-				"message": spverrors.ErrNotAnAdminKey.Message,
-			})
+			WithJSONf(apierror.ExpectedJSON("error-unauthorized-xpub-not-an-admin-key", "xpub provided is not an admin key"))
 	})
 
 }
