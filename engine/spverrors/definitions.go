@@ -432,6 +432,15 @@ var ErrWebhookGetAll = models.SPVError{Message: "cannot get all the stored webho
 // ErrNotificationsDisabled happens when the notifications are not enabled in the config
 var ErrNotificationsDisabled = models.SPVError{Message: "notifications are disabled", StatusCode: 404, Code: "error-notifications-disabled"}
 
+// ErrWebhookTokenHeaderRequired is when webhook token header is required
+var ErrWebhookTokenHeaderRequired = models.SPVError{Message: "webhook token header is required", StatusCode: 400, Code: "error-webhook-token-header-required"}
+
+// ErrWebhookUrlRequired is when webhook url is required
+var ErrWebhookUrlRequired = models.SPVError{Message: "webhook url is required", StatusCode: 400, Code: "error-webhook-url-required"}
+
+// ErrWebhookTokenValueRequired is when webhook token value is required
+var ErrWebhookTokenValueRequired = models.SPVError{Message: "webhook token value is required", StatusCode: 400, Code: "error-webhook-token-value-required"}
+
 // ////////////////////////////////// ROUTES ERRORS
 
 // ErrRouteNotFound is when route is not found
