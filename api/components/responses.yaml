@@ -304,8 +304,8 @@ components:
       content:
         application/json:
           schema:
-              $ref: "./errors.yaml#/components/schemas/CannotBindRequest"
-    
+            $ref: "./errors.yaml#/components/schemas/CannotBindRequest"
+
     NotificationsDisabled:
       description: Notifications disabled
       content:

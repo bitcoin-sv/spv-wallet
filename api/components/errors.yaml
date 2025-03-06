@@ -468,7 +468,7 @@ components:
               example: "error-webhook-url-required"
             message:
               example: "webhook url is required"
-    
+
     WebhookTokenHeaderRequired:
       allOf:
         - $ref: "#/components/schemas/Schema"

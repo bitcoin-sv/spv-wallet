@@ -148,7 +148,7 @@ paths:
         200:
           description: Success
         400:
-            $ref: "../components/responses.yaml#/components/responses/SubscribeToWebhookBadRequest"
+          $ref: "../components/responses.yaml#/components/responses/SubscribeToWebhookBadRequest"
         401:
           $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
         404:
