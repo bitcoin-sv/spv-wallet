@@ -13,7 +13,7 @@ type APIMerkleRoots struct {
 
 // NewAPIMerkleRoots creates a new server with API endpoints
 func NewAPIMerkleRoots(engine engine.ClientInterface, log *zerolog.Logger) APIMerkleRoots {
-	logger := log.With().Str("api", "transactions").Logger()
+	logger := log.With().Str("api", "merkleroots").Logger()
 
 	return APIMerkleRoots{
 		engine: engine,
