@@ -27,8 +27,6 @@ const (
 )
 
 func (f *contactFixture) HasContactTo(userB fixtures.User) *contactsmodels.Contact {
-	f.removeContactIfExists(userB)
-
 	newContact := contactsmodels.NewContact{
 		UserID:            f.user.ID(),
 		FullName:          userB.DefaultPaymail().PublicName(),
@@ -44,8 +42,6 @@ func (f *contactFixture) HasContactTo(userB fixtures.User) *contactsmodels.Conta
 }
 
 func (f *contactFixture) HasConfirmedContactTo(userB fixtures.User) *contactsmodels.Contact {
-	f.removeContactIfExists(userB)
-
 	newContact := contactsmodels.NewContact{
 		UserID:            f.user.ID(),
 		FullName:          userB.DefaultPaymail().PublicName(),
@@ -61,8 +57,6 @@ func (f *contactFixture) HasConfirmedContactTo(userB fixtures.User) *contactsmod
 }
 
 func (f *contactFixture) HasRejectedContactTo(userB fixtures.User) *contactsmodels.Contact {
-	f.removeContactIfExists(userB)
-
 	newContact := contactsmodels.NewContact{
 		UserID:            f.user.ID(),
 		FullName:          userB.DefaultPaymail().PublicName(),
@@ -78,8 +72,6 @@ func (f *contactFixture) HasRejectedContactTo(userB fixtures.User) *contactsmode
 }
 
 func (f *contactFixture) HasAwaitingContactTo(userB fixtures.User) *contactsmodels.Contact {
-	f.removeContactIfExists(userB)
-
 	newContact := contactsmodels.NewContact{
 		UserID:            f.user.ID(),
 		FullName:          userB.DefaultPaymail().PublicName(),
@@ -92,9 +84,4 @@ func (f *contactFixture) HasAwaitingContactTo(userB fixtures.User) *contactsmode
 	f.require.NoError(err)
 
 	return contact
-}
-
-func (f *contactFixture) removeContactIfExists(userB fixtures.User) {
-	err := f.engine.Repositories().Contacts.Delete(context.Background(), f.user.ID(), userB.DefaultPaymail().String())
-	f.require.NoError(err)
 }

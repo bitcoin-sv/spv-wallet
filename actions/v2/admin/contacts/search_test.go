@@ -11,16 +11,13 @@ import (
 )
 
 func TestSearchContact(t *testing.T) {
-	// given:
-	givenForAllTests := testabilities.Given(t)
-	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
-		testengine.WithV2(),
-	)
-	defer cleanup()
-
 	t.Run("No contacts", func(t *testing.T) {
 		// given:
-		given, then := testabilities.NewOf(givenForAllTests, t)
+		given, then := testabilities.New(t)
+		cleanup := given.StartedSPVWalletWithConfiguration(
+			testengine.WithV2(),
+		)
+		defer cleanup()
 		client := given.HttpClient().ForAdmin()
 
 		// when:
@@ -48,7 +45,11 @@ func TestSearchContact(t *testing.T) {
 
 	t.Run("Search for all contacts", func(t *testing.T) {
 		// given:
-		given, then := testabilities.NewOf(givenForAllTests, t)
+		given, then := testabilities.New(t)
+		cleanup := given.StartedSPVWalletWithConfiguration(
+			testengine.WithV2(),
+		)
+		defer cleanup()
 		c1 := given.User(fixtures.Sender).HasContactTo(fixtures.RecipientInternal)
 		c2 := given.User(fixtures.RecipientInternal).HasContactTo(fixtures.Sender)
 		c3 := given.User(fixtures.Sender).HasContactTo(fixtures.UserWithMorePaymails)
@@ -115,7 +116,11 @@ func TestSearchContact(t *testing.T) {
 
 	t.Run("Search with user xpub", func(t *testing.T) {
 		// given:
-		given, then := testabilities.NewOf(givenForAllTests, t)
+		given, then := testabilities.New(t)
+		cleanup := given.StartedSPVWalletWithConfiguration(
+			testengine.WithV2(),
+		)
+		defer cleanup()
 		given.User(fixtures.Sender).HasContactTo(fixtures.RecipientInternal)
 		given.User(fixtures.RecipientInternal).HasContactTo(fixtures.Sender)
 		given.User(fixtures.Sender).HasContactTo(fixtures.UserWithMorePaymails)
@@ -138,7 +143,11 @@ func TestSearchContact(t *testing.T) {
 
 	t.Run("Search with pagination", func(t *testing.T) {
 		// given:
-		given, then := testabilities.NewOf(givenForAllTests, t)
+		given, then := testabilities.New(t)
+		cleanup := given.StartedSPVWalletWithConfiguration(
+			testengine.WithV2(),
+		)
+		defer cleanup()
 		c1 := given.User(fixtures.Sender).HasContactTo(fixtures.RecipientInternal)
 		given.User(fixtures.RecipientInternal).HasContactTo(fixtures.Sender)
 		given.User(fixtures.Sender).HasContactTo(fixtures.UserWithMorePaymails)
@@ -184,7 +193,11 @@ func TestSearchContact(t *testing.T) {
 
 	t.Run("Search with conditions", func(t *testing.T) {
 		// given:
-		given, then := testabilities.NewOf(givenForAllTests, t)
+		given, then := testabilities.New(t)
+		cleanup := given.StartedSPVWalletWithConfiguration(
+			testengine.WithV2(),
+		)
+		defer cleanup()
 		given.User(fixtures.Sender).HasContactTo(fixtures.RecipientInternal)
 		c2 := given.User(fixtures.RecipientInternal).HasContactTo(fixtures.Sender)
 		given.User(fixtures.Sender).HasContactTo(fixtures.UserWithMorePaymails)
@@ -242,7 +255,11 @@ func TestSearchContact(t *testing.T) {
 
 	t.Run("Search with conditions and pagination", func(t *testing.T) {
 		// given:
-		given, then := testabilities.NewOf(givenForAllTests, t)
+		given, then := testabilities.New(t)
+		cleanup := given.StartedSPVWalletWithConfiguration(
+			testengine.WithV2(),
+		)
+		defer cleanup()
 		given.User(fixtures.Sender).HasContactTo(fixtures.RecipientInternal)
 		given.User(fixtures.RecipientInternal).HasContactTo(fixtures.Sender)
 		given.User(fixtures.Sender).HasContactTo(fixtures.UserWithMorePaymails)
