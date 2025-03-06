@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/beef"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"gorm.io/gorm"
 )
 
@@ -20,6 +21,70 @@ type Transactions struct {
 // It initializes a database-backed service for querying and managing transactions.
 func NewTransactions(db *gorm.DB) *Transactions {
 	return &Transactions{db: db}
+}
+
+// UpdateTransaction updates the tracked transaction with the given transaction data and makes cleanup of the input sources.
+func (t *Transactions) UpdateTransaction(ctx context.Context, trackedTx *txmodels.TrackedTransaction) error {
+	toUpdate := map[string]any{
+		"block_hash":   trackedTx.BlockHash,
+		"block_height": trackedTx.BlockHeight,
+		"tx_status":    trackedTx.TxStatus,
+	}
+	if trackedTx.BeefHex != nil {
+		toUpdate["beef_hex"] = trackedTx.BeefHex
+		toUpdate["raw_hex"] = nil
+	} else if trackedTx.RawHex != nil {
+		toUpdate["raw_hex"] = trackedTx.RawHex
+		toUpdate["beef_hex"] = nil
+	} else {
+		return spverrors.Newf("tracked transaction %s has no transaction hex", trackedTx.ID)
+	}
+
+	err := t.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		err := tx.
+			Model(&database.TrackedTransaction{}).
+			Where("id = ?", trackedTx.ID).
+			Updates(toUpdate).Error
+
+		if err != nil {
+			return err
+		}
+
+		return tx.
+			Where("tx_id = ?", trackedTx.ID).
+			Delete(&database.TxInput{}).Error
+	})
+
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to update transaction %s", trackedTx.ID)
+	}
+	return nil
+}
+
+// GetTransaction retrieves the tracked transaction with the given transaction ID.
+func (t *Transactions) GetTransaction(ctx context.Context, txID string) (transaction *txmodels.TrackedTransaction, err error) {
+	var record database.TrackedTransaction
+	err = t.db.
+		WithContext(ctx).
+		Where("id = ?", txID).
+		First(&record).Error
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to query transaction hex for %s", txID)
+	}
+
+	return &txmodels.TrackedTransaction{
+		ID:       record.ID,
+		TxStatus: txmodels.TxStatus(record.TxStatus),
+
+		CreatedAt: record.CreatedAt,
+		UpdatedAt: record.UpdatedAt,
+
+		BlockHeight: record.BlockHeight,
+		BlockHash:   record.BlockHash,
+
+		BeefHex: record.BeefHex,
+		RawHex:  record.RawHex,
+	}, nil
 }
 
 // HasTransactionInputSources checks if all the provided input source transaction IDs exist in the database.

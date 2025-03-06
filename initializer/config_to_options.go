@@ -282,17 +282,20 @@ func addARCOpts(c *config.AppConfig, options []engine.ClientOps) ([]engine.Clien
 		WaitFor:      c.ARC.WaitForStatus,
 	}
 
-	if c.ARC.Callback.Enabled {
+	if c.ARCCallbackEnabled() {
 		var err error
 		if c.ARC.Callback.Token == "" {
 			// This also sets the token to the config reference and, it is used in the callbacktoken_middleware
-			// TODO: consider moving config modification to a PostLoad method and make this ToEngineOptions pure (no side effects)
 			if c.ARC.Callback.Token, err = utils.HashAdler32(config.DefaultAdminXpub); err != nil {
 				return nil, spverrors.Wrapf(err, "error while generating callback token")
 			}
 		}
+		callbackURL, err := c.ARC.Callback.ShouldGetURL()
+		if err != nil {
+			return nil, spverrors.Wrapf(err, "error while getting callback url")
+		}
 		arcCfg.Callback = &chainmodels.ARCCallbackConfig{
-			URL:   c.ARC.Callback.Host + config.BroadcastCallbackRoute,
+			URL:   callbackURL.String(),
 			Token: c.ARC.Callback.Token,
 		}
 	}
