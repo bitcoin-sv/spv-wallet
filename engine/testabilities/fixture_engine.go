@@ -29,6 +29,8 @@ import (
 const inMemoryDbConnectionString = "file:spv-wallet-test.db?mode=memory"
 const fileDbConnectionString = "file:spv-wallet-test.db"
 
+const CallbackTestToken = "arc-test-token"
+
 type EngineFixture interface {
 	Engine() (walletEngine EngineWithConfig, cleanup func())
 	EngineWithConfiguration(opts ...ConfigOpts) (walletEngine EngineWithConfig, cleanup func())
@@ -66,24 +68,27 @@ type EngineWithConfig struct {
 }
 
 type engineFixture struct {
-	config            *config.AppConfig
-	engine            engine.ClientInterface
-	t                 testing.TB
-	logger            zerolog.Logger
-	externalTransport *httpmock.MockTransport
-	paymailClient     *paymailmock.PaymailClientMock
-	txFixture         txtestability.TransactionsFixtures
-	postgresContainer *testmode.TestContainer
+	config                       *config.AppConfig
+	engine                       engine.ClientInterface
+	t                            testing.TB
+	logger                       zerolog.Logger
+	dbConnectionString           string
+	externalTransport            *httpmock.MockTransport
+	paymailClient                *paymailmock.PaymailClientMock
+	txFixture                    txtestability.TransactionsFixtures
+	externalTransportWithSniffer *tester.HTTPSniffer
+	postgresContainer            *testmode.TestContainer
 }
 
 func Given(t testing.TB) EngineFixture {
 	externalTransport := httpmock.NewMockTransport()
 	f := &engineFixture{
-		t:                 t,
-		logger:            tester.Logger(t),
-		externalTransport: externalTransport,
-		paymailClient:     paymailmock.MockClient(externalTransport, fixtures.PaymailDomainExternal),
-		txFixture:         txtestability.Given(t),
+		t:                            t,
+		logger:                       tester.Logger(t),
+		externalTransport:            externalTransport,
+		paymailClient:                paymailmock.MockClient(externalTransport, fixtures.PaymailDomainExternal),
+		txFixture:                    txtestability.Given(t),
+		externalTransportWithSniffer: tester.NewHTTPSniffer(externalTransport),
 	}
 
 	return f
@@ -271,7 +276,7 @@ func (f *engineFixture) addMockedExternalDependenciesOptions(options []engine.Cl
 
 func (f *engineFixture) httpClientWithMockedTransport() *resty.Client {
 	client := resty.New()
-	client.SetTransport(f.externalTransport)
+	client.SetTransport(f.externalTransportWithSniffer)
 	return client
 }
 
@@ -325,6 +330,10 @@ func getConfigForTests() *config.AppConfig {
 		Satoshis: 1,
 		Bytes:    1000,
 	}
+
+	cfg.ARC.Callback.Enabled = true
+	cfg.ARC.Callback.Host = "https://" + fixtures.PaymailDomain
+	cfg.ARC.Callback.Token = CallbackTestToken
 
 	cfg.Paymail.Domains = []string{fixtures.PaymailDomain}
 

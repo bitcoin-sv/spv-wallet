@@ -1,7 +1,8 @@
 package transactions
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/config"
+	"fmt"
+
 	"github.com/bitcoin-sv/spv-wallet/server/handlers"
 )
 
@@ -15,5 +16,16 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 	group.POST("/drafts", handlers.AsUser(newTransactionDraft))
 	group.POST("", handlers.AsUser(recordTransaction))
 
-	handlersManager.Get(handlers.GroupTransactionCallback).POST(config.BroadcastCallbackRoute, broadcastCallback)
+	registerARCCallback(handlersManager)
+}
+
+func registerARCCallback(handlersManager *handlers.Manager) {
+	config := handlersManager.GetConfig()
+	if config.ARCCallbackEnabled() {
+		callbackURL, err := config.ARC.Callback.ShouldGetURL()
+		if err != nil {
+			panic(fmt.Sprintf(`couldn't get callback URL from configuration: %v`, err.Error()))
+		}
+		handlersManager.Get(handlers.GroupTransactionCallback).POST(callbackURL.Path, broadcastCallback)
+	}
 }

@@ -11,8 +11,7 @@ import (
 )
 
 type IntegrationTestFixtures interface {
-	StartedSPVWalletV2() (cleanup func())
-	StartedSPVWalletV2WithOptions(dbOptions ...DBOption) (cleanup func())
+	StartedSPVWalletV2(opts ...testengine.ConfigOpts) (cleanup func())
 	Paymail() testpaymail.PaymailClientFixture
 
 	Alice() *fixtures.User
@@ -55,17 +54,10 @@ func newFixture(t testing.TB, appFixture testabilities.SPVWalletApplicationFixtu
 	}
 }
 
-func (f *fixture) StartedSPVWalletV2() (cleanup func()) {
-	cleanup = f.StartedSPVWalletWithConfiguration(testengine.WithV2())
+func (f *fixture) StartedSPVWalletV2(opts ...testengine.ConfigOpts) (cleanup func()) {
+	cleanup = f.StartedSPVWalletWithConfiguration(append(opts, testengine.WithV2())...)
 	f.Paymail().ExternalPaymailHost().WillRespondWithP2PWithBEEFCapabilities()
 	return
-}
-
-func (f *fixture) StartedSPVWalletV2WithOptions(dbOptions ...DBOption) (cleanup func()) {
-	for _, option := range dbOptions {
-		option(f.t)
-	}
-	return f.StartedSPVWalletV2()
 }
 
 func (f *fixture) Alice() *fixtures.User {
