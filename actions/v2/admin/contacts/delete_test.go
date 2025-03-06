@@ -1,7 +1,7 @@
 package contacts_test
 
 import (
-	"strconv"
+	"fmt"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -26,7 +26,7 @@ func TestDeleteContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Delete("/api/v2/admin/contacts/" + strconv.Itoa(int(contact.ID)))
+			Delete(fmt.Sprintf("/api/v2/admin/contacts/%d", contact.ID))
 
 		// then:
 		then.Response(res).IsOK()
@@ -40,7 +40,7 @@ func TestDeleteContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Delete("/api/v2/admin/contacts/" + strconv.Itoa(int(contact.ID)))
+			Delete(fmt.Sprintf("/api/v2/admin/contacts/%d", contact.ID))
 
 		// then:
 		then.Response(res).IsOK()
@@ -48,7 +48,7 @@ func TestDeleteContact(t *testing.T) {
 		// and:
 		// when:
 		res, _ = client.R().
-			Delete("/api/v2/admin/contacts/" + strconv.Itoa(int(contact.ID)))
+			Delete(fmt.Sprintf("/api/v2/admin/contacts/%d", contact.ID))
 
 		// then:
 		then.Response(res).IsOK()
@@ -63,7 +63,7 @@ func TestDeleteContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Delete("/api/v2/admin/contacts/" + strconv.Itoa(int(contact.ID)))
+			Delete(fmt.Sprintf("/api/v2/admin/contacts/%d", contact.ID))
 
 		// then:
 		then.Response(res).

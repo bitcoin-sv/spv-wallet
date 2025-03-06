@@ -1,7 +1,7 @@
 package contacts_test
 
 import (
-	"strconv"
+	"fmt"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -32,7 +32,7 @@ func TestUpdateContact(t *testing.T) {
 			SetBody(map[string]any{
 				"fullName": fullNameForUpdate,
 			}).
-			Put("/api/v2/admin/contacts/" + strconv.Itoa(int(contact.ID)))
+			Put(fmt.Sprintf("/api/v2/admin/contacts/%d", contact.ID))
 
 		// then:
 		then.Response(res).
@@ -60,7 +60,7 @@ func TestUpdateContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Put("/api/v2/admin/contacts/" + strconv.Itoa(int(contact.ID)))
+			Put(fmt.Sprintf("/api/v2/admin/contacts/%d", contact.ID))
 
 		// then:
 		then.Response(res).
@@ -83,7 +83,7 @@ func TestUpdateContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Put("/api/v2/admin/contacts/" + strconv.Itoa(int(contact.ID)))
+			Put(fmt.Sprintf("/api/v2/admin/contacts/%d", contact.ID))
 
 		// then:
 		then.Response(res).

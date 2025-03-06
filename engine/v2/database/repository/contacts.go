@@ -3,8 +3,6 @@ package repository
 import (
 	"context"
 	"errors"
-	"fmt"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
@@ -183,10 +181,6 @@ func (r *Contacts) PaginatedForAdmin(ctx context.Context, page filter.Page, cond
 }
 
 func (r *Contacts) checkUpdateResultAndReturnContact(ctx context.Context, result *gorm.DB, contactID uint) (*contactsmodels.Contact, error) {
-	fmt.Println("checkUpdateResultAndReturnContact")
-	fmt.Println(result.Error)
-	fmt.Println(result.RowsAffected)
-
 	if result.Error != nil {
 		return nil, spverrors.Wrapf(result.Error, "failed to update contact")
 	}

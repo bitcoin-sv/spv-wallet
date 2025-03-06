@@ -26,7 +26,7 @@ func TestAcceptContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Post("/api/v2/invitations/" + fixtures.RecipientInternal.DefaultPaymail().String() + "/contacts")
+			Post(fmt.Sprintf("/api/v2/invitations/%s/contacts", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).IsOK()
@@ -42,7 +42,7 @@ func TestAcceptContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Post("/api/v2/invitations/" + fixtures.RecipientInternal.DefaultPaymail().String() + "/contacts")
+			Post(fmt.Sprintf("/api/v2/invitations/%s/contacts", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).IsOK()
@@ -50,7 +50,7 @@ func TestAcceptContact(t *testing.T) {
 		// and:
 		// when:
 		res, _ = client.R().
-			Post("/api/v2/invitations/" + fixtures.RecipientInternal.DefaultPaymail().String() + "/contacts")
+			Post(fmt.Sprintf("/api/v2/invitations/%s/contacts", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).
@@ -72,7 +72,7 @@ func TestAcceptContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Post("/api/v2/invitations/" + fixtures.RecipientInternal.DefaultPaymail().String() + "/contacts")
+			Post(fmt.Sprintf("/api/v2/invitations/%s/contacts", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).
@@ -95,7 +95,7 @@ func TestAcceptContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Post("/api/v2/invitations/" + fixtures.RecipientInternal.DefaultPaymail().String() + "/contacts")
+			Post(fmt.Sprintf("/api/v2/invitations/%s/contacts", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).
@@ -116,7 +116,7 @@ func TestAcceptContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Post("/api/v2/invitations/" + fixtures.RecipientExternal.DefaultPaymail().String() + "/contacts")
+			Post(fmt.Sprintf("/api/v2/invitations/%s/contacts", fixtures.RecipientExternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).

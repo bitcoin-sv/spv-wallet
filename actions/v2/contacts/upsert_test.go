@@ -1,6 +1,7 @@
 package contacts_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -30,7 +31,7 @@ func TestUpsertContact(t *testing.T) {
 				"requesterPaymail": fixtures.Sender.DefaultPaymail().String(),
 				"fullName":         fixtures.RecipientInternal.DefaultPaymail().PublicName(),
 			}).
-			Put("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
+			Put(fmt.Sprintf("/api/v2/contacts/%s", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).
@@ -62,7 +63,7 @@ func TestUpsertContact(t *testing.T) {
 				"requesterPaymail": fixtures.Sender.DefaultPaymail().String(),
 				"fullName":         fixtures.RecipientInternal.DefaultPaymail().PublicName(),
 			}).
-			Put("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
+			Put(fmt.Sprintf("/api/v2/contacts/%s", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).
@@ -88,7 +89,7 @@ func TestUpsertContact(t *testing.T) {
 				"requesterPaymail": fixtures.RecipientExternal.DefaultPaymail().String(),
 				"fullName":         fixtures.RecipientInternal.DefaultPaymail().PublicName(),
 			}).
-			Put("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
+			Put(fmt.Sprintf("/api/v2/contacts/%s", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).
@@ -114,7 +115,7 @@ func TestUpsertContact(t *testing.T) {
 				"requesterPaymail": fixtures.RecipientInternal.DefaultPaymail().String(),
 				"fullName":         fixtures.RecipientInternal.DefaultPaymail().PublicName(),
 			}).
-			Put("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
+			Put(fmt.Sprintf("/api/v2/contacts/%s", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).
@@ -140,7 +141,7 @@ func TestUpsertContact(t *testing.T) {
 			SetBody(map[string]any{
 				"fullName": fixtures.RecipientInternal.DefaultPaymail().PublicName(),
 			}).
-			Put("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
+			Put(fmt.Sprintf("/api/v2/contacts/%s", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).
@@ -166,7 +167,7 @@ func TestUpsertContact(t *testing.T) {
 			SetBody(map[string]any{
 				"requesterPaymail": fixtures.Sender.DefaultPaymail().String(),
 			}).
-			Put("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
+			Put(fmt.Sprintf("/api/v2/contacts/%s", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).

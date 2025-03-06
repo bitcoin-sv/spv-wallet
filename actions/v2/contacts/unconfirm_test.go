@@ -1,6 +1,7 @@
 package contacts_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -25,7 +26,7 @@ func TestUnconfirmContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Delete("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String() + "/confirmation")
+			Delete(fmt.Sprintf("/api/v2/contacts/%s/confirmation", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).IsOK()
@@ -39,7 +40,7 @@ func TestUnconfirmContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Delete("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String() + "/confirmation")
+			Delete(fmt.Sprintf("/api/v2/contacts/%s/confirmation", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).IsOK()
@@ -47,7 +48,7 @@ func TestUnconfirmContact(t *testing.T) {
 		// and:
 		// when:
 		res, _ = client.R().
-			Delete("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String() + "/confirmation")
+			Delete(fmt.Sprintf("/api/v2/contacts/%s/confirmation", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).
@@ -69,7 +70,7 @@ func TestUnconfirmContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Delete("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String() + "/confirmation")
+			Delete(fmt.Sprintf("/api/v2/contacts/%s/confirmation", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).
@@ -92,7 +93,7 @@ func TestUnconfirmContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Delete("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String() + "/confirmation")
+			Delete(fmt.Sprintf("/api/v2/contacts/%s/confirmation", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).
@@ -113,7 +114,7 @@ func TestUnconfirmContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Delete("/api/v2/contacts/" + fixtures.RecipientExternal.DefaultPaymail().String() + "/confirmation")
+			Delete(fmt.Sprintf("/api/v2/contacts/%s/confirmation", fixtures.RecipientExternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).

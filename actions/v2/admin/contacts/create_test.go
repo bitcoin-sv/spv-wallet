@@ -31,7 +31,7 @@ func TestCreateContact(t *testing.T) {
 				"creatorPaymail": fixtures.Sender.DefaultPaymail().String(),
 				"fullName":       fixtures.RecipientInternal.DefaultPaymail().PublicName(),
 			}).
-			Post("/api/v2/admin/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
+			Post(fmt.Sprintf("/api/v2/admin/contacts/%s", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).
@@ -63,7 +63,7 @@ func TestCreateContact(t *testing.T) {
 				"creatorPaymail": fixtures.Sender.DefaultPaymail().String(),
 				"fullName":       fixtures.RecipientInternal.DefaultPaymail().PublicName(),
 			}).
-			Post("/api/v2/admin/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
+			Post(fmt.Sprintf("/api/v2/admin/contacts/%s", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).
@@ -89,7 +89,7 @@ func TestCreateContact(t *testing.T) {
 				"creatorPaymail": "unknown-paymail@exmaple.com",
 				"fullName":       fixtures.RecipientInternal.DefaultPaymail().PublicName(),
 			}).
-			Post("/api/v2/admin/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
+			Post(fmt.Sprintf("/api/v2/admin/contacts/%s", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		fmt.Println(res.String())
 

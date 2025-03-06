@@ -1,6 +1,7 @@
 package contacts_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -25,7 +26,7 @@ func TestRemoveContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Delete("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
+			Delete(fmt.Sprintf("/api/v2/contacts/%s", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).IsOK()
@@ -39,7 +40,7 @@ func TestRemoveContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Delete("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
+			Delete(fmt.Sprintf("/api/v2/contacts/%s", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).IsOK()
@@ -53,7 +54,7 @@ func TestRemoveContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Delete("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
+			Delete(fmt.Sprintf("/api/v2/contacts/%s", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).IsOK()
@@ -67,7 +68,7 @@ func TestRemoveContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Delete("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
+			Delete(fmt.Sprintf("/api/v2/contacts/%s", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).IsOK()
@@ -81,7 +82,7 @@ func TestRemoveContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Delete("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
+			Delete(fmt.Sprintf("/api/v2/contacts/%s", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).IsOK()
@@ -89,7 +90,7 @@ func TestRemoveContact(t *testing.T) {
 		// and:
 		// when:
 		res, _ = client.R().
-			Delete("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
+			Delete(fmt.Sprintf("/api/v2/contacts/%s", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).IsOK()
@@ -104,7 +105,7 @@ func TestRemoveContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Delete("/api/v2/contacts/" + fixtures.RecipientInternal.DefaultPaymail().String())
+			Delete(fmt.Sprintf("/api/v2/contacts/%s", fixtures.RecipientInternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).
@@ -125,7 +126,7 @@ func TestRemoveContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Delete("/api/v2/contacts/" + fixtures.RecipientExternal.DefaultPaymail().String())
+			Delete(fmt.Sprintf("/api/v2/contacts/%s", fixtures.RecipientExternal.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).IsOK()

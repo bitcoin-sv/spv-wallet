@@ -132,10 +132,10 @@ func TestSearchContact(t *testing.T) {
 		given.User(fixtures.Sender).HasContactTo(fixtures.UserWithMorePaymails)
 		client := given.HttpClient().ForGivenUser(fixtures.Sender)
 
-		pageQuery := fmt.Sprintf("?page=%d&size=%d&sort=%s&sortBy=%s", 1, 1, "asc", "created_at")
+		pageQuery := fmt.Sprintf("page=%d&size=%d&sort=%s&sortBy=%s", 1, 1, "asc", "created_at")
 
 		// when:
-		res, _ := client.R().Get("/api/v2/contacts" + pageQuery)
+		res, _ := client.R().Get(fmt.Sprintf("/api/v2/contacts?%s", pageQuery))
 
 		// then:
 		then.Response(res).
@@ -179,10 +179,10 @@ func TestSearchContact(t *testing.T) {
 		given.User(fixtures.UserWithMorePaymails).HasContactTo(fixtures.Sender)
 		client := given.HttpClient().ForGivenUser(fixtures.Sender)
 
-		conditionsQuery := fmt.Sprintf("?paymail=%s", fixtures.UserWithMorePaymails.DefaultPaymail().String())
+		conditionsQuery := fmt.Sprintf("paymail=%s", fixtures.UserWithMorePaymails.DefaultPaymail().String())
 
 		// when:
-		res, _ := client.R().Get("/api/v2/contacts" + conditionsQuery)
+		res, _ := client.R().Get(fmt.Sprintf("/api/v2/contacts?%s", conditionsQuery))
 
 		// then:
 		then.Response(res).
@@ -224,11 +224,11 @@ func TestSearchContact(t *testing.T) {
 		given.User(fixtures.UserWithMorePaymails).HasContactTo(fixtures.Sender)
 		client := given.HttpClient().ForGivenUser(fixtures.Sender)
 
-		pageQuery := fmt.Sprintf("?page=%d&size=%d&sort=%s&sortBy=%s", 1, 1, "asc", "created_at")
+		pageQuery := fmt.Sprintf("page=%d&size=%d&sort=%s&sortBy=%s", 1, 1, "asc", "created_at")
 		conditionsQuery := fmt.Sprintf("&paymail=%s", fixtures.UserWithMorePaymails.DefaultPaymail().String())
 
 		// when:
-		res, _ := client.R().Get("/api/v2/contacts" + pageQuery + conditionsQuery)
+		res, _ := client.R().Get(fmt.Sprintf("/api/v2/contacts?%s%s", pageQuery, conditionsQuery))
 
 		// then:
 		then.Response(res).

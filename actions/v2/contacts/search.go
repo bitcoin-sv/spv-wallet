@@ -23,6 +23,8 @@ func (s *APIContacts) GetContacts(c *gin.Context, params api.GetContactsParams) 
 	page := mapContactsParamToFilterPage(params)
 	conditions := mapping.MapToDBConditions(params)
 
+	//mapstructure viper
+
 	pagedResult, err := s.engine.ContactService().PaginatedForUser(c.Request.Context(), userID, page, conditions)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)

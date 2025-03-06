@@ -1,6 +1,7 @@
 package contacts_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -23,7 +24,8 @@ func TestGetContact(t *testing.T) {
 		client := given.HttpClient().ForGivenUser(fixtures.Sender)
 
 		// when:
-		res, _ := client.R().Get("/api/v2/contacts/" + fixtures.UserWithMorePaymails.DefaultPaymail().String())
+		res, _ := client.R().
+			Get(fmt.Sprintf("/api/v2/contacts/%s", fixtures.UserWithMorePaymails.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).
@@ -46,7 +48,8 @@ func TestGetContact(t *testing.T) {
 		client := given.HttpClient().ForGivenUser(fixtures.Sender)
 
 		// when:
-		res, _ := client.R().Get("/api/v2/contacts/" + fixtures.UserWithMorePaymails.DefaultPaymail().String())
+		res, _ := client.R().
+			Get(fmt.Sprintf("/api/v2/contacts/%s", fixtures.UserWithMorePaymails.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).
@@ -76,7 +79,8 @@ func TestGetContact(t *testing.T) {
 		client := given.HttpClient().ForAdmin()
 
 		// when:
-		res, _ := client.R().Get("/api/v2/contacts/" + fixtures.UserWithMorePaymails.DefaultPaymail().String())
+		res, _ := client.R().
+			Get(fmt.Sprintf("/api/v2/contacts/%s", fixtures.UserWithMorePaymails.DefaultPaymail().String()))
 
 		// then:
 		then.Response(res).

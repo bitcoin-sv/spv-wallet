@@ -1,7 +1,7 @@
 package contacts_test
 
 import (
-	"strconv"
+	"fmt"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -27,7 +27,7 @@ func TestAcceptContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Post("/api/v2/admin/invitations/" + strconv.Itoa(int(contact.ID)))
+			Post(fmt.Sprintf("/api/v2/admin/invitations/%d", contact.ID))
 
 		// then:
 		then.Response(res).
@@ -55,7 +55,7 @@ func TestAcceptContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Post("/api/v2/admin/invitations/" + strconv.Itoa(int(contact.ID)))
+			Post(fmt.Sprintf("/api/v2/admin/invitations/%d", contact.ID))
 
 		// then:
 		then.Response(res).
@@ -77,7 +77,7 @@ func TestAcceptContact(t *testing.T) {
 		// and:
 		// when:
 		res, _ = client.R().
-			Post("/api/v2/admin/invitations/" + strconv.Itoa(int(contact.ID)))
+			Post(fmt.Sprintf("/api/v2/admin/invitations/%d", contact.ID))
 
 		// then:
 		then.Response(res).
@@ -106,7 +106,7 @@ func TestAcceptContact(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			Post("/api/v2/admin/invitations/" + strconv.Itoa(int(contact.ID)))
+			Post(fmt.Sprintf("/api/v2/admin/invitations/%d", contact.ID))
 
 		// then:
 		then.Response(res).
