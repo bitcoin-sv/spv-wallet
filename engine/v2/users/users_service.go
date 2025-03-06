@@ -15,15 +15,7 @@ import (
 // Service is a user domain service
 type Service struct {
 	usersRepo UserRepo
-	// paymailsRepo   paymails.PaymailRepo
-	// dataRepo       data.Repo
-	// operationsRepo operations.Repo
-	// addressesRepo addresses.AddressRepo
-	// transactions musimy usunac tracked_transactions i tracked output
-	// tracked output
-	// tracked transa
-
-	config *config.AppConfig
+	config    *config.AppConfig
 }
 
 // NewService creates a new user service
