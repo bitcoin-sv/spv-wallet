@@ -72,7 +72,6 @@ type engineFixture struct {
 	engine                       engine.ClientInterface
 	t                            testing.TB
 	logger                       zerolog.Logger
-	dbConnectionString           string
 	externalTransport            *httpmock.MockTransport
 	paymailClient                *paymailmock.PaymailClientMock
 	txFixture                    txtestability.TransactionsFixtures
