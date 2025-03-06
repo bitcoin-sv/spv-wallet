@@ -20,6 +20,7 @@ type usersService interface {
 	GetBalance(ctx context.Context, userID string) (bsv.Satoshis, error)
 }
 
+// APIUsers represents server with API endpoints
 type APIUsers struct {
 	usersService usersService
 	logger       *zerolog.Logger

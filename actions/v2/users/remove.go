@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// CurrentUser returns current user information
+// DeleteCurrentUser attempts to delete current user
 func (s *APIUsers) DeleteCurrentUser(c *gin.Context) {
 	userContext := reqctx.GetUserContext(c)
 	userID, err := userContext.ShouldGetUserID()

@@ -34,6 +34,7 @@ func (u *Users) Exists(ctx context.Context, userID string) (bool, error) {
 	return count > 0, nil
 }
 
+// Delete deletes user with userID and deletes their associated paymails, addresses, operations and tracked outputs
 func (u *Users) Delete(ctx context.Context, userID string) error {
 	error := u.db.WithContext(ctx).Unscoped().Transaction(func(tx *gorm.DB) error {
 		if err := tx.Delete(&database.Paymail{}, "user_id = ?", userID).Error; err != nil {
@@ -59,7 +60,7 @@ func (u *Users) Delete(ctx context.Context, userID string) error {
 		return nil
 	})
 
-	return error
+	return spverrors.Wrapf(error, "failed to delete user")
 }
 
 // GetIDByPubKey returns a user by its public key. If the user does not exist, it returns error.
