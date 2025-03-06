@@ -36,6 +36,7 @@ type IntegrationTestAction interface {
 	Alice() ActorsActions
 	Bob() ActorsActions
 	Charlie() ActorsActions
+	ARC() ARCActions
 }
 
 type ActorsActions interface {
@@ -44,6 +45,10 @@ type ActorsActions interface {
 	SendsData(data []string) string
 
 	CreatesOutline() OutlineBuilder
+}
+
+type ARCActions interface {
+	SendsCallback(txInfo chainmodels.TXInfo)
 }
 
 type actions struct {
@@ -60,6 +65,13 @@ func newActions(t testing.TB, given *fixture) IntegrationTestAction {
 
 func (a *actions) Alice() ActorsActions {
 	return a.fixture.alice
+}
+
+func (a *actions) ARC() ARCActions {
+	return &arcActions{
+		t:       a.t,
+		fixture: a.fixture,
+	}
 }
 
 func (a *actions) Bob() ActorsActions {

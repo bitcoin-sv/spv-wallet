@@ -30,5 +30,7 @@ func OperationsResponse(operation *operationsmodels.Operation) api.ModelsOperati
 		Type:         api.ModelsOperationType(operation.Type),
 		Counterparty: operation.Counterparty,
 		TxStatus:     api.ModelsOperationTxStatus(operation.TxStatus),
+		BlockHeight:  operation.BlockHeight,
+		BlockHash:    operation.BlockHash,
 	}
 }
