@@ -78,6 +78,9 @@ func matchNumber() string {
 }
 
 func containsAll(parts []string) string {
+	if len(parts) == 0 {
+		return "*"
+	}
 	partsRegex := strings.Builder{}
 	partsRegex.WriteString("^")
 	for _, part := range parts {

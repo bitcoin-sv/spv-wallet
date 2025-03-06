@@ -3,7 +3,7 @@ package clienterr
 import (
 	"errors"
 
-	errdef2 "github.com/bitcoin-sv/spv-wallet/errdef"
+	"github.com/bitcoin-sv/spv-wallet/errdef"
 	"github.com/gin-gonic/gin"
 	"github.com/joomcode/errorx"
 	"github.com/rs/zerolog"
@@ -16,11 +16,11 @@ func Response(c *gin.Context, err error, log *zerolog.Logger) {
 	c.JSON(problem.Status, problem)
 }
 
-func problemDetailsFromError(err error) (problem errdef2.ProblemDetails, level zerolog.Level) {
+func problemDetailsFromError(err error) (problem errdef.ProblemDetails, level zerolog.Level) {
 	var ex *errorx.Error
 	if errors.As(err, &ex) {
 		if details, ok := ex.Property(propProblemDetails); ok {
-			problem = details.(errdef2.ProblemDetails)
+			problem = details.(errdef.ProblemDetails)
 			level = zerolog.InfoLevel
 			return
 		}
@@ -29,12 +29,12 @@ func problemDetailsFromError(err error) (problem errdef2.ProblemDetails, level z
 		level = zerolog.WarnLevel
 		problem.Type = "internal"
 		problem.FromInternalError(ex)
-		if errorx.HasTrait(ex, errdef2.TraitUnsupported) {
+		if errorx.HasTrait(ex, errdef.TraitUnsupported) {
 			problem.Title = "Unsupported operation"
 			problem.Status = 501
 			return
 		}
-		if errorx.HasTrait(ex, errdef2.TraitShouldNeverHappen) {
+		if errorx.HasTrait(ex, errdef.TraitShouldNeverHappen) {
 			problem.Detail = "This should never happen"
 		}
 
@@ -44,11 +44,8 @@ func problemDetailsFromError(err error) (problem errdef2.ProblemDetails, level z
 	}
 
 	level = zerolog.ErrorLevel
-	problem = errdef2.ProblemDetails{
-		Type:     "internal",
-		Title:    "Unknown error",
-		Status:   500,
-		Instance: "",
-	}
+	problem.Title = "Unknown error"
+	problem.Status = 500
+	problem.Type = "internal"
 	return
 }

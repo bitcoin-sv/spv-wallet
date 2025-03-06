@@ -58,7 +58,7 @@ func (u *Users) Get(ctx context.Context, userID string) (*usersmodels.User, erro
 		Where("id = ?", userID).
 		First(&user).Error
 	if err != nil {
-		return nil, dberrors.QueryFailed.Wrap(err, "failed to get user by ID")
+		return nil, dberrors.QueryOrNotFoundError(err, "failed to get user by ID")
 	}
 
 	return mapToDomainUser(&user), nil

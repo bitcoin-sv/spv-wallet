@@ -1,6 +1,7 @@
 package users
 
 import (
+	dberrors "github.com/bitcoin-sv/spv-wallet/engine/v2/database/errors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/admin/internal/mapping"
@@ -12,7 +13,9 @@ import (
 func (s *APIAdminUsers) UserById(c *gin.Context, id string) {
 	user, err := s.engine.UsersService().GetByID(c, id)
 	if err != nil {
-		clienterr.Response(c, err, s.logger)
+		clienterr.Map(err).
+			IfOfType(dberrors.NotFound).Then(clienterr.NotFound.New()).
+			Response(c, s.logger)
 		return
 	}
 

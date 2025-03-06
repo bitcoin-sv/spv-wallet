@@ -2,6 +2,7 @@ package errdef
 
 import (
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/api"
 	"strings"
 
 	"github.com/joomcode/errorx"
@@ -10,11 +11,7 @@ import (
 // ProblemDetails is a struct that represents a problem details object as defined in RFC 7807.
 // https://datatracker.ietf.org/doc/html/rfc7807
 type ProblemDetails struct {
-	Type     string `json:"type"`
-	Title    string `json:"title"`
-	Status   int    `json:"status"`
-	Detail   string `json:"detail"`
-	Instance string `json:"instance"`
+	api.ErrorsProblemDetails
 }
 
 // PushDetail appends a detail to the existing details, separated by a semicolon.

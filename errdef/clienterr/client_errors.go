@@ -12,3 +12,9 @@ var UnprocessableEntity = ClientErrorDefinition{
 	typeName: "unprocessable_entity",
 	httpCode: 422,
 }
+
+var NotFound = ClientErrorDefinition{
+	title:    "Not found",
+	typeName: "not_found",
+	httpCode: 404,
+}
