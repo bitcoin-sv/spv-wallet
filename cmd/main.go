@@ -31,7 +31,6 @@ var version = "development"
 // @in header
 // @name authorization
 func main() {
-	logging.SetupGlobalZerologErrorHandler()
 	defaultLogger := logging.GetDefaultLogger()
 
 	// Load the Application Configuration
