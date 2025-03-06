@@ -13,7 +13,7 @@ import (
 )
 
 func TestTopUp(t *testing.T) {
-	// t.Skip("don't run yet")
+	t.Skip("don't run yet")
 
 	state := manualtests.NewState()
 	err := state.Load()
@@ -91,7 +91,7 @@ func TestTransactionWithBytesData(t *testing.T) {
 }
 
 func TestTransactionWithInternalPaymailTransfer(t *testing.T) {
-	// t.Skip("don't run yet")
+	t.Skip("don't run yet")
 
 	logger := manualtests.Logger()
 
