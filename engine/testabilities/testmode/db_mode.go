@@ -8,95 +8,37 @@ package testmode
 
 import (
 	"context"
-	"fmt"
-	"os"
-	"sync"
-	"testing"
-	"time"
-
-	"github.com/docker/go-connections/nat"
 	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
+	"os"
+	"testing"
 )
 
 const (
-	EnvDBMode      = "TEST_DB_MODE"
-	EnvDBName      = "TEST_DB_NAME"
-	EnvDBHost      = "TEST_DB_HOST"
-	EnvDBPort      = "TEST_DB_PORT"
-	EnvSkipCleanup = "TEST_SKIP_CLEANUP"
+	// EnvDBMode is the environment variable to set the test database mode
+	EnvDBMode = "TEST_DB_MODE"
+	// EnvDBName is the environment variable to set the test database name
+	EnvDBName = "TEST_DB_NAME"
+	// EnvDBHost is the environment variable to set the test database host
+	EnvDBHost = "TEST_DB_HOST"
+	// EnvDBPort is the environment variable to set the test database port
+	EnvDBPort = "TEST_DB_PORT"
 
-	defaultPostgresDBName = "postgres"
+	// PostgresContainerMode is the mode to use a PostgreSQL testcontainer for testing
+	PostgresContainerMode = "postgres-container"
+	// PostgresMode is the mode to use actual Postgres for testing
+	PostgresMode = "postgres"
+	// SQLiteFileMode is the mode to use SQLite file for testing
+	SQLiteFileMode = "file"
+
+	// DefaultPostgresName is the default database name for PostgreSQL
+	DefaultPostgresName = "postgres"
+	// DefaultPostgresUser is the default database user for PostgreSQL
+	DefaultPostgresUser = "postgres"
+	// DefaultPostgresPass is the default database password for PostgreSQL
+	DefaultPostgresPass = "postgres"
 )
-
-// Global container instance to be reused across tests
-var (
-	sharedContainer *TestContainer
-	containerMutex  sync.Mutex
-)
-
-// PostgresModeBuilder provides a fluent interface for configuring Postgres test mode
-type PostgresModeBuilder struct {
-	t testing.TB
-}
-
-// WithTestcontainersMode configures PostgreSQL to run in a testcontainer
-func (b *PostgresModeBuilder) WithTestcontainersMode() *PostgresModeBuilder {
-	container := GetOrCreatePostgres(b.t)
-
-	b.t.Setenv(EnvDBHost, container.Host)
-	b.t.Setenv(EnvDBPort, container.Port)
-	b.t.Setenv(EnvDBMode, "postgres")
-
-	return b
-}
-
-// WithoutCleanup prevents the container from being cleaned up after tests
-func (b *PostgresModeBuilder) WithoutCleanup() *PostgresModeBuilder {
-	WithoutCleanup(b.t)
-	return b
-}
-
-// DevelopmentOnly_SetPostgresMode sets the test mode to use actual Postgres
-// This should be used only for development purposes
-func DevelopmentOnly_SetPostgresMode(t testing.TB) *PostgresModeBuilder {
-	t.Helper()
-	t.Setenv(EnvDBMode, "postgres")
-	return &PostgresModeBuilder{t: t}
-}
-
-// DevelopmentOnly_SetPostgresModeWithName sets the test mode to use actual Postgres with a specific database name
-// This should be used only for development purposes
-func DevelopmentOnly_SetPostgresModeWithName(t testing.TB, dbName string) *PostgresModeBuilder {
-	t.Helper()
-	t.Setenv(EnvDBMode, "postgres")
-	t.Setenv(EnvDBName, dbName)
-	return &PostgresModeBuilder{t: t}
-}
-
-// DevelopmentOnly_SetFileSQLiteMode sets the test mode to use SQLite file
-// This should be used only for development purposes
-func DevelopmentOnly_SetFileSQLiteMode(t testing.TB) {
-	t.Helper()
-	t.Setenv(EnvDBMode, "file")
-}
-
-// CheckPostgresMode checks if the test mode is set to use actual Postgres and returns the database name
-func CheckPostgresMode() (ok bool, dbName string) {
-	if os.Getenv(EnvDBMode) != "postgres" {
-		return false, ""
-	}
-	dbName = os.Getenv(EnvDBName)
-	if dbName == "" {
-		dbName = defaultPostgresDBName
-	}
-	return true, dbName
-}
-
-// CheckFileSQLiteMode checks if the test mode is set to use SQLite file
-func CheckFileSQLiteMode() bool {
-	return os.Getenv(EnvDBMode) == "file"
-}
 
 // TestContainer represents a running test container
 type TestContainer struct {
@@ -105,112 +47,91 @@ type TestContainer struct {
 	Port      string
 }
 
-// GetOrCreatePostgres returns an existing PostgreSQL container or creates a new one if none exists
-// This helps reuse containers between tests
-func GetOrCreatePostgres(t testing.TB) *TestContainer {
+// StartPostgresContainer starts a PostgreSQL container and returns connection details
+func StartPostgresContainer(t testing.TB) *TestContainer {
 	t.Helper()
-
-	containerMutex.Lock()
-	defer containerMutex.Unlock()
-
-	if sharedContainer != nil {
-		t.Log("Reusing existing PostgreSQL container")
-		return sharedContainer
-	}
-
-	container := startPostgresContainer(t)
-	sharedContainer = container
-
-	if !ShouldSkipCleanup() {
-		t.Cleanup(func() {
-			containerMutex.Lock()
-			defer containerMutex.Unlock()
-
-			if sharedContainer != nil {
-				t.Log("Cleaning up PostgreSQL container")
-				ctx := context.Background()
-				if err := sharedContainer.Container.Terminate(ctx); err != nil {
-					t.Logf("Error terminating container: %v", err)
-				}
-				sharedContainer = nil
-			}
-		})
-	}
-
-	return container
-}
-
-// startPostgresContainer starts a PostgreSQL container
-func startPostgresContainer(t testing.TB) *TestContainer {
-	t.Helper()
-
-	skipCleanup := ShouldSkipCleanup()
-	if skipCleanup {
-		t.Log("Container cleanup will be skipped (EnvSkipCleanup=true)")
-	}
 
 	ctx := context.Background()
+	dbName := DefaultPostgresName
+	dbUser := DefaultPostgresUser
+	dbPassword := DefaultPostgresPass
 
-	req := testcontainers.ContainerRequest{
-		Image:        "postgres:14",
-		ExposedPorts: []string{"5432/tcp"},
-		Env: map[string]string{
-			"POSTGRES_USER":     "postgres",
-			"POSTGRES_PASSWORD": "postgres",
-			"POSTGRES_DB":       "postgres",
-		},
-		WaitingFor: wait.ForAll(
-			wait.ForLog("database system is ready to accept connections").WithStartupTimeout(30*time.Second),
-			wait.ForSQL("5432/tcp", "postgres", func(host string, port nat.Port) string {
-				return fmt.Sprintf("postgres://postgres:postgres@%s:%s/postgres?sslmode=disable", host, port.Port())
-			}).WithStartupTimeout(30*time.Second),
+	postgresContainer, err := postgres.Run(ctx,
+		"postgres:16-alpine",
+		postgres.WithDatabase(dbName),
+		postgres.WithUsername(dbUser),
+		postgres.WithPassword(dbPassword),
+		testcontainers.WithWaitStrategy(
+			wait.ForLog("database system is ready to accept connections").
+				WithOccurrence(2),
 		),
+	)
+	if err != nil {
+		t.Fatalf("failed to start postgres container: %s", err)
 	}
 
-	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
-		ContainerRequest: req,
-		Started:          true,
+	t.Cleanup(func() {
+		if err := testcontainers.TerminateContainer(postgresContainer); err != nil {
+			t.Logf("failed to terminate container: %s", err)
+		}
 	})
+
+	host, err := postgresContainer.Host(ctx)
 	if err != nil {
-		t.Fatalf("Failed to start PostgreSQL container: %v", err)
+		t.Fatalf("failed to get container host: %s", err)
 	}
 
-	host, err := container.Host(ctx)
+	port, err := postgresContainer.MappedPort(ctx, "5432")
 	if err != nil {
-		t.Fatalf("Failed to get container host: %v", err)
+		t.Fatalf("failed to get mapped port: %s", err)
 	}
 
-	mappedPort, err := container.MappedPort(ctx, nat.Port("5432/tcp"))
-	if err != nil {
-		t.Fatalf("Failed to get mapped port: %v", err)
-	}
+	t.Logf("Started PostgreSQL container at %s:%s", host, port.Port())
 
-	time.Sleep(1 * time.Second)
-
-	t.Logf("Started PostgreSQL container at %s:%s", host, mappedPort.Port())
-
-	tc := &TestContainer{
-		Container: container,
+	return &TestContainer{
+		Container: postgresContainer,
 		Host:      host,
-		Port:      mappedPort.Port(),
+		Port:      port.Port(),
 	}
-
-	// for debugging purposes: print a message about how to connect to this database
-	if skipCleanup {
-		t.Logf("POSTGRES KEPT ALIVE - Connect with: psql -h %s -p %s -U postgres", host, mappedPort.Port())
-	}
-
-	return tc
 }
 
-// ShouldSkipCleanup returns true if cleanup should be skipped
-func ShouldSkipCleanup() bool {
-	return os.Getenv(EnvSkipCleanup) == "true"
-}
-
-// WithoutCleanup sets the environment to skip cleanup
-func WithoutCleanup(t testing.TB) {
+// DevelopmentOnly_SetPostgresMode sets the test mode to use actual Postgres
+func DevelopmentOnly_SetPostgresMode(t testing.TB) {
 	t.Helper()
-	t.Setenv(EnvSkipCleanup, "true")
-	t.Log("Database cleanup will be skipped for this test")
+	t.Setenv(EnvDBMode, PostgresMode)
+}
+
+// DevelopmentOnly_SetPostgresModeWithName sets the test mode to use actual Postgres and sets the database name
+func DevelopmentOnly_SetPostgresModeWithName(t testing.TB, dbName string) {
+	t.Helper()
+	t.Setenv(EnvDBMode, PostgresMode)
+	t.Setenv(EnvDBName, dbName)
+}
+
+// DevelopmentOnly_SetFileSQLiteMode sets the test mode to use SQLite file
+func DevelopmentOnly_SetFileSQLiteMode(t testing.TB) {
+	t.Helper()
+	t.Setenv(EnvDBMode, SQLiteFileMode)
+}
+
+// CheckPostgresMode checks if the test mode is set to use actual Postgres and returns the database name
+func CheckPostgresMode() (ok bool, dbName string) {
+	if os.Getenv(EnvDBMode) != PostgresMode {
+		return false, ""
+	}
+	dbName = os.Getenv(EnvDBName)
+	if dbName == "" {
+		dbName = DefaultPostgresName
+	}
+	return true, dbName
+}
+
+// CheckFileSQLiteMode checks if the test mode is set to use SQLite file
+func CheckFileSQLiteMode() bool {
+	return os.Getenv(EnvDBMode) == SQLiteFileMode
+}
+
+// CheckPostgresContainerMode checks if the test mode is set to use PostgreSQL container
+func CheckPostgresContainerMode() bool {
+	return os.Getenv(EnvDBMode) == PostgresContainerMode
 }

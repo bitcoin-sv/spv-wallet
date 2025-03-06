@@ -112,7 +112,7 @@ func (f *engineFixture) EngineWithConfiguration(opts ...ConfigOpts) (walletEngin
 		opt(f.config)
 	}
 
-	if os.Getenv(testmode.EnvDBMode) == "postgres" &&
+	if os.Getenv(testmode.EnvDBMode) == "postgres-container" &&
 		os.Getenv(testmode.EnvDBHost) == "" {
 		f.usePostgresContainer()
 	} else {
@@ -170,16 +170,33 @@ func (f *engineFixture) Tx() txtestability.TransactionSpec {
 
 // prepareDBConfigForTests creates a new connection that will be used as connection for engine
 func (f *engineFixture) prepareDBConfigForTests() {
+	// check for PostgreSQL container mode
+	if testmode.CheckPostgresContainerMode() {
+		f.usePostgresContainer()
+		return
+	}
+
+	// check for development PostgreSQL mode
 	if f.tryDevelopmentPostgres() {
 		return
 	}
 
-	if f.tryDevelopmentSQLite() {
-		return
+	// check for development SQLite file mode or use in-memory SQLite by default
+	if !f.tryDevelopmentSQLite() {
+		f.useSQLite() // default: use SQLite in-memory
 	}
+}
 
-	// Default: use SQLite in-memory
-	f.useSQLite()
+// usePostgresContainer configures a PostgreSQL container for testing
+func (f *engineFixture) usePostgresContainer() {
+	f.postgresContainer = testmode.StartPostgresContainer(f.t)
+
+	f.config.Db.Datastore.Engine = datastore.PostgreSQL
+	f.config.Db.SQL.User = testmode.DefaultPostgresUser
+	f.config.Db.SQL.Password = testmode.DefaultPostgresPass
+	f.config.Db.SQL.Name = testmode.DefaultPostgresName
+	f.config.Db.SQL.Host = f.postgresContainer.Host
+	f.config.Db.SQL.Port = f.postgresContainer.Port
 }
 
 // tryDevelopmentPostgres configures a development PostgreSQL connection if requested
@@ -191,8 +208,8 @@ func (f *engineFixture) tryDevelopmentPostgres() bool {
 	}
 
 	f.config.Db.Datastore.Engine = datastore.PostgreSQL
-	f.config.Db.SQL.User = "postgres"
-	f.config.Db.SQL.Password = "postgres"
+	f.config.Db.SQL.User = testmode.DefaultPostgresUser
+	f.config.Db.SQL.Password = testmode.DefaultPostgresPass
 	f.config.Db.SQL.Name = dbName
 
 	host, port := os.Getenv(testmode.EnvDBHost), os.Getenv(testmode.EnvDBPort)
@@ -229,18 +246,6 @@ func (f *engineFixture) useSQLite() {
 	f.config.Db.SQLite.MaxIdleConnections = 1
 	f.config.Db.SQLite.MaxOpenConnections = 1
 	f.config.Db.SQLite.DatabasePath = inMemoryDbConnectionString
-}
-
-// usePostgresContainer configures a PostgreSQL container for testing
-func (f *engineFixture) usePostgresContainer() {
-	f.postgresContainer = testmode.GetOrCreatePostgres(f.t)
-
-	f.config.Db.Datastore.Engine = datastore.PostgreSQL
-	f.config.Db.SQL.User = "postgres"
-	f.config.Db.SQL.Password = "postgres"
-	f.config.Db.SQL.Name = "postgres"
-	f.config.Db.SQL.Host = f.postgresContainer.Host
-	f.config.Db.SQL.Port = f.postgresContainer.Port
 }
 
 func (f *engineFixture) initialiseFixtures() {
