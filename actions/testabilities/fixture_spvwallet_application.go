@@ -38,7 +38,7 @@ type SPVWalletApplicationFixture interface {
 
 	Faucet(user fixtures.User) testengine.FaucetFixture
 
-	User(user fixtures.User) testengine.ContactsFixture
+	User(user fixtures.User) testengine.UserFixture
 
 	EngineFixture() testengine.EngineFixture
 
@@ -162,7 +162,7 @@ func (f *appFixture) Faucet(user fixtures.User) testengine.FaucetFixture {
 	return f.engineFixture.Faucet(user)
 }
 
-func (f *appFixture) User(user fixtures.User) testengine.ContactsFixture {
+func (f *appFixture) User(user fixtures.User) testengine.UserFixture {
 	return f.engineFixture.User(user)
 }
 

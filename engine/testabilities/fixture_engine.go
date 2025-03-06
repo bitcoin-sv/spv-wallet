@@ -51,7 +51,7 @@ type EngineFixture interface {
 	Faucet(user fixtures.User) FaucetFixture
 
 	// User creates a new test fixture for Contacts
-	User(user fixtures.User) ContactsFixture
+	User(user fixtures.User) UserFixture
 
 	// Tx creates a new mocked transaction builder
 	Tx() txtestability.TransactionSpec
@@ -63,8 +63,8 @@ type FaucetFixture interface {
 	StoreData(data string) (txtestability.TransactionSpec, string)
 }
 
-// ContactsFixture is a test fixture for the contacts service
-type ContactsFixture interface {
+// UserFixture is a test fixture for the user management
+type UserFixture interface {
 	HasContactTo(userB fixtures.User) *contactsmodels.Contact
 	HasConfirmedContactTo(userB fixtures.User) *contactsmodels.Contact
 	HasRejectedContactTo(userB fixtures.User) *contactsmodels.Contact
@@ -165,7 +165,7 @@ func (f *engineFixture) Faucet(user fixtures.User) FaucetFixture {
 	}
 }
 
-func (f *engineFixture) User(user fixtures.User) ContactsFixture {
+func (f *engineFixture) User(user fixtures.User) UserFixture {
 	return &contactFixture{
 		engine:        f.engine,
 		user:          user,
