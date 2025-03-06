@@ -2,6 +2,7 @@ package dberrors
 
 import (
 	"errors"
+
 	"github.com/joomcode/errorx"
 	"gorm.io/gorm"
 )

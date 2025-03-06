@@ -2,9 +2,9 @@ package errdef
 
 import (
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/api"
 	"strings"
 
+	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/joomcode/errorx"
 )
 

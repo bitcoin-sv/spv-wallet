@@ -1,10 +1,10 @@
 package users
 
 import (
-	dberrors "github.com/bitcoin-sv/spv-wallet/engine/v2/database/errors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/admin/internal/mapping"
+	dberrors "github.com/bitcoin-sv/spv-wallet/engine/v2/database/errors"
 	"github.com/bitcoin-sv/spv-wallet/errdef/clienterr"
 	"github.com/gin-gonic/gin"
 )
