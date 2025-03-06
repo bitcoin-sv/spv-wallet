@@ -12,7 +12,13 @@ import (
 // Response sends the error as a JSON response to the client.
 func Response(c *gin.Context, err error, log *zerolog.Logger) {
 	problem, logLevel := problemDetailsFromError(err)
-	log.WithLevel(logLevel).Err(err).Msgf("Error HTTP response, returning %d: %s", problem.Status, problem.Detail)
+
+	l := log.WithLevel(logLevel)
+	if problem.Status >= 500 {
+		l.Stack()
+	}
+	l.Err(err).Msgf("Error HTTP response, returning %d: %s", problem.Status, problem.Detail)
+
 	c.JSON(problem.Status, problem)
 }
 
