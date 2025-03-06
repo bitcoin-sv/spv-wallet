@@ -116,7 +116,7 @@ func (f *engineFixture) EngineWithConfiguration(opts ...ConfigOpts) (walletEngin
 		opt(f.config)
 	}
 
-	if os.Getenv(testmode.EnvDBMode) == "postgres-container" &&
+	if os.Getenv(testmode.EnvDBMode) == testmode.PostgresContainerMode &&
 		os.Getenv(testmode.EnvDBHost) == "" {
 		f.usePostgresContainer()
 	} else {
