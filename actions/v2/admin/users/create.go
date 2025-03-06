@@ -2,7 +2,6 @@ package users
 
 import (
 	"github.com/bitcoin-sv/spv-wallet/errdef/clienterr"
-	"github.com/joomcode/errorx"
 	"net/http"
 
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
@@ -19,9 +18,7 @@ func (s *APIAdminUsers) CreateUser(c *gin.Context) {
 
 	if err := c.Bind(&request); err != nil {
 		// TODO: Bind does AbortWithError internally, so we should not call Response, I guess
-		clienterr.UnprocessableEntity.
-			Wrap(err, "cannot bind request").
-			Response(c, s.logger)
+		clienterr.UnprocessableEntity.New().Wrap(err).Response(c, s.logger)
 		return
 	}
 
@@ -37,18 +34,18 @@ func (s *APIAdminUsers) CreateUser(c *gin.Context) {
 	}
 
 	createdUser, err := s.engine.UsersService().Create(c, newUser)
+
 	if err != nil {
-		if errorx.IsOfType(err, configerrors.UnsupportedDomain) {
-			clienterr.BadRequest.
-				Wrap(err, "Unsupported domain").
-				Response(c, s.logger)
-		} else if errorx.IsOfType(err, paymailerrors.InvalidAvatarURL) {
-			clienterr.UnprocessableEntity.
-				Wrap(err, "Invalid avatar url").
-				Response(c, s.logger)
-		} else {
-			clienterr.Response(c, err, s.logger)
-		}
+		clienterr.Map(err).
+			IfOfType(configerrors.UnsupportedDomain).
+			Then(
+				clienterr.BadRequest.Detailed("unsupported_domain", "Unsupported domain: '%s'", newUser.Paymail.Domain),
+			).
+			IfOfType(paymailerrors.InvalidAvatarURL).
+			Then(
+				clienterr.UnprocessableEntity.Detailed("invalid_avatar_url", "Invalid avatar URL: '%s'", newUser.Paymail.Avatar),
+			).
+			Response(c, s.logger)
 		return
 	}
 
@@ -59,7 +56,8 @@ func validatePubKey(pubKey string) error {
 	_, err := primitives.PublicKeyFromString(pubKey)
 	if err != nil {
 		return clienterr.BadRequest.
-			Wrap(err, "Cannot parse public key: '%s'", pubKey).Err()
+			Detailed("invalid_public_key", "Invalid public key: '%s'", pubKey).
+			Wrap(err).Err()
 	}
 	return nil
 }

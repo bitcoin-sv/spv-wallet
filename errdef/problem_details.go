@@ -20,7 +20,7 @@ func (p *ProblemDetails) PushDetail(detail string) *ProblemDetails {
 	if p.Detail != "" {
 		separator = "; "
 	}
-	p.Detail = fmt.Sprintf("%v%s%v", detail, separator, p.Detail)
+	p.Detail = fmt.Sprintf("%v%s%v", p.Detail, separator, detail)
 	return p
 }
 

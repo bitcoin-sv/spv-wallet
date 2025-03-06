@@ -79,7 +79,7 @@ func TestAddPaymail(t *testing.T) {
 
 		// then:
 		then.Response(res).
-			WithProblemDetails(422, "unprocessable_entity", "Invalid avatar url")
+			WithProblemDetails(422, "invalid_avatar_url", "Invalid avatar URL")
 	})
 
 	t.Run("Add a paymail to a user as admin using alias and domain as address", func(t *testing.T) {
@@ -203,7 +203,7 @@ func TestAddPaymailWithWrongDomain(t *testing.T) {
 
 		// then:
 		then.Response(res).
-			WithProblemDetails(400, "bad_request", "Unsupported domain")
+			WithProblemDetails(400, "unsupported_domain", "Unsupported domain")
 	})
 
 	t.Run("Try to add using alias and domain as address", func(t *testing.T) {
@@ -220,7 +220,7 @@ func TestAddPaymailWithWrongDomain(t *testing.T) {
 
 		// then:
 		then.Response(res).
-			WithProblemDetails(400, "bad_request", "Unsupported domain")
+			WithProblemDetails(400, "unsupported_domain", "Unsupported domain")
 	})
 
 }
@@ -282,6 +282,6 @@ func TestAddPaymailWithBothPaymailAndAliasDomainPair(t *testing.T) {
 		// then:
 		then.Response(res).
 			HasStatus(400).
-			WithProblemDetails(400, "bad_request", "inconsistent")
+			WithProblemDetails(400, "inconsistent_alias_domain_and_address", "Inconsistent alias@domain and address fields")
 	})
 }

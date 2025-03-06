@@ -6,8 +6,8 @@ type ClientErrorDefinition struct {
 	httpCode int
 }
 
-func (c ClientErrorDefinition) Wrap(cause error, msg string, args ...any) *Builder {
-	return c.New().Wrap(cause, msg, args...)
+func (c ClientErrorDefinition) Detailed(errType string, detail string, args ...any) *Builder {
+	return c.New().Detailed(errType, detail, args...)
 }
 
 func (c ClientErrorDefinition) New() *Builder {

@@ -84,14 +84,20 @@ func parsePaymail(r *api.RequestsAddPaymail) (string, string, error) {
 	if request.HasAddress() &&
 		(request.HasAlias() || request.HasDomain()) &&
 		!request.AddressEqualsTo(request.Alias+"@"+request.Domain) {
-		return "", "", clienterr.BadRequest.New().WithDetailf("Alias and Domain are inconsistent with Address").Err()
+		return "", "", clienterr.BadRequest.
+			Detailed(
+				"inconsistent_alias_domain_and_address",
+				"Inconsistent alias@domain and address fields: %s, %s, %s. Hint: use either alias and domain or address (not both)",
+				request.Alias, request.Domain, request.Address,
+			).Err()
 	}
 	if !request.HasAddress() {
 		request.Address = request.Alias + "@" + request.Domain
 	}
 	alias, domain, sanitized := paymail.SanitizePaymail(request.Address)
 	if sanitized == "" {
-		return "", "", clienterr.BadRequest.New().WithDetailf("Invalid paymail address: %s", request.Address).Err()
+		return "", "", clienterr.BadRequest.
+			Detailed("invalid_paymail_address", "Invalid paymail address: %s", request.Address).Err()
 	}
 	return alias, domain, nil
 }

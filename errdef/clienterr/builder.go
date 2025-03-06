@@ -19,19 +19,24 @@ type Builder struct {
 	cause          error
 }
 
-func (b *Builder) Wrap(cause error, msg string, args ...any) *Builder {
+func (b *Builder) Wrap(cause error) *Builder {
 	b.cause = cause
 	b.problemDetails.
-		FromInternalError(cause).
-		PushDetail(fmt.Sprintf(msg, args...))
+		FromInternalError(cause)
 
+	return b
+}
+
+func (b *Builder) Detailed(errType string, detail string, args ...any) *Builder {
+	b.problemDetails.Type = errType
+	b.problemDetails.PushDetail(fmt.Sprintf(detail, args...))
 	return b
 }
 
 func (b *Builder) Err() *errorx.Error {
 	var err *errorx.Error
 	if b.cause != nil {
-		err = clientError.Wrap(b.cause, "")
+		err = clientError.WrapWithNoMessage(b.cause)
 	} else {
 		err = clientError.NewWithNoMessage()
 	}
@@ -40,11 +45,6 @@ func (b *Builder) Err() *errorx.Error {
 
 func (b *Builder) Response(c *gin.Context, log *zerolog.Logger) {
 	Response(c, b.Err(), log)
-}
-
-func (b *Builder) WithDetailf(detail string, args ...any) *Builder {
-	b.problemDetails.PushDetail(fmt.Sprintf(detail, args...))
-	return b
 }
 
 func (b *Builder) WithInstance(parts ...any) *Builder {
