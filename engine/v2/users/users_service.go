@@ -6,6 +6,7 @@ import (
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usererrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
@@ -14,7 +15,15 @@ import (
 // Service is a user domain service
 type Service struct {
 	usersRepo UserRepo
-	config    *config.AppConfig
+	// paymailsRepo   paymails.PaymailRepo
+	// dataRepo       data.Repo
+	// operationsRepo operations.Repo
+	// addressesRepo addresses.AddressRepo
+	// transactions musimy usunac tracked_transactions i tracked output
+	// tracked output
+	// tracked transa
+
+	config *config.AppConfig
 }
 
 // NewService creates a new user service
@@ -43,6 +52,25 @@ func (s *Service) Create(ctx context.Context, newUser *usersmodels.NewUser) (*us
 		return nil, spverrors.Wrapf(err, "failed to create user")
 	}
 	return createdUser, nil
+}
+
+// Remove removes current user
+func (s *Service) Remove(ctx context.Context, userID string) error {
+	balance, err := s.GetBalance(ctx, userID)
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to get user's balance")
+	}
+
+	if balance > 0 {
+		return usererrors.ErrUserHasUnspentUTXOs
+	}
+
+	err = s.usersRepo.Delete(ctx, userID)
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to delete user")
+	}
+
+	return nil
 }
 
 // Exists checks if a user exists

@@ -15,4 +15,5 @@ type UserRepo interface {
 	Get(ctx context.Context, userID string) (*usersmodels.User, error)
 	Create(ctx context.Context, newUser *usersmodels.NewUser) (*usersmodels.User, error)
 	GetBalance(ctx context.Context, userID string, name bucket.Name) (bsv.Satoshis, error)
+	Delete(ctx context.Context, userID string) error
 }

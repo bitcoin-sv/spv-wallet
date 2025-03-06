@@ -274,6 +274,22 @@ paths:
             tags:
                 - Transactions
     /api/v2/users/current:
+        delete:
+            description: This endpoint will delete current user with associated paymails, addresses, operations and tracked outputs You cannot delete user with balance larger than 0
+            operationId: deleteCurrentUser
+            responses:
+                "200":
+                    description: Success
+                "401":
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
+                "500":
+                    $ref: '#/components/responses/responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Delete current user
+            tags:
+                - User
         get:
             description: This endpoint return balance of current authenticated user
             operationId: currentUser

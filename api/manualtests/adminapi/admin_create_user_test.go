@@ -13,7 +13,7 @@ import (
 )
 
 func TestCreateUser(t *testing.T) {
-	t.Skip("Don't run it yet")
+	// t.Skip("Don't run it yet")
 
 	manualtests.APICallForAdmin(t).
 		CallWithUpdateState(func(state manualtests.StateForCall, c *client.ClientWithResponses) (manualtests.Result, error) {
