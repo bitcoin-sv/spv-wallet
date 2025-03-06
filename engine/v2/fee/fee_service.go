@@ -13,16 +13,19 @@ import (
 	"github.com/samber/lo"
 )
 
+// Provider is an interface that provides fee units from miners.
 type Provider interface {
 	GetFeeUnit(ctx context.Context) (*bsv.FeeUnit, error)
 }
 
+// Service is a fee service that provides fee units for transactions.
 type Service struct {
 	logger      zerolog.Logger
 	feeUnit     optional.Param[bsv.FeeUnit]
 	feeProvider Provider
 }
 
+// NewService creates a new fee service.
 func NewService(cfg *config.AppConfig, feeProvider Provider, logger zerolog.Logger) *Service {
 	must.BeTrue(cfg != nil, "config is required")
 	must.BeTrue(feeProvider != nil, "feeProvider is required")
@@ -48,6 +51,7 @@ func NewService(cfg *config.AppConfig, feeProvider Provider, logger zerolog.Logg
 	}
 }
 
+// GetFeeUnit returns the fee unit that should be used for transactions.
 func (s *Service) GetFeeUnit(ctx context.Context) (bsv.FeeUnit, error) {
 	if s.feeUnit != nil {
 		return *s.feeUnit, nil

@@ -30,6 +30,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// V2 is the engine of the wallet, it is creating all needed services, and preparing database connection.
 type V2 struct {
 	cfg     *config.AppConfig
 	storage *internal.Storage
@@ -49,6 +50,7 @@ type V2 struct {
 	paymailServerConfig        *server.Configuration
 }
 
+// NewEngine creates a new engine.V2 instance.
 func NewEngine(cfg *config.AppConfig, logger zerolog.Logger, overridesOpts ...InternalsOverride) *V2 {
 	logger = logger.With().Int("v", 2).Str("service", "engine").Logger()
 
@@ -158,51 +160,63 @@ func (e *V2) Close(_ context.Context) error {
 	return allErrors
 }
 
-// Deprecated: used as adapter for engine v1
+// DB returns the database
+// Deprecated: DB used as adapter for engine v1
 func (e *V2) DB() *gorm.DB {
 	return e.storage.DB()
 }
 
+// Repositories returns all repositories
 func (e *V2) Repositories() *repository.All {
 	return e.repositories
 }
 
+// Chain returns the chain service
 func (e *V2) Chain() chain.Service {
 	return e.chainService
 }
 
+// UsersService returns the users service
 func (e *V2) UsersService() *users.Service {
 	return e.usersService
 }
 
+// PaymailsService returns the paymails service
 func (e *V2) PaymailsService() *paymails.Service {
 	return e.paymailsService
 }
 
+// AddressesService returns the addresses service
 func (e *V2) AddressesService() *addresses.Service {
 	return e.addressesService
 }
 
+// DataService returns the data service
 func (e *V2) DataService() *data.Service {
 	return e.dataService
 }
 
+// OperationsService returns the operations service
 func (e *V2) OperationsService() *operations.Service {
 	return e.operationsService
 }
 
+// TransactionOutlinesService returns the transaction outlines service
 func (e *V2) TransactionOutlinesService() outlines.Service {
 	return e.transactionsOutlineService
 }
 
+// TransactionRecordService returns the transaction record service
 func (e *V2) TransactionRecordService() *record.Service {
 	return e.transactionsRecordService
 }
 
+// TxSyncService returns the tx sync service
 func (e *V2) TxSyncService() *txsync.Service {
 	return e.txSyncService
 }
 
+// PaymailServerConfiguration returns the paymail server configuration
 func (e *V2) PaymailServerConfiguration() *server.Configuration {
 	return e.paymailServerConfig
 }

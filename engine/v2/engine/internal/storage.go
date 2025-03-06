@@ -64,6 +64,7 @@ func (s *Storage) Start() error {
 	return nil
 }
 
+// Close closes the database connection.
 func (s *Storage) Close() error {
 	if s.db == nil {
 		return nil
@@ -168,6 +169,7 @@ func (s *Storage) migrateDatabase() error {
 	return nil
 }
 
+// DB returns the database connection.
 // Deprecated: used as adapter for engine v1
 func (s *Storage) DB() *gorm.DB {
 	return s.db

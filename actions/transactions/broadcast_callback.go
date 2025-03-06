@@ -12,7 +12,6 @@ import (
 // broadcastCallback will handle a broadcastCallback call from the broadcast api
 func broadcastCallback(c *gin.Context) {
 	logger := reqctx.Logger(c)
-	config := reqctx.AppConfig(c)
 	var callbackResp chainmodels.TXInfo
 
 	err := c.Bind(&callbackResp)
@@ -21,11 +20,7 @@ func broadcastCallback(c *gin.Context) {
 		return
 	}
 
-	if config.ExperimentalFeatures.V2 {
-		err = reqctx.Engine(c).TxSyncService().Handle(c, callbackResp)
-	} else {
-		err = reqctx.Engine(c).HandleTxCallback(c, &callbackResp)
-	}
+	err = reqctx.Engine(c).HandleTxCallback(c, &callbackResp)
 
 	if err != nil {
 		logger.Err(err).Any("TxInfo", callbackResp).Msgf("failed to update transaction in ARC broadcast callback handler")

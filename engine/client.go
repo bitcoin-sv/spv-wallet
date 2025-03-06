@@ -17,15 +17,7 @@ import (
 	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/data"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/database/repository"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/operations"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/record"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txsync"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/users"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/engine"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cachestore"
@@ -37,39 +29,32 @@ type (
 	// Client is the SPV Wallet Engine client & options
 	Client struct {
 		options *clientOptions
+		// TEMPORARY: to limit the changes in the codebase
+		V2Interface
 	}
 
 	// clientOptions holds all the configuration for the client
 	clientOptions struct {
-		cacheStore                 *cacheStoreOptions    // Configuration options for Cachestore (ristretto, redis, etc.)
-		cluster                    *clusterOptions       // Configuration options for the cluster coordinator
-		dataStore                  *dataStoreOptions     // Configuration options for the DataStore (PostgreSQL, etc.)
-		debug                      bool                  // If the client is in debug mode
-		encryptionKey              string                // Encryption key for encrypting sensitive information (IE: paymail xPub) (hex encoded key)
-		httpClient                 *resty.Client         // HTTP client to use for http calls
-		iuc                        bool                  // (Input UTXO Check) True will check input utxos when saving transactions
-		logger                     *zerolog.Logger       // Internal logging
-		metrics                    *metrics.Metrics      // Metrics with a collector interface
-		notifications              *notificationsOptions // Configuration options for Notifications
-		paymail                    *paymailOptions       // Paymail options & client
-		transactionOutlinesService outlines.Service      // Service for transaction outlines
-		transactionRecordService   *record.Service       // Service for recording transactions
-		taskManager                *taskManagerOptions   // Configuration options for the TaskManager (TaskQ, etc.)
-		userAgent                  string                // User agent for all outgoing requests
-		chainService               chain.Service         // Chain service
-		arcConfig                  chainmodels.ARCConfig // Configuration for ARC
-		bhsConfig                  chainmodels.BHSConfig // Configuration for BHS
-		feeUnit                    *bsv.FeeUnit          // Fee unit for transactions
+		cacheStore    *cacheStoreOptions    // Configuration options for Cachestore (ristretto, redis, etc.)
+		cluster       *clusterOptions       // Configuration options for the cluster coordinator
+		dataStore     *dataStoreOptions     // Configuration options for the DataStore (PostgreSQL, etc.)
+		debug         bool                  // If the client is in debug mode
+		encryptionKey string                // Encryption key for encrypting sensitive information (IE: paymail xPub) (hex encoded key)
+		httpClient    *resty.Client         // HTTP client to use for http calls
+		iuc           bool                  // (Input UTXO Check) True will check input utxos when saving transactions
+		logger        *zerolog.Logger       // Internal logging
+		metrics       *metrics.Metrics      // Metrics with a collector interface
+		notifications *notificationsOptions // Configuration options for Notifications
+		paymail       *paymailOptions       // Paymail options & client
+		taskManager   *taskManagerOptions   // Configuration options for the TaskManager (TaskQ, etc.)
+		userAgent     string                // User agent for all outgoing requests
+		feeUnit       *bsv.FeeUnit          // Fee unit for transactions
 
-		// v2
-		repositories *repository.All   // Repositories for all db models
-		users        *users.Service    // User domain service
-		paymails     *paymails.Service // Paymail domain service
-		addresses    *addresses.Service
-		operations   *operations.Service
-		txSync       *txsync.Service
-		data         *data.Service
-		config       *config.AppConfig
+		chainService chain.Service         // Chain service
+		arcConfig    chainmodels.ARCConfig // Configuration for ARC
+		bhsConfig    chainmodels.BHSConfig // Configuration for BHS
+
+		config *config.AppConfig
 	}
 
 	// cacheStoreOptions holds the cache configuration and client
@@ -138,6 +123,16 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		client.options.logger = logging.GetDefaultLogger()
 	}
 
+	if client.options.config != nil && client.options.config.ExperimentalFeatures.V2 {
+		client.V2Interface = engine.NewEngine(
+			client.options.config,
+			*client.options.logger,
+			engine.WithResty(client.options.httpClient),
+			engine.WithPaymailClient(client.options.paymail.client),
+		)
+		return client, nil
+	}
+
 	// Load the Cachestore client
 	var err error
 	if err = client.loadCache(ctx); err != nil {
@@ -158,14 +153,6 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		return nil, err
 	}
 
-	client.loadRepositories()
-
-	client.loadUsersService()
-	client.loadPaymailsService()
-	client.loadAddressesService()
-	client.loadDataService()
-	client.loadOperationsService()
-
 	// Load the Paymail client and service (if does not exist)
 	if err = client.loadPaymailComponents(); err != nil {
 		return nil, err
@@ -182,11 +169,6 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	}
 
 	client.loadChainService()
-	client.loadTxSyncService()
-
-	if err = client.loadTransactionRecordService(); err != nil {
-		return nil, err
-	}
 
 	// Register all cron jobs
 	if err = client.registerCronJobs(); err != nil {
@@ -201,10 +183,6 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		if err = client.askForFeeUnit(ctx); err != nil {
 			return nil, err
 		}
-	}
-
-	if err = client.loadTransactionOutlinesService(); err != nil {
-		return nil, err
 	}
 
 	// Return the client
@@ -229,6 +207,14 @@ func (c *Client) Cluster() cluster.ClientInterface {
 
 // Close will safely close any open connections (cache, datastore, etc.)
 func (c *Client) Close(ctx context.Context) error {
+	if c.V2Interface != nil {
+		err := c.V2Interface.Close(ctx)
+		if err != nil {
+			return spverrors.Wrapf(err, "failed to close envine V2")
+		}
+		return nil
+	}
+
 	// Close WebhookManager
 	if c.options.notifications != nil && c.options.notifications.webhookManager != nil {
 		c.options.notifications.webhookManager.Stop()
@@ -350,39 +336,4 @@ func (c *Client) LogBHSReadiness(ctx context.Context) {
 // FeeUnit will return the fee unit used for transactions
 func (c *Client) FeeUnit() bsv.FeeUnit {
 	return *c.options.feeUnit
-}
-
-// Repositories will return all the repositories
-func (c *Client) Repositories() *repository.All {
-	return c.options.repositories
-}
-
-// UsersService will return the user domain service
-func (c *Client) UsersService() *users.Service {
-	return c.options.users
-}
-
-// PaymailsService will return the paymail domain service
-func (c *Client) PaymailsService() *paymails.Service {
-	return c.options.paymails
-}
-
-// AddressesService will return the address domain service
-func (c *Client) AddressesService() *addresses.Service {
-	return c.options.addresses
-}
-
-// DataService will return the data domain service
-func (c *Client) DataService() *data.Service {
-	return c.options.data
-}
-
-// OperationsService will return the operations domain service
-func (c *Client) OperationsService() *operations.Service {
-	return c.options.operations
-}
-
-// TxSyncService will return the transaction sync service
-func (c *Client) TxSyncService() *txsync.Service {
-	return c.options.txSync
 }

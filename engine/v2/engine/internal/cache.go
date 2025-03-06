@@ -12,6 +12,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// Cache is an interface for cache storage.
 type Cache interface {
 	GetModel(ctx context.Context, key string, model interface{}) error
 	SetModel(ctx context.Context, key string, model interface{}, ttl time.Duration, dependencies ...string) error
@@ -19,6 +20,20 @@ type Cache interface {
 
 type cacheOptions struct {
 	opts []cachestore.ClientOps
+}
+
+// NewCache creates a new cache storage instance.
+func NewCache(cfg *config.AppConfig, logger zerolog.Logger) Cache {
+	logger.With().Str("service", "cache").Logger()
+
+	options := cacheOptions{make([]cachestore.ClientOps, 0)}
+
+	options.configureLogger(cfg, logger).configureEngine(cfg)
+
+	cache, err := cachestore.NewClient(context.Background(), options.opts...)
+	must.HaveNoErrorf(err, "failed to create cache storage: %v", err)
+
+	return cache
 }
 
 func (o *cacheOptions) configureLogger(cfg *config.AppConfig, logger zerolog.Logger) *cacheOptions {
@@ -48,17 +63,4 @@ func (o *cacheOptions) configureEngine(cfg *config.AppConfig) *cacheOptions {
 	}
 
 	return o
-}
-
-func NewCache(cfg *config.AppConfig, logger zerolog.Logger) Cache {
-	logger.With().Str("service", "cache").Logger()
-
-	options := cacheOptions{make([]cachestore.ClientOps, 0)}
-
-	options.configureLogger(cfg, logger).configureEngine(cfg)
-
-	cache, err := cachestore.NewClient(context.Background(), options.opts...)
-	must.HaveNoErrorf(err, "failed to create cache storage: %v", err)
-
-	return cache
 }
