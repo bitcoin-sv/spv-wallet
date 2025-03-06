@@ -251,6 +251,12 @@ type ErrorsNoOperations struct {
 	Message interface{} `json:"message"`
 }
 
+// ErrorsNotificationsDisabled defines model for errors_NotificationsDisabled.
+type ErrorsNotificationsDisabled struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ErrorsPaymailInconsistent defines model for errors_PaymailInconsistent.
 type ErrorsPaymailInconsistent struct {
 	Code    interface{} `json:"code"`
@@ -335,6 +341,24 @@ type ErrorsUserAuthOnNonUserEndpoint struct {
 // ErrorsUserAuthorization defines model for errors_UserAuthorization.
 type ErrorsUserAuthorization struct {
 	union json.RawMessage
+}
+
+// ErrorsWebhookTokenHeaderRequired defines model for errors_WebhookTokenHeaderRequired.
+type ErrorsWebhookTokenHeaderRequired struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsWebhookTokenValueRequired defines model for errors_WebhookTokenValueRequired.
+type ErrorsWebhookTokenValueRequired struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsWebhookUrlRequired defines model for errors_WebhookUrlRequired.
+type ErrorsWebhookUrlRequired struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
 }
 
 // ModelsAnnotatedTransactionOutline defines model for models_AnnotatedTransactionOutline.
@@ -586,6 +610,15 @@ type ModelsUserInfo struct {
 	CurrentBalance uint64 `json:"currentBalance"`
 }
 
+// ModelsWebhook defines model for models_Webhook.
+type ModelsWebhook struct {
+	Banned bool   `json:"banned"`
+	Url    string `json:"url"`
+}
+
+// ModelsWebhooks defines model for models_Webhooks.
+type ModelsWebhooks = []ModelsWebhook
+
 // RequestsAddPaymail defines model for requests_AddPaymail.
 type RequestsAddPaymail struct {
 	Address   string  `json:"address"`
@@ -643,6 +676,13 @@ type RequestsPaymailOutputSpecification struct {
 // RequestsPaymailOutputSpecificationType defines model for RequestsPaymailOutputSpecification.Type.
 type RequestsPaymailOutputSpecificationType string
 
+// RequestsSubscribeWebhook defines model for requests_SubscribeWebhook.
+type RequestsSubscribeWebhook struct {
+	TokenHeader string `json:"tokenHeader"`
+	TokenValue  string `json:"tokenValue"`
+	Url         string `json:"url"`
+}
+
 // RequestsTransactionOutline defines model for requests_TransactionOutline.
 type RequestsTransactionOutline struct {
 	Annotations *ModelsOutputsAnnotations `json:"annotations,omitempty"`
@@ -665,6 +705,11 @@ type RequestsTransactionOutlineOutputSpecification struct {
 // RequestsTransactionSpecification defines model for requests_TransactionSpecification.
 type RequestsTransactionSpecification struct {
 	Outputs []RequestsTransactionOutlineOutputSpecification `json:"outputs"`
+}
+
+// RequestsUnsubscribeWebhook defines model for requests_UnsubscribeWebhook.
+type RequestsUnsubscribeWebhook struct {
+	Url string `json:"url"`
 }
 
 // RequestsPageNumber defines model for requests_PageNumber.
@@ -745,6 +790,12 @@ type ResponsesGetMerklerootsNotFound = ErrorsMerkleRootNotFound
 // ResponsesGetMerklerootsSuccess defines model for responses_GetMerklerootsSuccess.
 type ResponsesGetMerklerootsSuccess = ModelsGetMerkleRootResult
 
+// ResponsesGetWebhooksInternalServerError defines model for responses_GetWebhooksInternalServerError.
+type ResponsesGetWebhooksInternalServerError = ErrorsInternal
+
+// ResponsesGetWebhooksSuccess defines model for responses_GetWebhooksSuccess.
+type ResponsesGetWebhooksSuccess = ModelsWebhooks
+
 // ResponsesInternalServerError defines model for responses_InternalServerError.
 type ResponsesInternalServerError = ErrorsInternal
 
@@ -753,6 +804,9 @@ type ResponsesNotAuthorized = ErrorsAnyAuthorization
 
 // ResponsesNotAuthorizedToAdminEndpoint defines model for responses_NotAuthorizedToAdminEndpoint.
 type ResponsesNotAuthorizedToAdminEndpoint = ErrorsAdminAuthorization
+
+// ResponsesNotificationsDisabled defines model for responses_NotificationsDisabled.
+type ResponsesNotificationsDisabled = ErrorsNotificationsDisabled
 
 // ResponsesRecordTransactionBadRequest defines model for responses_RecordTransactionBadRequest.
 type ResponsesRecordTransactionBadRequest struct {
@@ -775,6 +829,17 @@ type ResponsesSearchOperationsSuccess = ModelsOperationsSearchResult
 
 // ResponsesSharedConfig Shared config
 type ResponsesSharedConfig = ModelsSharedConfig
+
+// ResponsesSubscribeToWebhookBadRequest defines model for responses_SubscribeToWebhookBadRequest.
+type ResponsesSubscribeToWebhookBadRequest struct {
+	union json.RawMessage
+}
+
+// ResponsesSubscribeToWebhookInternalServerError defines model for responses_SubscribeToWebhookInternalServerError.
+type ResponsesSubscribeToWebhookInternalServerError = ErrorsCannotBindRequest
+
+// ResponsesUnsubscribeToWebhookInternalServerError defines model for responses_UnsubscribeToWebhookInternalServerError.
+type ResponsesUnsubscribeToWebhookInternalServerError = ErrorsCannotBindRequest
 
 // ResponsesUserBadRequest defines model for responses_UserBadRequest.
 type ResponsesUserBadRequest = ErrorsInvalidDataID
@@ -820,6 +885,12 @@ type CreateUserJSONRequestBody = RequestsCreateUser
 
 // AddPaymailToUserJSONRequestBody defines body for AddPaymailToUser for application/json ContentType.
 type AddPaymailToUserJSONRequestBody = RequestsAddPaymail
+
+// UnsubscribeWebhookJSONRequestBody defines body for UnsubscribeWebhook for application/json ContentType.
+type UnsubscribeWebhookJSONRequestBody = RequestsUnsubscribeWebhook
+
+// SubscribeWebhookJSONRequestBody defines body for SubscribeWebhook for application/json ContentType.
+type SubscribeWebhookJSONRequestBody = RequestsSubscribeWebhook
 
 // RecordTransactionOutlineJSONRequestBody defines body for RecordTransactionOutline for application/json ContentType.
 type RecordTransactionOutlineJSONRequestBody = RequestsTransactionOutline
@@ -2082,6 +2153,120 @@ func (t ResponsesRecordTransactionInternalServerError) MarshalJSON() ([]byte, er
 }
 
 func (t *ResponsesRecordTransactionInternalServerError) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsCannotBindRequest returns the union data inside the ResponsesSubscribeToWebhookBadRequest as a ErrorsCannotBindRequest
+func (t ResponsesSubscribeToWebhookBadRequest) AsErrorsCannotBindRequest() (ErrorsCannotBindRequest, error) {
+	var body ErrorsCannotBindRequest
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsCannotBindRequest overwrites any union data inside the ResponsesSubscribeToWebhookBadRequest as the provided ErrorsCannotBindRequest
+func (t *ResponsesSubscribeToWebhookBadRequest) FromErrorsCannotBindRequest(v ErrorsCannotBindRequest) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsCannotBindRequest performs a merge with any union data inside the ResponsesSubscribeToWebhookBadRequest, using the provided ErrorsCannotBindRequest
+func (t *ResponsesSubscribeToWebhookBadRequest) MergeErrorsCannotBindRequest(v ErrorsCannotBindRequest) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsWebhookUrlRequired returns the union data inside the ResponsesSubscribeToWebhookBadRequest as a ErrorsWebhookUrlRequired
+func (t ResponsesSubscribeToWebhookBadRequest) AsErrorsWebhookUrlRequired() (ErrorsWebhookUrlRequired, error) {
+	var body ErrorsWebhookUrlRequired
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsWebhookUrlRequired overwrites any union data inside the ResponsesSubscribeToWebhookBadRequest as the provided ErrorsWebhookUrlRequired
+func (t *ResponsesSubscribeToWebhookBadRequest) FromErrorsWebhookUrlRequired(v ErrorsWebhookUrlRequired) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsWebhookUrlRequired performs a merge with any union data inside the ResponsesSubscribeToWebhookBadRequest, using the provided ErrorsWebhookUrlRequired
+func (t *ResponsesSubscribeToWebhookBadRequest) MergeErrorsWebhookUrlRequired(v ErrorsWebhookUrlRequired) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsWebhookTokenHeaderRequired returns the union data inside the ResponsesSubscribeToWebhookBadRequest as a ErrorsWebhookTokenHeaderRequired
+func (t ResponsesSubscribeToWebhookBadRequest) AsErrorsWebhookTokenHeaderRequired() (ErrorsWebhookTokenHeaderRequired, error) {
+	var body ErrorsWebhookTokenHeaderRequired
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsWebhookTokenHeaderRequired overwrites any union data inside the ResponsesSubscribeToWebhookBadRequest as the provided ErrorsWebhookTokenHeaderRequired
+func (t *ResponsesSubscribeToWebhookBadRequest) FromErrorsWebhookTokenHeaderRequired(v ErrorsWebhookTokenHeaderRequired) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsWebhookTokenHeaderRequired performs a merge with any union data inside the ResponsesSubscribeToWebhookBadRequest, using the provided ErrorsWebhookTokenHeaderRequired
+func (t *ResponsesSubscribeToWebhookBadRequest) MergeErrorsWebhookTokenHeaderRequired(v ErrorsWebhookTokenHeaderRequired) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsWebhookTokenValueRequired returns the union data inside the ResponsesSubscribeToWebhookBadRequest as a ErrorsWebhookTokenValueRequired
+func (t ResponsesSubscribeToWebhookBadRequest) AsErrorsWebhookTokenValueRequired() (ErrorsWebhookTokenValueRequired, error) {
+	var body ErrorsWebhookTokenValueRequired
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsWebhookTokenValueRequired overwrites any union data inside the ResponsesSubscribeToWebhookBadRequest as the provided ErrorsWebhookTokenValueRequired
+func (t *ResponsesSubscribeToWebhookBadRequest) FromErrorsWebhookTokenValueRequired(v ErrorsWebhookTokenValueRequired) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsWebhookTokenValueRequired performs a merge with any union data inside the ResponsesSubscribeToWebhookBadRequest, using the provided ErrorsWebhookTokenValueRequired
+func (t *ResponsesSubscribeToWebhookBadRequest) MergeErrorsWebhookTokenValueRequired(v ErrorsWebhookTokenValueRequired) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesSubscribeToWebhookBadRequest) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesSubscribeToWebhookBadRequest) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
