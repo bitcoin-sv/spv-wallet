@@ -74,7 +74,6 @@ func TestAcceptContact(t *testing.T) {
 				"status":   contactsmodels.ContactNotConfirmed,
 			})
 
-		// and:
 		// when:
 		res, _ = client.R().
 			Post(fmt.Sprintf("/api/v2/admin/invitations/%d", contact.ID))

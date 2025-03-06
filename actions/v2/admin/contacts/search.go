@@ -15,7 +15,7 @@ func (s *APIAdminContacts) AdminGetContacts(c *gin.Context, params api.AdminGetC
 	page := mapContactsParamToFilterPage(params)
 	conditions := mapping.MapToDBConditions(params)
 
-	pagedResult, err := s.engine.ContactService().PaginatedForAdmin(c.Request.Context(), page, conditions)
+	pagedResult, err := s.engine.ContactService().PaginatedForAdmin(c, page, conditions)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return

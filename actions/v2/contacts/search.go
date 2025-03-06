@@ -25,7 +25,7 @@ func (s *APIContacts) GetContacts(c *gin.Context, params api.GetContactsParams) 
 
 	//mapstructure viper
 
-	pagedResult, err := s.engine.ContactService().PaginatedForUser(c.Request.Context(), userID, page, conditions)
+	pagedResult, err := s.engine.ContactService().PaginatedForUser(c, userID, page, conditions)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return

@@ -9,7 +9,7 @@ import (
 
 // AdminDeleteContact deletes a contact
 func (s *APIAdminContacts) AdminDeleteContact(c *gin.Context, id uint) {
-	err := s.engine.ContactService().RemoveContactByID(c.Request.Context(), id)
+	err := s.engine.ContactService().RemoveContactByID(c, id)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return

@@ -9,7 +9,7 @@ import (
 
 // AdminRejectInvitation rejects an invitation from a contact.
 func (s *APIAdminContacts) AdminRejectInvitation(c *gin.Context, id uint) {
-	_, err := s.engine.ContactService().RejectContactByID(c.Request.Context(), id)
+	_, err := s.engine.ContactService().RejectContactByID(c, id)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return

@@ -19,7 +19,7 @@ func (s *APIAdminContacts) AdminUpdateContact(c *gin.Context, id uint) {
 		return
 	}
 
-	contact, err := s.engine.ContactService().UpdateFullNameByID(c.Request.Context(), id, requestBody.FullName)
+	contact, err := s.engine.ContactService().UpdateFullNameByID(c, id, requestBody.FullName)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return
