@@ -1,7 +1,6 @@
 package webhooks_test
 
 import (
-	"net/http"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -9,7 +8,7 @@ import (
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 )
 
-func TestUnsubscribeWebhook(t *testing.T) {
+func TestUnsubscribeWebhookHappyPath(t *testing.T) {
 	t.Run("unsubscribe webhook", func(t *testing.T) {
 		// given:
 		given, then := testabilities.NewOf(testabilities.Given(t), t)
@@ -68,12 +67,42 @@ func TestUnsubscribeWebhook(t *testing.T) {
 			WithJSONf(`[
             ]`)
 	})
+}
 
-	t.Run("unsubscribe with missing URL returns bad request", func(t *testing.T) {
+func TestUnsubscribeWebhookErrorPath(t *testing.T) {
+	t.Run("unsubscribe with invalid JSON returns bad request", func(t *testing.T) {
 		// given:
 		given, then := testabilities.NewOf(testabilities.Given(t), t)
 		cleanup := given.StartedSPVWalletWithConfiguration(
 			testengine.WithNotificationsEnabled(),
+			testengine.WithV2())
+		defer cleanup()
+
+		client := given.HttpClient().
+			ForAdmin()
+
+		// when:
+		res, _ := client.
+			R().
+			SetBody("{invalid json}").
+			Delete(webhookURLSuffix)
+
+		// then:
+		then.Response(res).
+			HasStatus(400).
+			WithJSONMatching(`{
+				"code": "{{ .code }}",
+				"message": "{{ .message }}"
+			}`, map[string]any{
+				"code":    spverrors.ErrCannotBindRequest.Code,
+				"message": spverrors.ErrCannotBindRequest.Message,
+			})
+	})
+
+	t.Run("unsubscribe with notification disabled returns error 404", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(testabilities.Given(t), t)
+		cleanup := given.StartedSPVWalletWithConfiguration(
 			testengine.WithV2())
 		defer cleanup()
 		client := given.HttpClient().ForAdmin()
@@ -81,11 +110,19 @@ func TestUnsubscribeWebhook(t *testing.T) {
 		// when:
 		res, _ := client.
 			R().
-			SetBody(map[string]string{}).
+			SetBody(map[string]string{"url": "http://localhost:8080"}).
 			Delete(webhookURLSuffix)
 
 		// then:
-		then.Response(res).HasStatus(http.StatusBadRequest)
+		then.Response(res).
+			HasStatus(404).
+			WithJSONMatching(`{
+				"code": "{{ .code }}",
+				"message": "{{ .message }}"
+			}`, map[string]any{
+				"code":    spverrors.ErrNotificationsDisabled.Code,
+				"message": spverrors.ErrNotificationsDisabled.Message,
+			})
 	})
 
 	t.Run("unsubscribe non-existent webhook returns internal error", func(t *testing.T) {
@@ -108,13 +145,40 @@ func TestUnsubscribeWebhook(t *testing.T) {
 
 		// then:
 		then.Response(res).
-			HasStatus(500).
+			HasStatus(404).
 			WithJSONMatching(`{
 				"code": "{{ .code }}",
 				"message": "{{ .message }}"
 			}`, map[string]any{
-				"code":    spverrors.ErrWebhookUnsubscriptionFailed.Code,
-				"message": spverrors.ErrWebhookUnsubscriptionFailed.Message,
+				"code":    spverrors.ErrWebhookSubscriptionNotFound.Code,
+				"message": spverrors.ErrWebhookSubscriptionNotFound.Message,
+			})
+	})
+
+	t.Run("unsubscribe with missing URL returns bad request", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(testabilities.Given(t), t)
+		cleanup := given.StartedSPVWalletWithConfiguration(
+			testengine.WithNotificationsEnabled(),
+			testengine.WithV2())
+		defer cleanup()
+		client := given.HttpClient().ForAdmin()
+
+		// when:
+		res, _ := client.
+			R().
+			SetBody(map[string]string{}).
+			Delete(webhookURLSuffix)
+
+		// then:
+		then.Response(res).
+			HasStatus(400).
+			WithJSONMatching(`{
+				"code": "{{ .code }}",
+				"message": "{{ .message }}"
+			}`, map[string]any{
+				"code":    spverrors.ErrWebhookUrlRequired.Code,
+				"message": spverrors.ErrWebhookUrlRequired.Message,
 			})
 	})
 }
