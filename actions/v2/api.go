@@ -34,6 +34,6 @@ func NewV2API(config *config.AppConfig, engine v2.Engine, logger *zerolog.Logger
 		users.NewAPIUsers(engine, logger),
 		operations.NewAPIOperations(engine, logger),
 		transactions.NewAPITransactions(engine, logger),
-		merkleroots.NewAPIMerkleRoots(engine, logger),
+		merkleroots.NewAPIMerkleRoots(engine, logger), // TODO: You need to add missing AcceptContact method.
 	}
 }

@@ -32,7 +32,7 @@ func (s *APIAdminUsers) CreateUser(c *gin.Context) {
 		return
 	}
 
-	createdUser, err := s.engine.UsersService().Create(c, newUser)
+	createdUser, err := s.users.Create(c, newUser)
 	if err != nil {
 		spverrors.MapResponse(c, err, s.logger).
 			If(configerrors.ErrUnsupportedDomain).Then(adminerrors.ErrInvalidDomain).

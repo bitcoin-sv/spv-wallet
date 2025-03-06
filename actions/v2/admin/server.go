@@ -14,6 +14,6 @@ type APIAdmin struct {
 // NewAPIAdmin creates a new APIAdmin
 func NewAPIAdmin(spvWalletEngine v2.Engine, logger *zerolog.Logger) APIAdmin {
 	return APIAdmin{
-		users.NewAPIAdminUsers(spvWalletEngine, logger),
+		users.NewAPIAdminUsers(spvWalletEngine.UsersService(), spvWalletEngine.PaymailsService(), logger),
 	}
 }
