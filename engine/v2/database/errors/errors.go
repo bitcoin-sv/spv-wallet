@@ -1,3 +1,4 @@
+//nolint:revive // Error types should be self-explanatory
 package dberrors
 
 import (

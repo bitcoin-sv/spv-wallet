@@ -6,6 +6,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// Mapper is a fluent API for mapping errors to client errors.
 type Mapper interface {
 	IfOfType(typeToMatch *errorx.Type) OnMatch
 	Finalize() error
@@ -19,18 +20,18 @@ type OnMatch interface {
 
 // Map creates a new Mapper instance.
 func Map(err error) Mapper {
-	return &MapperBuilder{
+	return &mapperBuilder{
 		baseErr: err,
 	}
 }
 
-type MapperBuilder struct {
+type mapperBuilder struct {
 	baseErr  error
 	matching bool
 	final    *Builder
 }
 
-func (r *MapperBuilder) IfOfType(typeToMatch *errorx.Type) OnMatch {
+func (r *mapperBuilder) IfOfType(typeToMatch *errorx.Type) OnMatch {
 	if r.final != nil {
 		return r
 	}
@@ -41,14 +42,14 @@ func (r *MapperBuilder) IfOfType(typeToMatch *errorx.Type) OnMatch {
 	return r
 }
 
-func (r *MapperBuilder) Then(errToReturn *Builder) Mapper {
+func (r *mapperBuilder) Then(errToReturn *Builder) Mapper {
 	if r.final == nil && r.matching {
 		r.final = errToReturn
 	}
 	return r
 }
 
-func (r *MapperBuilder) Finalize() error {
+func (r *mapperBuilder) Finalize() error {
 	if r.final == nil {
 		return r.baseErr
 	}
@@ -56,7 +57,7 @@ func (r *MapperBuilder) Finalize() error {
 	return r.final.Wrap(r.baseErr).Err()
 }
 
-func (r *MapperBuilder) Response(c *gin.Context, log *zerolog.Logger) {
+func (r *mapperBuilder) Response(c *gin.Context, log *zerolog.Logger) {
 	err := r.Finalize()
 	Response(c, err, log)
 }

@@ -2,13 +2,14 @@ package clienterr
 
 import (
 	"errors"
-	errdef2 "github.com/bitcoin-sv/spv-wallet/errdef"
 
+	errdef2 "github.com/bitcoin-sv/spv-wallet/errdef"
 	"github.com/gin-gonic/gin"
 	"github.com/joomcode/errorx"
 	"github.com/rs/zerolog"
 )
 
+// Response sends the error as a JSON response to the client.
 func Response(c *gin.Context, err error, log *zerolog.Logger) {
 	problem, logLevel := problemDetailsFromError(err)
 	log.WithLevel(logLevel).Err(err).Msgf("Error HTTP response, returning %d: %s", problem.Status, problem.Detail)
@@ -44,10 +45,10 @@ func problemDetailsFromError(err error) (problem errdef2.ProblemDetails, level z
 
 	level = zerolog.ErrorLevel
 	problem = errdef2.ProblemDetails{
-		Type:     "unknown_error",
+		Type:     "internal",
 		Title:    "Unknown error",
 		Status:   500,
-		Instance: "unknown_error",
+		Instance: "",
 	}
 	return
 }

@@ -1,7 +1,6 @@
 package users
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/errdef/clienterr"
 	"net/http"
 
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
@@ -9,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/api"
 	configerrors "github.com/bitcoin-sv/spv-wallet/config/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailerrors"
+	"github.com/bitcoin-sv/spv-wallet/errdef/clienterr"
 	"github.com/gin-gonic/gin"
 )
 

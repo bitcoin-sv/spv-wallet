@@ -1,11 +1,11 @@
 package paymailsmodels
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/errdef"
 	"net/url"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailerrors"
+	"github.com/bitcoin-sv/spv-wallet/errdef"
 )
 
 // Paymail represents a domain model from paymails service

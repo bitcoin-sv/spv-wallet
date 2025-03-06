@@ -3,12 +3,12 @@ package paymails
 import (
 	"context"
 	"errors"
-	"github.com/joomcode/errorx"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailerrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
+	"github.com/joomcode/errorx"
 	"gorm.io/gorm"
 )
 

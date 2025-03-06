@@ -1,3 +1,4 @@
+//nolint:revive // Error types should be self-explanatory
 package clienterr
 
 var BadRequest = ClientErrorDefinition{
@@ -10,10 +11,4 @@ var UnprocessableEntity = ClientErrorDefinition{
 	title:    "Unprocessable entity",
 	typeName: "unprocessable_entity",
 	httpCode: 422,
-}
-
-var Unauthorized = ClientErrorDefinition{
-	title:    "Unauthorized",
-	typeName: "unauthorized",
-	httpCode: 401,
 }

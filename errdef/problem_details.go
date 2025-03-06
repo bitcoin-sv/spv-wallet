@@ -7,6 +7,8 @@ import (
 	"github.com/joomcode/errorx"
 )
 
+// ProblemDetails is a struct that represents a problem details object as defined in RFC 7807.
+// https://datatracker.ietf.org/doc/html/rfc7807
 type ProblemDetails struct {
 	Type     string `json:"type"`
 	Title    string `json:"title"`
@@ -15,6 +17,7 @@ type ProblemDetails struct {
 	Instance string `json:"instance"`
 }
 
+// PushDetail appends a detail to the existing details, separated by a semicolon.
 func (p *ProblemDetails) PushDetail(detail string) *ProblemDetails {
 	separator := ""
 	if p.Detail != "" {
@@ -24,6 +27,7 @@ func (p *ProblemDetails) PushDetail(detail string) *ProblemDetails {
 	return p
 }
 
+// FromInternalError maps an internal error to a ProblemDetails object.
 func (p *ProblemDetails) FromInternalError(err error) *ProblemDetails {
 	ex := errorx.Cast(err)
 	if ex == nil {

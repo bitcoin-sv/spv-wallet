@@ -1,10 +1,10 @@
 package users
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/errdef/clienterr"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/admin/internal/mapping"
+	"github.com/bitcoin-sv/spv-wallet/errdef/clienterr"
 	"github.com/gin-gonic/gin"
 )
 

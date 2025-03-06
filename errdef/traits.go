@@ -1,3 +1,4 @@
+//nolint:revive // Traits should be self-explanatory
 package errdef
 
 import "github.com/joomcode/errorx"
