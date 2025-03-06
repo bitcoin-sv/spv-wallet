@@ -148,3 +148,27 @@ func TestCreateAndDeleteUser(t *testing.T) {
 		then.Response(res).HasStatus(http.StatusUnauthorized).WithJSONf(apierror.ExpectedJSON("error-unauthorized", "unauthorized"))
 	})
 }
+
+func TestDeleteUserWithUTXO(t *testing.T) {
+	// given:
+	given, then := testabilities.New(t)
+	cleanup := given.StartedSPVWalletWithConfiguration(
+		testengine.WithV2(),
+	)
+	defer cleanup()
+
+	// and:
+	userCandidate := fixtures.Sender
+
+	// and:
+	given.Faucet(fixtures.Sender).TopUp(1000)
+
+	// given:
+	client := given.HttpClient().ForGivenUser(userCandidate)
+
+	// when:
+	res, _ := client.R().
+		Delete("/api/v2/users/current")
+
+	then.Response(res).HasStatus(http.StatusBadRequest).WithJSONf(apierror.ExpectedJSON("error-user-has-existing-utxos", "cannot delete user with existing UTXOs"))
+}
