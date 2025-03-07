@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"

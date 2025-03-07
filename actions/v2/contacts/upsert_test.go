@@ -2,10 +2,10 @@ package contacts_test
 
 import (
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
