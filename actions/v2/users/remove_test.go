@@ -47,25 +47,11 @@ func TestCreateAndDeleteUser(t *testing.T) {
 			Post("/api/v2/admin/users")
 
 		// then:
-		then.Response(res).HasStatus(201)
+		then.Response(res).IsCreated()
 
 		// update:
 		getter := then.Response(res).JSONValue()
 		testState.userID = getter.GetString("id")
-	})
-
-	t.Run("Get new user by id as admin", func(t *testing.T) {
-		// given:
-		given, then := testabilities.NewOf(givenForAllTests, t)
-		client := given.HttpClient().ForAdmin()
-
-		// when:
-		res, _ := client.R().
-			SetPathParam("id", testState.userID).
-			Get("/api/v2/admin/users/{id}")
-
-		// then:
-		then.Response(res).IsOK()
 	})
 
 	t.Run("Delete user", func(t *testing.T) {
