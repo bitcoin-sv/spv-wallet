@@ -34,11 +34,13 @@ func TestAcceptContact(t *testing.T) {
 
 	t.Run("Accept already accepted contact", func(t *testing.T) {
 		// given:
-		given, then := testabilities.NewOf(givenForAllTests, t)
-		contact := given.User(fixtures.Sender).HasAwaitingContactTo(fixtures.RecipientInternal)
+		given, then := testabilities.New(t)
+		cleanup = given.StartedSPVWalletWithConfiguration(
+			testengine.WithV2(),
+		)
+		defer cleanup()
+		given.User(fixtures.Sender).HasAwaitingContactTo(fixtures.RecipientInternal)
 		client := given.HttpClient().ForGivenUser(fixtures.Sender)
-
-		fmt.Println(contact)
 
 		// when:
 		res, _ := client.R().

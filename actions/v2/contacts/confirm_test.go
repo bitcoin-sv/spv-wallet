@@ -34,7 +34,11 @@ func TestConfirmContact(t *testing.T) {
 
 	t.Run("Confirm already confirmed contact", func(t *testing.T) {
 		// given:
-		given, then := testabilities.NewOf(givenForAllTests, t)
+		given, then := testabilities.New(t)
+		cleanup = given.StartedSPVWalletWithConfiguration(
+			testengine.WithV2(),
+		)
+		defer cleanup()
 		given.User(fixtures.Sender).HasContactTo(fixtures.RecipientInternal)
 		client := given.HttpClient().ForGivenUser(fixtures.Sender)
 
