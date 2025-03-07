@@ -1,6 +1,6 @@
 module github.com/bitcoin-sv/spv-wallet/api/manualtests
 
-go 1.24
+go 1.24.0
 
 require (
 	github.com/bitcoin-sv/go-sdk v1.1.18

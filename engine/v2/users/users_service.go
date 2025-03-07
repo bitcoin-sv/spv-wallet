@@ -6,6 +6,7 @@ import (
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usererrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
@@ -43,6 +44,25 @@ func (s *Service) Create(ctx context.Context, newUser *usersmodels.NewUser) (*us
 		return nil, spverrors.Wrapf(err, "failed to create user")
 	}
 	return createdUser, nil
+}
+
+// Remove removes current user
+func (s *Service) Remove(ctx context.Context, userID string) error {
+	balance, err := s.GetBalance(ctx, userID)
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to get user's balance")
+	}
+
+	if balance > 0 {
+		return usererrors.ErrUserHasUnspentUTXOs
+	}
+
+	err = s.usersRepo.Delete(ctx, userID)
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to delete user")
+	}
+
+	return nil
 }
 
 // Exists checks if a user exists

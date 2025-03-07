@@ -74,7 +74,7 @@ func TestOutlinesRecordOpReturn(t *testing.T) {
 
 		// then:
 		then.Response(res).
-			HasStatus(201).
+			IsCreated().
 			WithJSONMatching(`{
 				"txID": "{{ .txID }}"
 			}`, map[string]any{
@@ -240,7 +240,7 @@ func TestOutlinesRecordOpReturnOnBroadcastError(t *testing.T) {
 		}
 	}`
 
-	var mockTxInfo = func(txStatus chainmodels.TXStatus) chainmodels.TXInfo {
+	mockTxInfo := func(txStatus chainmodels.TXStatus) chainmodels.TXInfo {
 		return chainmodels.TXInfo{
 			TxID:     txSpec.ID(),
 			TXStatus: txStatus,
@@ -348,8 +348,7 @@ func TestOutlinesRecordForDifferentTxStatuses(t *testing.T) {
 				Post(transactionsOutlinesRecordURL)
 
 			// then:
-			then.Response(res).
-				HasStatus(201)
+			then.Response(res).IsCreated()
 
 			// when:
 			res, _ = client.R().Get("/api/v2/operations/search")
@@ -431,7 +430,7 @@ func TestRecordOpReturnTwiceByTheSameUser(t *testing.T) {
 
 			// then:
 			then.Response(res).
-				HasStatus(201).
+				IsCreated().
 				WithJSONMatching(`{
 				"txID": "{{ .txID }}"
 			}`, map[string]any{

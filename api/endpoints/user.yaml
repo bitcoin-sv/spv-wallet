@@ -3,7 +3,6 @@ info:
   title: ignored
   version: ignored
 paths:
-
   /api/v2/users/current:
     get:
       operationId: currentUser
@@ -18,6 +17,24 @@ paths:
       responses:
         200:
           $ref: "../components/responses.yaml#/components/responses/GetCurrentUserSuccess"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+    delete:
+      operationId: deleteCurrentUser
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - User
+      summary: Delete current user
+      description: >-
+        This endpoint will delete current user with associated paymails, addresses, operations and tracked outputs
+        You cannot delete user with balance larger than 0
+      responses:
+        200:
+          description: Success
         401:
           $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
         500:
