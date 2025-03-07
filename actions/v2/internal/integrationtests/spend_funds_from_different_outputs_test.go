@@ -1,8 +1,9 @@
 package integrationtests
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/integrationtests/testsuite"
 	"testing"
+
+	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/integrationtests/testsuite"
 )
 
 func TestSpendingFromMultipleSourceOutputs(t *testing.T) {

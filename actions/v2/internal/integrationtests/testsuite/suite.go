@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/integrationtests/testabilities"
-	"github.com/bitcoin-sv/spv-wallet/actions/v2/internal/integrationtests/testcontainer"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/engine/testabilities/testmode"
 )
 
 const (
@@ -22,9 +22,6 @@ const (
 // RunOnAllDBMS runs the given test function on all database management systems
 func RunOnAllDBMS(t *testing.T, testFunc func(t *testing.T, dbms string)) {
 	t.Run("PostgreSQL", func(t *testing.T) {
-		container := testcontainer.NewPostgresContainer(t)
-		t.Logf("Using PostgreSQL container at %s:%s", container.Host, container.Port)
-
 		testFunc(t, DbmsPostgres)
 	})
 
@@ -46,24 +43,17 @@ func SetupDBMSTest(t *testing.T, dbms string) (
 	given, when, then = testabilities.New(t)
 
 	if dbms == DbmsPostgres {
-		container := testcontainer.NewPostgresContainer(t)
+		t.Setenv(testmode.EnvDBMode, testmode.PostgresContainerMode)
 
-		container.CleanDatabase(t)
+		container := given.(testengine.EngineFixture).GetPostgresContainer()
+		testmode.CleanDatabaseSchema(t, container)
 
-		cleanup = given.StartedSPVWalletV2(testengine.WithPostgresConfig(
-			container.Host,
-			container.Port,
-			container.User,
-			container.Password,
-			container.DBName,
-		))
+		cleanup = given.StartedSPVWalletV2()
 	} else {
 		var sqliteOpts []testengine.ConfigOpts
-
 		if dbPath := os.Getenv(EnvSQLiteDBPath); dbPath != "" {
 			sqliteOpts = append(sqliteOpts, testengine.WithSQLiteFilePath(dbPath))
 		}
-
 		cleanup = given.StartedSPVWalletV2(sqliteOpts...)
 	}
 
