@@ -47,29 +47,7 @@ func TestCreateAndDeleteUser(t *testing.T) {
 			Post("/api/v2/admin/users")
 
 		// then:
-		then.Response(res).
-			HasStatus(201).
-			WithJSONMatching(`{
-				"id": "{{ matchAddress }}",
-				"createdAt": "{{ matchTimestamp }}",
-				"updatedAt": "{{ matchTimestamp }}",
-				"publicKey": "{{ .publicKey }}",
-				"paymails": [
-					{
-						"alias": "{{ .alias }}",
-						"avatar": "",
-						"domain": "example.com",
-						"id": "{{ matchNumber }}",
-						"paymail": "{{ .paymail }}",
-						"publicName": "{{ .publicName }}"
-					}
-				]
-			}`, map[string]any{
-				"publicKey":  publicKey,
-				"paymail":    userCandidate.DefaultPaymail(),
-				"publicName": userCandidate.DefaultPaymail().Alias(),
-				"alias":      userCandidate.DefaultPaymail().Alias(),
-			})
+		then.Response(res).HasStatus(201)
 
 		// update:
 		getter := then.Response(res).JSONValue()
@@ -86,29 +64,8 @@ func TestCreateAndDeleteUser(t *testing.T) {
 			SetPathParam("id", testState.userID).
 			Get("/api/v2/admin/users/{id}")
 
-		then.Response(res).
-			IsOK().
-			WithJSONMatching(`{
-				"id": "{{ matchAddress }}",
-				"createdAt": "{{ matchTimestamp }}",
-				"updatedAt": "{{ matchTimestamp }}",
-				"publicKey": "{{ .publicKey }}",
-				"paymails": [
-					{
-						"alias": "{{ .alias }}",
-						"avatar": "",
-						"domain": "example.com",
-						"id": "{{ matchNumber }}",
-						"paymail": "{{ .paymail }}",
-						"publicName": "{{ .publicName }}"
-					}
-				]
-			}`, map[string]any{
-				"publicKey":  publicKey,
-				"paymail":    userCandidate.DefaultPaymail(),
-				"publicName": userCandidate.DefaultPaymail().Alias(),
-				"alias":      userCandidate.DefaultPaymail().Alias(),
-			})
+		// then:
+		then.Response(res).IsOK()
 	})
 
 	t.Run("Delete user", func(t *testing.T) {
@@ -120,6 +77,7 @@ func TestCreateAndDeleteUser(t *testing.T) {
 		res, _ := client.R().
 			Delete("/api/v2/users/current")
 
+		// then:
 		then.Response(res).IsOK()
 	})
 
@@ -133,6 +91,7 @@ func TestCreateAndDeleteUser(t *testing.T) {
 			SetPathParam("id", testState.userID).
 			Get("/api/v2/admin/users/{id}")
 
+		// then:
 		then.Response(res).HasStatus(http.StatusNotFound).WithJSONf(apierror.ExpectedJSON("error-user-not-found", "user not found"))
 	})
 

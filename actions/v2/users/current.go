@@ -18,7 +18,7 @@ func (s *APIUsers) CurrentUser(c *gin.Context) {
 		return
 	}
 
-	satoshis, err := reqctx.Engine(c).UsersService().GetBalance(c.Request.Context(), userID)
+	satoshis, err := s.usersService.GetBalance(c.Request.Context(), userID)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return

@@ -17,7 +17,7 @@ func (s *APIUsers) DeleteCurrentUser(c *gin.Context) {
 		return
 	}
 
-	err = reqctx.Engine(c).UsersService().Remove(c.Request.Context(), userID)
+	err = s.usersService.Remove(c.Request.Context(), userID)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
