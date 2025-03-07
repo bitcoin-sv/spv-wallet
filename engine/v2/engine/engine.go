@@ -84,7 +84,6 @@ func NewEngine(cfg *config.AppConfig, logger zerolog.Logger, overridesOpts ...In
 	chainService := chain.NewChainService(logger, httpClient, extractARCConfig(cfg), extractBHSConfig(cfg))
 	feeService := fee.NewService(cfg, chainService, logger)
 
-	// TODO: use feeService instead of fee unit in services
 	feeUnit, err := feeService.GetFeeUnit(context.Background())
 	must.HaveNoErrorf(err, "failed to setup fee unit")
 
@@ -240,7 +239,6 @@ func extractARCConfig(cfg *config.AppConfig) chainmodels.ARCConfig {
 		var err error
 		if cfg.ARC.Callback.Token == "" {
 			// This also sets the token to the config reference and, it is used in the callbacktoken_middleware
-			// TODO: consider moving config modification to a PostLoad method and make this ToEngineOptions pure (no side effects)
 			cfg.ARC.Callback.Token, err = utils.HashAdler32(config.DefaultAdminXpub)
 			must.HaveNoErrorf(err, "error while generating callback token")
 		}
