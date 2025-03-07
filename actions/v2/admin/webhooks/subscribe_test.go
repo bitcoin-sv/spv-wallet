@@ -8,7 +8,7 @@ import (
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 )
 
-const webhookURLSuffix = "/api/v2/admin/webhooks"
+const webhookAPIURL = "/api/v2/admin/webhooks"
 
 func TestSubscribeWebhooksHappyPath(t *testing.T) {
 	t.Run("add webhook", func(t *testing.T) {
@@ -18,28 +18,23 @@ func TestSubscribeWebhooksHappyPath(t *testing.T) {
 			testengine.WithNotificationsEnabled(),
 			testengine.WithV2())
 		defer cleanup()
+		client := given.HttpClient().ForAdmin()
 
-		client := given.HttpClient().
-			ForAdmin()
-
-		webhook := map[string]string{
-			"url":         "http://localhost:8080",
-			"tokenHeader": "Auth1",
-			"tokenValue":  "123",
-		}
 		// when:
 		res, _ := client.R().
-			SetBody(webhook).
-			Post(webhookURLSuffix)
+			SetBody(
+				map[string]string{
+					"url":         "http://localhost:8080",
+					"tokenHeader": "Auth1",
+					"tokenValue":  "123",
+				},
+			).
+			Post(webhookAPIURL)
 
-		// then:
-		then.Response(res).
-			IsOK()
+		then.Response(res).IsOK()
 
-		// and:
-		// when:
 		res, _ = client.R().
-			Get(webhookURLSuffix)
+			Get(webhookAPIURL)
 
 		// then:
 		then.Response(res).
@@ -56,38 +51,28 @@ func TestSubscribeWebhooksHappyPath(t *testing.T) {
 			testengine.WithNotificationsEnabled(),
 			testengine.WithV2())
 		defer cleanup()
+		client := given.HttpClient().ForAdmin()
 
-		client := given.HttpClient().
-			ForAdmin()
-
-		webhook := map[string]string{
+		sameWebhook := map[string]string{
 			"url":         "http://localhost:8080",
 			"tokenHeader": "Auth1",
 			"tokenValue":  "123",
 		}
 		// when:
 		res, _ := client.R().
-			SetBody(webhook).
-			Post(webhookURLSuffix)
+			SetBody(sameWebhook).
+			Post(webhookAPIURL)
 
-		// then:
-		then.Response(res).
-			IsOK()
+		then.Response(res).IsOK()
 
-		// and:
-		// when:
 		res, _ = client.R().
-			SetBody(webhook).
-			Post(webhookURLSuffix)
+			SetBody(sameWebhook).
+			Post(webhookAPIURL)
 
-		// then:
-		then.Response(res).
-			IsOK()
+		then.Response(res).IsOK()
 
-		// and:
-		// when:
 		res, _ = client.R().
-			Get(webhookURLSuffix)
+			Get(webhookAPIURL)
 
 		// then:
 		then.Response(res).
@@ -104,33 +89,35 @@ func TestSubscribeWebhooksHappyPath(t *testing.T) {
 			testengine.WithNotificationsEnabled(),
 			testengine.WithV2())
 		defer cleanup()
-
-		client := given.HttpClient().
-			ForAdmin()
-
-		webhook1 := map[string]string{
-			"url":         "http://localhost:8080",
-			"tokenHeader": "Auth1",
-			"tokenValue":  "123",
-		}
-
-		webhook2 := map[string]string{
-			"url":         "http://localhost:8081",
-			"tokenHeader": "Auth2",
-			"tokenValue":  "456",
-		}
+		client := given.HttpClient().ForAdmin()
 
 		// when:
-		client.R().
-			SetBody(webhook1).
-			Post(webhookURLSuffix)
-
-		client.R().
-			SetBody(webhook2).
-			Post(webhookURLSuffix)
-
 		res, _ := client.R().
-			Get(webhookURLSuffix)
+			SetBody(
+				map[string]string{
+					"url":         "http://localhost:8080",
+					"tokenHeader": "Auth1",
+					"tokenValue":  "123",
+				},
+			).
+			Post(webhookAPIURL)
+
+		then.Response(res).IsOK()
+
+		res, _ = client.R().
+			SetBody(
+				map[string]string{
+					"url":         "http://localhost:8081",
+					"tokenHeader": "Auth2",
+					"tokenValue":  "456",
+				},
+			).
+			Post(webhookAPIURL)
+
+		then.Response(res).IsOK()
+
+		res, _ = client.R().
+			Get(webhookAPIURL)
 
 		// then:
 		then.Response(res).
@@ -150,19 +137,18 @@ func TestSubscribeWebhooksErrorPath(t *testing.T) {
 		cleanup := given.StartedSPVWalletWithConfiguration(
 			testengine.WithV2())
 		defer cleanup()
+		client := given.HttpClient().ForAdmin()
 
-		client := given.HttpClient().
-			ForAdmin()
-
-		webhook := map[string]string{
-			"url":         "http://localhost:8080",
-			"tokenHeader": "Auth1",
-			"tokenValue":  "123",
-		}
 		// when:
 		res, _ := client.R().
-			SetBody(webhook).
-			Post(webhookURLSuffix)
+			SetBody(
+				map[string]string{
+					"url":         "http://localhost:8080",
+					"tokenHeader": "Auth1",
+					"tokenValue":  "123",
+				},
+			).
+			Post(webhookAPIURL)
 
 		// then:
 		then.Response(res).
@@ -183,17 +169,16 @@ func TestSubscribeWebhooksErrorPath(t *testing.T) {
 			testengine.WithNotificationsEnabled(),
 			testengine.WithV2())
 		defer cleanup()
-
-		client := given.HttpClient().
-			ForAdmin()
+		client := given.HttpClient().ForAdmin()
 
 		// when:
 		res, _ := client.
 			R().
-			SetBody("{invalid json}").
-			Post(webhookURLSuffix)
+			SetBody(
+				"{invalid json}",
+			).
+			Post(webhookAPIURL)
 
-		// then:
 		then.Response(res).
 			HasStatus(400).
 			WithJSONMatching(`{
@@ -204,10 +189,8 @@ func TestSubscribeWebhooksErrorPath(t *testing.T) {
 				"message": spverrors.ErrCannotBindRequest.Message,
 			})
 
-		// and:
-		// when:
 		res, _ = client.R().
-			Get(webhookURLSuffix)
+			Get(webhookAPIURL)
 
 		// then:
 		then.Response(res).
@@ -223,22 +206,19 @@ func TestSubscribeWebhooksErrorPath(t *testing.T) {
 			testengine.WithNotificationsEnabled(),
 			testengine.WithV2())
 		defer cleanup()
-
-		client := given.HttpClient().
-			ForAdmin()
-
-		webhook := map[string]string{
-			"tokenHeader": "Authorization",
-			"url":         "http://localhost:8080",
-		}
+		client := given.HttpClient().ForAdmin()
 
 		// when:
 		res, _ := client.
 			R().
-			SetBody(webhook).
-			Post(webhookURLSuffix)
+			SetBody(
+				map[string]string{
+					"tokenHeader": "Authorization",
+					"url":         "http://localhost:8080",
+				},
+			).
+			Post(webhookAPIURL)
 
-		// then:
 		then.Response(res).
 			HasStatus(400).
 			WithJSONMatching(`{
@@ -249,10 +229,8 @@ func TestSubscribeWebhooksErrorPath(t *testing.T) {
 				"message": spverrors.ErrWebhookTokenValueRequired.Message,
 			})
 
-		// and:
-		// when:
 		res, _ = client.R().
-			Get(webhookURLSuffix)
+			Get(webhookAPIURL)
 
 		// then:
 		then.Response(res).
@@ -268,22 +246,19 @@ func TestSubscribeWebhooksErrorPath(t *testing.T) {
 			testengine.WithNotificationsEnabled(),
 			testengine.WithV2())
 		defer cleanup()
-
-		client := given.HttpClient().
-			ForAdmin()
-
-		webhook := map[string]string{
-			"url":        "http://localhost:8080",
-			"tokenValue": "123",
-		}
+		client := given.HttpClient().ForAdmin()
 
 		// when:
 		res, _ := client.
 			R().
-			SetBody(webhook).
-			Post(webhookURLSuffix)
+			SetBody(
+				map[string]string{
+					"url":        "http://localhost:8080",
+					"tokenValue": "123",
+				},
+			).
+			Post(webhookAPIURL)
 
-		// then:
 		then.Response(res).
 			HasStatus(400).
 			WithJSONMatching(`{
@@ -294,10 +269,8 @@ func TestSubscribeWebhooksErrorPath(t *testing.T) {
 				"message": spverrors.ErrWebhookTokenHeaderRequired.Message,
 			})
 
-		// and:
-		// when:
 		res, _ = client.R().
-			Get(webhookURLSuffix)
+			Get(webhookAPIURL)
 
 		// then:
 		then.Response(res).
@@ -313,22 +286,19 @@ func TestSubscribeWebhooksErrorPath(t *testing.T) {
 			testengine.WithNotificationsEnabled(),
 			testengine.WithV2())
 		defer cleanup()
-
-		client := given.HttpClient().
-			ForAdmin()
-
-		webhook := map[string]string{
-			"tokenHeader": "Authorization",
-			"tokenValue":  "123",
-		}
+		client := given.HttpClient().ForAdmin()
 
 		// when:
 		res, _ := client.
 			R().
-			SetBody(webhook).
-			Post(webhookURLSuffix)
+			SetBody(
+				map[string]string{
+					"tokenHeader": "Authorization",
+					"tokenValue":  "Bearer 123",
+				},
+			).
+			Post(webhookAPIURL)
 
-		// then:
 		then.Response(res).
 			HasStatus(400).
 			WithJSONMatching(`{
@@ -339,10 +309,49 @@ func TestSubscribeWebhooksErrorPath(t *testing.T) {
 				"message": spverrors.ErrWebhookUrlRequired.Message,
 			})
 
-		// and:
-		// when:
 		res, _ = client.R().
-			Get(webhookURLSuffix)
+			Get(webhookAPIURL)
+
+		// then:
+		then.Response(res).
+			IsOK().
+			WithJSONf(`[
+            ]`)
+	})
+
+	t.Run("subscribe with invalid URL returns bad request", func(t *testing.T) {
+		// given:
+		given, then := testabilities.New(t)
+		cleanup := given.StartedSPVWalletWithConfiguration(
+			testengine.WithNotificationsEnabled(),
+			testengine.WithV2())
+		defer cleanup()
+		client := given.HttpClient().ForAdmin()
+
+		// when:
+		res, _ := client.
+			R().
+			SetBody(
+				map[string]string{
+					"tokenHeader": "Authorization",
+					"tokenValue":  "Bearer 123",
+					"url":         "http://test.com/%",
+				},
+			).
+			Post(webhookAPIURL)
+
+		then.Response(res).
+			HasStatus(400).
+			WithJSONMatching(`{
+				"code": "{{ .code }}",
+				"message": "{{ .message }}"
+			}`, map[string]any{
+				"code":    spverrors.WebhookUrlInvalid.Code,
+				"message": spverrors.WebhookUrlInvalid.Message,
+			})
+
+		res, _ = client.R().
+			Get(webhookAPIURL)
 
 		// then:
 		then.Response(res).

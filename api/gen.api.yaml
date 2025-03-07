@@ -606,6 +606,7 @@ components:
                         oneOf:
                             - $ref: '#/components/schemas/errors_CannotBindRequest'
                             - $ref: '#/components/schemas/errors_WebhookUrlRequired'
+                            - $ref: '#/components/schemas/errors_WebhookUrlInvalid'
                             - $ref: '#/components/schemas/errors_WebhookTokenHeaderRequired'
                             - $ref: '#/components/schemas/errors_WebhookTokenValueRequired'
             description: Bad request is an error that occurs when the request is malformed.
@@ -1032,6 +1033,15 @@ components:
                         example: error-webhook-token-value-required
                     message:
                         example: webhook token value is required
+                  type: object
+        errors_WebhookUrlInvalid:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-webhook-url-invalid
+                    message:
+                        example: webhook url is invalid
                   type: object
         errors_WebhookUrlRequired:
             allOf:

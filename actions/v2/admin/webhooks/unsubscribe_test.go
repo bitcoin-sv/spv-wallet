@@ -17,49 +17,41 @@ func TestUnsubscribeWebhookHappyPath(t *testing.T) {
 			testengine.WithV2())
 		defer cleanup()
 		client := given.HttpClient().ForAdmin()
-		webhook := map[string]string{
-			"url":         "http://localhost:8080",
-			"tokenHeader": "Auth1",
-			"tokenValue":  "123",
-		}
+
 		// when:
 		res, _ := client.R().
-			SetBody(webhook).
-			Post(webhookURLSuffix)
+			SetBody(
+				map[string]string{
+					"url":         "http://localhost:8080",
+					"tokenHeader": "Auth1",
+					"tokenValue":  "123",
+				},
+			).
+			Post(webhookAPIURL)
 
-		// then:
-		then.Response(res).
-			IsOK()
+		then.Response(res).IsOK()
 
-		// and:
-		// when:
 		res, _ = client.R().
-			Get(webhookURLSuffix)
+			Get(webhookAPIURL)
 
-		// then:
 		then.Response(res).
 			IsOK().
 			WithJSONf(`[
                 {"url": "http://localhost:8080", "banned": false}
             ]`)
 
-		// and:
-		// when:
 		res, _ = client.
 			R().
 			SetBody(
 				map[string]string{
 					"url": "http://localhost:8080",
 				}).
-			Delete(webhookURLSuffix)
+			Delete(webhookAPIURL)
 
-		// then:
 		then.Response(res).IsOK()
 
-		// and:
-		// when:
 		res, _ = client.R().
-			Get(webhookURLSuffix)
+			Get(webhookAPIURL)
 
 		// then:
 		then.Response(res).
@@ -77,15 +69,13 @@ func TestUnsubscribeWebhookErrorPath(t *testing.T) {
 			testengine.WithNotificationsEnabled(),
 			testengine.WithV2())
 		defer cleanup()
-
-		client := given.HttpClient().
-			ForAdmin()
+		client := given.HttpClient().ForAdmin()
 
 		// when:
 		res, _ := client.
 			R().
 			SetBody("{invalid json}").
-			Delete(webhookURLSuffix)
+			Delete(webhookAPIURL)
 
 		// then:
 		then.Response(res).
@@ -110,8 +100,12 @@ func TestUnsubscribeWebhookErrorPath(t *testing.T) {
 		// when:
 		res, _ := client.
 			R().
-			SetBody(map[string]string{"url": "http://localhost:8080"}).
-			Delete(webhookURLSuffix)
+			SetBody(
+				map[string]string{
+					"url": "http://localhost:8080",
+				},
+			).
+			Delete(webhookAPIURL)
 
 		// then:
 		then.Response(res).
@@ -132,16 +126,17 @@ func TestUnsubscribeWebhookErrorPath(t *testing.T) {
 			testengine.WithNotificationsEnabled(),
 			testengine.WithV2())
 		defer cleanup()
-
 		client := given.HttpClient().ForAdmin()
-
-		webhookURL := "http://nonexistent.com"
 
 		// when:
 		res, _ := client.
 			R().
-			SetBody(map[string]string{"url": webhookURL}).
-			Delete(webhookURLSuffix)
+			SetBody(
+				map[string]string{
+					"url": "http://nonexistent.com",
+				},
+			).
+			Delete(webhookAPIURL)
 
 		// then:
 		then.Response(res).
@@ -168,7 +163,7 @@ func TestUnsubscribeWebhookErrorPath(t *testing.T) {
 		res, _ := client.
 			R().
 			SetBody(map[string]string{}).
-			Delete(webhookURLSuffix)
+			Delete(webhookAPIURL)
 
 		// then:
 		then.Response(res).
@@ -179,6 +174,35 @@ func TestUnsubscribeWebhookErrorPath(t *testing.T) {
 			}`, map[string]any{
 				"code":    spverrors.ErrWebhookUrlRequired.Code,
 				"message": spverrors.ErrWebhookUrlRequired.Message,
+			})
+	})
+
+	t.Run("unsubscribe with incorrect URL returns bad request", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(testabilities.Given(t), t)
+		cleanup := given.StartedSPVWalletWithConfiguration(
+			testengine.WithNotificationsEnabled(),
+			testengine.WithV2())
+		defer cleanup()
+		client := given.HttpClient().ForAdmin()
+
+		// when:
+		res, _ := client.
+			R().
+			SetBody(map[string]string{
+				"url": "http://test.com/%",
+			}).
+			Delete(webhookAPIURL)
+
+		// then:
+		then.Response(res).
+			HasStatus(400).
+			WithJSONMatching(`{
+				"code": "{{ .code }}",
+				"message": "{{ .message }}"
+			}`, map[string]any{
+				"code":    spverrors.WebhookUrlInvalid.Code,
+				"message": spverrors.WebhookUrlInvalid.Message,
 			})
 	})
 }

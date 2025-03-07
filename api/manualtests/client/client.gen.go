@@ -362,6 +362,12 @@ type ErrorsWebhookTokenValueRequired struct {
 	Message interface{} `json:"message"`
 }
 
+// ErrorsWebhookUrlInvalid defines model for errors_WebhookUrlInvalid.
+type ErrorsWebhookUrlInvalid struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ErrorsWebhookUrlRequired defines model for errors_WebhookUrlRequired.
 type ErrorsWebhookUrlRequired struct {
 	Code    interface{} `json:"code"`
@@ -2206,6 +2212,32 @@ func (t *ResponsesSubscribeToWebhookBadRequest) FromErrorsWebhookUrlRequired(v E
 
 // MergeErrorsWebhookUrlRequired performs a merge with any union data inside the ResponsesSubscribeToWebhookBadRequest, using the provided ErrorsWebhookUrlRequired
 func (t *ResponsesSubscribeToWebhookBadRequest) MergeErrorsWebhookUrlRequired(v ErrorsWebhookUrlRequired) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsWebhookUrlInvalid returns the union data inside the ResponsesSubscribeToWebhookBadRequest as a ErrorsWebhookUrlInvalid
+func (t ResponsesSubscribeToWebhookBadRequest) AsErrorsWebhookUrlInvalid() (ErrorsWebhookUrlInvalid, error) {
+	var body ErrorsWebhookUrlInvalid
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsWebhookUrlInvalid overwrites any union data inside the ResponsesSubscribeToWebhookBadRequest as the provided ErrorsWebhookUrlInvalid
+func (t *ResponsesSubscribeToWebhookBadRequest) FromErrorsWebhookUrlInvalid(v ErrorsWebhookUrlInvalid) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsWebhookUrlInvalid performs a merge with any union data inside the ResponsesSubscribeToWebhookBadRequest, using the provided ErrorsWebhookUrlInvalid
+func (t *ResponsesSubscribeToWebhookBadRequest) MergeErrorsWebhookUrlInvalid(v ErrorsWebhookUrlInvalid) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
