@@ -14,4 +14,7 @@ type Operation struct {
 	Value        int64
 
 	TxStatus string
+
+	BlockHeight *int64
+	BlockHash   *string
 }
