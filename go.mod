@@ -29,9 +29,9 @@ require (
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jarcoal/httpmock v1.3.1
 	github.com/mrz1836/go-cache v0.11.3
-	github.com/mrz1836/go-cachestore v0.5.2
+	github.com/mrz1836/go-cachestore v0.5.3
 	github.com/mrz1836/go-logger v0.3.5
-	github.com/mrz1836/go-sanitize v1.3.3
+	github.com/mrz1836/go-sanitize v1.3.4
 	github.com/mrz1836/go-validate v0.2.1
 	github.com/oapi-codegen/oapi-codegen/v2 v2.4.1
 	github.com/oapi-codegen/runtime v1.1.1
@@ -66,7 +66,7 @@ require (
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/newrelic/go-agent/v3 v3.36.0 // indirect
+	github.com/newrelic/go-agent/v3 v3.37.0 // indirect
 	github.com/oasdiff/yaml v0.0.0-20241210131133-6b86fb107d80 // indirect
 	github.com/oasdiff/yaml3 v0.0.0-20241210130736-a94c01f36349 // indirect
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
@@ -153,7 +153,7 @@ require (
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
 	golang.org/x/tools v0.30.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250207221924-e9438ea467c6 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250227231956-55c901821b1e // indirect
 	google.golang.org/grpc v1.70.0 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
