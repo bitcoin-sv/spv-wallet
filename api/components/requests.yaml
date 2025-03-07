@@ -135,6 +135,32 @@ components:
         - to
         - satoshis
 
+    SubscribeWebhook:
+      type: object
+      properties:
+        tokenHeader:
+          type: string
+          example: "Authorization"
+        tokenValue:
+          type: string
+          example: "Bearer some-token"
+        url:
+          type: string
+          example: "https://example.com/example"
+      required:
+        - tokenHeader
+        - tokenValue
+        - url
+
+    UnsubscribeWebhook:
+      type: object
+      properties:
+        url:
+          type: string
+          example: "https://example.com/example"
+      required:
+        - url
+
   parameters:
     PageNumber:
       in: query

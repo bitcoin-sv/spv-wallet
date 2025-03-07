@@ -163,7 +163,6 @@ components:
       required:
         - currentBalance
 
-
     OperationsSearchResult:
       type: object
       required:
@@ -435,3 +434,21 @@ components:
           type: integer
           description: Block height
           example: 1234
+
+    Webhook:
+      type: object
+      properties:
+        url:
+          type: string
+          example: "https://example.com/webhook"
+        banned:
+          type: boolean
+          example: true
+      required:
+        - url
+        - banned
+
+    Webhooks:
+      type: array
+      items:
+        $ref: "#/components/schemas/Webhook"
