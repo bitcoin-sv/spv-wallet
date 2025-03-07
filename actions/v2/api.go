@@ -36,7 +36,7 @@ func NewV2API(config *config.AppConfig, engine engine.ClientInterface, logger *z
 		users.NewAPIUsers(engine, logger),
 		operations.NewAPIOperations(engine, logger),
 		transactions.NewAPITransactions(engine, logger),
-		merkleroots.NewAPIMerkleRoots(engine, logger),
 		contacts.NewAPIContacts(engine, logger),
+		merkleroots.NewAPIMerkleRoots(engine, logger),
 	}
 }
