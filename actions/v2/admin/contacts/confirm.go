@@ -16,7 +16,7 @@ func (s *APIAdminContacts) AdminConfirmContact(c *gin.Context) {
 		return
 	}
 
-	if err := s.engine.ContactService().AdminConfirmContacts(c, reqParams.PaymailA, reqParams.PaymailB); err != nil {
+	if err := s.contactsService.AdminConfirmContacts(c, reqParams.PaymailA, reqParams.PaymailB); err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return
 	}

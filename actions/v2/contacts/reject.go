@@ -17,7 +17,7 @@ func (s *APIContacts) RejectInvitation(c *gin.Context, paymail string) {
 		return
 	}
 
-	err = s.engine.ContactService().RejectContact(c, userID, paymail)
+	err = s.contactsService.RejectContact(c, userID, paymail)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return

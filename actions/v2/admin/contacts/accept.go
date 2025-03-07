@@ -10,7 +10,7 @@ import (
 
 // AdminAcceptInvitation accepts an invitation from a contact.
 func (s *APIAdminContacts) AdminAcceptInvitation(c *gin.Context, id uint) {
-	contact, err := s.engine.ContactService().AcceptContactByID(c, id)
+	contact, err := s.contactsService.AcceptContactByID(c, id)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return

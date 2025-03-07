@@ -25,7 +25,7 @@ func (s *APIAdminContacts) AdminCreateContact(c *gin.Context, paymail string) {
 		Status:            contactsmodels.ContactNotConfirmed,
 	}
 
-	contact, err := s.engine.ContactService().AdminCreateContact(c, newContact)
+	contact, err := s.contactsService.AdminCreateContact(c, newContact)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return
