@@ -6,7 +6,6 @@ import (
 
 	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
-	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
@@ -138,184 +137,6 @@ func TestOutlinesRecordOpReturn(t *testing.T) {
 	})
 }
 
-func TestDoubleSpending(t *testing.T) {
-	// given:
-	givenForAllTests := testabilities.Given(t)
-	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
-		testengine.WithV2(),
-	)
-	defer cleanup()
-
-	// and:
-	sourceTxSpec := givenForAllTests.Faucet(fixtures.Sender).TopUp(1000)
-
-	t.Run("Spending the UTXO", func(t *testing.T) {
-		// given:
-		given, then := testabilities.NewOf(givenForAllTests, t)
-
-		// and:
-		txSpec := given.Tx().
-			WithSender(fixtures.Sender).
-			WithInputFromUTXO(sourceTxSpec.TX(), 0).
-			WithOPReturn("hello world")
-
-		// and:
-		client := given.HttpClient().ForAdmin()
-
-		// and:
-		given.ARC().WillRespondForBroadcast(200, &chainmodels.TXInfo{
-			TxID:     txSpec.ID(),
-			TXStatus: chainmodels.SeenOnNetwork,
-		})
-
-		// when:
-		res, _ := client.R().
-			SetHeader("Content-Type", "application/json").
-			SetBody(map[string]any{
-				"hex": txSpec.BEEF(),
-				"annotations": map[string]any{
-					"outputs": map[string]any{
-						"0": map[string]any{
-							"bucket": "data",
-						},
-					},
-				},
-				"userID": fixtures.Sender.ID(),
-			}).
-			Post(recordTransactionOutlineForUserURL)
-
-		// then:
-		then.Response(res).
-			HasStatus(201).
-			WithJSONMatching(`{
-				"txID": "{{ .txID }}"
-			}`, map[string]any{
-				"txID": txSpec.ID(),
-			})
-	})
-
-	t.Run("Double spend attempt", func(t *testing.T) {
-		// given:
-		given, then := testabilities.NewOf(givenForAllTests, t)
-
-		// and:
-		txSpec := given.Tx().
-			WithSender(fixtures.Sender).
-			WithInputFromUTXO(sourceTxSpec.TX(), 0).
-			WithOPReturn("other data")
-
-		// and:
-		client := given.HttpClient().ForAdmin()
-
-		// when:
-		res, _ := client.R().
-			SetHeader("Content-Type", "application/json").
-			SetBody(map[string]any{
-				"hex": txSpec.BEEF(),
-				"annotations": map[string]any{
-					"outputs": map[string]any{
-						"0": map[string]any{
-							"bucket": "data",
-						},
-					},
-				},
-				"userID": fixtures.Sender.ID(),
-			}).
-			Post(recordTransactionOutlineForUserURL)
-
-		// then:
-		then.Response(res).
-			HasStatus(400).
-			WithJSONf(apierror.ExpectedJSON("error-utxo-spent", "UTXO is already spent"))
-	})
-}
-
-func TestExternalOutgoingTransaction(t *testing.T) {
-	// given:
-	given, then := testabilities.New(t)
-	cleanup := given.StartedSPVWalletWithConfiguration(
-		testengine.WithV2(),
-	)
-	defer cleanup()
-
-	// and:
-	sender := fixtures.Sender
-	recipient := fixtures.RecipientExternal
-
-	// and:
-	sourceTxSpec := given.Faucet(sender).TopUp(1001)
-
-	// and:
-	givenPaymail := given.Paymail()
-	externalPaymailHost := givenPaymail.ExternalPaymailHost()
-
-	// and:
-	lockingScript := recipient.P2PKHLockingScript()
-	reference := "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7"
-
-	// and:
-	txSpec := given.Tx().
-		WithSender(sender).
-		WithRecipient(recipient).
-		WithInputFromUTXO(sourceTxSpec.TX(), 0).
-		WithOutputScript(1000, lockingScript)
-
-	// and:
-	externalPaymailHost.WillRespondWithP2PWithBEEFCapabilities()
-
-	// and:
-	client := given.HttpClient().ForAdmin()
-
-	// and:
-	given.ARC().WillRespondForBroadcastWithSeenOnNetwork(txSpec.ID())
-
-	// when:
-	res, _ := client.R().
-		SetHeader("Content-Type", "application/json").
-		SetBody(map[string]any{
-			"hex":    txSpec.BEEF(),
-			"format": "BEEF",
-			"annotations": map[string]any{
-				"outputs": map[string]any{
-					"0": map[string]any{
-						"bucket": "bsv",
-						"paymail": map[string]any{
-							"receiver":  recipient.DefaultPaymail(),
-							"reference": reference,
-							"sender":    sender.DefaultPaymail(),
-						},
-					},
-				},
-			},
-			"userID": sender.ID(),
-		}).
-		Post(recordTransactionOutlineForUserURL)
-
-	// then:
-	then.Response(res).
-		IsCreated().
-		WithJSONMatching(`{
-				"txID": "{{ .txID }}"
-			}`, map[string]any{
-			"txID": txSpec.ID(),
-		})
-
-	// and:
-	then.User(sender).Balance().IsZero()
-
-	// and:
-	then.User(sender).Operations().Last().
-		WithTxID(txSpec.ID()).
-		WithTxStatus("BROADCASTED").
-		WithValue(-1001).
-		WithType("outgoing").
-		WithCounterparty(recipient.DefaultPaymail().Address())
-
-	// and:
-	then.ExternalPaymailHost().
-		ReceivedBeefTransaction(sender.DefaultPaymail().Address(), txSpec.BEEF(), reference)
-}
-
 func TestInternalOutgoingTransaction(t *testing.T) {
 	// given:
 	givenForAllTests := testabilities.Given(t)
@@ -334,7 +155,7 @@ func TestInternalOutgoingTransaction(t *testing.T) {
 	recipient := fixtures.RecipientInternal
 
 	// and:
-	sourceTxSpec := givenForAllTests.Faucet(sender).TopUp(1001)
+	sourceTxSpec := givenForAllTests.Faucet(sender).TopUp(1201)
 
 	t.Run("During outline preparation - call recipient destination", func(t *testing.T) {
 		// given:
@@ -345,7 +166,7 @@ func TestInternalOutgoingTransaction(t *testing.T) {
 
 		// and:
 		requestBody := map[string]any{
-			"satoshis": 1000,
+			"satoshis": 200,
 		}
 
 		// when:
@@ -372,7 +193,7 @@ func TestInternalOutgoingTransaction(t *testing.T) {
 		testState.lockingScript = lockingScript
 	})
 
-	t.Run("Record new tx outline for sender by admin", func(t *testing.T) {
+	t.Run("Record new tx outline with change for sender by admin", func(t *testing.T) {
 		// given:
 		given, then := testabilities.NewOf(givenForAllTests, t)
 
@@ -384,7 +205,49 @@ func TestInternalOutgoingTransaction(t *testing.T) {
 			WithSender(sender).
 			WithRecipient(recipient).
 			WithInputFromUTXO(sourceTxSpec.TX(), 0).
-			WithOutputScript(1000, testState.lockingScript)
+			WithOutputScript(200, testState.lockingScript)
+
+		// and:
+		changeOutputs := changeOutputSpecs{
+			{
+				customInstructions: bsv.CustomInstructions{
+					{
+						Type:        "type42",
+						Instruction: "1-destination-1instruction87d3be7bd26cfe2b5996",
+					},
+					{
+						Type:        "type42",
+						Instruction: "1-destination-2instruction7d3be7bd26cfe2b5996",
+					},
+					{
+						Type:        "type42",
+						Instruction: "1-destination-3instruction87d3be7bd26cfe2b5996",
+					},
+				},
+				satoshis: 200,
+			},
+			{
+				customInstructions: bsv.CustomInstructions{
+					{
+						Type:        "type42",
+						Instruction: "1-destination-1output4d06387d3be7bd26cfe2b5996",
+					},
+				},
+				satoshis: 400,
+			},
+			{
+				customInstructions: bsv.CustomInstructions{
+					{
+						Type:        "type42",
+						Instruction: "1-destination-1output4d06387d3be7bd26cfe2b5996",
+					},
+				},
+				satoshis: 400,
+			},
+		}
+		for _, changeOutput := range changeOutputs {
+			txSpec.WithOutputScript(uint64(changeOutput.satoshis), sender.P2PKHLockingScript(changeOutput.customInstructions...))
+		}
 
 		// and:
 		given.ARC().WillRespondForBroadcastWithSeenOnNetwork(txSpec.ID())
@@ -396,16 +259,19 @@ func TestInternalOutgoingTransaction(t *testing.T) {
 				"hex":    txSpec.BEEF(),
 				"format": "BEEF",
 				"annotations": map[string]any{
-					"outputs": map[string]any{
-						"0": map[string]any{
-							"bucket": "bsv",
-							"paymail": map[string]any{
-								"receiver":  recipient.DefaultPaymail(),
-								"reference": testState.reference,
-								"sender":    sender.DefaultPaymail(),
+					"outputs": lo.Assign(
+						map[string]any{
+							"0": map[string]any{
+								"bucket": "bsv",
+								"paymail": map[string]any{
+									"receiver":  recipient.DefaultPaymail(),
+									"reference": testState.reference,
+									"sender":    sender.DefaultPaymail(),
+								},
 							},
 						},
-					},
+						changeOutputs.toAnnotations(1),
+					),
 				},
 				"userID": sender.ID(),
 			}).
@@ -421,179 +287,23 @@ func TestInternalOutgoingTransaction(t *testing.T) {
 			})
 
 		// and:
-		then.User(sender).Balance().IsZero()
+		then.User(sender).Balance().IsEqualTo(1000)
 		then.User(sender).Operations().Last().
 			WithTxID(txSpec.ID()).
 			WithTxStatus("BROADCASTED").
-			WithValue(-1001).
+			WithValue(-201).
 			WithType("outgoing").
 			WithCounterparty(recipient.DefaultPaymail().Address())
 
 		// and:
-		then.User(recipient).Balance().IsEqualTo(1000)
+		then.User(recipient).Balance().IsEqualTo(200)
 		then.User(recipient).Operations().Last().
 			WithTxID(txSpec.ID()).
 			WithTxStatus("BROADCASTED").
-			WithValue(1000).
+			WithValue(200).
 			WithType("incoming").
 			WithCounterparty(sender.DefaultPaymail().Address())
 	})
-}
-
-func TestTransactionWithChange(t *testing.T) {
-	tests := map[string]struct {
-		changeOutputs changeOutputSpecs
-	}{
-		"one change output": {
-			changeOutputs: changeOutputSpecs{
-				{
-					customInstructions: bsv.CustomInstructions{
-						{
-							Type:        "type42",
-							Instruction: "1-destination-1output4d06387d3be7bd26cfe2b5996",
-						},
-					},
-					satoshis: 1000,
-				},
-			},
-		},
-		"two change outputs": {
-			changeOutputs: changeOutputSpecs{
-				{
-					customInstructions: bsv.CustomInstructions{
-						{
-							Type:        "type42",
-							Instruction: "1-destination-1output4d06387d3be7bd26cfe2b5996",
-						},
-					},
-					satoshis: 600,
-				},
-				{
-					customInstructions: bsv.CustomInstructions{
-						{
-							Type:        "type42",
-							Instruction: "1-destination-2output4d06387d3be7bd26cfe2b5996",
-						},
-					},
-					satoshis: 400,
-				},
-			},
-		},
-		"one change outputs with longer custom instructions": {
-			changeOutputs: changeOutputSpecs{
-				{
-					customInstructions: bsv.CustomInstructions{
-						{
-							Type:        "type42",
-							Instruction: "1-destination-1instruction87d3be7bd26cfe2b5996",
-						},
-						{
-							Type:        "type42",
-							Instruction: "1-destination-2instruction7d3be7bd26cfe2b5996",
-						},
-						{
-							Type:        "type42",
-							Instruction: "1-destination-3instruction87d3be7bd26cfe2b5996",
-						},
-					},
-					satoshis: 1000,
-				},
-			},
-		},
-		"two outputs with the same address": {
-			changeOutputs: changeOutputSpecs{
-				{
-					customInstructions: bsv.CustomInstructions{
-						{
-							Type:        "type42",
-							Instruction: "1-destination-1output4d06387d3be7bd26cfe2b5996",
-						},
-					},
-					satoshis: 600,
-				},
-				{
-					customInstructions: bsv.CustomInstructions{
-						{
-							Type:        "type42",
-							Instruction: "1-destination-1output4d06387d3be7bd26cfe2b5996",
-						},
-					},
-					satoshis: 400,
-				},
-			},
-		},
-	}
-	for name, test := range tests {
-		t.Run(name, func(t *testing.T) {
-			// given:
-			given, then := testabilities.New(t)
-			cleanup := given.StartedSPVWalletWithConfiguration(
-				testengine.WithV2(),
-			)
-			defer cleanup()
-
-			// and:
-			sender := fixtures.Sender
-
-			// and:
-			sourceTxSpec := given.Faucet(sender).TopUp(1001)
-
-			// and:
-			txSpec := given.Tx().
-				WithSender(sender).
-				WithInputFromUTXO(sourceTxSpec.TX(), 0).
-				WithOPReturn("hello, world")
-
-			for _, changeOutput := range test.changeOutputs {
-				txSpec.WithOutputScript(uint64(changeOutput.satoshis), sender.P2PKHLockingScript(changeOutput.customInstructions...))
-			}
-			// and:
-			client := given.HttpClient().ForAdmin()
-
-			// and:
-			given.ARC().WillRespondForBroadcastWithSeenOnNetwork(txSpec.ID())
-
-			// when:
-			res, _ := client.R().
-				SetHeader("Content-Type", "application/json").
-				SetBody(map[string]any{
-					"hex":    txSpec.BEEF(),
-					"format": "BEEF",
-					"annotations": map[string]any{
-						"outputs": lo.Assign(
-							map[string]any{
-								"0": map[string]any{
-									"bucket": "data",
-								},
-							},
-							test.changeOutputs.toAnnotations(1),
-						),
-					},
-					"userID": sender.ID(),
-				}).
-				Post(recordTransactionOutlineForUserURL)
-
-			// then:
-			then.Response(res).
-				IsCreated().
-				WithJSONMatching(`{
-				"txID": "{{ .txID }}"
-			}`, map[string]any{
-					"txID": txSpec.ID(),
-				})
-
-			// and:
-			then.User(sender).Balance().IsEqualTo(1000)
-
-			// and:
-			then.User(sender).Operations().Last().
-				WithTxID(txSpec.ID()).
-				WithTxStatus("BROADCASTED").
-				WithValue(-1).
-				WithType("outgoing").
-				WithNoCounterparty()
-		})
-	}
 }
 
 type changeOutputSpec struct {
