@@ -12,18 +12,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/data"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/database/repository"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/operations"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
-	paymailprovider "github.com/bitcoin-sv/spv-wallet/engine/v2/paymailserver"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/beef"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines/utxo"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/record"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txsync"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/users"
 	"github.com/mrz1836/go-cachestore"
 )
 
@@ -76,7 +64,7 @@ func (c *Client) autoMigrate(ctx context.Context) error {
 	}
 
 	db := c.Datastore().DB().WithContext(ctx)
-	models := AllDBModels(c.options.paymail.serverConfig.ExperimentalProvider)
+	models := AllDBModels()
 
 	if err := db.AutoMigrate(models...); err != nil {
 		return spverrors.Wrapf(err, "failed to auto-migrate models")
@@ -170,82 +158,11 @@ func (c *Client) loadPaymailComponents() (err error) {
 	return
 }
 
-func (c *Client) loadTransactionOutlinesService() error {
-	if c.options.transactionOutlinesService == nil {
-		logger := c.Logger().With().Str("subservice", "transactionOutlines").Logger()
-		utxoSelector := utxo.NewSelector(c.Datastore().DB(), c.FeeUnit())
-		beefService := beef.NewService(c.Repositories().Transactions)
-
-		c.options.transactionOutlinesService = outlines.NewService(c.PaymailService(), c.options.paymails, beefService, utxoSelector, c.FeeUnit(), logger, c.UsersService())
-	}
-	return nil
-}
-
-func (c *Client) loadTransactionRecordService() error {
-	if c.options.transactionRecordService == nil {
-		logger := c.Logger().With().Str("subservice", "transactionRecord").Logger()
-		c.options.transactionRecordService = record.NewService(
-			logger,
-			c.AddressesService(),
-			c.UsersService(),
-			c.Repositories().Outputs,
-			c.Repositories().Operations,
-			c.Repositories().Transactions,
-			c.Chain(),
-			c.PaymailService(),
-		)
-	}
-	return nil
-}
-
-func (c *Client) loadRepositories() {
-	if c.options.repositories == nil {
-		c.options.repositories = repository.NewRepositories(c.Datastore().DB())
-	}
-}
-
-func (c *Client) loadUsersService() {
-	if c.options.users == nil {
-		c.options.users = users.NewService(c.Repositories().Users, c.options.config)
-	}
-}
-
-func (c *Client) loadPaymailsService() {
-	if c.options.paymails == nil {
-		c.options.paymails = paymails.NewService(c.Repositories().Paymails, c.UsersService(), c.options.config)
-	}
-}
-
-func (c *Client) loadAddressesService() {
-	if c.options.addresses == nil {
-		c.options.addresses = addresses.NewService(c.Repositories().Addresses)
-	}
-}
-
-func (c *Client) loadDataService() {
-	if c.options.data == nil {
-		c.options.data = data.NewService(c.Repositories().Data)
-	}
-}
-
-func (c *Client) loadOperationsService() {
-	if c.options.operations == nil {
-		c.options.operations = operations.NewService(c.Repositories().Operations)
-	}
-}
-
 func (c *Client) loadChainService() {
 	if c.options.chainService == nil {
 		logger := c.Logger().With().Str("subservice", "chain").Logger()
 		c.options.arcConfig.TxsGetter = newSDKTxGetter(c)
 		c.options.chainService = chain.NewChainService(logger, c.options.httpClient, c.options.arcConfig, c.options.bhsConfig)
-	}
-}
-
-func (c *Client) loadTxSyncService() {
-	if c.options.txSync == nil {
-		logger := c.Logger().With().Str("subservice", "tx_sync").Logger()
-		c.options.txSync = txsync.NewService(logger, c.Repositories().Transactions)
 	}
 }
 
@@ -298,21 +215,7 @@ func (c *Client) loadPaymailServer() (err error) {
 	// Create the paymail configuration using the client and default service provider
 	paymailLocator := &paymailserver.PaymailServiceLocator{}
 
-	var serviceProvider paymailserver.PaymailServiceProvider
-	if c.options.paymail.serverConfig.ExperimentalProvider {
-		paymailServiceLogger := c.Logger().With().Str("subservice", "paymail-service-provider").Logger()
-		serviceProvider = paymailprovider.NewServiceProvider(
-			&paymailServiceLogger,
-			c.PaymailsService(),
-			c.UsersService(),
-			c.AddressesService(),
-			c.Chain(),
-			c.TransactionRecordService(),
-		)
-	} else {
-		serviceProvider = &PaymailDefaultServiceProvider{client: c}
-	}
-
+	serviceProvider := &PaymailDefaultServiceProvider{client: c}
 	paymailLocator.RegisterPaymailService(serviceProvider)
 	paymailLocator.RegisterPikeContactService(&PikeContactServiceProvider{client: c})
 	paymailLocator.RegisterPikePaymentService(&PikePaymentServiceProvider{client: c})

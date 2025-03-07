@@ -109,11 +109,12 @@ func (s *Server) Handlers() *gin.Engine {
 
 func setupServerRoutes(appConfig *config.AppConfig, spvWalletEngine engine.ClientInterface, ginEngine *gin.Engine, log *zerolog.Logger) {
 	handlersManager := handlers.NewManager(ginEngine, appConfig)
-	actions.Register(handlersManager)
-	paymailserver.Register(spvWalletEngine.GetPaymailConfig().Configuration, ginEngine)
 
-	if appConfig.ExperimentalFeatures.V2 {
-		v2.RegisterNonOpenAPIRoutes(handlersManager)
+	if !appConfig.ExperimentalFeatures.V2 {
+		paymailserver.Register(spvWalletEngine.GetPaymailConfig().Configuration, ginEngine)
+		actions.Register(handlersManager)
+	} else {
+		v2.RegisterNonOpenAPIRoutes(ginEngine, appConfig, spvWalletEngine)
 		api.RegisterHandlersWithOptions(ginEngine, v2.NewV2API(appConfig, spvWalletEngine, log), api.GinServerOptions{
 			BaseURL: "",
 			Middlewares: []api.MiddlewareFunc{

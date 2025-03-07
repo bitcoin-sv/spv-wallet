@@ -2,11 +2,18 @@ package paymail
 
 import (
 	"context"
+	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
+
+// Cache is an interface that defines the methods to interact with a cache.
+type Cache interface {
+	GetModel(ctx context.Context, key string, model interface{}) error
+	SetModel(ctx context.Context, key string, model interface{}, ttl time.Duration, dependencies ...string) error
+}
 
 // ServiceClient is a service that aims to make easier paymail operations.
 type ServiceClient interface {

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/go-paymail"
+	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
@@ -25,6 +26,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rs/zerolog"
+	"gorm.io/gorm"
 )
 
 // AccessKeyService is the access key actions
@@ -64,8 +66,6 @@ type ClientService interface {
 	Notifications() *notifications.Notifications
 	PaymailClient() paymail.ClientInterface
 	PaymailService() paymailclient.ServiceClient
-	TransactionOutlinesService() outlines.Service
-	TransactionRecordService() *record.Service
 	Taskmanager() taskmanager.TaskEngine
 }
 
@@ -160,15 +160,22 @@ type XPubService interface {
 	UpdateXpubMetadata(ctx context.Context, xPubID string, metadata Metadata) (*Xpub, error)
 }
 
-// V2 contains services for version 2
-type V2 interface {
+// V2Interface is the V2 interface comprised of all services/actions
+// Deprecated: V2Interface will be removed in a future version.
+type V2Interface interface {
+	DB() *gorm.DB
+	Chain() chain.Service
 	Repositories() *repository.All
 	UsersService() *users.Service
 	PaymailsService() *paymails.Service
 	AddressesService() *addresses.Service
 	DataService() *data.Service
 	OperationsService() *operations.Service
+	TransactionOutlinesService() outlines.Service
+	TransactionRecordService() *record.Service
+	PaymailServerConfiguration() *server.Configuration
 	TxSyncService() *txsync.Service
+	Close(context.Context) error
 }
 
 // ClientInterface is the client (spv wallet engine) interface comprised of all services/actions
@@ -197,5 +204,5 @@ type ClientInterface interface {
 	Chain() chain.Service
 	LogBHSReadiness(ctx context.Context)
 	FeeUnit() bsv.FeeUnit
-	V2
+	V2Interface
 }
