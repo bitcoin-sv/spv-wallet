@@ -146,37 +146,6 @@ paths:
         500:
           $ref: "../components/responses.yaml#/components/responses/InternalServerError"
 
-
-  /api/v2/contacts:
-    get:
-      operationId: getContacts
-      security:
-        - XPubAuth:
-            - "user"
-      tags:
-        - Contacts
-      summary: Get contacts
-      description: >-
-        This endpoint allows to get contacts for authenticated user
-      parameters:
-        - $ref: "../components/requests.yaml#/components/parameters/PageNumber"
-        - $ref: "../components/requests.yaml#/components/parameters/PageSize"
-        - $ref: "../components/requests.yaml#/components/parameters/Sort"
-        - $ref: "../components/requests.yaml#/components/parameters/SortBy"
-        - $ref: "../components/requests.yaml#/components/parameters/FullName"
-        - $ref: "../components/requests.yaml#/components/parameters/Paymail"
-        - $ref: "../components/requests.yaml#/components/parameters/ID"
-        - $ref: "../components/requests.yaml#/components/parameters/PubKey"
-        - $ref: "../components/requests.yaml#/components/parameters/Status"
-      responses:
-        200:
-          $ref: "../components/responses.yaml#/components/responses/SearchContactsSuccess"
-        401:
-          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
-        500:
-          $ref: "../components/responses.yaml#/components/responses/ContactSearchInternalServerError"
-
-
   /api/v2/contacts/{paymail}:
     put:
       operationId: upsertContact

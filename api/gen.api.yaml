@@ -6,33 +6,6 @@ info:
     title: SPV Wallet API
     version: main
 paths:
-    /api/v2/admin/contacts:
-        get:
-            description: This endpoint returns all contacts.
-            operationId: adminGetContacts
-            parameters:
-                - $ref: '#/components/parameters/requests_PageNumber'
-                - $ref: '#/components/parameters/requests_PageSize'
-                - $ref: '#/components/parameters/requests_Sort'
-                - $ref: '#/components/parameters/requests_SortBy'
-                - $ref: '#/components/parameters/requests_FullName'
-                - $ref: '#/components/parameters/requests_Paymail'
-                - $ref: '#/components/parameters/requests_ID'
-                - $ref: '#/components/parameters/requests_PubKey'
-                - $ref: '#/components/parameters/requests_Status'
-            responses:
-                "200":
-                    $ref: '#/components/responses/responses_SearchContactsSuccess'
-                "401":
-                    $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
-                "500":
-                    $ref: '#/components/responses/responses_ContactSearchInternalServerError'
-            security:
-                - XPubAuth:
-                    - admin
-            summary: Get contacts
-            tags:
-                - Admin endpoints
     /api/v2/admin/contacts/{id}:
         delete:
             description: This endpoint deletes contact.
@@ -311,33 +284,6 @@ paths:
             tags:
                 - Admin endpoints
                 - Configurations
-    /api/v2/contacts:
-        get:
-            description: This endpoint allows to get contacts for authenticated user
-            operationId: getContacts
-            parameters:
-                - $ref: '#/components/parameters/requests_PageNumber'
-                - $ref: '#/components/parameters/requests_PageSize'
-                - $ref: '#/components/parameters/requests_Sort'
-                - $ref: '#/components/parameters/requests_SortBy'
-                - $ref: '#/components/parameters/requests_FullName'
-                - $ref: '#/components/parameters/requests_Paymail'
-                - $ref: '#/components/parameters/requests_ID'
-                - $ref: '#/components/parameters/requests_PubKey'
-                - $ref: '#/components/parameters/requests_Status'
-            responses:
-                "200":
-                    $ref: '#/components/responses/responses_SearchContactsSuccess'
-                "401":
-                    $ref: '#/components/responses/responses_UserNotAuthorized'
-                "500":
-                    $ref: '#/components/responses/responses_ContactSearchInternalServerError'
-            security:
-                - XPubAuth:
-                    - user
-            summary: Get contacts
-            tags:
-                - Contacts
     /api/v2/contacts/{paymail}:
         delete:
             description: This endpoint allows to remove contact for authenticated user
@@ -665,20 +611,6 @@ paths:
                 - User
 components:
     parameters:
-        requests_FullName:
-            description: Full name of the contact
-            example: Test name
-            in: query
-            name: fullName
-            schema:
-                type: string
-        requests_ID:
-            description: ID of the contact
-            example: "1"
-            in: query
-            name: id
-            schema:
-                type: integer
         requests_PageNumber:
             description: Page number for pagination
             example: 1
@@ -693,20 +625,6 @@ components:
             name: size
             schema:
                 type: integer
-        requests_Paymail:
-            description: Paymail of the contact
-            example: test@spv-wallet.com
-            in: query
-            name: paymail
-            schema:
-                type: string
-        requests_PubKey:
-            description: Public key of the contact
-            example: 76a914e069bd2e2fe3ea702c40d5e65b491b734c01686788ac
-            in: query
-            name: pubKey
-            schema:
-                type: string
         requests_Sort:
             description: Sorting order (asc or desc)
             example: asc
@@ -721,13 +639,6 @@ components:
             name: sortBy
             schema:
                 type: string
-        requests_Status:
-            description: Status of the contact
-            example: confirmed
-            in: query
-            name: status
-            schema:
-                $ref: '#/components/schemas/models_ContactStatus'
     responses:
         responses_AdminAddPaymailSuccess:
             content:
@@ -835,14 +746,6 @@ components:
                     schema:
                         $ref: '#/components/schemas/errors_ContactNotFound'
             description: Not found is an error that occurs when the requested resource is not found.
-        responses_ContactSearchInternalServerError:
-            content:
-                application/json:
-                    schema:
-                        oneOf:
-                            - $ref: '#/components/schemas/errors_Internal'
-                            - $ref: '#/components/schemas/errors_FailedToGetPaginatedResults'
-            description: Contact search internal server error
         responses_ContactSuccess:
             content:
                 application/json:
@@ -969,14 +872,6 @@ components:
                     schema:
                         $ref: '#/components/schemas/errors_InvalidDataID'
             description: Error when search request is malformed and params can not be parsed
-        responses_SearchContactsSuccess:
-            content:
-                application/json:
-                    schema:
-                        items:
-                            $ref: '#/components/schemas/models_ContactsSearchResult'
-                        type: array
-            description: Contacts success
         responses_SearchOperationsSuccess:
             content:
                 application/json:
@@ -1178,15 +1073,6 @@ components:
                         example: error-contact-deleting-contact-failed
                     message:
                         example: deleting contact failed
-                  type: object
-        errors_FailedToGetPaginatedResults:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-contact-failed-to-get-paginated-results
-                    message:
-                        example: failed to get paginated results
                   type: object
         errors_GetContact:
             allOf:
@@ -1544,18 +1430,6 @@ components:
                 - rejected
             example: confirmed
             type: string
-        models_ContactsSearchResult:
-            properties:
-                content:
-                    items:
-                        $ref: '#/components/schemas/models_Contact'
-                    type: array
-                page:
-                    $ref: '#/components/schemas/models_SearchPage'
-            required:
-                - content
-                - page
-            type: object
         models_CustomInstructions:
             oneOf:
                 - $ref: '#/components/schemas/models_SPVWalletCustomInstructions'

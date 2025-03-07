@@ -200,12 +200,6 @@ type ErrorsDeleteContact struct {
 	Message interface{} `json:"message"`
 }
 
-// ErrorsFailedToGetPaginatedResults defines model for errors_FailedToGetPaginatedResults.
-type ErrorsFailedToGetPaginatedResults struct {
-	Code    interface{} `json:"code"`
-	Message interface{} `json:"message"`
-}
-
 // ErrorsGetContact defines model for errors_GetContact.
 type ErrorsGetContact struct {
 	Code    interface{} `json:"code"`
@@ -445,12 +439,6 @@ type ModelsContact struct {
 
 // ModelsContactStatus defines model for models_ContactStatus.
 type ModelsContactStatus string
-
-// ModelsContactsSearchResult defines model for models_ContactsSearchResult.
-type ModelsContactsSearchResult struct {
-	Content []ModelsContact  `json:"content"`
-	Page    ModelsSearchPage `json:"page"`
-}
 
 // ModelsCustomInstructions defines model for models_CustomInstructions.
 type ModelsCustomInstructions struct {
@@ -754,32 +742,17 @@ type RequestsUpsertContact struct {
 	RequesterPaymail string `json:"requesterPaymail"`
 }
 
-// RequestsFullName defines model for requests_FullName.
-type RequestsFullName = string
-
-// RequestsID defines model for requests_ID.
-type RequestsID = int
-
 // RequestsPageNumber defines model for requests_PageNumber.
 type RequestsPageNumber = int
 
 // RequestsPageSize defines model for requests_PageSize.
 type RequestsPageSize = int
 
-// RequestsPaymail defines model for requests_Paymail.
-type RequestsPaymail = string
-
-// RequestsPubKey defines model for requests_PubKey.
-type RequestsPubKey = string
-
 // RequestsSort defines model for requests_Sort.
 type RequestsSort = string
 
 // RequestsSortBy defines model for requests_SortBy.
 type RequestsSortBy = string
-
-// RequestsStatus defines model for requests_Status.
-type RequestsStatus = ModelsContactStatus
 
 // ResponsesAdminAddPaymailSuccess defines model for responses_AdminAddPaymailSuccess.
 type ResponsesAdminAddPaymailSuccess = ModelsPaymail
@@ -838,11 +811,6 @@ type ResponsesAdminUserBadRequest struct {
 
 // ResponsesContactNotFound defines model for responses_ContactNotFound.
 type ResponsesContactNotFound = ErrorsContactNotFound
-
-// ResponsesContactSearchInternalServerError defines model for responses_ContactSearchInternalServerError.
-type ResponsesContactSearchInternalServerError struct {
-	union json.RawMessage
-}
 
 // ResponsesContactSuccess defines model for responses_ContactSuccess.
 type ResponsesContactSuccess = ModelsContact
@@ -911,9 +879,6 @@ type ResponsesRecordTransactionSuccess = ModelsRecordedOutline
 // ResponsesSearchBadRequest defines model for responses_SearchBadRequest.
 type ResponsesSearchBadRequest = ErrorsInvalidDataID
 
-// ResponsesSearchContactsSuccess defines model for responses_SearchContactsSuccess.
-type ResponsesSearchContactsSuccess = []ModelsContactsSearchResult
-
 // ResponsesSearchOperationsSuccess defines model for responses_SearchOperationsSuccess.
 type ResponsesSearchOperationsSuccess = ModelsOperationsSearchResult
 
@@ -945,66 +910,6 @@ type ResponsesUserBadRequest = ErrorsInvalidDataID
 
 // ResponsesUserNotAuthorized defines model for responses_UserNotAuthorized.
 type ResponsesUserNotAuthorized = ErrorsUserAuthorization
-
-// AdminGetContactsParams defines parameters for AdminGetContacts.
-type AdminGetContactsParams struct {
-	// Page Page number for pagination
-	Page *RequestsPageNumber `form:"page,omitempty" json:"page,omitempty"`
-
-	// Size Number of items per page
-	Size *RequestsPageSize `form:"size,omitempty" json:"size,omitempty"`
-
-	// Sort Sorting order (asc or desc)
-	Sort *RequestsSort `form:"sort,omitempty" json:"sort,omitempty"`
-
-	// SortBy Field to sort by
-	SortBy *RequestsSortBy `form:"sortBy,omitempty" json:"sortBy,omitempty"`
-
-	// FullName Full name of the contact
-	FullName *RequestsFullName `form:"fullName,omitempty" json:"fullName,omitempty"`
-
-	// Paymail Paymail of the contact
-	Paymail *RequestsPaymail `form:"paymail,omitempty" json:"paymail,omitempty"`
-
-	// Id ID of the contact
-	Id *RequestsID `form:"id,omitempty" json:"id,omitempty"`
-
-	// PubKey Public key of the contact
-	PubKey *RequestsPubKey `form:"pubKey,omitempty" json:"pubKey,omitempty"`
-
-	// Status Status of the contact
-	Status *RequestsStatus `form:"status,omitempty" json:"status,omitempty"`
-}
-
-// GetContactsParams defines parameters for GetContacts.
-type GetContactsParams struct {
-	// Page Page number for pagination
-	Page *RequestsPageNumber `form:"page,omitempty" json:"page,omitempty"`
-
-	// Size Number of items per page
-	Size *RequestsPageSize `form:"size,omitempty" json:"size,omitempty"`
-
-	// Sort Sorting order (asc or desc)
-	Sort *RequestsSort `form:"sort,omitempty" json:"sort,omitempty"`
-
-	// SortBy Field to sort by
-	SortBy *RequestsSortBy `form:"sortBy,omitempty" json:"sortBy,omitempty"`
-
-	// FullName Full name of the contact
-	FullName *RequestsFullName `form:"fullName,omitempty" json:"fullName,omitempty"`
-
-	// Paymail Paymail of the contact
-	Paymail *RequestsPaymail `form:"paymail,omitempty" json:"paymail,omitempty"`
-
-	// Id ID of the contact
-	Id *RequestsID `form:"id,omitempty" json:"id,omitempty"`
-
-	// PubKey Public key of the contact
-	PubKey *RequestsPubKey `form:"pubKey,omitempty" json:"pubKey,omitempty"`
-
-	// Status Status of the contact
-	Status *RequestsStatus `form:"status,omitempty" json:"status,omitempty"`
-}
 
 // SearchOperationsParams defines parameters for SearchOperations.
 type SearchOperationsParams struct {
@@ -2131,68 +2036,6 @@ func (t *ResponsesAdminUserBadRequest) UnmarshalJSON(b []byte) error {
 	return err
 }
 
-// AsErrorsInternal returns the union data inside the ResponsesContactSearchInternalServerError as a ErrorsInternal
-func (t ResponsesContactSearchInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
-	var body ErrorsInternal
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromErrorsInternal overwrites any union data inside the ResponsesContactSearchInternalServerError as the provided ErrorsInternal
-func (t *ResponsesContactSearchInternalServerError) FromErrorsInternal(v ErrorsInternal) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeErrorsInternal performs a merge with any union data inside the ResponsesContactSearchInternalServerError, using the provided ErrorsInternal
-func (t *ResponsesContactSearchInternalServerError) MergeErrorsInternal(v ErrorsInternal) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-// AsErrorsFailedToGetPaginatedResults returns the union data inside the ResponsesContactSearchInternalServerError as a ErrorsFailedToGetPaginatedResults
-func (t ResponsesContactSearchInternalServerError) AsErrorsFailedToGetPaginatedResults() (ErrorsFailedToGetPaginatedResults, error) {
-	var body ErrorsFailedToGetPaginatedResults
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromErrorsFailedToGetPaginatedResults overwrites any union data inside the ResponsesContactSearchInternalServerError as the provided ErrorsFailedToGetPaginatedResults
-func (t *ResponsesContactSearchInternalServerError) FromErrorsFailedToGetPaginatedResults(v ErrorsFailedToGetPaginatedResults) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeErrorsFailedToGetPaginatedResults performs a merge with any union data inside the ResponsesContactSearchInternalServerError, using the provided ErrorsFailedToGetPaginatedResults
-func (t *ResponsesContactSearchInternalServerError) MergeErrorsFailedToGetPaginatedResults(v ErrorsFailedToGetPaginatedResults) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-func (t ResponsesContactSearchInternalServerError) MarshalJSON() ([]byte, error) {
-	b, err := t.union.MarshalJSON()
-	return b, err
-}
-
-func (t *ResponsesContactSearchInternalServerError) UnmarshalJSON(b []byte) error {
-	err := t.union.UnmarshalJSON(b)
-	return err
-}
-
 // AsErrorsInternal returns the union data inside the ResponsesContactUpsertInternalServerError as a ErrorsInternal
 func (t ResponsesContactUpsertInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
 	var body ErrorsInternal
@@ -3244,9 +3087,6 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
-	// AdminGetContacts request
-	AdminGetContacts(ctx context.Context, params *AdminGetContactsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// AdminConfirmContactWithBody request with any body
 	AdminConfirmContactWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -3290,9 +3130,6 @@ type ClientInterface interface {
 	// SharedConfig request
 	SharedConfig(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetContacts request
-	GetContacts(ctx context.Context, params *GetContactsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// RemoveContact request
 	RemoveContact(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -3334,18 +3171,6 @@ type ClientInterface interface {
 
 	// CurrentUser request
 	CurrentUser(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
-}
-
-func (c *Client) AdminGetContacts(ctx context.Context, params *AdminGetContactsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewAdminGetContactsRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
 }
 
 func (c *Client) AdminConfirmContactWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -3540,18 +3365,6 @@ func (c *Client) SharedConfig(ctx context.Context, reqEditors ...RequestEditorFn
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetContacts(ctx context.Context, params *GetContactsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetContactsRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
 func (c *Client) RemoveContact(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRemoveContactRequest(c.Server, paymail)
 	if err != nil {
@@ -3730,183 +3543,6 @@ func (c *Client) CurrentUser(ctx context.Context, reqEditors ...RequestEditorFn)
 		return nil, err
 	}
 	return c.Client.Do(req)
-}
-
-// NewAdminGetContactsRequest generates requests for AdminGetContacts
-func NewAdminGetContactsRequest(server string, params *AdminGetContactsParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v2/admin/contacts")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Page != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Size != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "size", runtime.ParamLocationQuery, *params.Size); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Sort != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sort", runtime.ParamLocationQuery, *params.Sort); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.SortBy != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortBy", runtime.ParamLocationQuery, *params.SortBy); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.FullName != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fullName", runtime.ParamLocationQuery, *params.FullName); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Paymail != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "paymail", runtime.ParamLocationQuery, *params.Paymail); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Id != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "id", runtime.ParamLocationQuery, *params.Id); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.PubKey != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "pubKey", runtime.ParamLocationQuery, *params.PubKey); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Status != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "status", runtime.ParamLocationQuery, *params.Status); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
 }
 
 // NewAdminConfirmContactRequest calls the generic AdminConfirmContact builder with application/json body
@@ -4310,183 +3946,6 @@ func NewSharedConfigRequest(server string) (*http.Request, error) {
 	queryURL, err := serverURL.Parse(operationPath)
 	if err != nil {
 		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewGetContactsRequest generates requests for GetContacts
-func NewGetContactsRequest(server string, params *GetContactsParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v2/contacts")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Page != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Size != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "size", runtime.ParamLocationQuery, *params.Size); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Sort != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sort", runtime.ParamLocationQuery, *params.Sort); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.SortBy != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortBy", runtime.ParamLocationQuery, *params.SortBy); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.FullName != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fullName", runtime.ParamLocationQuery, *params.FullName); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Paymail != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "paymail", runtime.ParamLocationQuery, *params.Paymail); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Id != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "id", runtime.ParamLocationQuery, *params.Id); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.PubKey != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "pubKey", runtime.ParamLocationQuery, *params.PubKey); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Status != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "status", runtime.ParamLocationQuery, *params.Status); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
 	}
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
@@ -5051,9 +4510,6 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// AdminGetContactsWithResponse request
-	AdminGetContactsWithResponse(ctx context.Context, params *AdminGetContactsParams, reqEditors ...RequestEditorFn) (*AdminGetContactsResponse, error)
-
 	// AdminConfirmContactWithBodyWithResponse request with any body
 	AdminConfirmContactWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminConfirmContactResponse, error)
 
@@ -5097,9 +4553,6 @@ type ClientWithResponsesInterface interface {
 	// SharedConfigWithResponse request
 	SharedConfigWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*SharedConfigResponse, error)
 
-	// GetContactsWithResponse request
-	GetContactsWithResponse(ctx context.Context, params *GetContactsParams, reqEditors ...RequestEditorFn) (*GetContactsResponse, error)
-
 	// RemoveContactWithResponse request
 	RemoveContactWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*RemoveContactResponse, error)
 
@@ -5141,40 +4594,6 @@ type ClientWithResponsesInterface interface {
 
 	// CurrentUserWithResponse request
 	CurrentUserWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CurrentUserResponse, error)
-}
-
-type AdminGetContactsResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ResponsesSearchContactsSuccess
-	JSON401      *ResponsesNotAuthorizedToAdminEndpoint
-	JSON500      *ResponsesContactSearchInternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r AdminGetContactsResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r AdminGetContactsResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// HTTPResponse returns http.Response from which this response was parsed.
-func (r AdminGetContactsResponse) Response() *http.Response {
-	return r.HTTPResponse
-}
-
-// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
-func (r AdminGetContactsResponse) Bytes() []byte {
-	return r.Body
 }
 
 type AdminConfirmContactResponse struct {
@@ -5548,40 +4967,6 @@ func (r SharedConfigResponse) Response() *http.Response {
 
 // Bytes is a convenience method to retrieve the raw bytes from the HTTP response
 func (r SharedConfigResponse) Bytes() []byte {
-	return r.Body
-}
-
-type GetContactsResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ResponsesSearchContactsSuccess
-	JSON401      *ResponsesUserNotAuthorized
-	JSON500      *ResponsesContactSearchInternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetContactsResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetContactsResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// HTTPResponse returns http.Response from which this response was parsed.
-func (r GetContactsResponse) Response() *http.Response {
-	return r.HTTPResponse
-}
-
-// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
-func (r GetContactsResponse) Bytes() []byte {
 	return r.Body
 }
 
@@ -6005,15 +5390,6 @@ func (r CurrentUserResponse) Bytes() []byte {
 	return r.Body
 }
 
-// AdminGetContactsWithResponse request returning *AdminGetContactsResponse
-func (c *ClientWithResponses) AdminGetContactsWithResponse(ctx context.Context, params *AdminGetContactsParams, reqEditors ...RequestEditorFn) (*AdminGetContactsResponse, error) {
-	rsp, err := c.AdminGetContacts(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseAdminGetContactsResponse(rsp)
-}
-
 // AdminConfirmContactWithBodyWithResponse request with arbitrary body returning *AdminConfirmContactResponse
 func (c *ClientWithResponses) AdminConfirmContactWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminConfirmContactResponse, error) {
 	rsp, err := c.AdminConfirmContactWithBody(ctx, contentType, body, reqEditors...)
@@ -6153,15 +5529,6 @@ func (c *ClientWithResponses) SharedConfigWithResponse(ctx context.Context, reqE
 	return ParseSharedConfigResponse(rsp)
 }
 
-// GetContactsWithResponse request returning *GetContactsResponse
-func (c *ClientWithResponses) GetContactsWithResponse(ctx context.Context, params *GetContactsParams, reqEditors ...RequestEditorFn) (*GetContactsResponse, error) {
-	rsp, err := c.GetContacts(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetContactsResponse(rsp)
-}
-
 // RemoveContactWithResponse request returning *RemoveContactResponse
 func (c *ClientWithResponses) RemoveContactWithResponse(ctx context.Context, paymail string, reqEditors ...RequestEditorFn) (*RemoveContactResponse, error) {
 	rsp, err := c.RemoveContact(ctx, paymail, reqEditors...)
@@ -6292,46 +5659,6 @@ func (c *ClientWithResponses) CurrentUserWithResponse(ctx context.Context, reqEd
 		return nil, err
 	}
 	return ParseCurrentUserResponse(rsp)
-}
-
-// ParseAdminGetContactsResponse parses an HTTP response from a AdminGetContactsWithResponse call
-func ParseAdminGetContactsResponse(rsp *http.Response) (*AdminGetContactsResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &AdminGetContactsResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ResponsesSearchContactsSuccess
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ResponsesNotAuthorizedToAdminEndpoint
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ResponsesContactSearchInternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
-	return response, nil
 }
 
 // ParseAdminConfirmContactResponse parses an HTTP response from a AdminConfirmContactWithResponse call
@@ -6768,46 +6095,6 @@ func ParseSharedConfigResponse(rsp *http.Response) (*SharedConfigResponse, error
 			return nil, err
 		}
 		response.JSON401 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetContactsResponse parses an HTTP response from a GetContactsWithResponse call
-func ParseGetContactsResponse(rsp *http.Response) (*GetContactsResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetContactsResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ResponsesSearchContactsSuccess
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ResponsesUserNotAuthorized
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ResponsesContactSearchInternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 

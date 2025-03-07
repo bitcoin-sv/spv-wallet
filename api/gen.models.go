@@ -193,12 +193,6 @@ type ErrorsDeleteContact struct {
 	Message interface{} `json:"message"`
 }
 
-// ErrorsFailedToGetPaginatedResults defines model for errors_FailedToGetPaginatedResults.
-type ErrorsFailedToGetPaginatedResults struct {
-	Code    interface{} `json:"code"`
-	Message interface{} `json:"message"`
-}
-
 // ErrorsGetContact defines model for errors_GetContact.
 type ErrorsGetContact struct {
 	Code    interface{} `json:"code"`
@@ -438,12 +432,6 @@ type ModelsContact struct {
 
 // ModelsContactStatus defines model for models_ContactStatus.
 type ModelsContactStatus string
-
-// ModelsContactsSearchResult defines model for models_ContactsSearchResult.
-type ModelsContactsSearchResult struct {
-	Content []ModelsContact  `json:"content"`
-	Page    ModelsSearchPage `json:"page"`
-}
 
 // ModelsCustomInstructions defines model for models_CustomInstructions.
 type ModelsCustomInstructions struct {
@@ -747,32 +735,17 @@ type RequestsUpsertContact struct {
 	RequesterPaymail string `json:"requesterPaymail"`
 }
 
-// RequestsFullName defines model for requests_FullName.
-type RequestsFullName = string
-
-// RequestsID defines model for requests_ID.
-type RequestsID = int
-
 // RequestsPageNumber defines model for requests_PageNumber.
 type RequestsPageNumber = int
 
 // RequestsPageSize defines model for requests_PageSize.
 type RequestsPageSize = int
 
-// RequestsPaymail defines model for requests_Paymail.
-type RequestsPaymail = string
-
-// RequestsPubKey defines model for requests_PubKey.
-type RequestsPubKey = string
-
 // RequestsSort defines model for requests_Sort.
 type RequestsSort = string
 
 // RequestsSortBy defines model for requests_SortBy.
 type RequestsSortBy = string
-
-// RequestsStatus defines model for requests_Status.
-type RequestsStatus = ModelsContactStatus
 
 // ResponsesAdminAddPaymailSuccess defines model for responses_AdminAddPaymailSuccess.
 type ResponsesAdminAddPaymailSuccess = ModelsPaymail
@@ -831,11 +804,6 @@ type ResponsesAdminUserBadRequest struct {
 
 // ResponsesContactNotFound defines model for responses_ContactNotFound.
 type ResponsesContactNotFound = ErrorsContactNotFound
-
-// ResponsesContactSearchInternalServerError defines model for responses_ContactSearchInternalServerError.
-type ResponsesContactSearchInternalServerError struct {
-	union json.RawMessage
-}
 
 // ResponsesContactSuccess defines model for responses_ContactSuccess.
 type ResponsesContactSuccess = ModelsContact
@@ -904,9 +872,6 @@ type ResponsesRecordTransactionSuccess = ModelsRecordedOutline
 // ResponsesSearchBadRequest defines model for responses_SearchBadRequest.
 type ResponsesSearchBadRequest = ErrorsInvalidDataID
 
-// ResponsesSearchContactsSuccess defines model for responses_SearchContactsSuccess.
-type ResponsesSearchContactsSuccess = []ModelsContactsSearchResult
-
 // ResponsesSearchOperationsSuccess defines model for responses_SearchOperationsSuccess.
 type ResponsesSearchOperationsSuccess = ModelsOperationsSearchResult
 
@@ -938,66 +903,6 @@ type ResponsesUserBadRequest = ErrorsInvalidDataID
 
 // ResponsesUserNotAuthorized defines model for responses_UserNotAuthorized.
 type ResponsesUserNotAuthorized = ErrorsUserAuthorization
-
-// AdminGetContactsParams defines parameters for AdminGetContacts.
-type AdminGetContactsParams struct {
-	// Page Page number for pagination
-	Page *RequestsPageNumber `form:"page,omitempty" json:"page,omitempty"`
-
-	// Size Number of items per page
-	Size *RequestsPageSize `form:"size,omitempty" json:"size,omitempty"`
-
-	// Sort Sorting order (asc or desc)
-	Sort *RequestsSort `form:"sort,omitempty" json:"sort,omitempty"`
-
-	// SortBy Field to sort by
-	SortBy *RequestsSortBy `form:"sortBy,omitempty" json:"sortBy,omitempty"`
-
-	// FullName Full name of the contact
-	FullName *RequestsFullName `form:"fullName,omitempty" json:"fullName,omitempty"`
-
-	// Paymail Paymail of the contact
-	Paymail *RequestsPaymail `form:"paymail,omitempty" json:"paymail,omitempty"`
-
-	// Id ID of the contact
-	Id *RequestsID `form:"id,omitempty" json:"id,omitempty"`
-
-	// PubKey Public key of the contact
-	PubKey *RequestsPubKey `form:"pubKey,omitempty" json:"pubKey,omitempty"`
-
-	// Status Status of the contact
-	Status *RequestsStatus `form:"status,omitempty" json:"status,omitempty"`
-}
-
-// GetContactsParams defines parameters for GetContacts.
-type GetContactsParams struct {
-	// Page Page number for pagination
-	Page *RequestsPageNumber `form:"page,omitempty" json:"page,omitempty"`
-
-	// Size Number of items per page
-	Size *RequestsPageSize `form:"size,omitempty" json:"size,omitempty"`
-
-	// Sort Sorting order (asc or desc)
-	Sort *RequestsSort `form:"sort,omitempty" json:"sort,omitempty"`
-
-	// SortBy Field to sort by
-	SortBy *RequestsSortBy `form:"sortBy,omitempty" json:"sortBy,omitempty"`
-
-	// FullName Full name of the contact
-	FullName *RequestsFullName `form:"fullName,omitempty" json:"fullName,omitempty"`
-
-	// Paymail Paymail of the contact
-	Paymail *RequestsPaymail `form:"paymail,omitempty" json:"paymail,omitempty"`
-
-	// Id ID of the contact
-	Id *RequestsID `form:"id,omitempty" json:"id,omitempty"`
-
-	// PubKey Public key of the contact
-	PubKey *RequestsPubKey `form:"pubKey,omitempty" json:"pubKey,omitempty"`
-
-	// Status Status of the contact
-	Status *RequestsStatus `form:"status,omitempty" json:"status,omitempty"`
-}
 
 // SearchOperationsParams defines parameters for SearchOperations.
 type SearchOperationsParams struct {
@@ -2120,68 +2025,6 @@ func (t ResponsesAdminUserBadRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (t *ResponsesAdminUserBadRequest) UnmarshalJSON(b []byte) error {
-	err := t.union.UnmarshalJSON(b)
-	return err
-}
-
-// AsErrorsInternal returns the union data inside the ResponsesContactSearchInternalServerError as a ErrorsInternal
-func (t ResponsesContactSearchInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
-	var body ErrorsInternal
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromErrorsInternal overwrites any union data inside the ResponsesContactSearchInternalServerError as the provided ErrorsInternal
-func (t *ResponsesContactSearchInternalServerError) FromErrorsInternal(v ErrorsInternal) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeErrorsInternal performs a merge with any union data inside the ResponsesContactSearchInternalServerError, using the provided ErrorsInternal
-func (t *ResponsesContactSearchInternalServerError) MergeErrorsInternal(v ErrorsInternal) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-// AsErrorsFailedToGetPaginatedResults returns the union data inside the ResponsesContactSearchInternalServerError as a ErrorsFailedToGetPaginatedResults
-func (t ResponsesContactSearchInternalServerError) AsErrorsFailedToGetPaginatedResults() (ErrorsFailedToGetPaginatedResults, error) {
-	var body ErrorsFailedToGetPaginatedResults
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromErrorsFailedToGetPaginatedResults overwrites any union data inside the ResponsesContactSearchInternalServerError as the provided ErrorsFailedToGetPaginatedResults
-func (t *ResponsesContactSearchInternalServerError) FromErrorsFailedToGetPaginatedResults(v ErrorsFailedToGetPaginatedResults) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeErrorsFailedToGetPaginatedResults performs a merge with any union data inside the ResponsesContactSearchInternalServerError, using the provided ErrorsFailedToGetPaginatedResults
-func (t *ResponsesContactSearchInternalServerError) MergeErrorsFailedToGetPaginatedResults(v ErrorsFailedToGetPaginatedResults) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-func (t ResponsesContactSearchInternalServerError) MarshalJSON() ([]byte, error) {
-	b, err := t.union.MarshalJSON()
-	return b, err
-}
-
-func (t *ResponsesContactSearchInternalServerError) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
