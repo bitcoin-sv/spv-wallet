@@ -34,7 +34,11 @@ func TestUnconfirmContact(t *testing.T) {
 
 	t.Run("Unconfirm already unconfirmed contact", func(t *testing.T) {
 		// given:
-		given, then := testabilities.NewOf(givenForAllTests, t)
+		given, then := testabilities.New(t)
+		cleanup = given.StartedSPVWalletWithConfiguration(
+			testengine.WithV2(),
+		)
+		defer cleanup()
 		given.User(fixtures.Sender).HasConfirmedContactTo(fixtures.RecipientInternal)
 		client := given.HttpClient().ForGivenUser(fixtures.Sender)
 
@@ -45,7 +49,6 @@ func TestUnconfirmContact(t *testing.T) {
 		// then:
 		then.Response(res).IsOK()
 
-		// and:
 		// when:
 		res, _ = client.R().
 			Delete(fmt.Sprintf("/api/v2/contacts/%s/confirmation", fixtures.RecipientInternal.DefaultPaymail().String()))
