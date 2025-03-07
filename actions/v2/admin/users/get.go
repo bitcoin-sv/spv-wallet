@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/admin/internal/mapping"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	dberrors "github.com/bitcoin-sv/spv-wallet/engine/v2/database/errors"
+	"github.com/bitcoin-sv/spv-wallet/errdef/clienterr"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,7 +13,9 @@ import (
 func (s *APIAdminUsers) UserById(c *gin.Context, id string) {
 	user, err := s.engine.UsersService().GetByID(c, id)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, s.logger)
+		clienterr.Map(err).
+			IfOfType(dberrors.NotFound).Then(clienterr.NotFound.New()).
+			Response(c, s.logger)
 		return
 	}
 

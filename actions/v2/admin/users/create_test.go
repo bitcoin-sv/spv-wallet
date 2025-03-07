@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
-	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 )
@@ -131,8 +130,7 @@ func TestCreateUserWithBadURLAvatar(t *testing.T) {
 
 	// then:
 	then.Response(res).
-		HasStatus(422).
-		WithJSONf(apierror.ExpectedJSON("error-user-invalid-avatar-url", "invalid avatar url"))
+		WithProblemDetails(422, "invalid_avatar_url", "Invalid avatar URL")
 
 }
 
@@ -441,8 +439,7 @@ func TestAddUserWithWrongPaymailDomain(t *testing.T) {
 
 		// then:
 		then.Response(res).
-			HasStatus(400).
-			WithJSONf(apierror.ExpectedJSON("error-invalid-domain", "invalid domain"))
+			WithProblemDetails(400, "unsupported_domain", "Unsupported domain")
 	})
 
 	t.Run("Try to add using alias and domain as address", func(t *testing.T) {
@@ -461,8 +458,29 @@ func TestAddUserWithWrongPaymailDomain(t *testing.T) {
 
 		// then:
 		then.Response(res).
-			HasStatus(400).
-			WithJSONf(apierror.ExpectedJSON("error-invalid-domain", "invalid domain"))
+			WithProblemDetails(400, "unsupported_domain", "Unsupported domain")
 	})
+}
 
+func TestTryToAddWithWrongPubKey(t *testing.T) {
+	// given:
+	given, then := testabilities.New(t)
+	cleanup := given.StartedSPVWalletWithConfiguration(
+		testengine.WithV2(),
+	)
+	defer cleanup()
+
+	// and:
+	client := given.HttpClient().ForAdmin()
+
+	// when:
+	res, _ := client.R().
+		SetBody(map[string]any{
+			"publicKey": "wrong",
+		}).
+		Post("/api/v2/admin/users")
+
+	// then:
+	then.Response(res).
+		WithProblemDetails(400, "invalid_public_key", "Invalid public key")
 }
