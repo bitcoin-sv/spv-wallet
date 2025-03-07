@@ -57,12 +57,6 @@ const (
 	ModelsTransactionHexFormatRAW  ModelsTransactionHexFormat = "RAW"
 )
 
-// Defines values for ModelsTransactionOutlineFormat.
-const (
-	ModelsTransactionOutlineFormatBEEF ModelsTransactionOutlineFormat = "BEEF"
-	ModelsTransactionOutlineFormatRAW  ModelsTransactionOutlineFormat = "RAW"
-)
-
 // Defines values for RequestsOpReturnOutputSpecificationDataType.
 const (
 	Hexes   RequestsOpReturnOutputSpecificationDataType = "hexes"
@@ -87,8 +81,8 @@ const (
 
 // Defines values for RequestsTransactionOutlineFormat.
 const (
-	BEEF RequestsTransactionOutlineFormat = "BEEF"
-	RAW  RequestsTransactionOutlineFormat = "RAW"
+	RequestsTransactionOutlineFormatBEEF RequestsTransactionOutlineFormat = "BEEF"
+	RequestsTransactionOutlineFormatRAW  RequestsTransactionOutlineFormat = "RAW"
 )
 
 // Defines values for CreateTransactionOutlineParamsFormat.
@@ -573,20 +567,6 @@ type ModelsTransactionHex struct {
 
 // ModelsTransactionHexFormat Transaction format
 type ModelsTransactionHexFormat string
-
-// ModelsTransactionOutline defines model for models_TransactionOutline.
-type ModelsTransactionOutline struct {
-	Annotations *ModelsOutputsAnnotations `json:"annotations,omitempty"`
-
-	// Format Transaction format
-	Format ModelsTransactionOutlineFormat `json:"format"`
-
-	// Hex Transaction hex
-	Hex string `json:"hex"`
-}
-
-// ModelsTransactionOutlineFormat Transaction format
-type ModelsTransactionOutlineFormat string
 
 // ModelsUser defines model for models_User.
 type ModelsUser struct {

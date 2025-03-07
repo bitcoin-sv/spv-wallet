@@ -27,7 +27,7 @@ func (s *APIAdminTransactions) RecordTransactionOutlineForUser(c *gin.Context) {
 		return
 	}
 
-	recorded, err := s.engine.TransactionRecordService().RecordTransactionOutline(c, requestBody.UserID, outline)
+	recorded, err := s.transactionsRecordService.RecordTransactionOutline(c, requestBody.UserID, outline)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return

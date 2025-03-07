@@ -42,7 +42,7 @@ components:
 
     RecordTransactionOutlineForUser:
       allOf:
-        - $ref: "../components/models.yaml#/components/schemas/TransactionOutline"
+        - $ref: "../components/requests.yaml#/components/schemas/TransactionOutline"
         - type: object
           properties:
             userID:

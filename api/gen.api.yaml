@@ -1292,13 +1292,6 @@ components:
                 - hex
                 - format
             type: object
-        models_TransactionOutline:
-            allOf:
-                - $ref: '#/components/schemas/models_TransactionHex'
-                - properties:
-                    annotations:
-                        $ref: '#/components/schemas/models_OutputsAnnotations'
-                  type: object
         models_User:
             properties:
                 createdAt:
@@ -1440,7 +1433,7 @@ components:
             type: object
         requests_RecordTransactionOutlineForUser:
             allOf:
-                - $ref: '#/components/schemas/models_TransactionOutline'
+                - $ref: '#/components/schemas/requests_TransactionOutline'
                 - properties:
                     userID:
                         description: User ID for which admin records transaction outline
