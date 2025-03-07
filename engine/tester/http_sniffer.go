@@ -1,40 +1,53 @@
-package paymailmock
+package tester
 
 import (
 	"bytes"
 	"io"
 	"net/http"
 	"regexp"
+	"strings"
 	"sync"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
+type Headers map[string]string
+
+func (h Headers) Get(key string) (string, bool) {
+	val, ok := h[strings.ToLower(key)]
+	return val, ok
+}
+
+func (h Headers) Set(key, value string) {
+	h[strings.ToLower(key)] = value
+}
+
 // CallDetails holds the details of a call made to the mocked server
 type CallDetails struct {
 	URL string
 
-	RequestMethod string
-	RequestBody   []byte
+	RequestMethod  string
+	RequestBody    []byte
+	RequestHeaders Headers
 
 	ResponseBody []byte
 	ResponseCode int
 }
 
-type httpSniffer struct {
+type HTTPSniffer struct {
 	next   http.RoundTripper
 	called map[string]CallDetails
 	lock   sync.Mutex
 }
 
-func newHTTPSniffer(next http.RoundTripper) *httpSniffer {
-	return &httpSniffer{
+func NewHTTPSniffer(next http.RoundTripper) *HTTPSniffer {
+	return &HTTPSniffer{
 		called: make(map[string]CallDetails),
 		next:   next,
 	}
 }
 
-func (s *httpSniffer) getCallByRegex(r string) *CallDetails {
+func (s *HTTPSniffer) GetCallByRegex(r string) *CallDetails {
 	reg := regexp.MustCompile(r)
 	s.lock.Lock()
 	defer s.lock.Unlock()
@@ -46,10 +59,15 @@ func (s *httpSniffer) getCallByRegex(r string) *CallDetails {
 	return nil
 }
 
-func (s *httpSniffer) RoundTrip(req *http.Request) (*http.Response, error) {
+func (s *HTTPSniffer) RoundTrip(req *http.Request) (*http.Response, error) {
 	var details CallDetails
 	details.URL = req.URL.String()
 	details.RequestMethod = req.Method
+
+	details.RequestHeaders = make(map[string]string)
+	for k, v := range req.Header {
+		details.RequestHeaders.Set(k, v[0])
+	}
 
 	var err error
 	if req.Body != nil {

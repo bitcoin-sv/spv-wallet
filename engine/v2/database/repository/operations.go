@@ -49,6 +49,8 @@ func (o *Operations) PaginatedForUser(ctx context.Context, userID string, page f
 				Type:         operation.Type,
 				Value:        operation.Value,
 				TxStatus:     operation.Transaction.TxStatus,
+				BlockHeight:  operation.Transaction.BlockHeight,
+				BlockHash:    operation.Transaction.BlockHash,
 			}
 		}),
 	}, nil

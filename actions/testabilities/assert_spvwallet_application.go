@@ -21,6 +21,7 @@ type SPVWalletApplicationAssertions interface {
 	Response(response *resty.Response) SPVWalletResponseAssertions
 	User(user fixtures.User) SPVWalletAppUserAssertions
 	ExternalPaymailHost() testpaymail.PaymailExternalAssertions
+	ARC() testengine.ARCAssertions
 }
 
 type SPVWalletResponseAssertions interface {
@@ -79,6 +80,10 @@ func (a *appAssertions) User(user fixtures.User) SPVWalletAppUserAssertions {
 
 func (a *appAssertions) ExternalPaymailHost() testpaymail.PaymailExternalAssertions {
 	return a.engineAssertions.ExternalPaymailHost()
+}
+
+func (a *appAssertions) ARC() testengine.ARCAssertions {
+	return a.engineAssertions.ARC()
 }
 
 type responseAssertions struct {

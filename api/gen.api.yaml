@@ -932,6 +932,15 @@ components:
             type: object
         models_Operation:
             properties:
+                blockHash:
+                    description: Block hash of underlying transaction
+                    example: 000000000000000000d3577fe46b2329cce684cbcad2e8ae2129bd8874764258
+                    type: string
+                blockHeight:
+                    description: Block height of underlying transaction
+                    example: 1234
+                    type: integer
+                    x-go-type: int64
                 counterparty:
                     description: Counterparty of operation
                     example: alice@example.com

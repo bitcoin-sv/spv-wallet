@@ -65,3 +65,8 @@ func (mg *Manager) GetFeatureFlags() *config.ExperimentalConfig {
 func (mg *Manager) APIVersion() string {
 	return mg.appConfig.Version
 }
+
+// GetConfig returns the app configuration
+func (mg *Manager) GetConfig() *config.AppConfig {
+	return mg.appConfig
+}
