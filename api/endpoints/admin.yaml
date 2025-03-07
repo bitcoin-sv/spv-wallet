@@ -106,3 +106,183 @@ paths:
           $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
         422:
           $ref: "../components/responses.yaml#/components/responses/AdminInvalidAvatarURL"
+
+  /api/v2/admin/contacts/{id}:
+    put:
+      operationId: adminUpdateContact
+      security:
+        - XPubAuth:
+            - "admin"
+      tags:
+        - Admin endpoints
+      summary: Update contact
+      description: >-
+        This endpoint updates contact.
+      parameters:
+        - name: id
+          in: path
+          description: Contact ID
+          required: true
+          schema:
+            type: integer
+            format: uint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../components/requests.yaml#/components/schemas/UpdateContact"
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/ContactSuccess"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/AdminUpdateContactStatusInternalServerError"
+
+    delete:
+      operationId: adminDeleteContact
+      security:
+        - XPubAuth:
+            - "admin"
+      tags:
+        - Admin endpoints
+      summary: Delete contact
+      description: >-
+        This endpoint deletes contact.
+      parameters:
+        - name: id
+          in: path
+          description: Contact ID
+          required: true
+          schema:
+            type: integer
+            format: uint
+      responses:
+        200:
+          description: Contact deleted
+        401:
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/DeleteContactInternalServerError"
+
+
+  /api/v2/admin/contacts/{paymail}:
+    post:
+      operationId: adminCreateContact
+      security:
+        - XPubAuth:
+            - "admin"
+      tags:
+        - Admin endpoints
+      summary: Create contact
+      description: >-
+        This endpoint creates contact.
+      parameters:
+        - name: paymail
+          in: path
+          description: Contact paymail
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../components/requests.yaml#/components/schemas/AdminCreateContact"
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/ContactSuccess"
+        400:
+          $ref: "../components/responses.yaml#/components/responses/AdminCreateContactBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
+        404:
+          $ref: "../components/responses.yaml#/components/responses/AdminCreateContactNotFound"
+        409:
+          $ref: "../components/responses.yaml#/components/responses/AdminCreateContactConflict"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/AdminCreateContactInternalServerError"
+
+  /api/v2/admin/contacts/confirmations:
+    post:
+      operationId: adminConfirmContact
+      security:
+        - XPubAuth:
+            - "admin"
+      tags:
+        - Admin endpoints
+      summary: Confirm contact
+      description: >-
+        This endpoint confirms contact.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../components/requests.yaml#/components/schemas/AdminConfirmContact"
+      responses:
+        200:
+          description: Contact confirmed
+        400:
+          $ref: "../components/responses.yaml#/components/responses/AdminUserBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/AdminConfirmContactInternalServerError"
+
+  /api/v2/admin/invitations/{id}:
+    post:
+      operationId: adminAcceptInvitation
+      security:
+        - XPubAuth:
+            - "admin"
+      tags:
+        - Admin endpoints
+      summary: Accept invitation
+      description: >-
+        This endpoint allows to accept invitation for selected ID
+      parameters:
+        - name: id
+          in: path
+          description: >-
+            ID of the contact that the admin would like to accept
+          required: true
+          schema:
+            type: integer
+            format: uint
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/ContactSuccess"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/AdminUpdateContactStatusInternalServerError"
+
+    delete:
+      operationId: adminRejectInvitation
+      security:
+        - XPubAuth:
+            - "admin"
+      tags:
+        - Admin endpoints
+      summary: Reject invitation
+      description: >-
+        This endpoint allows to reject invitation for selected ID
+      parameters:
+        - name: id
+          in: path
+          description: >-
+            ID of the contact that the admin would like to reject
+          required: true
+          schema:
+            type: integer
+            format: uint
+      responses:
+        200:
+          description: Invitation rejected
+        401:
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/AdminUpdateContactStatusInternalServerError"
