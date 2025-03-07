@@ -43,10 +43,6 @@ func APICallForCurrentUser(t testing.TB) *APICall {
 	return APICallFor(t, CurrentUserClientFactory)
 }
 
-func APICallForDeleteCurrentUser(t testing.TB) *APICall {
-	return APICallFor(t, CurrentUserClientFactory)
-}
-
 func APICallForRecipient(t testing.TB) *APICall {
 	return APICallFor(t, RecipientClientFactory)
 }
