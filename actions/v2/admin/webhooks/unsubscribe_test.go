@@ -56,8 +56,7 @@ func TestUnsubscribeWebhookHappyPath(t *testing.T) {
 		// then:
 		then.Response(res).
 			IsOK().
-			WithJSONf(`[
-            ]`)
+			WithJSONf(`[]`)
 	})
 }
 

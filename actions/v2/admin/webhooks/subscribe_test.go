@@ -195,8 +195,7 @@ func TestSubscribeWebhooksErrorPath(t *testing.T) {
 		// then:
 		then.Response(res).
 			IsOK().
-			WithJSONf(`[
-            ]`)
+			WithJSONf(`[]`)
 	})
 
 	t.Run("subscribe with missing token value returns bad request", func(t *testing.T) {
@@ -235,8 +234,7 @@ func TestSubscribeWebhooksErrorPath(t *testing.T) {
 		// then:
 		then.Response(res).
 			IsOK().
-			WithJSONf(`[
-            ]`)
+			WithJSONf(`[]`)
 	})
 
 	t.Run("subscribe with missing token header returns bad request", func(t *testing.T) {
@@ -275,8 +273,7 @@ func TestSubscribeWebhooksErrorPath(t *testing.T) {
 		// then:
 		then.Response(res).
 			IsOK().
-			WithJSONf(`[
-            ]`)
+			WithJSONf(`[]`)
 	})
 
 	t.Run("subscribe with missing URL returns bad request", func(t *testing.T) {
@@ -315,8 +312,7 @@ func TestSubscribeWebhooksErrorPath(t *testing.T) {
 		// then:
 		then.Response(res).
 			IsOK().
-			WithJSONf(`[
-            ]`)
+			WithJSONf(`[]`)
 	})
 
 	t.Run("subscribe with invalid URL returns bad request", func(t *testing.T) {
@@ -356,8 +352,7 @@ func TestSubscribeWebhooksErrorPath(t *testing.T) {
 		// then:
 		then.Response(res).
 			IsOK().
-			WithJSONf(`[
-            ]`)
+			WithJSONf(`[]`)
 	})
 
 }
