@@ -2,6 +2,7 @@ package webhooks
 
 import (
 	"net/http"
+	"net/url"
 
 	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -19,6 +20,11 @@ func (s *APIAdminWebhooks) SubscribeWebhook(c *gin.Context) {
 
 	if bodyReq.Url == "" {
 		spverrors.ErrorResponse(c, spverrors.ErrWebhookUrlRequired, s.logger)
+		return
+	}
+
+	if _, err := url.Parse(bodyReq.Url); err != nil {
+		spverrors.ErrorResponse(c, spverrors.WebhookUrlInvalid, s.logger)
 		return
 	}
 

@@ -273,6 +273,7 @@ components:
             oneOf:
               - $ref: "./errors.yaml#/components/schemas/CannotBindRequest"
               - $ref: "./errors.yaml#/components/schemas/WebhookUrlRequired"
+              - $ref: "./errors.yaml#/components/schemas/WebhookUrlInvalid"
               - $ref: "./errors.yaml#/components/schemas/WebhookTokenHeaderRequired"
               - $ref: "./errors.yaml#/components/schemas/WebhookTokenValueRequired"
 
@@ -298,6 +299,7 @@ components:
             oneOf:
               - $ref: "./errors.yaml#/components/schemas/CannotBindRequest"
               - $ref: "./errors.yaml#/components/schemas/WebhookUrlRequired"
+              - $ref: "./errors.yaml#/components/schemas/WebhookUrlInvalid"
 
     UnsubscribeToWebhookInternalServerError:
       description: Internal server error

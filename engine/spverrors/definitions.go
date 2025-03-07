@@ -441,6 +441,9 @@ var ErrWebhookUrlRequired = models.SPVError{Message: "webhook url is required", 
 // ErrWebhookTokenValueRequired is when webhook token value is required
 var ErrWebhookTokenValueRequired = models.SPVError{Message: "webhook token value is required", StatusCode: 400, Code: "error-webhook-token-value-required"}
 
+// WebhookUrlInvalid is when webhook url is required
+var WebhookUrlInvalid = models.SPVError{Message: "webhook url is invalid", StatusCode: 400, Code: "error-webhook-url-invalid"}
+
 // ////////////////////////////////// ROUTES ERRORS
 
 // ErrRouteNotFound is when route is not found

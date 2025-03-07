@@ -488,3 +488,13 @@ components:
               example: "error-webhook-token-value-required"
             message:
               example: "webhook token value is required"
+
+    WebhookUrlInvalid:
+      allOf:
+        - $ref: "#/components/schemas/Schema"
+        - type: object
+          properties:
+            code:
+              example: "error-webhook-url-invalid"
+            message:
+              example: "webhook url is invalid"
