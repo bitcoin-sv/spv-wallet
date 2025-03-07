@@ -351,3 +351,45 @@ components:
             oneOf:
               - $ref: "./errors.yaml#/components/schemas/Internal"
               - $ref: "./errors.yaml#/components/schemas/UpdateContactStatus"
+
+    GetMerklerootsSuccess:
+      description: Merkleroots found
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/GetMerkleRootResult"
+
+    GetMerklerootsBadRequest:
+      description: Bad request is an error that occurs when the request is malformed.
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/InvalidBatchSize"
+
+    GetMerklerootsNotFound:
+      description: Not found is an error that occurs when the requested resource is not found.
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/MerkleRootNotFound"
+
+    GetMerklerootsConflict:
+      description: Conflict is an error that occurs when the request conflicts with the current state of the server.
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/MerkleRootNotInLongestChain"
+
+    GetMerklerootsInternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "./errors.yaml#/components/schemas/BHSUnreachable"
+              - $ref: "./errors.yaml#/components/schemas/BHSNoSuccessResponse"
+              - $ref: "./errors.yaml#/components/schemas/BHSUnauthorized"
+              - $ref: "./errors.yaml#/components/schemas/BHSBadRequest"
+              - $ref: "./errors.yaml#/components/schemas/BHSUnhealthy"
+              - $ref: "./errors.yaml#/components/schemas/BHSBadURL"
+              - $ref: "./errors.yaml#/components/schemas/BHSParsingResponse"

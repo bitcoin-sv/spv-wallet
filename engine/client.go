@@ -25,6 +25,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/record"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txsync"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/go-resty/resty/v2"
@@ -67,6 +68,7 @@ type (
 		paymails     *paymails.Service // Paymail domain service
 		addresses    *addresses.Service
 		operations   *operations.Service
+		txSync       *txsync.Service
 		data         *data.Service
 		config       *config.AppConfig
 		contacts     *contacts.Service
@@ -185,6 +187,7 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	}
 
 	client.loadChainService()
+	client.loadTxSyncService()
 
 	if err = client.loadTransactionRecordService(); err != nil {
 		return nil, err
@@ -387,4 +390,9 @@ func (c *Client) OperationsService() *operations.Service {
 // ContactService will return the contacts domain service
 func (c *Client) ContactService() *contacts.Service {
 	return c.options.contacts
+}
+
+// TxSyncService will return the transaction sync service
+func (c *Client) TxSyncService() *txsync.Service {
+	return c.options.txSync
 }

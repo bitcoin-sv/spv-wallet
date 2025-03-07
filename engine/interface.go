@@ -21,6 +21,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/record"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txsync"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/mrz1836/go-cachestore"
@@ -169,6 +170,7 @@ type V2 interface {
 	DataService() *data.Service
 	OperationsService() *operations.Service
 	ContactService() *contacts.Service
+	TxSyncService() *txsync.Service
 }
 
 // ClientInterface is the client (spv wallet engine) interface comprised of all services/actions

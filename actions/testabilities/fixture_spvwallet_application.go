@@ -44,6 +44,8 @@ type SPVWalletApplicationFixture interface {
 
 	// Tx creates a new mocked transaction builder
 	Tx() txtestability.TransactionSpec
+
+	Config() *config.AppConfig
 }
 
 type BlockHeadersServiceFixture interface {
@@ -172,4 +174,8 @@ func (f *appFixture) Tx() txtestability.TransactionSpec {
 
 func (f *appFixture) EngineFixture() testengine.EngineFixture {
 	return f.engineFixture
+}
+
+func (f *appFixture) Config() *config.AppConfig {
+	return &f.engineWithConfig.Config
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/base"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/contacts"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/data"
+	"github.com/bitcoin-sv/spv-wallet/actions/v2/merkleroots"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/operations"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/transactions"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/users"
@@ -23,6 +24,7 @@ type apiV2 struct {
 	operations.APIOperations
 	transactions.APITransactions
 	contacts.APIContacts
+	merkleroots.APIMerkleRoots
 }
 
 // NewV2API creates a new server
@@ -34,6 +36,7 @@ func NewV2API(config *config.AppConfig, engine engine.ClientInterface, logger *z
 		users.NewAPIUsers(engine, logger),
 		operations.NewAPIOperations(engine, logger),
 		transactions.NewAPITransactions(engine, logger),
+		merkleroots.NewAPIMerkleRoots(engine, logger),
 		contacts.NewAPIContacts(engine, logger),
 	}
 }

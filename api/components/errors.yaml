@@ -528,3 +528,103 @@ components:
               example: "error-contact-updating-status-failed"
             message:
               example: "updating contact status failed"
+
+    BHSUnreachable:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-bhs-unreachable"
+            message:
+              example: "Block Headers Service cannot be requested"
+
+    BHSNoSuccessResponse:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-bhs-no-success-response"
+            message:
+              example: "Block Headers Service request did not return a success response"
+
+    BHSUnauthorized:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-bhs-unauthorized"
+            message:
+              example: "Block Headers Service returned unauthorized"
+
+    BHSBadRequest:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-bhs-bad-request"
+            message:
+              example: "Block Headers Service bad request"
+
+    BHSUnhealthy:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-bhs-unhealthy"
+            message:
+              example: "Block Headers Service is unhealthy"
+
+    BHSBadURL:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-bhs-bad-url"
+            message:
+              example: "cannot create Block Headers Service url. Please check your configuration"
+
+    BHSParsingResponse:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-bhs-parse-response"
+            message:
+              example: "cannot parse Block Headers Service response"
+
+    InvalidBatchSize:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-invalid-batch-size"
+            message:
+              example: "batchSize must be 0 or a positive integer"
+
+    MerkleRootNotFound:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-merkleroot-not-found"
+            message:
+              example: "No block with provided merkleroot was found"
+
+    MerkleRootNotInLongestChain:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-merkleroot-not-part-of-longest-chain"
+            message:
+              example: "Provided merkleroot is not part of the longest chain"
