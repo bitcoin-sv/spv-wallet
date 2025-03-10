@@ -7,6 +7,7 @@ import (
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses/addressesmodels"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
 )
 
@@ -33,4 +34,9 @@ type MerkleRootsVerifier interface {
 // TxRecorder is an interface for recording transactions
 type TxRecorder interface {
 	RecordPaymailTransaction(ctx context.Context, tx *trx.Transaction, senderPaymail, receiverPaymail string) error
+}
+
+// ContactsService is an interface for contacts service
+type ContactsService interface {
+	AddContactRequest(ctx context.Context, fullName, paymail, userID string) (*contactsmodels.Contact, error)
 }
