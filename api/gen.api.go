@@ -16,6 +16,9 @@ type ServerInterface interface {
 	// Get admin status
 	// (GET /api/v2/admin/status)
 	AdminStatus(c *gin.Context)
+	// Record transaction outline for user
+	// (POST /api/v2/admin/transactions/record)
+	RecordTransactionOutlineForUser(c *gin.Context)
 	// Create user
 	// (POST /api/v2/admin/users)
 	CreateUser(c *gin.Context)
@@ -70,6 +73,21 @@ func (siw *ServerInterfaceWrapper) AdminStatus(c *gin.Context) {
 	}
 
 	siw.Handler.AdminStatus(c)
+}
+
+// RecordTransactionOutlineForUser operation middleware
+func (siw *ServerInterfaceWrapper) RecordTransactionOutlineForUser(c *gin.Context) {
+
+	c.Set(XPubAuthScopes, []string{"admin"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.RecordTransactionOutlineForUser(c)
 }
 
 // CreateUser operation middleware
@@ -354,6 +372,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	}
 
 	router.GET(options.BaseURL+"/api/v2/admin/status", wrapper.AdminStatus)
+	router.POST(options.BaseURL+"/api/v2/admin/transactions/record", wrapper.RecordTransactionOutlineForUser)
 	router.POST(options.BaseURL+"/api/v2/admin/users", wrapper.CreateUser)
 	router.GET(options.BaseURL+"/api/v2/admin/users/:id", wrapper.UserById)
 	router.POST(options.BaseURL+"/api/v2/admin/users/:id/paymails", wrapper.AddPaymailToUser)
