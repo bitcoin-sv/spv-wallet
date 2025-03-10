@@ -1,3 +1,16 @@
+package users
+
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/bitcoin-sv/spv-wallet/api"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses/addressesmodels"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
+)
+
 func (s *APIUsers) CreateAddress(c *gin.Context) {
 	userContext := reqctx.GetUserContext(c)
 	userID, err := userContext.ShouldGetUserID()
@@ -6,14 +19,13 @@ func (s *APIUsers) CreateAddress(c *gin.Context) {
 		return
 	}
 
-	// Parse request body
-	var req api.ModelsPaymailAddress
+	var req api.RequestsCreatePaymailAddress
 	if err := c.ShouldBindJSON(&req); err != nil {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
 	}
 
-	fullAddress := req.Alias + "@" + req.Domain
+	fullAddress := req.Paymail.Alias + "@" + req.Paymail.Domain
 
 	newAddress := &addressesmodels.NewAddress{
 		UserID:             userID,
@@ -27,12 +39,18 @@ func (s *APIUsers) CreateAddress(c *gin.Context) {
 		return
 	}
 
-	// Return the created Paymail address
-	c.JSON(http.StatusOK, &api.ModelsPaymailAddress{
-		Alias:      req.Alias,
-		Domain:     req.Domain,
+	c.JSON(http.StatusOK, &api.ResponsesPaymailAddress{
+		Alias:      req.Paymail.Alias,
+		Domain:     req.Paymail.Domain,
 		Paymail:    fullAddress,
-		PublicName: req.PublicName,
-		AvatarURL:  req.AvatarURL,
+		PublicName: valueOrDefault(req.Paymail.PublicName, req.Paymail.Alias),
+		Avatar:     valueOrDefault(req.Paymail.AvatarURL, ""),
 	})
+}
+
+func valueOrDefault(ptr *string, defaultValue string) string {
+	if ptr != nil {
+		return *ptr
+	}
+	return defaultValue
 }

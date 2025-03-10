@@ -273,6 +273,30 @@ paths:
             summary: Create transaction outline
             tags:
                 - Transactions
+    /api/v2/users/address:
+        post:
+            operationId: createAddress
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/requests_CreatePaymailAddress'
+                required: true
+            responses:
+                "200":
+                    $ref: '#/components/responses/responses_PaymailAddress'
+                "400":
+                    $ref: '#/components/responses/responses_UserBadRequest'
+                "401":
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
+                "500":
+                    $ref: '#/components/responses/responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Create Paymail Address
+            tags:
+                - User
     /api/v2/users/current:
         get:
             description: This endpoint return balance of current authenticated user
@@ -468,6 +492,12 @@ components:
                     schema:
                         $ref: '#/components/schemas/errors_AdminAuthorization'
             description: Security requirements failed
+        responses_PaymailAddress:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/models_Paymail'
+            description: Paymail address created successfully
         responses_RecordTransactionBadRequest:
             content:
                 application/json:
@@ -1311,6 +1341,13 @@ components:
                 - address
                 - alias
                 - domain
+            type: object
+        requests_CreatePaymailAddress:
+            properties:
+                paymail:
+                    $ref: '#/components/schemas/requests_AddPaymail'
+            required:
+                - paymail
             type: object
         requests_CreateUser:
             properties:

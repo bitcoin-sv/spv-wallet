@@ -597,6 +597,11 @@ type RequestsAddPaymail struct {
 	PublicName *string `json:"publicName,omitempty"`
 }
 
+// RequestsCreatePaymailAddress defines model for requests_CreatePaymailAddress.
+type RequestsCreatePaymailAddress struct {
+	Paymail RequestsAddPaymail `json:"paymail"`
+}
+
 // RequestsCreateUser defines model for requests_CreateUser.
 type RequestsCreateUser struct {
 	Paymail   *RequestsAddPaymail `json:"paymail,omitempty"`
@@ -754,6 +759,9 @@ type ResponsesNotAuthorized = ErrorsAnyAuthorization
 // ResponsesNotAuthorizedToAdminEndpoint defines model for responses_NotAuthorizedToAdminEndpoint.
 type ResponsesNotAuthorizedToAdminEndpoint = ErrorsAdminAuthorization
 
+// ResponsesPaymailAddress defines model for responses_PaymailAddress.
+type ResponsesPaymailAddress = ModelsPaymail
+
 // ResponsesRecordTransactionBadRequest defines model for responses_RecordTransactionBadRequest.
 type ResponsesRecordTransactionBadRequest struct {
 	union json.RawMessage
@@ -826,6 +834,9 @@ type RecordTransactionOutlineJSONRequestBody = RequestsTransactionOutline
 
 // CreateTransactionOutlineJSONRequestBody defines body for CreateTransactionOutline for application/json ContentType.
 type CreateTransactionOutlineJSONRequestBody = RequestsTransactionSpecification
+
+// CreateAddressJSONRequestBody defines body for CreateAddress for application/json ContentType.
+type CreateAddressJSONRequestBody = RequestsCreatePaymailAddress
 
 // AsErrorsUserAuthOnNonUserEndpoint returns the union data inside the ErrorsAdminAuthorization as a ErrorsUserAuthOnNonUserEndpoint
 func (t ErrorsAdminAuthorization) AsErrorsUserAuthOnNonUserEndpoint() (ErrorsUserAuthOnNonUserEndpoint, error) {
