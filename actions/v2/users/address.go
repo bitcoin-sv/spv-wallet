@@ -3,14 +3,14 @@ package users
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-
 	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses/addressesmodels"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
+	"github.com/gin-gonic/gin"
 )
 
+// CreateAddress creates a new paymail address for the user.
 func (s *APIUsers) CreateAddress(c *gin.Context) {
 	userContext := reqctx.GetUserContext(c)
 	userID, err := userContext.ShouldGetUserID()
