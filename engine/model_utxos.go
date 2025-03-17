@@ -225,6 +225,8 @@ reserveUtxoLoop:
 			// break the loop if we are not paginating
 			break reserveUtxoLoop
 		}
+
+		queryParams.Page++
 	}
 
 	if reservedSatoshis < satoshis {
