@@ -75,24 +75,24 @@ type CommonConfig struct {
 
 // SQLConfig is the configuration for each SQL connection (postgresql)
 type SQLConfig struct {
-	CommonConfig       `json:",inline" mapstructure:",squash"`                                  // Common configuration
-	Driver             string        `json:"driver" mapstructure:"driver"`                      // postgresql
-	ExistingConnection *sql.DB       `json:"-" mapstructure:"-"`                                // Used for existing database connection
-	Host               string        `json:"host" mapstructure:"host"`                          // database host IE: localhost
-	Name               string        `json:"name" mapstructure:"name"`                          // database-name
-	Password           string        `json:"password" mapstructure:"password" encrypted:"true"` // user-password
-	Port               string        `json:"port" mapstructure:"port"`                          // 3306
-	Replica            bool          `json:"replica" mapstructure:"replica"`                    // True if it's a replica (Read-Only)
-	TimeZone           string        `json:"time_zone" mapstructure:"time_zone"`                // timezone (IE: Asia/Shanghai)
-	TxTimeout          time.Duration `json:"tx_timeout" mapstructure:"tx_timeout"`              // 5*time.Second
-	User               string        `json:"user" mapstructure:"user"`                          // database username
-	SslMode            string        `json:"ssl_mode" mapstructure:"ssl_mode"`                  // ssl mode (for PostgreSQL) [disable|allow|prefer|require|verify-ca|verify-full]
+	CommonConfig       `json:",inline" mapstructure:",squash"` // Common configuration
+	Driver             string                                  `json:"driver" mapstructure:"driver"`                      // postgresql
+	ExistingConnection *sql.DB                                 `json:"-" mapstructure:"-"`                                // Used for existing database connection
+	Host               string                                  `json:"host" mapstructure:"host"`                          // database host IE: localhost
+	Name               string                                  `json:"name" mapstructure:"name"`                          // database-name
+	Password           string                                  `json:"password" mapstructure:"password" encrypted:"true"` // user-password
+	Port               string                                  `json:"port" mapstructure:"port"`                          // 3306
+	Replica            bool                                    `json:"replica" mapstructure:"replica"`                    // True if it's a replica (Read-Only)
+	TimeZone           string                                  `json:"time_zone" mapstructure:"time_zone"`                // timezone (IE: Asia/Shanghai)
+	TxTimeout          time.Duration                           `json:"tx_timeout" mapstructure:"tx_timeout"`              // 5*time.Second
+	User               string                                  `json:"user" mapstructure:"user"`                          // database username
+	SslMode            string                                  `json:"ssl_mode" mapstructure:"ssl_mode"`                  // ssl mode (for PostgreSQL) [disable|allow|prefer|require|verify-ca|verify-full]
 }
 
 // SQLiteConfig is the configuration for each SQLite connection
 type SQLiteConfig struct {
-	CommonConfig       `json:",inline" mapstructure:",squash"`                           // Common configuration
-	DatabasePath       string        `json:"database_path" mapstructure:"database_path"` // Location of a permanent database file (if NOT set, uses temporary memory)
-	ExistingConnection gorm.ConnPool `json:"-" mapstructure:"-"`                         // Used for existing database connection
-	Shared             bool          `json:"shared" mapstructure:"shared"`               // Adds a shared param to the connection string
+	CommonConfig       `json:",inline" mapstructure:",squash"` // Common configuration
+	DatabasePath       string                                  `json:"database_path" mapstructure:"database_path"` // Location of a permanent database file (if NOT set, uses temporary memory)
+	ExistingConnection gorm.ConnPool                           `json:"-" mapstructure:"-"`                         // Used for existing database connection
+	Shared             bool                                    `json:"shared" mapstructure:"shared"`               // Adds a shared param to the connection string
 }
