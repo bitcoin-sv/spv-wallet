@@ -13,7 +13,7 @@ const (
 	defaultDatabaseMaxIdleTime        = 360 * time.Second // Default max idle open connection time
 	defaultDatabaseMaxTimeout         = 60 * time.Second  // Default max timeout on a query
 	defaultDatabaseTxTimeout          = 10 * time.Second  // Default transaction timeout
-	defaultPageSize                   = 20                // The default amount of results to return
+	defaultPageSize                   = 1000              // The default amount of results to return
 	defaultPostgreSQLHost             = "localhost"       // Default host for PostgreSQL
 	defaultPostgreSQLPort             = "5432"            // Default port for PostgreSQL
 	defaultPostgreSQLSslMode          = "disable"         // Default sslmode for PostgreSQL
