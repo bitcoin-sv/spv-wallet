@@ -14,6 +14,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures/txtestability"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts/contactsmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
 	"github.com/bitcoin-sv/spv-wallet/initializer"
@@ -51,6 +52,9 @@ type EngineFixture interface {
 	// Faucet creates a new test fixture for Faucet
 	Faucet(user fixtures.User) FaucetFixture
 
+	// User creates a new test fixture for Contacts
+	User(user fixtures.User) UserFixture
+
 	// Tx creates a new mocked transaction builder
 	Tx() txtestability.TransactionSpec
 }
@@ -59,6 +63,14 @@ type EngineFixture interface {
 type FaucetFixture interface {
 	TopUp(satoshis bsv.Satoshis) txtestability.TransactionSpec
 	StoreData(data string) (txtestability.TransactionSpec, string)
+}
+
+// UserFixture is a test fixture for the user management
+type UserFixture interface {
+	HasContactTo(userB fixtures.User) *contactsmodels.Contact
+	HasConfirmedContactTo(userB fixtures.User) *contactsmodels.Contact
+	HasRejectedContactTo(userB fixtures.User) *contactsmodels.Contact
+	HasAwaitingContactTo(userB fixtures.User) *contactsmodels.Contact
 }
 
 type EngineWithConfig struct {
@@ -154,6 +166,17 @@ func (f *engineFixture) Faucet(user fixtures.User) FaucetFixture {
 		arc:       f.ARC(),
 		bhs:       f.BHS(),
 		txFixture: f.txFixture,
+	}
+}
+
+func (f *engineFixture) User(user fixtures.User) UserFixture {
+	return &contactFixture{
+		engine:        f.engine,
+		user:          user,
+		t:             f.t,
+		assert:        assert.New(f.t),
+		require:       require.New(f.t),
+		paymailClient: f.paymailClient,
 	}
 }
 
