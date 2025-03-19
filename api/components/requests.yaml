@@ -135,6 +135,14 @@ components:
         - to
         - satoshis
 
+    CreatePaymailAddress:
+      type: object
+      properties:
+        paymail:
+          $ref: "#/components/schemas/AddPaymail"
+      required:
+        - paymail
+
   parameters:
     PageNumber:
       in: query

@@ -236,3 +236,10 @@ components:
               - $ref: "./errors.yaml#/components/schemas/BHSUnhealthy"
               - $ref: "./errors.yaml#/components/schemas/BHSBadURL"
               - $ref: "./errors.yaml#/components/schemas/BHSParsingResponse"
+
+    PaymailAddress:
+      description: Paymail address created successfully
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/Paymail"
