@@ -168,18 +168,6 @@ type ErrorsBHSUnreachable struct {
 	Message interface{} `json:"message"`
 }
 
-// ErrorsCannotBindRequest defines model for errors_CannotBindRequest.
-type ErrorsCannotBindRequest struct {
-	Code    interface{} `json:"code"`
-	Message interface{} `json:"message"`
-}
-
-// ErrorsCreatingUser defines model for errors_CreatingUser.
-type ErrorsCreatingUser struct {
-	Code    interface{} `json:"code"`
-	Message interface{} `json:"message"`
-}
-
 // ErrorsDataNotFound defines model for errors_DataNotFound.
 type ErrorsDataNotFound struct {
 	Code    interface{} `json:"code"`
@@ -192,20 +180,8 @@ type ErrorsGettingOutputs struct {
 	Message interface{} `json:"message"`
 }
 
-// ErrorsGettingUser defines model for errors_GettingUser.
-type ErrorsGettingUser struct {
-	Code    interface{} `json:"code"`
-	Message interface{} `json:"message"`
-}
-
 // ErrorsInternal defines model for errors_Internal.
 type ErrorsInternal struct {
-	Code    interface{} `json:"code"`
-	Message interface{} `json:"message"`
-}
-
-// ErrorsInvalidAvatarURL defines model for errors_InvalidAvatarURL.
-type ErrorsInvalidAvatarURL struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
@@ -218,24 +194,6 @@ type ErrorsInvalidBatchSize struct {
 
 // ErrorsInvalidDataID defines model for errors_InvalidDataID.
 type ErrorsInvalidDataID struct {
-	Code    interface{} `json:"code"`
-	Message interface{} `json:"message"`
-}
-
-// ErrorsInvalidDomain defines model for errors_InvalidDomain.
-type ErrorsInvalidDomain struct {
-	Code    interface{} `json:"code"`
-	Message interface{} `json:"message"`
-}
-
-// ErrorsInvalidPaymail defines model for errors_InvalidPaymail.
-type ErrorsInvalidPaymail struct {
-	Code    interface{} `json:"code"`
-	Message interface{} `json:"message"`
-}
-
-// ErrorsInvalidPubKey defines model for errors_InvalidPubKey.
-type ErrorsInvalidPubKey struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
@@ -258,10 +216,22 @@ type ErrorsNoOperations struct {
 	Message interface{} `json:"message"`
 }
 
-// ErrorsPaymailInconsistent defines model for errors_PaymailInconsistent.
-type ErrorsPaymailInconsistent struct {
-	Code    interface{} `json:"code"`
-	Message interface{} `json:"message"`
+// ErrorsProblemDetails defines model for errors_ProblemDetails.
+type ErrorsProblemDetails struct {
+	// Detail A human-readable explanation specific to this occurrence of the problem
+	Detail string `json:"detail"`
+
+	// Instance A URI reference that identifies the specific occurrence of the problem
+	Instance string `json:"instance"`
+
+	// Status The HTTP status code
+	Status int `json:"status"`
+
+	// Title A short, human-readable summary of the problem type
+	Title string `json:"title"`
+
+	// Type A URI reference that identifies the problem type
+	Type string `json:"type"`
 }
 
 // ErrorsSchema defines model for errors_Schema.
@@ -689,27 +659,11 @@ type RequestsSortBy = string
 // ResponsesAdminAddPaymailSuccess defines model for responses_AdminAddPaymailSuccess.
 type ResponsesAdminAddPaymailSuccess = ModelsPaymail
 
-// ResponsesAdminCreateUserInternalServerError defines model for responses_AdminCreateUserInternalServerError.
-type ResponsesAdminCreateUserInternalServerError = ErrorsCreatingUser
-
 // ResponsesAdminCreateUserSuccess defines model for responses_AdminCreateUserSuccess.
 type ResponsesAdminCreateUserSuccess = ModelsUser
 
 // ResponsesAdminGetUser defines model for responses_AdminGetUser.
 type ResponsesAdminGetUser = ModelsUser
-
-// ResponsesAdminGetUserInternalServerError defines model for responses_AdminGetUserInternalServerError.
-type ResponsesAdminGetUserInternalServerError = ErrorsGettingUser
-
-// ResponsesAdminInvalidAvatarURL defines model for responses_AdminInvalidAvatarURL.
-type ResponsesAdminInvalidAvatarURL struct {
-	union json.RawMessage
-}
-
-// ResponsesAdminUserBadRequest defines model for responses_AdminUserBadRequest.
-type ResponsesAdminUserBadRequest struct {
-	union json.RawMessage
-}
 
 // ResponsesCreateTransactionOutlineBadRequest defines model for responses_CreateTransactionOutlineBadRequest.
 type ResponsesCreateTransactionOutlineBadRequest struct {
@@ -760,6 +714,9 @@ type ResponsesNotAuthorized = ErrorsAnyAuthorization
 
 // ResponsesNotAuthorizedToAdminEndpoint defines model for responses_NotAuthorizedToAdminEndpoint.
 type ResponsesNotAuthorizedToAdminEndpoint = ErrorsAdminAuthorization
+
+// ResponsesProblemDetails defines model for responses_ProblemDetails.
+type ResponsesProblemDetails = ErrorsProblemDetails
 
 // ResponsesRecordTransactionBadRequest defines model for responses_RecordTransactionBadRequest.
 type ResponsesRecordTransactionBadRequest struct {
@@ -1255,182 +1212,6 @@ func (t RequestsTransactionOutlineOutputSpecification) MarshalJSON() ([]byte, er
 }
 
 func (t *RequestsTransactionOutlineOutputSpecification) UnmarshalJSON(b []byte) error {
-	err := t.union.UnmarshalJSON(b)
-	return err
-}
-
-// AsErrorsInvalidAvatarURL returns the union data inside the ResponsesAdminInvalidAvatarURL as a ErrorsInvalidAvatarURL
-func (t ResponsesAdminInvalidAvatarURL) AsErrorsInvalidAvatarURL() (ErrorsInvalidAvatarURL, error) {
-	var body ErrorsInvalidAvatarURL
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromErrorsInvalidAvatarURL overwrites any union data inside the ResponsesAdminInvalidAvatarURL as the provided ErrorsInvalidAvatarURL
-func (t *ResponsesAdminInvalidAvatarURL) FromErrorsInvalidAvatarURL(v ErrorsInvalidAvatarURL) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeErrorsInvalidAvatarURL performs a merge with any union data inside the ResponsesAdminInvalidAvatarURL, using the provided ErrorsInvalidAvatarURL
-func (t *ResponsesAdminInvalidAvatarURL) MergeErrorsInvalidAvatarURL(v ErrorsInvalidAvatarURL) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-func (t ResponsesAdminInvalidAvatarURL) MarshalJSON() ([]byte, error) {
-	b, err := t.union.MarshalJSON()
-	return b, err
-}
-
-func (t *ResponsesAdminInvalidAvatarURL) UnmarshalJSON(b []byte) error {
-	err := t.union.UnmarshalJSON(b)
-	return err
-}
-
-// AsErrorsCannotBindRequest returns the union data inside the ResponsesAdminUserBadRequest as a ErrorsCannotBindRequest
-func (t ResponsesAdminUserBadRequest) AsErrorsCannotBindRequest() (ErrorsCannotBindRequest, error) {
-	var body ErrorsCannotBindRequest
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromErrorsCannotBindRequest overwrites any union data inside the ResponsesAdminUserBadRequest as the provided ErrorsCannotBindRequest
-func (t *ResponsesAdminUserBadRequest) FromErrorsCannotBindRequest(v ErrorsCannotBindRequest) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeErrorsCannotBindRequest performs a merge with any union data inside the ResponsesAdminUserBadRequest, using the provided ErrorsCannotBindRequest
-func (t *ResponsesAdminUserBadRequest) MergeErrorsCannotBindRequest(v ErrorsCannotBindRequest) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-// AsErrorsInvalidPubKey returns the union data inside the ResponsesAdminUserBadRequest as a ErrorsInvalidPubKey
-func (t ResponsesAdminUserBadRequest) AsErrorsInvalidPubKey() (ErrorsInvalidPubKey, error) {
-	var body ErrorsInvalidPubKey
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromErrorsInvalidPubKey overwrites any union data inside the ResponsesAdminUserBadRequest as the provided ErrorsInvalidPubKey
-func (t *ResponsesAdminUserBadRequest) FromErrorsInvalidPubKey(v ErrorsInvalidPubKey) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeErrorsInvalidPubKey performs a merge with any union data inside the ResponsesAdminUserBadRequest, using the provided ErrorsInvalidPubKey
-func (t *ResponsesAdminUserBadRequest) MergeErrorsInvalidPubKey(v ErrorsInvalidPubKey) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-// AsErrorsInvalidPaymail returns the union data inside the ResponsesAdminUserBadRequest as a ErrorsInvalidPaymail
-func (t ResponsesAdminUserBadRequest) AsErrorsInvalidPaymail() (ErrorsInvalidPaymail, error) {
-	var body ErrorsInvalidPaymail
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromErrorsInvalidPaymail overwrites any union data inside the ResponsesAdminUserBadRequest as the provided ErrorsInvalidPaymail
-func (t *ResponsesAdminUserBadRequest) FromErrorsInvalidPaymail(v ErrorsInvalidPaymail) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeErrorsInvalidPaymail performs a merge with any union data inside the ResponsesAdminUserBadRequest, using the provided ErrorsInvalidPaymail
-func (t *ResponsesAdminUserBadRequest) MergeErrorsInvalidPaymail(v ErrorsInvalidPaymail) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-// AsErrorsPaymailInconsistent returns the union data inside the ResponsesAdminUserBadRequest as a ErrorsPaymailInconsistent
-func (t ResponsesAdminUserBadRequest) AsErrorsPaymailInconsistent() (ErrorsPaymailInconsistent, error) {
-	var body ErrorsPaymailInconsistent
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromErrorsPaymailInconsistent overwrites any union data inside the ResponsesAdminUserBadRequest as the provided ErrorsPaymailInconsistent
-func (t *ResponsesAdminUserBadRequest) FromErrorsPaymailInconsistent(v ErrorsPaymailInconsistent) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeErrorsPaymailInconsistent performs a merge with any union data inside the ResponsesAdminUserBadRequest, using the provided ErrorsPaymailInconsistent
-func (t *ResponsesAdminUserBadRequest) MergeErrorsPaymailInconsistent(v ErrorsPaymailInconsistent) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-// AsErrorsInvalidDomain returns the union data inside the ResponsesAdminUserBadRequest as a ErrorsInvalidDomain
-func (t ResponsesAdminUserBadRequest) AsErrorsInvalidDomain() (ErrorsInvalidDomain, error) {
-	var body ErrorsInvalidDomain
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromErrorsInvalidDomain overwrites any union data inside the ResponsesAdminUserBadRequest as the provided ErrorsInvalidDomain
-func (t *ResponsesAdminUserBadRequest) FromErrorsInvalidDomain(v ErrorsInvalidDomain) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeErrorsInvalidDomain performs a merge with any union data inside the ResponsesAdminUserBadRequest, using the provided ErrorsInvalidDomain
-func (t *ResponsesAdminUserBadRequest) MergeErrorsInvalidDomain(v ErrorsInvalidDomain) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-func (t ResponsesAdminUserBadRequest) MarshalJSON() ([]byte, error) {
-	b, err := t.union.MarshalJSON()
-	return b, err
-}
-
-func (t *ResponsesAdminUserBadRequest) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
@@ -3009,10 +2790,7 @@ type CreateUserResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *ResponsesAdminCreateUserSuccess
-	JSON400      *ResponsesAdminUserBadRequest
-	JSON401      *ResponsesNotAuthorizedToAdminEndpoint
-	JSON422      *ResponsesAdminInvalidAvatarURL
-	JSON500      *ResponsesAdminCreateUserInternalServerError
+	JSONDefault  *ResponsesProblemDetails
 }
 
 // Status returns HTTPResponse.Status
@@ -3045,7 +2823,7 @@ type UserByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ResponsesAdminGetUser
-	JSON500      *ResponsesAdminGetUserInternalServerError
+	JSONDefault  *ResponsesProblemDetails
 }
 
 // Status returns HTTPResponse.Status
@@ -3078,9 +2856,7 @@ type AddPaymailToUserResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *ResponsesAdminAddPaymailSuccess
-	JSON400      *ResponsesAdminUserBadRequest
-	JSON401      *ResponsesNotAuthorizedToAdminEndpoint
-	JSON422      *ResponsesAdminInvalidAvatarURL
+	JSONDefault  *ResponsesProblemDetails
 }
 
 // Status returns HTTPResponse.Status
@@ -3533,33 +3309,12 @@ func ParseCreateUserResponse(rsp *http.Response) (*CreateUserResponse, error) {
 		}
 		response.JSON201 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ResponsesAdminUserBadRequest
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ResponsesProblemDetails
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ResponsesNotAuthorizedToAdminEndpoint
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest ResponsesAdminInvalidAvatarURL
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ResponsesAdminCreateUserInternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
+		response.JSONDefault = &dest
 
 	}
 
@@ -3587,12 +3342,12 @@ func ParseUserByIdResponse(rsp *http.Response) (*UserByIdResponse, error) {
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ResponsesAdminGetUserInternalServerError
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ResponsesProblemDetails
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON500 = &dest
+		response.JSONDefault = &dest
 
 	}
 
@@ -3620,26 +3375,12 @@ func ParseAddPaymailToUserResponse(rsp *http.Response) (*AddPaymailToUserRespons
 		}
 		response.JSON201 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ResponsesAdminUserBadRequest
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ResponsesProblemDetails
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ResponsesNotAuthorizedToAdminEndpoint
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest ResponsesAdminInvalidAvatarURL
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
+		response.JSONDefault = &dest
 
 	}
 

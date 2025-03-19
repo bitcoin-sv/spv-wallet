@@ -173,6 +173,13 @@ components:
           schema:
             $ref: "./models.yaml#/components/schemas/RecordedOutline"
 
+    ProblemDetails:
+      description: RFC 7807 Problem Details. For 4xx codes, you can switch by 'type' field to get more specific error.
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/ProblemDetails"
+
     RecordTransactionBadRequest:
       description: Bad request is an error that occurs when the request is malformed.
       content:

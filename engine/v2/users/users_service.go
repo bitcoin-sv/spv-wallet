@@ -5,10 +5,10 @@ import (
 
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet/config"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
+	"github.com/joomcode/errorx"
 )
 
 // Service is a user domain service
@@ -29,10 +29,10 @@ func NewService(users UserRepo, cfg *config.AppConfig) *Service {
 func (s *Service) Create(ctx context.Context, newUser *usersmodels.NewUser) (*usersmodels.User, error) {
 	if newUser.Paymail != nil {
 		if err := s.config.Paymail.CheckDomain(newUser.Paymail.Domain); err != nil {
-			return nil, spverrors.Wrapf(err, "invalid domain during user creation")
+			return nil, errorx.Decorate(err, "invalid domain during user creation")
 		}
 		if err := newUser.Paymail.ValidateAvatar(); err != nil {
-			return nil, spverrors.Wrapf(err, "invalid avatar url during user creation")
+			return nil, errorx.Decorate(err, "invalid avatar url during user creation")
 		}
 		if newUser.Paymail.PublicName == "" {
 			newUser.Paymail.PublicName = newUser.Paymail.Alias
@@ -40,7 +40,7 @@ func (s *Service) Create(ctx context.Context, newUser *usersmodels.NewUser) (*us
 	}
 	createdUser, err := s.usersRepo.Create(ctx, newUser)
 	if err != nil {
-		return nil, spverrors.Wrapf(err, "failed to create user")
+		return nil, errorx.Decorate(err, "users service failed to create new user")
 	}
 	return createdUser, nil
 }
@@ -49,7 +49,7 @@ func (s *Service) Create(ctx context.Context, newUser *usersmodels.NewUser) (*us
 func (s *Service) Exists(ctx context.Context, userID string) (bool, error) {
 	exists, err := s.usersRepo.Exists(ctx, userID)
 	if err != nil {
-		return false, spverrors.Wrapf(err, "failed to check if user exists")
+		return false, errorx.Decorate(err, "users service failed to check if user exists")
 	}
 	return exists, nil
 }
@@ -58,7 +58,7 @@ func (s *Service) Exists(ctx context.Context, userID string) (bool, error) {
 func (s *Service) GetByID(ctx context.Context, userID string) (*usersmodels.User, error) {
 	user, err := s.usersRepo.Get(ctx, userID)
 	if err != nil {
-		return nil, spverrors.Wrapf(err, "failed to get user with paymails")
+		return nil, errorx.Decorate(err, "users service failed to get user by ID")
 	}
 	return user, nil
 }
@@ -67,7 +67,7 @@ func (s *Service) GetByID(ctx context.Context, userID string) (*usersmodels.User
 func (s *Service) GetIDByPubKey(ctx context.Context, pubKey string) (string, error) {
 	userID, err := s.usersRepo.GetIDByPubKey(ctx, pubKey)
 	if err != nil {
-		return "", spverrors.Wrapf(err, "Cannot get user")
+		return "", errorx.Decorate(err, "users service failed to get user ID by public key")
 	}
 
 	return userID, nil
@@ -77,12 +77,12 @@ func (s *Service) GetIDByPubKey(ctx context.Context, pubKey string) (string, err
 func (s *Service) GetPubKey(ctx context.Context, userID string) (*primitives.PublicKey, error) {
 	user, err := s.usersRepo.Get(ctx, userID)
 	if err != nil {
-		return nil, spverrors.Wrapf(err, "Cannot get user")
+		return nil, errorx.Decorate(err, "users service failed to get user by ID")
 	}
 
 	pubKey, err := user.PubKeyObj()
 	if err != nil {
-		return nil, spverrors.Wrapf(err, "Cannot get user's public key")
+		return nil, errorx.Decorate(err, "users service failed to get public key from user")
 	}
 	return pubKey, nil
 }
@@ -91,7 +91,7 @@ func (s *Service) GetPubKey(ctx context.Context, userID string) (*primitives.Pub
 func (s *Service) GetBalance(ctx context.Context, userID string) (bsv.Satoshis, error) {
 	balance, err := s.usersRepo.GetBalance(ctx, userID, bucket.BSV)
 	if err != nil {
-		return 0, spverrors.Wrapf(err, "Cannot get user's balance")
+		return 0, errorx.Decorate(err, "users service failed to get balance for user by ID")
 	}
 	return balance, nil
 }

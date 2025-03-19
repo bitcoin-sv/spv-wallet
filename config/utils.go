@@ -7,13 +7,16 @@ import (
 
 	configerrors "github.com/bitcoin-sv/spv-wallet/config/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/errdef"
 )
 
 // CheckDomain will check if the domain is allowed
 func (p *PaymailConfig) CheckDomain(domain string) error {
 	if p.DomainValidationEnabled {
 		if !slices.Contains(p.Domains, domain) {
-			return configerrors.ErrUnsupportedDomain
+			return configerrors.UnsupportedDomain.
+				New("domain %s is not supported", domain).
+				WithProperty(errdef.PropPublicHint, "Domain of provided paymail is not supported by this spv-wallet service")
 		}
 	}
 	return nil
