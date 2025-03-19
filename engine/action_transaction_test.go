@@ -351,7 +351,7 @@ func BenchmarkAction_Transaction_recordTransaction(b *testing.B) {
 	}
 }
 
-// BenchmarkTransaction_newTransaction will benchmark the method newTransaction()
+// BenchmarkAction_Transaction_newTransaction will benchmark the method newTransaction()
 func BenchmarkAction_Transaction_newTransaction(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

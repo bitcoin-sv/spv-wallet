@@ -48,7 +48,7 @@ func Test_whereObject(t *testing.T) {
 	})
 }
 
-// Test_whereObject test the SQL where selector
+// Test_whereSlice test the SQL where selector
 func Test_whereSlice(t *testing.T) {
 	t.Parallel()
 
