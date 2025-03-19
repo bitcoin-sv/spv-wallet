@@ -3,6 +3,7 @@ package testabilities
 import (
 	"context"
 	"errors"
+	"os"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
@@ -30,6 +31,9 @@ const fileDbConnectionString = "file:spv-wallet-test.db"
 
 const CallbackTestToken = "arc-test-token"
 
+// singleton container for the shared PostgreSQL container
+var sharedContainer *testmode.TestContainer
+
 type EngineFixture interface {
 	Engine() (walletEngine EngineWithConfig, cleanup func())
 	EngineWithConfiguration(opts ...ConfigOpts) (walletEngine EngineWithConfig, cleanup func())
@@ -53,6 +57,9 @@ type EngineFixture interface {
 
 	// Tx creates a new mocked transaction builder
 	Tx() txtestability.TransactionSpec
+
+	// GetPostgresContainer returns the shared PostgreSQL container instance
+	GetPostgresContainer() *testmode.TestContainer
 }
 
 // FaucetFixture is a test fixture for the faucet service
@@ -71,7 +78,6 @@ type engineFixture struct {
 	engine                       engine.ClientInterface
 	t                            testing.TB
 	logger                       zerolog.Logger
-	dbConnectionString           string
 	externalTransport            *httpmock.MockTransport
 	paymailClient                *paymailmock.PaymailClientMock
 	txFixture                    txtestability.TransactionsFixtures
@@ -108,8 +114,31 @@ func (f *engineFixture) Engine() (walletEngine EngineWithConfig, cleanup func())
 	return f.EngineWithConfiguration()
 }
 
+func (f *engineFixture) GetPostgresContainer() *testmode.TestContainer {
+	if sharedContainer == nil {
+		sharedContainer = testmode.StartPostgresContainer(f.t)
+
+		f.t.Cleanup(func() {
+			if sharedContainer != nil {
+				ctx := context.Background()
+				if err := sharedContainer.Container.Terminate(ctx); err != nil {
+					f.t.Logf("Failed to terminate container: %s", err)
+				}
+				sharedContainer = nil
+			}
+		})
+	}
+
+	return sharedContainer
+}
+
 func (f *engineFixture) EngineWithConfiguration(opts ...ConfigOpts) (walletEngine EngineWithConfig, cleanup func()) {
 	f.config = f.ConfigForTests(opts...)
+
+	for _, opt := range opts {
+		opt(f.config)
+	}
+
 	f.prepareDBConfigForTests()
 
 	options, err := initializer.ToEngineOptions(f.config, f.logger)
@@ -161,30 +190,89 @@ func (f *engineFixture) Tx() txtestability.TransactionSpec {
 	return f.txFixture.Tx()
 }
 
-// prepareDBConfigForTests creates a new connection that will be used as connection for engine
 func (f *engineFixture) prepareDBConfigForTests() {
-	require.Equal(f.t, datastore.SQLite, f.config.Db.Datastore.Engine, "Other datastore engines are not supported in tests (yet)")
-
-	// It is a workaround for development purpose to check the code with postgres instance.
-	if ok, dbName := testmode.CheckPostgresMode(); ok {
-		f.config.Db.Datastore.Engine = datastore.PostgreSQL
-		f.config.Db.SQL.User = "postgres"
-		f.config.Db.SQL.Password = "postgres"
-		f.config.Db.SQL.Name = dbName
-		f.config.Db.SQL.Host = "localhost"
+	if f.tryPostgresContainer() {
 		return
 	}
 
-	// It is a workaround for development purpose to check what is the db state after running a tests.
-	if testmode.CheckFileSQLiteMode() {
-		f.dbConnectionString = fileDbConnectionString
-	} else {
-		f.dbConnectionString = inMemoryDbConnectionString
+	if f.tryDevelopmentPostgres() {
+		return
 	}
+
+	if f.tryDevelopmentSQLite() {
+		return
+	}
+
+	f.useSQLite()
+}
+
+func (f *engineFixture) tryPostgresContainer() bool {
+	if !testmode.CheckPostgresContainerMode() {
+		return false
+	}
+
+	container := f.GetPostgresContainer()
+
+	f.config.Db.Datastore.Engine = datastore.PostgreSQL
+	f.config.Db.SQL.User = testmode.DefaultPostgresUser
+	f.config.Db.SQL.Password = testmode.DefaultPostgresPass
+	f.config.Db.SQL.Name = testmode.DefaultPostgresName
+
+	f.config.Db.SQL.Host = getConfigValueOrDefault(os.Getenv(testmode.EnvDBHost), container.Host)
+	f.config.Db.SQL.Port = getConfigValueOrDefault(os.Getenv(testmode.EnvDBPort), container.Port)
+
+	f.t.Logf("Using PostgreSQL container at %s:%s", f.config.Db.SQL.Host, f.config.Db.SQL.Port)
+
+	return true
+}
+
+func (f *engineFixture) tryDevelopmentPostgres() bool {
+	ok, dbName := testmode.CheckPostgresMode()
+	if !ok {
+		return false
+	}
+
+	f.config.Db.Datastore.Engine = datastore.PostgreSQL
+	f.config.Db.SQL.User = testmode.DefaultPostgresUser
+	f.config.Db.SQL.Password = testmode.DefaultPostgresPass
+	f.config.Db.SQL.Name = dbName
+
+	host := os.Getenv(testmode.EnvDBHost)
+	port := os.Getenv(testmode.EnvDBPort)
+
+	if host != "" {
+		f.config.Db.SQL.Host = host
+	} else {
+		f.config.Db.SQL.Host = "localhost"
+	}
+
+	if port != "" {
+		f.config.Db.SQL.Port = port
+	}
+
+	return true
+}
+
+func (f *engineFixture) tryDevelopmentSQLite() bool {
+	if !testmode.CheckFileSQLiteMode() {
+		return false
+	}
+
+	f.config.Db.Datastore.Engine = datastore.SQLite
 	f.config.Db.SQLite.Shared = false
 	f.config.Db.SQLite.MaxIdleConnections = 1
 	f.config.Db.SQLite.MaxOpenConnections = 1
-	f.config.Db.SQLite.DatabasePath = f.dbConnectionString
+	f.config.Db.SQLite.DatabasePath = fileDbConnectionString
+
+	return true
+}
+
+func (f *engineFixture) useSQLite() {
+	f.config.Db.Datastore.Engine = datastore.SQLite
+	f.config.Db.SQLite.Shared = false
+	f.config.Db.SQLite.MaxIdleConnections = 1
+	f.config.Db.SQLite.MaxOpenConnections = 1
+	f.config.Db.SQLite.DatabasePath = inMemoryDbConnectionString
 }
 
 func (f *engineFixture) initialiseFixtures() {
@@ -280,4 +368,11 @@ func getConfigForTests() *config.AppConfig {
 	cfg.Db.SQLite.MaxOpenConnections = 1
 
 	return cfg
+}
+
+func getConfigValueOrDefault(value, defaultValue string) string {
+	if value != "" {
+		return value
+	}
+	return defaultValue
 }
