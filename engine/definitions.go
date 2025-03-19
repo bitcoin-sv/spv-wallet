@@ -2,8 +2,6 @@ package engine
 
 import (
 	"time"
-
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 )
 
 // Defaults for engine functionality
@@ -114,8 +112,8 @@ const (
 )
 
 // AllDBModels returns all the database models, e.g. for migrations.
-func AllDBModels(v2 bool) []any {
-	legacyModels := []any{
+func AllDBModels() []any {
+	return []any{
 		&Xpub{},
 		&AccessKey{},
 		&DraftTransaction{},
@@ -126,14 +124,4 @@ func AllDBModels(v2 bool) []any {
 		&Webhook{},
 		&PaymailAddress{},
 	}
-
-	if !v2 {
-		return legacyModels
-	}
-
-	// New models from database package
-	// NOTE: Our intention is to move all models to the database package in the future
-	dbModels := database.Models()
-
-	return append(legacyModels, dbModels...)
 }

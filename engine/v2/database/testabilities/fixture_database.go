@@ -45,7 +45,7 @@ type databaseFixture struct {
 func Given(t testing.TB, opts ...testengine.ConfigOpts) (given DatabaseFixture, cleanup func()) {
 	engineWithConfig, cleanup := testengine.Given(t).EngineWithConfiguration(opts...)
 
-	db := engineWithConfig.Engine.Datastore().DB()
+	db := engineWithConfig.Engine.DB()
 	fixture := &databaseFixture{
 		t:  t,
 		db: db,
