@@ -10,6 +10,8 @@ import (
 	"github.com/samber/lo"
 )
 
+var UserDeleted = StateError.NewSubtype("userDeleted")
+
 type AdditionalAlias struct {
 	Alias string `mapstructure:"alias" yaml:"alias"`
 }
@@ -32,6 +34,7 @@ type User struct {
 	ID                string            `mapstructure:"id" yaml:"id"`
 	AdditionalAliases []AdditionalAlias `mapstructure:"additional_aliases" yaml:"additional_aliases"`
 	DataOutpoints     []string          `mapstructure:"data_outpoints" yaml:"data_outpoints"`
+	Tags              []string          `mapstructure:"tags" yaml:"tags"`
 
 	// Note holds your notes about the user
 	// This field prevent removing your custom notes when updating a state in file.
@@ -184,4 +187,18 @@ func (u *User) init() error {
 
 func (u *User) AddDataOutpoint(txID string, vout int) {
 	u.DataOutpoints = append(u.DataOutpoints, fmt.Sprintf("%s-%d", txID, vout))
+}
+
+func (u *User) MarkAsDeleted() error {
+	if lo.Contains(u.DataOutpoints, "deleted") {
+		return UserDeleted.New("user is already marked as deleted")
+	}
+	u.Tags = append(u.Tags, "deleted")
+	return nil
+}
+
+func (u *User) RemoveTag(s string) {
+	u.Tags = lo.Filter(u.Tags, func(tag string, _ int) bool {
+		return tag != s
+	})
 }

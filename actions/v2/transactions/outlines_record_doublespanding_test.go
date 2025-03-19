@@ -60,7 +60,7 @@ func TestDoubleSpending(t *testing.T) {
 
 		// then:
 		then.Response(res).
-			HasStatus(201).
+			IsCreated().
 			WithJSONMatching(`{
 				"txID": "{{ .txID }}"
 			}`, map[string]any{

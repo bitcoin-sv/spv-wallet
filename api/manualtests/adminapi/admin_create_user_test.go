@@ -34,3 +34,23 @@ func TestCreateUser(t *testing.T) {
 		}).
 		RequireSuccess()
 }
+
+func TestCreateUserAgain(t *testing.T) {
+	t.Skip("Don't run it yet")
+
+	manualtests.APICallForAdmin(t).
+		CallWithUpdateState(func(state manualtests.StateForCall, c *client.ClientWithResponses) (manualtests.Result, error) {
+			user := state.CurrentUser()
+
+			user.RemoveTag("deleted")
+
+			return c.CreateUserWithResponse(context.Background(), client.CreateUserJSONRequestBody{
+				Paymail: &client.RequestsAddPaymail{
+					Address:    user.PaymailAddress(),
+					AvatarURL:  lo.ToPtr(user.AvatarURL()),
+					PublicName: lo.ToPtr(user.PublicName()),
+				},
+				PublicKey: user.PublicKey,
+			})
+		})
+}

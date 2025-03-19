@@ -2204,6 +2204,9 @@ type ClientInterface interface {
 
 	CreateTransactionOutline(ctx context.Context, params *CreateTransactionOutlineParams, body CreateTransactionOutlineJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// DeleteCurrentUser request
+	DeleteCurrentUser(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// CurrentUser request
 	CurrentUser(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
@@ -2366,6 +2369,18 @@ func (c *Client) CreateTransactionOutlineWithBody(ctx context.Context, params *C
 
 func (c *Client) CreateTransactionOutline(ctx context.Context, params *CreateTransactionOutlineParams, body CreateTransactionOutlineJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateTransactionOutlineRequest(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteCurrentUser(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteCurrentUserRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -2861,6 +2876,33 @@ func NewCreateTransactionOutlineRequestWithBody(server string, params *CreateTra
 	return req, nil
 }
 
+// NewDeleteCurrentUserRequest generates requests for DeleteCurrentUser
+func NewDeleteCurrentUserRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/users/current")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewCurrentUserRequest generates requests for CurrentUser
 func NewCurrentUserRequest(server string) (*http.Request, error) {
 	var err error
@@ -2968,6 +3010,9 @@ type ClientWithResponsesInterface interface {
 	CreateTransactionOutlineWithBodyWithResponse(ctx context.Context, params *CreateTransactionOutlineParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTransactionOutlineResponse, error)
 
 	CreateTransactionOutlineWithResponse(ctx context.Context, params *CreateTransactionOutlineParams, body CreateTransactionOutlineJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTransactionOutlineResponse, error)
+
+	// DeleteCurrentUserWithResponse request
+	DeleteCurrentUserWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*DeleteCurrentUserResponse, error)
 
 	// CurrentUserWithResponse request
 	CurrentUserWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CurrentUserResponse, error)
@@ -3321,6 +3366,39 @@ func (r CreateTransactionOutlineResponse) Bytes() []byte {
 	return r.Body
 }
 
+type DeleteCurrentUserResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON401      *ResponsesUserNotAuthorized
+	JSON500      *ResponsesInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteCurrentUserResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteCurrentUserResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r DeleteCurrentUserResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r DeleteCurrentUserResponse) Bytes() []byte {
+	return r.Body
+}
+
 type CurrentUserResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -3475,6 +3553,15 @@ func (c *ClientWithResponses) CreateTransactionOutlineWithResponse(ctx context.C
 		return nil, err
 	}
 	return ParseCreateTransactionOutlineResponse(rsp)
+}
+
+// DeleteCurrentUserWithResponse request returning *DeleteCurrentUserResponse
+func (c *ClientWithResponses) DeleteCurrentUserWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*DeleteCurrentUserResponse, error) {
+	rsp, err := c.DeleteCurrentUser(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteCurrentUserResponse(rsp)
 }
 
 // CurrentUserWithResponse request returning *CurrentUserResponse
@@ -3929,6 +4016,39 @@ func ParseCreateTransactionOutlineResponse(rsp *http.Response) (*CreateTransacti
 			return nil, err
 		}
 		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteCurrentUserResponse parses an HTTP response from a DeleteCurrentUserWithResponse call
+func ParseDeleteCurrentUserResponse(rsp *http.Response) (*DeleteCurrentUserResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteCurrentUserResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesUserNotAuthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest ResponsesInternalServerError

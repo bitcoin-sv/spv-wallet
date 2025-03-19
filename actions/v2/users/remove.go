@@ -3,14 +3,13 @@ package users
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
-// CurrentUser returns current user information
-func (s *APIUsers) CurrentUser(c *gin.Context) {
+// DeleteCurrentUser attempts to delete current user
+func (s *APIUsers) DeleteCurrentUser(c *gin.Context) {
 	userContext := reqctx.GetUserContext(c)
 	userID, err := userContext.ShouldGetUserID()
 	if err != nil {
@@ -18,13 +17,11 @@ func (s *APIUsers) CurrentUser(c *gin.Context) {
 		return
 	}
 
-	satoshis, err := s.usersService.GetBalance(c.Request.Context(), userID)
+	err = s.usersService.Remove(c.Request.Context(), userID)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
 	}
 
-	c.JSON(http.StatusOK, &api.ModelsUserInfo{
-		CurrentBalance: uint64(satoshis),
-	})
+	c.Status(http.StatusOK)
 }

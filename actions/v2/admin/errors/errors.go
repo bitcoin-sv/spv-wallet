@@ -22,3 +22,9 @@ var ErrPaymailInconsistent = models.SPVError{Message: "inconsistent paymail addr
 
 // ErrInvalidDomain is when the domain is wrong
 var ErrInvalidDomain = models.SPVError{Message: "invalid domain", StatusCode: 400, Code: "error-invalid-domain"}
+
+// ErrUserNotFound is when requested user does not exist in database
+var ErrUserNotFound = models.SPVError{Message: "user not found", StatusCode: 404, Code: "error-user-not-found"}
+
+// ErrGetUserFailed is when request for a user failed
+var ErrGetUserFailed = models.SPVError{Message: "error fetching user", StatusCode: 500, Code: "error-user-fetch-failed"}
