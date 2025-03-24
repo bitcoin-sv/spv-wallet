@@ -34,6 +34,35 @@ func (u *Users) Exists(ctx context.Context, userID string) (bool, error) {
 	return count > 0, nil
 }
 
+// Delete deletes user with userID and deletes their associated paymails, addresses, operations and tracked outputs
+func (u *Users) Delete(ctx context.Context, userID string) error {
+	txErr := u.db.WithContext(ctx).Unscoped().Transaction(func(tx *gorm.DB) error {
+		if err := tx.Delete(&database.Paymail{}, "user_id = ?", userID).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Delete(&database.Address{}, "user_id = ?", userID).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Delete(&database.Operation{}, "user_id = ?", userID).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Delete(&database.TrackedOutput{}, "user_id = ?", userID).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Delete(&database.User{}, "id = ?", userID).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	return spverrors.Wrapf(txErr, "failed to delete user")
+}
+
 // GetIDByPubKey returns a user by its public key. If the user does not exist, it returns error.
 func (u *Users) GetIDByPubKey(ctx context.Context, pubKey string) (string, error) {
 	var user struct {
@@ -97,7 +126,6 @@ func (u *Users) GetBalance(ctx context.Context, userID string, bucket bucket.Nam
 		Select("COALESCE(SUM(satoshis), 0)").
 		Row().
 		Scan(&balance)
-
 	if err != nil {
 		return 0, spverrors.Wrapf(err, "failed to get balance")
 	}

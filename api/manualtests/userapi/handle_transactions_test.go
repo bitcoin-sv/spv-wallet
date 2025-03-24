@@ -186,7 +186,6 @@ func TestTransactionToTopUpRegressionTests(t *testing.T) {
 		logger.Info().Msgf("iteration %d - step 4: State of Sender", i)
 		TestCurrentUser(t)
 	}
-
 }
 
 func UnlockOutline(outline *client.ResponsesCreateTransactionOutlineSuccess, state *manualtests.State) (string, error) {
@@ -275,7 +274,6 @@ func RequestExternalPaymailPaymentTransactionOutline() manualtests.GenericCallWi
 
 func RequestPaymailPaymentTransactionOutlineTo(paymailAddresses ...string) manualtests.GenericCallWithState[*client.CreateTransactionOutlineResponse] {
 	return func(state manualtests.StateForCall, c *client.ClientWithResponses) (*client.CreateTransactionOutlineResponse, error) {
-
 		pmOutputs := lo.Map(paymailAddresses, func(recipient string, _ int) client.RequestsPaymailOutputSpecification {
 			paymailOutput := client.RequestsPaymailOutputSpecification{
 				To:       recipient,
@@ -326,7 +324,6 @@ func RequestTopUpToRegressionTests(multiplier int) manualtests.GenericCallWithSt
 
 func RequestPaymailPaymentTransactionSplitIntoMultipleOutputsOutlineTo(recipient string, amount uint64, numberOfSplits uint64) manualtests.GenericCallWithState[*client.CreateTransactionOutlineResponse] {
 	return func(state manualtests.StateForCall, c *client.ClientWithResponses) (*client.CreateTransactionOutlineResponse, error) {
-
 		paymailOutput := client.RequestsPaymailOutputSpecification{
 			To:       recipient,
 			Satoshis: amount,

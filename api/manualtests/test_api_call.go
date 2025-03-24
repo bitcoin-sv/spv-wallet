@@ -8,11 +8,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type GenericCall[R Result] = func(c *client.ClientWithResponses) (R, error)
-type Call = GenericCall[Result]
-type CallWithT = func(t testing.TB, c *client.ClientWithResponses) (Result, error)
-type GenericCallWithState[R Result] = func(state StateForCall, c *client.ClientWithResponses) (R, error)
-type CallWithState = GenericCallWithState[Result]
+type (
+	GenericCall[R Result]          = func(c *client.ClientWithResponses) (R, error)
+	Call                           = GenericCall[Result]
+	CallWithT                      = func(t testing.TB, c *client.ClientWithResponses) (Result, error)
+	GenericCallWithState[R Result] = func(state StateForCall, c *client.ClientWithResponses) (R, error)
+	CallWithState                  = GenericCallWithState[Result]
+)
 
 // ToCall because go generics are stupid, we need to have this wrapping.
 func ToCall[R Result](f GenericCall[R]) Call {

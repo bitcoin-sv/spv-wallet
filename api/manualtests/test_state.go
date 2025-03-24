@@ -329,3 +329,16 @@ func (s *State) SaveUserDataOutpoint(txID string, vout int) error {
 	}
 	return nil
 }
+
+func (s *State) CleanupOldUsersByTag(tag string) {
+	s.OldUsers = lo.Filter(s.OldUsers, func(user *User, _ int) bool {
+		return !lo.Contains(user.Tags, tag)
+	})
+}
+
+func (s *State) GetLastOldUserFromState() (User, error) {
+	if len(s.OldUsers) == 0 {
+		return User{}, NotFound.New("no old users")
+	}
+	return *s.OldUsers[0], nil
+}
