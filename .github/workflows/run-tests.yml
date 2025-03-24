@@ -48,7 +48,7 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7
         with:
           version: ${{ env.LINT_VERSION }}
           args: --config=./.golangci-lint.yml
@@ -61,7 +61,7 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - name: golangci-style-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7
         with:
           version: ${{ env.LINT_VERSION }}
           args: --config=./.golangci-style.yml
@@ -117,7 +117,7 @@ jobs:
           go-version-file: 'go.mod'
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7
         with:
           version: ${{ env.LINT_VERSION }}
           working-directory: './models'
@@ -132,7 +132,7 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - name: golangci-style-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7
         with:
           version: ${{ env.LINT_VERSION }}
           working-directory: './models'
