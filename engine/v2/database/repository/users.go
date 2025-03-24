@@ -3,8 +3,8 @@ package repository
 import (
 	"context"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
+	dberrors "github.com/bitcoin-sv/spv-wallet/engine/v2/database/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
@@ -28,7 +28,7 @@ func (u *Users) Exists(ctx context.Context, userID string) (bool, error) {
 	var count int64
 	err := u.db.WithContext(ctx).Model(&database.User{}).Where("id = ?", userID).Count(&count).Error
 	if err != nil {
-		return false, spverrors.Wrapf(err, "failed to check if user exists")
+		return false, dberrors.QueryFailed.Wrap(err, "failed to check if user exists by ID")
 	}
 
 	return count > 0, nil
@@ -44,7 +44,7 @@ func (u *Users) GetIDByPubKey(ctx context.Context, pubKey string) (string, error
 		Where("pub_key = ?", pubKey).
 		First(&user).Error
 	if err != nil {
-		return "", spverrors.Wrapf(err, "failed to get user by public key")
+		return "", dberrors.QueryFailed.Wrap(err, "failed to get user by public key")
 	}
 
 	return user.ID, nil
@@ -58,7 +58,7 @@ func (u *Users) Get(ctx context.Context, userID string) (*usersmodels.User, erro
 		Where("id = ?", userID).
 		First(&user).Error
 	if err != nil {
-		return nil, spverrors.Wrapf(err, "failed to get user by public key")
+		return nil, dberrors.QueryOrNotFoundError(err, "failed to get user by ID")
 	}
 
 	return mapToDomainUser(&user), nil
@@ -81,7 +81,7 @@ func (u *Users) Create(ctx context.Context, newUser *usersmodels.NewUser) (*user
 	}
 
 	if err := query.Create(row).Error; err != nil {
-		return nil, spverrors.Wrapf(err, "failed to save user")
+		return nil, dberrors.QueryFailed.Wrap(err, "failed to create new user")
 	}
 
 	return mapToDomainUser(row), nil
@@ -99,7 +99,7 @@ func (u *Users) GetBalance(ctx context.Context, userID string, bucket bucket.Nam
 		Scan(&balance)
 
 	if err != nil {
-		return 0, spverrors.Wrapf(err, "failed to get balance")
+		return 0, dberrors.QueryFailed.Wrap(err, "failed to get balance for user by ID")
 	}
 
 	return balance, nil

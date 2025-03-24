@@ -19,6 +19,7 @@ var funcsMap = template.FuncMap{
 	"anything":           anything,
 	"matchTxByFormat":    matchTxByFormat,
 	"matchDestination":   matchDestination,
+	"containsAll":        containsAll,
 }
 
 func anything() string {
@@ -74,6 +75,20 @@ func matchAddress() string {
 
 func matchNumber() string {
 	return regexPlaceholder(`^\\d+$`)
+}
+
+func containsAll(parts []string) string {
+	if len(parts) == 0 {
+		return "*"
+	}
+	partsRegex := strings.Builder{}
+	partsRegex.WriteString("^")
+	for _, part := range parts {
+		partsRegex.WriteString(fmt.Sprintf(`(.*%s)`, part))
+	}
+	partsRegex.WriteString(".*$")
+	s := partsRegex.String()
+	return regexPlaceholder(s)
 }
 
 // regexPlaceholder adds slashes at the beginning and end of a string

@@ -34,14 +34,8 @@ paths:
             responses:
                 "201":
                     $ref: '#/components/responses/responses_AdminCreateUserSuccess'
-                "400":
-                    $ref: '#/components/responses/responses_AdminUserBadRequest'
-                "401":
-                    $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
-                "422":
-                    $ref: '#/components/responses/responses_AdminInvalidAvatarURL'
-                "500":
-                    $ref: '#/components/responses/responses_AdminCreateUserInternalServerError'
+                default:
+                    $ref: '#/components/responses/responses_ProblemDetails'
             security:
                 - XPubAuth:
                     - admin
@@ -62,8 +56,8 @@ paths:
             responses:
                 "200":
                     $ref: '#/components/responses/responses_AdminGetUser'
-                "500":
-                    $ref: '#/components/responses/responses_AdminGetUserInternalServerError'
+                default:
+                    $ref: '#/components/responses/responses_ProblemDetails'
             security:
                 - XPubAuth:
                     - admin
@@ -90,12 +84,8 @@ paths:
             responses:
                 "201":
                     $ref: '#/components/responses/responses_AdminAddPaymailSuccess'
-                "400":
-                    $ref: '#/components/responses/responses_AdminUserBadRequest'
-                "401":
-                    $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
-                "422":
-                    $ref: '#/components/responses/responses_AdminInvalidAvatarURL'
+                default:
+                    $ref: '#/components/responses/responses_ProblemDetails'
             security:
                 - XPubAuth:
                     - admin
@@ -327,12 +317,6 @@ components:
                     schema:
                         $ref: '#/components/schemas/models_Paymail'
             description: Paymail added to user
-        responses_AdminCreateUserInternalServerError:
-            content:
-                application/json:
-                    schema:
-                        $ref: '#/components/schemas/errors_CreatingUser'
-            description: Internal error while creating user
         responses_AdminCreateUserSuccess:
             content:
                 application/json:
@@ -345,30 +329,6 @@ components:
                     schema:
                         $ref: '#/components/schemas/models_User'
             description: User found
-        responses_AdminGetUserInternalServerError:
-            content:
-                application/json:
-                    schema:
-                        $ref: '#/components/schemas/errors_GettingUser'
-            description: Internal error while getting user
-        responses_AdminInvalidAvatarURL:
-            content:
-                application/json:
-                    schema:
-                        oneOf:
-                            - $ref: '#/components/schemas/errors_InvalidAvatarURL'
-            description: Unprocessable entity is an error that occurs when the request cannot be fulfilled.
-        responses_AdminUserBadRequest:
-            content:
-                application/json:
-                    schema:
-                        oneOf:
-                            - $ref: '#/components/schemas/errors_CannotBindRequest'
-                            - $ref: '#/components/schemas/errors_InvalidPubKey'
-                            - $ref: '#/components/schemas/errors_InvalidPaymail'
-                            - $ref: '#/components/schemas/errors_PaymailInconsistent'
-                            - $ref: '#/components/schemas/errors_InvalidDomain'
-            description: Bad request is an error that occurs when the request is malformed.
         responses_CreateTransactionOutlineBadRequest:
             content:
                 application/json:
@@ -468,6 +428,12 @@ components:
                     schema:
                         $ref: '#/components/schemas/errors_AdminAuthorization'
             description: Security requirements failed
+        responses_ProblemDetails:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/errors_ProblemDetails'
+            description: RFC 7807 Problem Details. For 4xx codes, you can switch by 'type' field to get more specific error.
         responses_RecordTransactionBadRequest:
             content:
                 application/json:
@@ -632,24 +598,6 @@ components:
                     message:
                         example: Block Headers Service cannot be requested
                   type: object
-        errors_CannotBindRequest:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-bind-body-invalid
-                    message:
-                        example: cannot bind request body
-                  type: object
-        errors_CreatingUser:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-user-creating
-                    message:
-                        example: error creating user
-                  type: object
         errors_DataNotFound:
             allOf:
                 - $ref: '#/components/schemas/errors_Schema'
@@ -668,15 +616,6 @@ components:
                     message:
                         example: failed to get outputs
                   type: object
-        errors_GettingUser:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-unknown
-                    message:
-                        example: Internal server error
-                  type: object
         errors_Internal:
             allOf:
                 - $ref: '#/components/schemas/errors_Schema'
@@ -685,15 +624,6 @@ components:
                         example: error-internal-server-error
                     message:
                         example: internal server error
-                  type: object
-        errors_InvalidAvatarURL:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-user-invalid-avatar-url
-                    message:
-                        example: invalid avatar url
                   type: object
         errors_InvalidBatchSize:
             allOf:
@@ -712,33 +642,6 @@ components:
                         example: error-invalid-data-id
                     message:
                         example: invalid data id
-                  type: object
-        errors_InvalidDomain:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-invalid-domain
-                    message:
-                        example: invalid domain
-                  type: object
-        errors_InvalidPaymail:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-user-invalid-paymail
-                    message:
-                        example: invalid paymail
-                  type: object
-        errors_InvalidPubKey:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-user-invalid-pubkey
-                    message:
-                        example: invalid public key
                   type: object
         errors_MerkleRootNotFound:
             allOf:
@@ -767,15 +670,30 @@ components:
                     message:
                         example: no operations to save
                   type: object
-        errors_PaymailInconsistent:
-            allOf:
-                - $ref: '#/components/schemas/errors_Schema'
-                - properties:
-                    code:
-                        example: error-user-inconsistent-paymail
-                    message:
-                        example: inconsistent paymail address and alias/domain
-                  type: object
+        errors_ProblemDetails:
+            properties:
+                detail:
+                    description: A human-readable explanation specific to this occurrence of the problem
+                    type: string
+                instance:
+                    description: A URI reference that identifies the specific occurrence of the problem
+                    type: string
+                status:
+                    description: The HTTP status code
+                    type: integer
+                title:
+                    description: A short, human-readable summary of the problem type
+                    type: string
+                type:
+                    description: A URI reference that identifies the problem type
+                    type: string
+            required:
+                - type
+                - title
+                - status
+                - detail
+                - instance
+            type: object
         errors_Schema:
             additionalProperties: false
             properties:

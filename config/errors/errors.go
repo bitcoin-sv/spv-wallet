@@ -1,6 +1,11 @@
+//nolint:revive // Error types should be self-explanatory
 package errors
 
-import "github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+import (
+	"github.com/bitcoin-sv/spv-wallet/errdef"
+	"github.com/joomcode/errorx"
+)
 
-// ErrUnsupportedDomain is returned when the domain is not supported
-var ErrUnsupportedDomain = spverrors.Newf("unsupported domain")
+var Namespace = errorx.NewNamespace("config", errdef.TraitConfig)
+
+var UnsupportedDomain = Namespace.NewType("unsupported_domain", errdef.TraitIllegalArgument)

@@ -36,5 +36,5 @@ func (m *mockPaymailAddressService) GetDefaultPaymailAddress(_ context.Context, 
 			return user.DefaultPaymail().Address(), nil
 		}
 	}
-	return "", paymailerrors.ErrNoDefaultPaymailAddress
+	return "", paymailerrors.NoDefaultPaymailAddress.NewWithNoMessage()
 }

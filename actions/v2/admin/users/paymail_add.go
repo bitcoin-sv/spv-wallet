@@ -3,12 +3,11 @@ package users
 import (
 	"net/http"
 
-	adminerrors "github.com/bitcoin-sv/spv-wallet/actions/v2/admin/errors"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/admin/internal/mapping"
 	"github.com/bitcoin-sv/spv-wallet/api"
 	configerrors "github.com/bitcoin-sv/spv-wallet/config/errors"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailerrors"
+	"github.com/bitcoin-sv/spv-wallet/errdef/clienterr"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,22 +15,29 @@ import (
 func (s *APIAdminUsers) AddPaymailToUser(c *gin.Context, id string) {
 	var request api.RequestsAddPaymail
 	if err := c.Bind(&request); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), s.logger)
+		clienterr.UnprocessableEntity.New().Wrap(err).Response(c, s.logger)
 		return
 	}
 
 	newPaymail, err := mapping.RequestAddPaymailToNewPaymailModel(&request, id)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, s.logger)
+		clienterr.Response(c, err, s.logger)
 		return
 	}
 
 	createdPaymail, err := s.engine.PaymailsService().Create(c, newPaymail)
+
 	if err != nil {
-		spverrors.MapResponse(c, err, s.logger).
-			If(configerrors.ErrUnsupportedDomain).Then(adminerrors.ErrInvalidDomain).
-			If(paymailerrors.ErrInvalidAvatarURL).Then(adminerrors.ErrInvalidAvatarURL).
-			Else(adminerrors.ErrAddingPaymail)
+		clienterr.Map(err).
+			IfOfType(configerrors.UnsupportedDomain).
+			Then(
+				clienterr.BadRequest.Detailed("unsupported_domain", "Unsupported domain: '%s'", newPaymail.Domain),
+			).
+			IfOfType(paymailerrors.InvalidAvatarURL).
+			Then(
+				clienterr.UnprocessableEntity.Detailed("invalid_avatar_url", "Invalid avatar URL: '%s'", newPaymail.Avatar),
+			).
+			Response(c, s.logger)
 		return
 	}
 

@@ -4,8 +4,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailerrors"
+	"github.com/bitcoin-sv/spv-wallet/errdef"
 )
 
 // Paymail represents a domain model from paymails service
@@ -41,11 +41,15 @@ func (np *NewPaymail) ValidateAvatar() error {
 
 	URL, err := url.Parse(np.Avatar)
 	if err != nil {
-		return paymailerrors.ErrInvalidAvatarURL.Wrap(err)
+		return paymailerrors.InvalidAvatarURL.
+			Wrap(err, "avatarURL is not a valid URL: %s", np.Avatar).
+			WithProperty(errdef.PropPublicHint, "Avatar should be a valid URL")
 	}
 
 	if URL.Scheme != "http" && URL.Scheme != "https" {
-		return paymailerrors.ErrInvalidAvatarURL.Wrap(spverrors.Newf("avatarURL should have http(s) scheme"))
+		return paymailerrors.InvalidAvatarURL.
+			New("avatar has not valid scheme (http or https): %s", np.Avatar).
+			WithProperty(errdef.PropPublicHint, "Avatar should have a valid scheme (http or https)")
 	}
 
 	return nil

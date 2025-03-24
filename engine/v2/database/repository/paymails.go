@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
+	dberrors "github.com/bitcoin-sv/spv-wallet/engine/v2/database/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
 	"gorm.io/gorm"
 )
@@ -32,7 +33,7 @@ func (p *Paymails) Create(ctx context.Context, newPaymail *paymailsmodels.NewPay
 	}
 
 	if err := p.db.WithContext(ctx).Create(&row).Error; err != nil {
-		return nil, err
+		return nil, dberrors.QueryFailed.Wrap(err, "failed to create paymail")
 	}
 
 	return p.newPaymailModel(row), nil
@@ -48,7 +49,7 @@ func (p *Paymails) Find(ctx context.Context, alias, domain string) (*paymailsmod
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
-		return nil, err
+		return nil, dberrors.QueryFailed.Wrap(err, "failed to find paymail by alias and domain")
 	}
 
 	return p.newPaymailModel(row), nil
@@ -64,7 +65,7 @@ func (p *Paymails) FindForUser(ctx context.Context, alias, domain, userID string
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
-		return nil, err
+		return nil, dberrors.QueryFailed.Wrap(err, "failed to find paymail by alias, domain and user")
 	}
 
 	return p.newPaymailModel(row), nil
@@ -78,7 +79,7 @@ func (p *Paymails) GetDefault(ctx context.Context, userID string) (*paymailsmode
 		Where("user_id = ?", userID).
 		Order("created_at ASC").
 		First(&row).Error; err != nil {
-		return nil, err
+		return nil, dberrors.QueryFailed.Wrap(err, "failed to get default paymail for user")
 	}
 
 	return p.newPaymailModel(row), nil

@@ -1,6 +1,13 @@
+//nolint:revive // Error types should be self-explanatory
 package dberrors
 
-import "github.com/bitcoin-sv/spv-wallet/models"
+import (
+	"github.com/bitcoin-sv/spv-wallet/errdef"
+	"github.com/joomcode/errorx"
+)
 
-// ErrDBFailed is when the database operation failed.
-var ErrDBFailed = models.SPVError{Message: "database operation failed", StatusCode: 500, Code: "error-db-failed"}
+var Namespace = errorx.NewNamespace("db")
+
+var QueryFailed = Namespace.NewType("query_failed")
+
+var NotFound = Namespace.NewType("not_found", errdef.TraitNotFound)
