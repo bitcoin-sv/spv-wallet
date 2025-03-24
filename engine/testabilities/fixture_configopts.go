@@ -21,3 +21,24 @@ func WithNotificationsEnabled() ConfigOpts {
 		c.Notifications.Enabled = true
 	}
 }
+
+func WithPostgresConfig(host, port, user, password, dbName string) ConfigOpts {
+	return func(c *config.AppConfig) {
+		c.Db.Datastore.Engine = "postgresql"
+		c.Db.SQL.User = user
+		c.Db.SQL.Password = password
+		c.Db.SQL.Name = dbName
+		c.Db.SQL.Host = host
+		c.Db.SQL.Port = port
+	}
+}
+
+func WithSQLiteFilePath(dbPath string) ConfigOpts {
+	return func(c *config.AppConfig) {
+		c.Db.Datastore.Engine = "sqlite"
+		c.Db.SQLite.DatabasePath = dbPath
+		c.Db.SQLite.Shared = false
+		c.Db.SQLite.MaxIdleConnections = 1
+		c.Db.SQLite.MaxOpenConnections = 1
+	}
+}
