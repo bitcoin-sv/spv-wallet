@@ -6,22 +6,22 @@ import (
 	"strings"
 
 	"github.com/bitcoin-sv/spv-wallet/api"
-	routes "github.com/bitcoin-sv/spv-wallet/server/handlers"
+	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // RegisterRoutes creates the specific package routes
-func RegisterRoutes(handlersManager *routes.Manager) {
-	root := handlersManager.Get(routes.GroupRoot)
+func RegisterRoutes(engine *gin.Engine, cfg *config.AppConfig) {
+	root := engine.Group("")
 
 	root.GET("v2/swagger", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "v2/swagger/index.html")
 	})
 
-	api.Yaml = strings.Replace(api.Yaml, "version: main", fmt.Sprintf("version: '%s'", handlersManager.APIVersion()), 1)
-	api.Yaml = strings.Replace(api.Yaml, "https://github.com/bitcoin-sv/spv-wallet/blob/main", fmt.Sprintf("https://github.com/bitcoin-sv/spv-wallet/blob/%s", handlersManager.APIVersion()), 1)
+	api.Yaml = strings.Replace(api.Yaml, "version: main", fmt.Sprintf("version: '%s'", cfg.Version), 1)
+	api.Yaml = strings.Replace(api.Yaml, "https://github.com/bitcoin-sv/spv-wallet/blob/main", fmt.Sprintf("https://github.com/bitcoin-sv/spv-wallet/blob/%s", cfg.Version), 1)
 
 	root.GET("/api/gen.api.yaml", func(c *gin.Context) {
 		c.Header("Content-Type", "application/yaml")

@@ -17,14 +17,17 @@ import (
 const cacheKeyCapabilities = "paymail-capabilities-"
 const cacheTTLCapabilities = 2 * time.Minute
 
+// ClientInterface is an interface for the paymail client
+type ClientInterface = paymail.ClientInterface
+
 type service struct {
-	cache         cachestore.ClientInterface
+	cache         Cache
 	paymailClient paymail.ClientInterface
 	log           zerolog.Logger
 }
 
 // NewServiceClient creates a new paymail service client
-func NewServiceClient(cache cachestore.ClientInterface, paymailClient paymail.ClientInterface, log zerolog.Logger) ServiceClient {
+func NewServiceClient(cache Cache, paymailClient ClientInterface, log zerolog.Logger) ServiceClient {
 	if paymailClient == nil {
 		panic(spverrors.Newf("paymail client is required to create a new paymail service"))
 	}

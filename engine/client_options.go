@@ -67,9 +67,6 @@ func defaultClientOptions() *clientOptions {
 			},
 		},
 
-		// Blank transaction outline
-		transactionOutlinesService: nil,
-
 		// Blank TaskManager config
 		taskManager: &taskManagerOptions{
 			TaskEngine:        nil,
@@ -346,13 +343,6 @@ func WithPaymailPikeContactSupport() ClientOps {
 func WithPaymailPikePaymentSupport() ClientOps {
 	return func(c *clientOptions) {
 		c.paymail.serverConfig.options = append(c.paymail.serverConfig.options, server.WithPikePaymentCapabilities())
-	}
-}
-
-// WithPaymailExperimentalNewTransactionFlow switches to the new transaction flow (experimental)
-func WithPaymailExperimentalNewTransactionFlow() ClientOps {
-	return func(c *clientOptions) {
-		c.paymail.serverConfig.ExperimentalProvider = true
 	}
 }
 
