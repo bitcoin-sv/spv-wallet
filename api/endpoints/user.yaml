@@ -188,3 +188,28 @@ paths:
           $ref: "../components/responses.yaml#/components/responses/GetMerklerootsConflict"
         500:
           $ref: "../components/responses.yaml#/components/responses/GetMerklerootsInternalServerError"
+
+  /api/v2/users/address:
+    post:
+      summary: Create Paymail Address
+      operationId: createAddress
+      security:
+        - XPubAuth:
+            - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../components/requests.yaml#/components/schemas/CreatePaymailAddress"
+      responses:
+        "200":
+          $ref: "../components/responses.yaml#/components/responses/PaymailAddress"
+        "400":
+          $ref: "../components/responses.yaml#/components/responses/UserBadRequest"
+        "401":
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        "500":
+          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+      tags:
+        - User

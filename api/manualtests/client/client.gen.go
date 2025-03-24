@@ -604,6 +604,11 @@ type RequestsAddPaymail struct {
 	PublicName *string `json:"publicName,omitempty"`
 }
 
+// RequestsCreatePaymailAddress defines model for requests_CreatePaymailAddress.
+type RequestsCreatePaymailAddress struct {
+	Paymail RequestsAddPaymail `json:"paymail"`
+}
+
 // RequestsCreateUser defines model for requests_CreateUser.
 type RequestsCreateUser struct {
 	Paymail   *RequestsAddPaymail `json:"paymail,omitempty"`
@@ -761,6 +766,9 @@ type ResponsesNotAuthorized = ErrorsAnyAuthorization
 // ResponsesNotAuthorizedToAdminEndpoint defines model for responses_NotAuthorizedToAdminEndpoint.
 type ResponsesNotAuthorizedToAdminEndpoint = ErrorsAdminAuthorization
 
+// ResponsesPaymailAddress defines model for responses_PaymailAddress.
+type ResponsesPaymailAddress = ModelsPaymail
+
 // ResponsesRecordTransactionBadRequest defines model for responses_RecordTransactionBadRequest.
 type ResponsesRecordTransactionBadRequest struct {
 	union json.RawMessage
@@ -833,6 +841,9 @@ type RecordTransactionOutlineJSONRequestBody = RequestsTransactionOutline
 
 // CreateTransactionOutlineJSONRequestBody defines body for CreateTransactionOutline for application/json ContentType.
 type CreateTransactionOutlineJSONRequestBody = RequestsTransactionSpecification
+
+// CreateAddressJSONRequestBody defines body for CreateAddress for application/json ContentType.
+type CreateAddressJSONRequestBody = RequestsCreatePaymailAddress
 
 // AsErrorsUserAuthOnNonUserEndpoint returns the union data inside the ErrorsAdminAuthorization as a ErrorsUserAuthOnNonUserEndpoint
 func (t ErrorsAdminAuthorization) AsErrorsUserAuthOnNonUserEndpoint() (ErrorsUserAuthOnNonUserEndpoint, error) {
@@ -2204,6 +2215,11 @@ type ClientInterface interface {
 
 	CreateTransactionOutline(ctx context.Context, params *CreateTransactionOutlineParams, body CreateTransactionOutlineJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// CreateAddressWithBody request with any body
+	CreateAddressWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateAddress(ctx context.Context, body CreateAddressJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// CurrentUser request
 	CurrentUser(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
@@ -2366,6 +2382,30 @@ func (c *Client) CreateTransactionOutlineWithBody(ctx context.Context, params *C
 
 func (c *Client) CreateTransactionOutline(ctx context.Context, params *CreateTransactionOutlineParams, body CreateTransactionOutlineJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateTransactionOutlineRequest(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateAddressWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateAddressRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateAddress(ctx context.Context, body CreateAddressJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateAddressRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -2861,6 +2901,46 @@ func NewCreateTransactionOutlineRequestWithBody(server string, params *CreateTra
 	return req, nil
 }
 
+// NewCreateAddressRequest calls the generic CreateAddress builder with application/json body
+func NewCreateAddressRequest(server string, body CreateAddressJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateAddressRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateAddressRequestWithBody generates requests for CreateAddress with any type of body
+func NewCreateAddressRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v2/users/address")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewCurrentUserRequest generates requests for CurrentUser
 func NewCurrentUserRequest(server string) (*http.Request, error) {
 	var err error
@@ -2968,6 +3048,11 @@ type ClientWithResponsesInterface interface {
 	CreateTransactionOutlineWithBodyWithResponse(ctx context.Context, params *CreateTransactionOutlineParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTransactionOutlineResponse, error)
 
 	CreateTransactionOutlineWithResponse(ctx context.Context, params *CreateTransactionOutlineParams, body CreateTransactionOutlineJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTransactionOutlineResponse, error)
+
+	// CreateAddressWithBodyWithResponse request with any body
+	CreateAddressWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateAddressResponse, error)
+
+	CreateAddressWithResponse(ctx context.Context, body CreateAddressJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateAddressResponse, error)
 
 	// CurrentUserWithResponse request
 	CurrentUserWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CurrentUserResponse, error)
@@ -3321,6 +3406,41 @@ func (r CreateTransactionOutlineResponse) Bytes() []byte {
 	return r.Body
 }
 
+type CreateAddressResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ResponsesPaymailAddress
+	JSON400      *ResponsesUserBadRequest
+	JSON401      *ResponsesUserNotAuthorized
+	JSON500      *ResponsesInternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateAddressResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateAddressResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// HTTPResponse returns http.Response from which this response was parsed.
+func (r CreateAddressResponse) Response() *http.Response {
+	return r.HTTPResponse
+}
+
+// Bytes is a convenience method to retrieve the raw bytes from the HTTP response
+func (r CreateAddressResponse) Bytes() []byte {
+	return r.Body
+}
+
 type CurrentUserResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -3475,6 +3595,23 @@ func (c *ClientWithResponses) CreateTransactionOutlineWithResponse(ctx context.C
 		return nil, err
 	}
 	return ParseCreateTransactionOutlineResponse(rsp)
+}
+
+// CreateAddressWithBodyWithResponse request with arbitrary body returning *CreateAddressResponse
+func (c *ClientWithResponses) CreateAddressWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateAddressResponse, error) {
+	rsp, err := c.CreateAddressWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateAddressResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateAddressWithResponse(ctx context.Context, body CreateAddressJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateAddressResponse, error) {
+	rsp, err := c.CreateAddress(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateAddressResponse(rsp)
 }
 
 // CurrentUserWithResponse request returning *CurrentUserResponse
@@ -3929,6 +4066,53 @@ func ParseCreateTransactionOutlineResponse(rsp *http.Response) (*CreateTransacti
 			return nil, err
 		}
 		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ResponsesInternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateAddressResponse parses an HTTP response from a CreateAddressWithResponse call
+func ParseCreateAddressResponse(rsp *http.Response) (*CreateAddressResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateAddressResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ResponsesPaymailAddress
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ResponsesUserBadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ResponsesUserNotAuthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest ResponsesInternalServerError
