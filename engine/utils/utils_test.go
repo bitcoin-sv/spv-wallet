@@ -26,7 +26,6 @@ const (
 	privateKeyHash      = "644fdfc7e2815555e68d0317535b08d28a5e21d55d5c2d57e605cb63a346d9f2"
 )
 
-// TestHash will test the method Hash()
 func TestHash(t *testing.T) {
 	t.Parallel()
 
@@ -41,7 +40,6 @@ func TestHash(t *testing.T) {
 	})
 }
 
-// TestRandomHex will test the method RandomHex()
 func TestRandomHex(t *testing.T) {
 	t.Parallel()
 
@@ -66,7 +64,6 @@ func TestRandomHex(t *testing.T) {
 	}
 }
 
-// TestValidateXPub will test the method ValidateXPub()
 func TestValidateXPub(t *testing.T) {
 	t.Parallel()
 
@@ -89,7 +86,6 @@ func TestValidateXPub(t *testing.T) {
 	})
 }
 
-// TestDeriveAddresses will test the method DeriveAddresses()
 func TestDeriveAddresses(t *testing.T) {
 	t.Parallel()
 
@@ -113,7 +109,6 @@ func TestDeriveAddresses(t *testing.T) {
 	})
 }
 
-// TestDerivePrivateKeyFromHex test the method DerivePrivateKeyFromHex
 func TestDerivePrivateKeyFromHex(t *testing.T) {
 	hdXpriv, _ := compat.GetHDKeyFromExtendedPublicKey(testXpriv)
 
@@ -135,7 +130,6 @@ func TestDerivePrivateKeyFromHex(t *testing.T) {
 	})
 }
 
-// TestGetChildNumsFromHex test the method GetChildNumsFromHex
 func TestGetChildNumsFromHex(t *testing.T) {
 	t.Run("empty hex", func(t *testing.T) {
 		childNums, err := GetChildNumsFromHex("")
@@ -170,7 +164,6 @@ func TestGetChildNumsFromHex(t *testing.T) {
 	})
 }
 
-// TestDeriveChildKeyFromHex will test the method DeriveChildKeyFromHex()
 func TestDeriveChildKeyFromHex(t *testing.T) {
 	t.Run("xpriv", func(t *testing.T) {
 		key, err := compat.GenerateHDKeyFromString(testXpriv)
@@ -207,7 +200,6 @@ func TestDeriveChildKeyFromHex(t *testing.T) {
 	})
 }
 
-// TestDerivePublicKey will test the method DerivePublicKey()
 func TestDerivePublicKey(t *testing.T) {
 	t.Parallel()
 
@@ -239,7 +231,6 @@ func TestDerivePublicKey(t *testing.T) {
 	})
 }
 
-// TestStringInSlice will test the method StringInSlice()
 func TestStringInSlice(t *testing.T) {
 	t.Parallel()
 
@@ -257,7 +248,6 @@ func TestStringInSlice(t *testing.T) {
 	})
 }
 
-// TestGetTransactionIDFromHex will test the method GetTransactionIDFromHex()
 func TestGetTransactionIDFromHex(t *testing.T) {
 	t.Parallel()
 

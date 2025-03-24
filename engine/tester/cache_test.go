@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestLoadMockRedis will test the method LoadMockRedis()
 func TestLoadMockRedis(t *testing.T) {
 	t.Run("valid mock redis", func(t *testing.T) {
 		idleTimeout := 10 * time.Second

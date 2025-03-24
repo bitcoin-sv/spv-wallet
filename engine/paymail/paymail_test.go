@@ -236,7 +236,6 @@ func Test_StartP2PTransaction(t *testing.T) {
 	})
 }
 
-// Test_getCapabilities will test the method getCapabilities()
 func Test_GetCapabilities(t *testing.T) {
 	const (
 		testIdleTimeout          = 240 * time.Second

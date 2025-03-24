@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestGetInputSizeForType will test the method GetInputSizeForType()
 func TestGetInputSizeForType(t *testing.T) {
 	t.Parallel()
 
@@ -20,7 +19,6 @@ func TestGetInputSizeForType(t *testing.T) {
 	})
 }
 
-// TestGetOutputSizeForType will test the method GetOutputSizeForType()
 func TestGetOutputSizeForType(t *testing.T) {
 	t.Parallel()
 

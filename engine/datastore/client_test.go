@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestClient_IsDebug will test the method IsDebug()
 func TestClient_IsDebug(t *testing.T) {
 	t.Run("toggle debug", func(t *testing.T) {
 		c, err := NewClient(WithDebugging())
@@ -29,7 +28,6 @@ func TestClient_IsDebug(t *testing.T) {
 	})
 }
 
-// TestClient_Debug will test the method Debug()
 func TestClient_Debug(t *testing.T) {
 	t.Run("turn debug on", func(t *testing.T) {
 		c, err := NewClient()
@@ -49,7 +47,6 @@ func TestClient_Debug(t *testing.T) {
 	})
 }
 
-// TestClient_DebugLog will test the method DebugLog()
 func TestClient_DebugLog(t *testing.T) {
 	t.Run("write debug log", func(t *testing.T) {
 		c, err := NewClient(WithDebugging())
@@ -65,7 +62,6 @@ func TestClient_DebugLog(t *testing.T) {
 	})
 }
 
-// TestClient_Engine will test the method Engine()
 func TestClient_Engine(t *testing.T) {
 	t.Run("[sqlite] - get engine", func(t *testing.T) {
 		c, err := NewClient(WithSQLite(&SQLiteConfig{
@@ -80,7 +76,6 @@ func TestClient_Engine(t *testing.T) {
 	// todo: Postgresql
 }
 
-// TestClient_GetTableName will test the method GetTableName()
 func TestClient_GetTableName(t *testing.T) {
 	t.Run("table prefix", func(t *testing.T) {
 		c, err := NewClient(WithDebugging(), WithSQLite(&SQLiteConfig{

@@ -14,7 +14,6 @@ import (
 
 // todo: finish unit tests!
 
-// TestClient_Debug will test the method Debug()
 func TestClient_Debug(t *testing.T) {
 	t.Parallel()
 
@@ -37,7 +36,6 @@ func TestClient_Debug(t *testing.T) {
 	})
 }
 
-// TestClient_IsDebug will test the method IsDebug()
 func TestClient_IsDebug(t *testing.T) {
 	t.Parallel()
 
@@ -58,7 +56,6 @@ func TestClient_IsDebug(t *testing.T) {
 	})
 }
 
-// TestClient_Version will test the method Version()
 func TestClient_Version(t *testing.T) {
 	t.Parallel()
 
@@ -75,7 +72,6 @@ func TestClient_Version(t *testing.T) {
 	})
 }
 
-// TestClient_Cachestore will test the method Cachestore()
 func TestClient_Cachestore(t *testing.T) {
 	t.Parallel()
 
@@ -99,7 +95,6 @@ func TestClient_Cachestore(t *testing.T) {
 	})
 }
 
-// TestClient_Datastore will test the method Datastore()
 func TestClient_Datastore(t *testing.T) {
 	t.Parallel()
 
@@ -123,7 +118,6 @@ func TestClient_Datastore(t *testing.T) {
 	})
 }
 
-// TestClient_PaymailClient will test the method PaymailClient()
 func TestClient_PaymailClient(t *testing.T) {
 	t.Parallel()
 
@@ -147,7 +141,6 @@ func TestClient_PaymailClient(t *testing.T) {
 	})
 }
 
-// TestClient_GetPaymailConfig will test the method GetPaymailConfig()
 func TestClient_GetPaymailConfig(t *testing.T) {
 	t.Parallel()
 
@@ -175,7 +168,6 @@ func TestClient_GetPaymailConfig(t *testing.T) {
 	})
 }
 
-// TestPaymailOptions_Client will test the method Client()
 func TestPaymailOptions_Client(t *testing.T) {
 	t.Parallel()
 
@@ -199,7 +191,6 @@ func TestPaymailOptions_Client(t *testing.T) {
 	})
 }
 
-// TestPaymailOptions_FromSender will test the method FromSender()
 func TestPaymailOptions_FromSender(t *testing.T) {
 	t.Parallel()
 
@@ -220,7 +211,6 @@ func TestPaymailOptions_FromSender(t *testing.T) {
 	})
 }
 
-// TestPaymailOptions_ServerConfig will test the method ServerConfig()
 func TestPaymailOptions_ServerConfig(t *testing.T) {
 	// t.Parallel()
 

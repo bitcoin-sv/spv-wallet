@@ -17,7 +17,6 @@ const (
 	testXpubAuth = "xpub661MyMwAqRbcH3WGvLjupmr43L1GVH3MP2WQWvdreDraBeFJy64Xxv4LLX9ZVWWz3ZjZkMuZtSsc9qH9JZR74bR4PWkmtEvP423r6DJR8kA"
 )
 
-// TestNewPaymail will test the method newPaymail()
 func TestNewPaymail(t *testing.T) {
 	t.Run("paymail basic test", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, true, false)

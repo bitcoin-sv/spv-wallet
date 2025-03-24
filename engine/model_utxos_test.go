@@ -51,7 +51,6 @@ func createTestUtxos(ctx context.Context, client ClientInterface) error {
 	return err
 }
 
-// TestUtxo_newUtxo will test the method newUtxo()
 func TestUtxo_newUtxo(t *testing.T) {
 	t.Parallel()
 
@@ -71,7 +70,6 @@ func TestUtxo_newUtxo(t *testing.T) {
 	})
 }
 
-// TestUtxo_newUtxoFromTxID will test the method newUtxoFromTxID()
 func TestUtxo_newUtxoFromTxID(t *testing.T) {
 	t.Run("newUtxo", func(t *testing.T) {
 		utxo := newUtxoFromTxID(testTxID, 12, New())
@@ -82,7 +80,6 @@ func TestUtxo_newUtxoFromTxID(t *testing.T) {
 	})
 }
 
-// TestUtxo_getUtxo will test the method getUtxo()
 func TestUtxo_getUtxo(t *testing.T) {
 	// t.Parallel()
 
@@ -106,7 +103,6 @@ func TestUtxo_getUtxo(t *testing.T) {
 	})
 }
 
-// TestUtxo_getUtxosByXpubID will test the method getUtxosByXpubID()
 func TestUtxo_getUtxosByXpubID(t *testing.T) {
 	t.Run("getUtxos empty", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
@@ -142,7 +138,6 @@ func TestUtxo_getUtxosByXpubID(t *testing.T) {
 	})
 }
 
-// TestUtxo_GetModelName will test the method GetModelName()
 func TestUtxo_GetModelName(t *testing.T) {
 	t.Parallel()
 
@@ -150,7 +145,6 @@ func TestUtxo_GetModelName(t *testing.T) {
 	assert.Equal(t, ModelUtxo.String(), utxo.GetModelName())
 }
 
-// TestUtxo_UnReserveUtxos un-reserve utxos
 func TestUtxo_UnReserveUtxos(t *testing.T) {
 	t.Run("un-reserve 2000", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
@@ -182,7 +176,6 @@ func TestUtxo_UnReserveUtxos(t *testing.T) {
 	})
 }
 
-// TestUtxo_ReserveUtxos reserve utxos
 func TestUtxo_ReserveUtxos(t *testing.T) {
 	t.Run("reserve 1000", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
@@ -321,7 +314,6 @@ func TestUtxo_ReserveUtxos(t *testing.T) {
 	})
 }
 
-// TestUtxo_GetSpendableUtxos get spendable utxos
 func TestUtxo_GetSpendableUtxos(t *testing.T) {
 	t.Run("spendable", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
@@ -390,7 +382,6 @@ func TestUtxo_GetSpendableUtxos(t *testing.T) {
 	})
 }
 
-// TestUtxo_Save will test the method Save()
 func TestUtxo_Save(t *testing.T) {
 	// t.Parallel()
 

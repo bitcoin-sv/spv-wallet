@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestBaseRegisterRoutes will test routes
 func (ts *TestSuite) TestRegisterRoutes() {
 	ts.T().Run("test routes", func(t *testing.T) {
 		testCases := []struct {

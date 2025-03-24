@@ -19,7 +19,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestClient_defaultModelOptions will test the method DefaultModelOptions()
 func TestClient_defaultModelOptions(t *testing.T) {
 	t.Parallel()
 
@@ -47,7 +46,6 @@ func TestClient_defaultModelOptions(t *testing.T) {
 	})
 }
 
-// TestWithUserAgent will test the method WithUserAgent()
 func TestWithUserAgent(t *testing.T) {
 	t.Parallel()
 	testLogger := zerolog.Nop()
@@ -86,7 +84,6 @@ func TestWithUserAgent(t *testing.T) {
 	})
 }
 
-// TestWithDebugging will test the method WithDebugging()
 func TestWithDebugging(t *testing.T) {
 	t.Parallel()
 
@@ -109,7 +106,6 @@ func TestWithDebugging(t *testing.T) {
 	})
 }
 
-// TestWithEncryption will test the method WithEncryption()
 func TestWithEncryption(t *testing.T) {
 	t.Parallel()
 	testLogger := zerolog.Nop()
@@ -147,7 +143,6 @@ func TestWithEncryption(t *testing.T) {
 	})
 }
 
-// TestWithRedisConnection will test the method WithRedisConnection()
 func TestWithRedisConnection(t *testing.T) {
 	testLogger := zerolog.Nop()
 
@@ -192,7 +187,6 @@ func TestWithRedisConnection(t *testing.T) {
 	})
 }
 
-// TestWithFreeCache will test the method WithFreeCache()
 func TestWithFreeCache(t *testing.T) {
 	t.Parallel()
 
@@ -220,7 +214,6 @@ func TestWithFreeCache(t *testing.T) {
 	})
 }
 
-// TestWithFreeCacheConnection will test the method WithFreeCacheConnection()
 func TestWithFreeCacheConnection(t *testing.T) {
 	t.Parallel()
 	testLogger := zerolog.Nop()
@@ -269,7 +262,6 @@ func TestWithFreeCacheConnection(t *testing.T) {
 	})
 }
 
-// TestWithPaymailClient will test the method WithPaymailClient()
 func TestWithPaymailClient(t *testing.T) {
 	t.Parallel()
 	testLogger := zerolog.Nop()
@@ -307,7 +299,6 @@ func TestWithPaymailClient(t *testing.T) {
 	})
 }
 
-// TestWithTaskQ will test the method WithTaskQ()
 func TestWithTaskQ(t *testing.T) {
 	t.Parallel()
 	testLogger := zerolog.Nop()
@@ -332,7 +323,6 @@ func TestWithTaskQ(t *testing.T) {
 	})
 }
 
-// TestWithLogger will test the method WithLogger()
 func TestWithLogger(t *testing.T) {
 	t.Parallel()
 
@@ -368,7 +358,6 @@ func TestWithLogger(t *testing.T) {
 	})
 }
 
-// TestWithIUCDisabled will test the method WithIUCDisabled()
 func TestWithIUCDisabled(t *testing.T) {
 	t.Parallel()
 	testLogger := zerolog.Nop()
@@ -404,7 +393,6 @@ func TestWithIUCDisabled(t *testing.T) {
 	})
 }
 
-// TestWithCustomCachestore will test the method WithCustomCachestore()
 func TestWithCustomCachestore(t *testing.T) {
 	t.Parallel()
 	testLogger := zerolog.Nop()
@@ -445,7 +433,6 @@ func TestWithCustomCachestore(t *testing.T) {
 	})
 }
 
-// TestWithCustomDatastore will test the method WithCustomDatastore()
 func TestWithCustomDatastore(t *testing.T) {
 	t.Parallel()
 	testLogger := zerolog.Nop()

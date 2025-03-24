@@ -19,7 +19,6 @@ const (
 	testXPubID          = "1a0b10d4eda0636aae1709e7e7080485a4d99af3ca2962c6e677cf5b53d8ab8c"
 )
 
-// TestXpub_newXpub will test the method newXpub()
 func TestXpub_newXpub(t *testing.T) {
 	t.Parallel()
 
@@ -33,7 +32,6 @@ func TestXpub_newXpub(t *testing.T) {
 	})
 }
 
-// TestXpub_getXpub will test the method getXpub()
 func TestXpub_getXpub(t *testing.T) {
 	t.Run("get xpub - does not exist", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
@@ -58,7 +56,6 @@ func TestXpub_getXpub(t *testing.T) {
 	})
 }
 
-// TestXpub_GetModelName will test the method GetModelName()
 func TestXpub_GetModelName(t *testing.T) {
 	t.Parallel()
 
@@ -66,7 +63,6 @@ func TestXpub_GetModelName(t *testing.T) {
 	assert.Equal(t, ModelXPub.String(), xPub.GetModelName())
 }
 
-// TestXpub_GetID will test the method GetID()
 func TestXpub_GetID(t *testing.T) {
 	t.Parallel()
 
@@ -74,7 +70,6 @@ func TestXpub_GetID(t *testing.T) {
 	assert.Equal(t, testXPubID, xPub.GetID())
 }
 
-// TestXpub_getNewDestination will test the method GetNewDestination()
 func TestXpub_getNewDestination(t *testing.T) {
 	t.Run("err destination", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
@@ -137,7 +132,6 @@ func TestXpub_getNewDestination(t *testing.T) {
 	})
 }
 
-// TestXpub_childModels will test the method ChildModels()
 func TestXpub_childModels(t *testing.T) {
 	t.Run("with 1 child model", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
@@ -173,7 +167,6 @@ func TestXpub_childModels(t *testing.T) {
 	})
 }
 
-// TestXpub_BeforeCreating will test the method BeforeCreating()
 func TestXpub_BeforeCreating(t *testing.T) {
 	// t.Parallel()
 
@@ -215,7 +208,6 @@ func TestXpub_BeforeCreating(t *testing.T) {
 	})
 }
 
-// TestXpub_AfterCreated will test the method AfterCreated()
 func TestXpub_AfterCreated(t *testing.T) {
 	// t.Parallel()
 
@@ -236,7 +228,6 @@ func TestXpub_AfterCreated(t *testing.T) {
 	})
 }
 
-// TestXpub_AfterUpdated will test the method AfterUpdated()
 func TestXpub_AfterUpdated(t *testing.T) {
 	// t.Parallel()
 
@@ -258,7 +249,6 @@ func TestXpub_AfterUpdated(t *testing.T) {
 	})
 }
 
-// TestXpub_RemovePrivateData will test the method RemovePrivateData()
 func TestXpub_RemovePrivateData(t *testing.T) {
 	t.Run("remove private data", func(t *testing.T) {
 		xPub := newXpub(testXPub, New())
@@ -282,7 +272,6 @@ func TestXpub_RemovePrivateData(t *testing.T) {
 	})
 }
 
-// TestXpub_Save will test the method Save()
 func (ts *EmbeddedDBTestSuite) TestXpub_Save() {
 	for _, testCase := range dbTestCases {
 		ts.T().Run(testCase.name+" - valid Save (basic)", func(t *testing.T) {

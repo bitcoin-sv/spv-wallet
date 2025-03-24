@@ -12,7 +12,6 @@ const (
 	testXPub = "xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J"
 )
 
-// Test_DeriveAddresses will test the method DeriveAddresses()
 func Test_DeriveAddresses(t *testing.T) {
 	xPub, errX := compat.NewKeyFromString(testXPub)
 	require.NoError(t, errX)
@@ -32,7 +31,6 @@ func Test_DeriveAddresses(t *testing.T) {
 	})
 }
 
-// Test_DeriveAddress will test the method DeriveAddress()
 func Test_DeriveAddress(t *testing.T) {
 	xPub, errX := compat.NewKeyFromString(testXPub)
 	require.NoError(t, errX)

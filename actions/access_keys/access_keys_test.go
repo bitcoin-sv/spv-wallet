@@ -35,7 +35,6 @@ func (ts *TestSuite) TearDownTest() {
 	ts.BaseTearDownTest()
 }
 
-// TestTestSuite kick-starts all suite tests
 func TestTestSuite(t *testing.T) {
 	suite.Run(t, new(TestSuite))
 }

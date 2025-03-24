@@ -14,7 +14,6 @@ import (
 
 const testString = "test-string"
 
-// TestNullString will test the basics of the null time struct
 func TestNullString(t *testing.T) {
 	t.Run("empty string", func(t *testing.T) {
 		nt := new(NullString)
@@ -32,7 +31,6 @@ func TestNullString(t *testing.T) {
 	})
 }
 
-// TestNullString_IsZero will test the method IsZero()
 func TestNullString_IsZero(t *testing.T) {
 	t.Run("nil string", func(t *testing.T) {
 		nt := new(NullString)
@@ -45,7 +43,6 @@ func TestNullString_IsZero(t *testing.T) {
 	})
 }
 
-// TestMarshalNullString will test the method MarshalNullString()
 func TestMarshalNullString(t *testing.T) {
 	t.Run("empty string", func(t *testing.T) {
 		nt := new(NullString)
@@ -62,7 +59,6 @@ func TestMarshalNullString(t *testing.T) {
 	})
 }
 
-// TestUnmarshalNullString will test the method UnmarshalNullString()
 func TestUnmarshalNullString(t *testing.T) {
 	t.Run("nil string", func(t *testing.T) {
 		nt, err := UnmarshalNullString(nil)
@@ -88,7 +84,6 @@ func TestUnmarshalNullString(t *testing.T) {
 	})
 }
 
-// TestNullString_MarshalJSON will test the method MarshalJSON()
 func TestNullString_MarshalJSON(t *testing.T) {
 	t.Run("nil string", func(t *testing.T) {
 		nt := new(NullString)
@@ -115,7 +110,6 @@ func TestNullString_MarshalJSON(t *testing.T) {
 	})
 }
 
-// TestNullString_UnmarshalJSON will test the method UnmarshalJSON()
 func TestNullString_UnmarshalJSON(t *testing.T) {
 	t.Run("nil string", func(t *testing.T) {
 		var nt NullString

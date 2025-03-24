@@ -11,7 +11,6 @@ const (
 	testEncryptValue = "##!(TEST)!##"
 )
 
-// TestEncrypt will test the Encrypt and Decrypt methods
 func TestEncrypt(t *testing.T) {
 	t.Run("empty key", func(t *testing.T) {
 		encrypted, err := Encrypt("", "")

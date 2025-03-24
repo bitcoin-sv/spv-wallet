@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestXpubOutputValue_Scan will test the db Scanner of the XpubOutputValue model
 func TestXpubOutputValue_Scan(t *testing.T) {
 	t.Parallel()
 
@@ -41,7 +40,6 @@ func TestXpubOutputValue_Scan(t *testing.T) {
 	})
 }
 
-// TestXpubOutputValue_Value will test the db Valuer of the XpubOutputValue model
 func TestXpubOutputValue_Value(t *testing.T) {
 	t.Parallel()
 

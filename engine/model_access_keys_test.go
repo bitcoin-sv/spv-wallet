@@ -85,7 +85,6 @@ func Test_newAccessKey(t *testing.T) {
 	})
 }
 
-// TestAccessKey_GetAccessKey will test the method getAccessKey()
 func TestAccessKey_GetAccessKey(t *testing.T) {
 	t.Run("not found", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
@@ -113,7 +112,6 @@ func TestAccessKey_GetAccessKey(t *testing.T) {
 	})
 }
 
-// TestAccessKey_GetAccessKeys will test the method getAccessKeysByXPubID()
 func TestAccessKey_GetAccessKeys(t *testing.T) {
 	t.Run("not found", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())

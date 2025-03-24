@@ -48,12 +48,10 @@ func (ts *TestSuite) TearDownTest() {
 	ts.BaseTearDownTest()
 }
 
-// TestTestSuite kick-starts all suite tests
 func TestTestSuite(t *testing.T) {
 	suite.Run(t, new(TestSuite))
 }
 
-// TestAdminAuthentication will test admin authentication
 func (ts *TestSuite) TestAdminAuthentication() {
 	ts.T().Run("no value", func(t *testing.T) {
 		w := httptest.NewRecorder()
@@ -96,7 +94,6 @@ func (ts *TestSuite) TestAdminAuthentication() {
 	})
 }
 
-// TestApiAuthentication will api authentication
 func (ts *TestSuite) TestApiAuthentication() {
 	ts.T().Run("no value", func(t *testing.T) {
 		w := httptest.NewRecorder()
@@ -143,7 +140,6 @@ func (ts *TestSuite) TestApiAuthentication() {
 	})
 }
 
-// TestBasicAuthentication will api authentication
 func (ts *TestSuite) TestBasicAuthentication() {
 	ts.T().Run("no value", func(t *testing.T) {
 		w := httptest.NewRecorder()

@@ -97,7 +97,6 @@ func mustParsePubKey(hexKey string) *ec.PublicKey {
 	return key
 }
 
-// TestDeriveLinkedKey tests the DeriveLinkedKey function
 func TestDeriveLinkedKeyCases(t *testing.T) {
 	validTests := []struct {
 		name           string

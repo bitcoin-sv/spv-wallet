@@ -15,7 +15,6 @@ const (
 	testMetadataValue = "test_value"
 )
 
-// TestModelName_String will test the method String()
 func TestModelName_String(t *testing.T) {
 	t.Parallel()
 
@@ -34,7 +33,6 @@ func TestModelName_String(t *testing.T) {
 	})
 }
 
-// TestModelName_IsEmpty will test the method IsEmpty()
 func TestModelName_IsEmpty(t *testing.T) {
 	t.Parallel()
 
@@ -44,7 +42,6 @@ func TestModelName_IsEmpty(t *testing.T) {
 	})
 }
 
-// TestModel_GetModelName will test the GetModelName function
 func TestModel_GetModelName(t *testing.T) {
 	t.Parallel()
 
@@ -76,7 +73,6 @@ func TestModel_GetModelName(t *testing.T) {
 	})
 }
 
-// TestModel_GetModelTableName will test the GetModelTableName function
 func TestModel_GetModelTableName(t *testing.T) {
 	t.Parallel()
 
@@ -125,7 +121,6 @@ type xPubFieldsTest struct {
 	CurrentBalance uint64 `json:"current_balance" toml:"current_balance" yaml:"current_balance"`
 }
 
-// TestModels_GetModels will test the method GetModels()
 func (ts *EmbeddedDBTestSuite) TestModels_GetModels() {
 	numberOfModels := 10
 	for _, testCase := range dbTestCases {
