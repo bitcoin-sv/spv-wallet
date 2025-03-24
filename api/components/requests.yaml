@@ -135,6 +135,55 @@ components:
         - to
         - satoshis
 
+    UpsertContact:
+      type: object
+      properties:
+        fullName:
+          type: string
+          example: "Test name"
+        requesterPaymail:
+          type: string
+          example: "test@spv-wallet.com"
+      required:
+        - fullName
+        - requesterPaymail
+
+    UpdateContact:
+      type: object
+      properties:
+        fullName:
+          type: string
+          example: "Test name"
+      required:
+        - fullName
+
+    AdminCreateContact:
+      type: object
+      properties:
+        creatorPaymail:
+          type: string
+          example: "example@spv-wallet.com"
+        fullName:
+          type: string
+          example: "Test name"
+      required:
+        - fullName
+        - creatorPaymail
+
+    AdminConfirmContact:
+      type: object
+      properties:
+        paymailA:
+          type: string
+          example: "alice@spv-wallet.com"
+        paymailB:
+          type: string
+          example: "bob@spv-wallet.com"
+      required:
+        - paymailA
+        - paymailB
+
+
   parameters:
     PageNumber:
       in: query
@@ -171,3 +220,48 @@ components:
       schema:
         type: string
       example: "name"
+
+    FullName:
+      in: query
+      name: fullName
+      description: Full name of the contact
+      required: false
+      schema:
+        type: string
+      example: "Test name"
+
+    Paymail:
+      in: query
+      name: paymail
+      description: Paymail of the contact
+      required: false
+      schema:
+        type: string
+      example: "test@spv-wallet.com"
+
+    ID:
+      in: query
+      name: id
+      description: ID of the contact
+      required: false
+      schema:
+        type: integer
+      example: "1"
+
+    PubKey:
+      in: query
+      name: pubKey
+      description: Public key of the contact
+      required: false
+      schema:
+        type: string
+      example: "76a914e069bd2e2fe3ea702c40d5e65b491b734c01686788ac"
+
+    Status:
+      in: query
+      name: status
+      description: Status of the contact
+      required: false
+      schema:
+        $ref: "../components/models.yaml#/components/schemas/ContactStatus"
+      example: "confirmed"

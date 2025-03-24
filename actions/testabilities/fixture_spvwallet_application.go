@@ -38,6 +38,8 @@ type SPVWalletApplicationFixture interface {
 
 	Faucet(user fixtures.User) testengine.FaucetFixture
 
+	User(user fixtures.User) testengine.UserFixture
+
 	EngineFixture() testengine.EngineFixture
 
 	// Tx creates a new mocked transaction builder
@@ -160,6 +162,10 @@ func (f *appFixture) Paymail() testpaymail.PaymailClientFixture {
 
 func (f *appFixture) Faucet(user fixtures.User) testengine.FaucetFixture {
 	return f.engineFixture.Faucet(user)
+}
+
+func (f *appFixture) User(user fixtures.User) testengine.UserFixture {
+	return f.engineFixture.User(user)
 }
 
 func (f *appFixture) Tx() txtestability.TransactionSpec {

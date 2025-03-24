@@ -18,6 +18,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/contacts"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/data"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database/repository"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/operations"
@@ -70,6 +71,7 @@ type (
 		txSync       *txsync.Service
 		data         *data.Service
 		config       *config.AppConfig
+		contacts     *contacts.Service
 	}
 
 	// cacheStoreOptions holds the cache configuration and client
@@ -170,6 +172,9 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	if err = client.loadPaymailComponents(); err != nil {
 		return nil, err
 	}
+
+	// Load the Contacts service after the Paymail service
+	client.loadContactsService()
 
 	// Load the Notification client (if client does not exist)
 	if err = client.loadNotificationClient(ctx); err != nil {
@@ -380,6 +385,11 @@ func (c *Client) DataService() *data.Service {
 // OperationsService will return the operations domain service
 func (c *Client) OperationsService() *operations.Service {
 	return c.options.operations
+}
+
+// ContactService will return the contacts domain service
+func (c *Client) ContactService() *contacts.Service {
+	return c.options.contacts
 }
 
 // TxSyncService will return the transaction sync service

@@ -3,6 +3,7 @@ package v2
 import (
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/admin"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/base"
+	"github.com/bitcoin-sv/spv-wallet/actions/v2/contacts"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/data"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/merkleroots"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/operations"
@@ -22,6 +23,7 @@ type apiV2 struct {
 	users.APIUsers
 	operations.APIOperations
 	transactions.APITransactions
+	contacts.APIContacts
 	merkleroots.APIMerkleRoots
 }
 
@@ -34,6 +36,7 @@ func NewV2API(config *config.AppConfig, engine engine.ClientInterface, logger *z
 		users.NewAPIUsers(engine, logger),
 		operations.NewAPIOperations(engine, logger),
 		transactions.NewAPITransactions(engine, logger),
+		contacts.NewAPIContacts(engine, logger),
 		merkleroots.NewAPIMerkleRoots(engine, logger),
 	}
 }

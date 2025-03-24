@@ -76,7 +76,7 @@ func PageWithDefaults(page *filter.Page) {
 		page.SortBy = "created_at"
 	}
 
-	if strings.ToLower(page.Sort) == "arc" {
+	if strings.ToLower(page.Sort) == "asc" {
 		page.Sort = "ASC"
 	} else {
 		page.Sort = "DESC"

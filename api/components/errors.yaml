@@ -339,6 +339,196 @@ components:
             message:
               example: "failed to broadcast transaction"
 
+    FailedToGetPaginatedResults:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-contact-failed-to-get-paginated-results"
+            message:
+              example: "failed to get paginated results"
+
+    CouldNotFindPaymail:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-paymail-not-found"
+            message:
+              example: "paymail not found"
+
+    UserDoNotOwnPaymail:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-paymail-user-do-not-own"
+            message:
+              example: "user do not own paymail"
+
+    ContactInvalidPaymail:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-contacts-invalid-paymail"
+            message:
+              example: "invalid paymail"
+
+    GetContact:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-contact-getting-contact-failed"
+            message:
+              example: "getting contact failed"
+
+    GettingPKIFailed:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-contact-getting-pki-failed"
+            message:
+              example: "getting pki for contact failed"
+
+    ContactFailedToUpdate:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-contact-updating-contact-failed"
+            message:
+              example: "updating contact failed"
+
+    SaveContact:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-contact-adding-contact-failed"
+            message:
+              example: "adding contact failed"
+
+    ContactFullNameRequired:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-contact-full-name-required"
+            message:
+              example: "full name is required"
+
+    ContactNotFound:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-contact-not-found"
+            message:
+              example: "contact not found"
+
+    DeleteContact:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-contact-deleting-contact-failed"
+            message:
+              example: "deleting contact failed"
+
+    ContactInWrongStatus:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-contact-wrong-status"
+            message:
+              example: "contact is in wrong status"
+
+    MissingContactFullName:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-contact-full-name-missing"
+            message:
+              example: "missing full name in contact"
+
+    MissingContactPaymailParam:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-contact-paymail-missing"
+            message:
+              example: "missing paymail parameter in request"
+
+    MissingContactCreatorPaymailParam:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-contact-creator-paymail-missing"
+            message:
+              example: "missing creator paymail parameter in request"
+
+    ContactAlreadyExists:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-contact-already-exists"
+            message:
+              example: "contact already exists"
+
+    RequesterContactInvalid:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-contact-requested-contact-invalid"
+            message:
+              example: "requested contact paymail is invalid"
+
+    GetPKIFailed:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-contact-getting-pki-failed"
+            message:
+              example: "getting pki for contact failed"
+
+    UpdateContactStatus:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-contact-updating-status-failed"
+            message:
+              example: "updating contact status failed"
+
     BHSUnreachable:
       allOf:
         - $ref: '#/components/schemas/Schema'

@@ -146,6 +146,220 @@ paths:
         500:
           $ref: "../components/responses.yaml#/components/responses/InternalServerError"
 
+  /api/v2/contacts/{paymail}:
+    put:
+      operationId: upsertContact
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - Contacts
+      summary: Add contact
+      description: >-
+        Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
+      parameters:
+        - name: paymail
+          in: path
+          description: >-
+            Paymail address of the contact that the user would like to add/modify
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../components/requests.yaml#/components/schemas/UpsertContact"
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/ContactSuccess"
+        400:
+          $ref: "../components/responses.yaml#/components/responses/UpsertContactBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        404:
+          $ref: "../components/responses.yaml#/components/responses/UpsertContactNotFound"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/ContactUpsertInternalServerError"
+
+    get:
+      operationId: getContact
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - Contacts
+      summary: Get contact
+      description: >-
+        This endpoint allows to get contact for authenticated user
+      parameters:
+        - name: paymail
+          in: path
+          description: >-
+            Paymail address of the contact that the user would like to get
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/ContactSuccess"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        404:
+          $ref: "../components/responses.yaml#/components/responses/ContactNotFound"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/GetContactInternalServerError"
+
+    delete:
+      operationId: removeContact
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - Contacts
+      summary: Remove contact
+      description: >-
+        This endpoint allows to remove contact for authenticated user
+      parameters:
+        - name: paymail
+          in: path
+          description: >-
+            Paymail address of the contact that the user would like to remove
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success - contact removed
+        401:
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/DeleteContactInternalServerError"
+
+  /api/v2/contacts/{paymail}/confirmation:
+    post:
+      operationId: confirmContact
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - Contacts
+      summary: Confirm contact
+      description: >-
+        This endpoint allows to confirm contact for authenticated user
+      parameters:
+        - name: paymail
+          in: path
+          description: >-
+            Paymail address of the contact that the user would like to confirm
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success - contact confirmed
+        400:
+          $ref: "../components/responses.yaml#/components/responses/UpdateContactBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        404:
+          $ref: "../components/responses.yaml#/components/responses/ContactNotFound"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/UpdateContactInternalServerError"
+
+    delete:
+      operationId: unconfirmContact
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - Contacts
+      summary: Unconfirm contact
+      description: >-
+        Unconfirm contact. For contact with status "confirmed" change status to "unconfirmed"
+      parameters:
+        - name: paymail
+          in: path
+          description: >-
+            Paymail address of the contact that the user would like to unconfirm
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success - contact removed
+        400:
+          $ref: "../components/responses.yaml#/components/responses/UpdateContactBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        404:
+          $ref: "../components/responses.yaml#/components/responses/ContactNotFound"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/UpdateContactInternalServerError"
+
+  /api/v2/invitations/{paymail}:
+    delete:
+      operationId: rejectInvitation
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - Contacts
+      summary: Reject invitation
+      description: >-
+        This endpoint allows to reject invitation for authenticated user
+      parameters:
+        - name: paymail
+          in: path
+          description: >-
+            Paymail address of the contact that the user would like to reject
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success - invitation removed
+        400:
+          $ref: "../components/responses.yaml#/components/responses/UpdateContactBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        404:
+          $ref: "../components/responses.yaml#/components/responses/ContactNotFound"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/UpdateContactInternalServerError"
+
+  /api/v2/invitations/{paymail}/contacts:
+    post:
+      operationId: acceptInvitation
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - Contacts
+      summary: Accept invitation
+      description: >-
+        This endpoint allows to accept invitation for authenticated user
+      parameters:
+        - name: paymail
+          in: path
+          description: >-
+            Paymail address of the contact that the user would like to accept
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success - invitation accepted
+        400:
+          $ref: "../components/responses.yaml#/components/responses/UpdateContactBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        404:
+          $ref: "../components/responses.yaml#/components/responses/ContactNotFound"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/UpdateContactInternalServerError"
+
   /api/v2/merkleroots:
     get:
       operationId: merkleRoots

@@ -44,6 +44,7 @@ type JsonValueGetter interface {
 	GetString(xpath string) string
 	GetAsType(xpath string, target any)
 	GetField(xpath string) any
+	GetInt(xpath string) int
 }
 
 func Then(t testing.TB, app SPVWalletApplicationFixture) SPVWalletApplicationAssertions {

@@ -56,3 +56,17 @@ func (g *Getter) GetField(xpath string) any {
 
 	return getByXPath(g.t, g.data, xpath)
 }
+
+// GetField returns a value from the data.
+func (g *Getter) GetInt(xpath string) int {
+	g.t.Helper()
+
+	value := getByXPath(g.t, g.data, xpath)
+
+	intValue, ok := value.(float64)
+	if !ok {
+		require.Fail(g.t, "Value on xpath %s is not a uint, it is %T (%v)", xpath, value, value)
+	}
+
+	return int(intValue)
+}

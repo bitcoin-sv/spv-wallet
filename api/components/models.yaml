@@ -163,7 +163,6 @@ components:
       required:
         - currentBalance
 
-
     OperationsSearchResult:
       type: object
       required:
@@ -420,6 +419,84 @@ components:
           description: ID of the transaction
       required:
         - txID
+
+    UpsertContact:
+      allOf:
+        - $ref: "#/components/schemas/Contact"
+        - $ref: "#/components/schemas/AdditionalInfo"
+
+    ContactsSearchResult:
+      type: object
+      required:
+        - content
+        - page
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+        page:
+          $ref: '#/components/schemas/SearchPage'
+
+    Contact:
+      allOf:
+        - $ref: '#/components/schemas/Model'
+        - type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+              format: uint
+            fullName:
+              type: string
+              example: "Test User"
+            paymail:
+              type: string
+              example: "alice@spv-wallet.com"
+            pubKey:
+              type: string
+              example: "xpub661MyMwAqRbcGpZVrSHU..."
+            status:
+              $ref: '#/components/schemas/ContactStatus'
+          required:
+            - id
+            - fullName
+            - pubKey
+            - status
+            - paymail
+
+    ContactStatus:
+      type: string
+      enum:
+        - unconfirmed
+        - awaiting
+        - confirmed
+        - rejected
+      example: confirmed
+
+    AdditionalInfo:
+      type: object
+      additionalProperties:
+        type: string
+
+    Model:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-01-01T00:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-01-01T00:00:00Z"
+        deletedAt:
+          type: string
+          format: date-time
+          example: "2025-01-01T00:00:00Z"
+      required:
+        - createdAt
+        - updatedAt
 
     MerkleRoot:
       type: object
