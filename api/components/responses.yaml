@@ -59,6 +59,36 @@ components:
           schema:
             $ref: "./errors.yaml#/components/schemas/GettingUser"
 
+    AdminRecordTransactionOutlineForUserSuccess:
+      description: Transaction outline for user recorded
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/RecordedOutline"
+
+    AdminRecordTransactionOutlineForUserBadRequest:
+      description: Bad request is an error that occurs when the request is malformed.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "./errors.yaml#/components/schemas/CannotBindRequest"
+              - $ref: "./errors.yaml#/components/schemas/InvalidDataID"
+              - $ref: "./errors.yaml#/components/schemas/AnnotationIndexOutOfRange"
+              - $ref: "./errors.yaml#/components/schemas/UTXOSpent"
+              - $ref: "./errors.yaml#/components/schemas/AnnotationIndexConversion"
+              - $ref: "./errors.yaml#/components/schemas/NoOperations"
+
+    AdminRecordTransactionOutlineForUserInternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "./errors.yaml#/components/schemas/Internal"
+              - $ref: "./errors.yaml#/components/schemas/GettingOutputs"
+              - $ref: "./errors.yaml#/components/schemas/TxBroadcast"
+
     NotAuthorized:
       description: Security requirements failed
       content:

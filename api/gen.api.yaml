@@ -21,6 +21,31 @@ paths:
             summary: Get admin status
             tags:
                 - Admin endpoints
+    /api/v2/admin/transactions/record:
+        post:
+            description: This endpoint allows for admin to record outline transaction for user with given id.
+            operationId: recordTransactionOutlineForUser
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/requests_RecordTransactionOutlineForUser'
+                required: true
+            responses:
+                "201":
+                    $ref: '#/components/responses/responses_AdminRecordTransactionOutlineForUserSuccess'
+                "400":
+                    $ref: '#/components/responses/responses_AdminRecordTransactionOutlineForUserBadRequest'
+                "401":
+                    $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
+                "500":
+                    $ref: '#/components/responses/responses_AdminRecordTransactionOutlineForUserInternalServerError'
+            security:
+                - XPubAuth:
+                    - admin
+            summary: Record transaction outline for user
+            tags:
+                - Admin endpoints
     /api/v2/admin/users:
         post:
             description: This endpoint creates a new user.
@@ -358,6 +383,33 @@ components:
                         oneOf:
                             - $ref: '#/components/schemas/errors_InvalidAvatarURL'
             description: Unprocessable entity is an error that occurs when the request cannot be fulfilled.
+        responses_AdminRecordTransactionOutlineForUserBadRequest:
+            content:
+                application/json:
+                    schema:
+                        oneOf:
+                            - $ref: '#/components/schemas/errors_CannotBindRequest'
+                            - $ref: '#/components/schemas/errors_InvalidDataID'
+                            - $ref: '#/components/schemas/errors_AnnotationIndexOutOfRange'
+                            - $ref: '#/components/schemas/errors_UTXOSpent'
+                            - $ref: '#/components/schemas/errors_AnnotationIndexConversion'
+                            - $ref: '#/components/schemas/errors_NoOperations'
+            description: Bad request is an error that occurs when the request is malformed.
+        responses_AdminRecordTransactionOutlineForUserInternalServerError:
+            content:
+                application/json:
+                    schema:
+                        oneOf:
+                            - $ref: '#/components/schemas/errors_Internal'
+                            - $ref: '#/components/schemas/errors_GettingOutputs'
+                            - $ref: '#/components/schemas/errors_TxBroadcast'
+            description: Internal server error
+        responses_AdminRecordTransactionOutlineForUserSuccess:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/models_RecordedOutline'
+            description: Transaction outline for user recorded
         responses_AdminUserBadRequest:
             content:
                 application/json:
@@ -1388,6 +1440,17 @@ components:
                 - to
                 - satoshis
             type: object
+        requests_RecordTransactionOutlineForUser:
+            allOf:
+                - $ref: '#/components/schemas/requests_TransactionOutline'
+                - properties:
+                    userID:
+                        description: User ID for which admin records transaction outline
+                        example: "1"
+                        type: string
+                  required:
+                    - userID
+                  type: object
         requests_TransactionOutline:
             allOf:
                 - $ref: '#/components/schemas/models_TransactionHex'
