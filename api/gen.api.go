@@ -25,6 +25,15 @@ type ServerInterface interface {
 	// Add paymails to user
 	// (POST /api/v2/admin/users/{id}/paymails)
 	AddPaymailToUser(c *gin.Context, id string)
+	// Delete webhooks
+	// (DELETE /api/v2/admin/webhooks)
+	UnsubscribeWebhook(c *gin.Context)
+	// Get webhooks
+	// (GET /api/v2/admin/webhooks)
+	Webhooks(c *gin.Context)
+	// Create webhook
+	// (POST /api/v2/admin/webhooks)
+	SubscribeWebhook(c *gin.Context)
 	// Get shared config
 	// (GET /api/v2/configs/shared)
 	SharedConfig(c *gin.Context)
@@ -137,6 +146,51 @@ func (siw *ServerInterfaceWrapper) AddPaymailToUser(c *gin.Context) {
 	}
 
 	siw.Handler.AddPaymailToUser(c, id)
+}
+
+// UnsubscribeWebhook operation middleware
+func (siw *ServerInterfaceWrapper) UnsubscribeWebhook(c *gin.Context) {
+
+	c.Set(XPubAuthScopes, []string{"admin"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.UnsubscribeWebhook(c)
+}
+
+// Webhooks operation middleware
+func (siw *ServerInterfaceWrapper) Webhooks(c *gin.Context) {
+
+	c.Set(XPubAuthScopes, []string{"admin"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.Webhooks(c)
+}
+
+// SubscribeWebhook operation middleware
+func (siw *ServerInterfaceWrapper) SubscribeWebhook(c *gin.Context) {
+
+	c.Set(XPubAuthScopes, []string{"admin"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.SubscribeWebhook(c)
 }
 
 // SharedConfig operation middleware
@@ -357,6 +411,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/api/v2/admin/users", wrapper.CreateUser)
 	router.GET(options.BaseURL+"/api/v2/admin/users/:id", wrapper.UserById)
 	router.POST(options.BaseURL+"/api/v2/admin/users/:id/paymails", wrapper.AddPaymailToUser)
+	router.DELETE(options.BaseURL+"/api/v2/admin/webhooks", wrapper.UnsubscribeWebhook)
+	router.GET(options.BaseURL+"/api/v2/admin/webhooks", wrapper.Webhooks)
+	router.POST(options.BaseURL+"/api/v2/admin/webhooks", wrapper.SubscribeWebhook)
 	router.GET(options.BaseURL+"/api/v2/configs/shared", wrapper.SharedConfig)
 	router.GET(options.BaseURL+"/api/v2/data/:id", wrapper.DataById)
 	router.GET(options.BaseURL+"/api/v2/merkleroots", wrapper.MerkleRoots)

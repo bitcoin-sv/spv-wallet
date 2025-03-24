@@ -106,3 +106,78 @@ paths:
           $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
         422:
           $ref: "../components/responses.yaml#/components/responses/AdminInvalidAvatarURL"
+
+  /api/v2/admin/webhooks:
+    get:
+      operationId: webhooks
+      security:
+        - XPubAuth:
+            - "admin"
+      tags:
+        - Admin endpoints
+      summary: Get webhooks
+      description: >-
+        This endpoint gets all webhooks.
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/GetWebhooksSuccess"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
+        404:
+          $ref: "../components/responses.yaml#/components/responses/NotificationsDisabled"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/GetWebhooksInternalServerError"
+
+    post:
+      operationId: subscribeWebhook
+      security:
+        - XPubAuth:
+            - "admin"
+      tags:
+        - Admin endpoints
+      summary: Create webhook
+      description: >-
+        This endpoint creates a new webhook.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../components/requests.yaml#/components/schemas/SubscribeWebhook"
+      responses:
+        200:
+          description: Success
+        400:
+          $ref: "../components/responses.yaml#/components/responses/SubscribeToWebhookBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
+        404:
+          $ref: "../components/responses.yaml#/components/responses/NotificationsDisabled"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/SubscribeToWebhookInternalServerError"
+
+    delete:
+      operationId: unsubscribeWebhook
+      security:
+        - XPubAuth:
+            - "admin"
+      tags:
+        - Admin endpoints
+      summary: Delete webhooks
+      description: >-
+        This endpoint deletes all webhooks.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../components/requests.yaml#/components/schemas/UnsubscribeWebhook"
+      responses:
+        200:
+          description: Webhooks deleted
+        401:
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorizedToAdminEndpoint"
+        404:
+          $ref: "../components/responses.yaml#/components/responses/NotificationsDisabled"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/UnsubscribeToWebhookInternalServerError"

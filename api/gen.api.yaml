@@ -102,6 +102,75 @@ paths:
             summary: Add paymails to user
             tags:
                 - Admin endpoints
+    /api/v2/admin/webhooks:
+        delete:
+            description: This endpoint deletes all webhooks.
+            operationId: unsubscribeWebhook
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/requests_UnsubscribeWebhook'
+                required: true
+            responses:
+                "200":
+                    description: Webhooks deleted
+                "401":
+                    $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
+                "404":
+                    $ref: '#/components/responses/responses_NotificationsDisabled'
+                "500":
+                    $ref: '#/components/responses/responses_UnsubscribeToWebhookInternalServerError'
+            security:
+                - XPubAuth:
+                    - admin
+            summary: Delete webhooks
+            tags:
+                - Admin endpoints
+        get:
+            description: This endpoint gets all webhooks.
+            operationId: webhooks
+            responses:
+                "200":
+                    $ref: '#/components/responses/responses_GetWebhooksSuccess'
+                "401":
+                    $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
+                "404":
+                    $ref: '#/components/responses/responses_NotificationsDisabled'
+                "500":
+                    $ref: '#/components/responses/responses_GetWebhooksInternalServerError'
+            security:
+                - XPubAuth:
+                    - admin
+            summary: Get webhooks
+            tags:
+                - Admin endpoints
+        post:
+            description: This endpoint creates a new webhook.
+            operationId: subscribeWebhook
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/requests_SubscribeWebhook'
+                required: true
+            responses:
+                "200":
+                    description: Success
+                "400":
+                    $ref: '#/components/responses/responses_SubscribeToWebhookBadRequest'
+                "401":
+                    $ref: '#/components/responses/responses_NotAuthorizedToAdminEndpoint'
+                "404":
+                    $ref: '#/components/responses/responses_NotificationsDisabled'
+                "500":
+                    $ref: '#/components/responses/responses_SubscribeToWebhookInternalServerError'
+            security:
+                - XPubAuth:
+                    - admin
+            summary: Create webhook
+            tags:
+                - Admin endpoints
     /api/v2/configs/shared:
         get:
             description: This endpoint returns shared config. It can be obtained by both admin and user.
@@ -450,6 +519,18 @@ components:
                     schema:
                         $ref: '#/components/schemas/models_GetMerkleRootResult'
             description: Merkleroots found
+        responses_GetWebhooksInternalServerError:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/errors_Internal'
+            description: Internal server error
+        responses_GetWebhooksSuccess:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/models_Webhooks'
+            description: Webhooks found
         responses_InternalServerError:
             content:
                 application/json:
@@ -468,6 +549,12 @@ components:
                     schema:
                         $ref: '#/components/schemas/errors_AdminAuthorization'
             description: Security requirements failed
+        responses_NotificationsDisabled:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/errors_NotificationsDisabled'
+            description: Notifications disabled
         responses_RecordTransactionBadRequest:
             content:
                 application/json:
@@ -512,6 +599,29 @@ components:
                     schema:
                         $ref: '#/components/schemas/models_SharedConfig'
             description: Shared config
+        responses_SubscribeToWebhookBadRequest:
+            content:
+                application/json:
+                    schema:
+                        oneOf:
+                            - $ref: '#/components/schemas/errors_CannotBindRequest'
+                            - $ref: '#/components/schemas/errors_WebhookUrlRequired'
+                            - $ref: '#/components/schemas/errors_WebhookUrlInvalid'
+                            - $ref: '#/components/schemas/errors_WebhookTokenHeaderRequired'
+                            - $ref: '#/components/schemas/errors_WebhookTokenValueRequired'
+            description: Bad request is an error that occurs when the request is malformed.
+        responses_SubscribeToWebhookInternalServerError:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/errors_CannotBindRequest'
+            description: Internal server error
+        responses_UnsubscribeToWebhookInternalServerError:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/errors_CannotBindRequest'
+            description: Internal server error
         responses_UserBadRequest:
             content:
                 application/json:
@@ -767,6 +877,15 @@ components:
                     message:
                         example: no operations to save
                   type: object
+        errors_NotificationsDisabled:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-notifications-disabled
+                    message:
+                        example: notifications are disabled
+                  type: object
         errors_PaymailInconsistent:
             allOf:
                 - $ref: '#/components/schemas/errors_Schema'
@@ -897,6 +1016,42 @@ components:
                 - $ref: '#/components/schemas/errors_Unauthorized'
                 - $ref: '#/components/schemas/errors_AdminAuthOnNonAdminEndpoint'
                 - $ref: '#/components/schemas/errors_AuthXPubRequired'
+        errors_WebhookTokenHeaderRequired:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-webhook-token-header-required
+                    message:
+                        example: webhook token header is required
+                  type: object
+        errors_WebhookTokenValueRequired:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-webhook-token-value-required
+                    message:
+                        example: webhook token value is required
+                  type: object
+        errors_WebhookUrlInvalid:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-webhook-url-invalid
+                    message:
+                        example: webhook url is invalid
+                  type: object
+        errors_WebhookUrlRequired:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-webhook-url-required
+                    message:
+                        example: webhook url is required
+                  type: object
         models_AnnotatedTransactionOutline:
             allOf:
                 - $ref: '#/components/schemas/models_TransactionHex'
@@ -1289,6 +1444,22 @@ components:
             required:
                 - currentBalance
             type: object
+        models_Webhook:
+            properties:
+                banned:
+                    example: true
+                    type: boolean
+                url:
+                    example: https://example.com/webhook
+                    type: string
+            required:
+                - url
+                - banned
+            type: object
+        models_Webhooks:
+            items:
+                $ref: '#/components/schemas/models_Webhook'
+            type: array
         requests_AddPaymail:
             properties:
                 address:
@@ -1388,6 +1559,22 @@ components:
                 - to
                 - satoshis
             type: object
+        requests_SubscribeWebhook:
+            properties:
+                tokenHeader:
+                    example: Authorization
+                    type: string
+                tokenValue:
+                    example: Bearer some-token
+                    type: string
+                url:
+                    example: https://example.com/example
+                    type: string
+            required:
+                - tokenHeader
+                - tokenValue
+                - url
+            type: object
         requests_TransactionOutline:
             allOf:
                 - $ref: '#/components/schemas/models_TransactionHex'
@@ -1412,6 +1599,14 @@ components:
                     type: array
             required:
                 - outputs
+            type: object
+        requests_UnsubscribeWebhook:
+            properties:
+                url:
+                    example: https://example.com/example
+                    type: string
+            required:
+                - url
             type: object
     securitySchemes:
         XPubAuth:
