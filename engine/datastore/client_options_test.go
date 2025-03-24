@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestDefaultClientOptions will test the method defaultClientOptions()
 func TestDefaultClientOptions(t *testing.T) {
 	t.Run("ensure default values", func(t *testing.T) {
 		defaults := defaultClientOptions()
@@ -19,7 +18,6 @@ func TestDefaultClientOptions(t *testing.T) {
 	})
 }
 
-// TestWithDebugging will test the method WithDebugging()
 func TestWithDebugging(t *testing.T) {
 	t.Run("get opts", func(t *testing.T) {
 		opt := WithDebugging()
@@ -41,7 +39,6 @@ func TestWithDebugging(t *testing.T) {
 	})
 }
 
-// TestWithSQLite will test the method WithSQLite()
 func TestWithSQLite(t *testing.T) {
 	t.Run("check type", func(t *testing.T) {
 		opt := WithSQLite(nil)
@@ -79,7 +76,6 @@ func TestWithSQLite(t *testing.T) {
 	})
 }
 
-// TestWithSQL will test the method WithSQL()
 func TestWithSQL(t *testing.T) {
 	t.Run("check type", func(t *testing.T) {
 		opt := WithSQL("", nil)
@@ -95,7 +91,6 @@ func TestWithSQL(t *testing.T) {
 	})
 }
 
-// TestWithSQLConnection will test the method WithSQLConnection()
 func TestWithSQLConnection(t *testing.T) {
 	t.Run("check type", func(t *testing.T) {
 		opt := WithSQLConnection("", nil, testTablePrefix)
@@ -111,7 +106,6 @@ func TestWithSQLConnection(t *testing.T) {
 	})
 }
 
-// TestWithLogger will test the method WithLogger()
 func TestWithLogger(t *testing.T) {
 	t.Run("check type", func(t *testing.T) {
 		opt := WithLogger(nil)

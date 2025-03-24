@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestIDs_GormDataType will test the method GormDataType()
 func TestIDs_GormDataType(t *testing.T) {
 	t.Parallel()
 
@@ -15,7 +14,6 @@ func TestIDs_GormDataType(t *testing.T) {
 	assert.Equal(t, gormTypeText, i.GormDataType())
 }
 
-// TestIDs_Scan will test the method Scan()
 func TestIDs_Scan(t *testing.T) {
 	t.Parallel()
 
@@ -57,7 +55,6 @@ func TestIDs_Scan(t *testing.T) {
 	})
 }
 
-// TestIDs_Value will test the method Value()
 func TestIDs_Value(t *testing.T) {
 	t.Parallel()
 

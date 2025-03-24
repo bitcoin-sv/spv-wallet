@@ -64,7 +64,6 @@ func assertEmptyTransactionConfig(t *testing.T, transactionConfig TransactionCon
 	assert.Equal(t, uint64(0), transactionConfig.Fee)
 }
 
-// TestTransactionConfigScan will test the db Scanner of the TransactionConfig model
 func TestTransactionConfig_Scan(t *testing.T) {
 	t.Parallel()
 
@@ -97,7 +96,6 @@ func TestTransactionConfig_Scan(t *testing.T) {
 	})
 }
 
-// TestTransactionConfigValue will test the db Valuer of the TransactionConfig model
 func TestTransactionConfig_Value(t *testing.T) {
 	t.Parallel()
 
@@ -116,7 +114,6 @@ func TestTransactionConfig_Value(t *testing.T) {
 	})
 }
 
-// TestTransactionConfig_processAddressOutput will test the method processAddressOutput()
 func TestTransactionConfig_processAddressOutput(t *testing.T) {
 	// t.Parallel() mocking does not allow parallel tests
 
@@ -151,7 +148,6 @@ func TestTransactionConfig_processAddressOutput(t *testing.T) {
 	})
 }
 
-// TestTransactionConfig_processOutput will test the method processOutput()
 func TestTransactionConfig_processOutput(t *testing.T) {
 	// t.Parallel() mocking does not allow parallel tests
 	const (
@@ -310,7 +306,6 @@ func TestTransactionConfig_processOutput(t *testing.T) {
 	})
 }
 
-// TestTransactionConfig_processOpReturnOutput will test the method processOpReturnOutput()
 func TestTransactionConfig_processOpReturnOutput(t *testing.T) {
 	t.Run("empty op_return", func(t *testing.T) {
 		output := &TransactionOutput{
@@ -419,7 +414,6 @@ func TestTransactionConfig_processOpReturnOutput(t *testing.T) {
 	})
 }
 
-// TestTransactionConfig_processScriptOutput will test the method processScriptOutput()
 func TestTransactionConfig_processScriptOutput(t *testing.T) {
 	t.Run("empty script", func(t *testing.T) {
 		script := ""

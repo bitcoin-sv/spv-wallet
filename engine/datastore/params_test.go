@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestQueryParams_UnmarshalQueryParams will test the db Scanner of the QueryParams model
 func TestQueryParams_UnmarshalQueryParams(t *testing.T) {
 	t.Parallel()
 
@@ -42,7 +41,6 @@ func TestQueryParams_UnmarshalQueryParams(t *testing.T) {
 	})
 }
 
-// TestMetadata_MarshalMetadata will test the db Valuer of the Metadata model
 func TestMetadata_MarshalMetadata(t *testing.T) {
 	t.Parallel()
 

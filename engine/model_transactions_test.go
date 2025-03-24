@@ -45,7 +45,6 @@ func (x transactionServiceMock) getUtxo(_ context.Context, txID string, index ui
 	return x.utxos[txID][index], nil
 }
 
-// TestTransaction_newTransaction will test the method newTransaction()
 func TestTransaction_newTransaction(t *testing.T) {
 	t.Parallel()
 
@@ -72,7 +71,6 @@ func TestTransaction_newTransaction(t *testing.T) {
 	})
 }
 
-// TestTransaction_newTransactionWithDraftID will test the method newTransactionWithDraftID()
 func TestTransaction_newTransactionWithDraftID(t *testing.T) {
 	t.Parallel()
 
@@ -96,7 +94,6 @@ func TestTransaction_newTransactionWithDraftID(t *testing.T) {
 	})
 }
 
-// TestTransaction_getTransactionByID will test the method getTransactionByID()
 func TestTransaction_getTransactionByID(t *testing.T) {
 	t.Run("not found", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
@@ -126,7 +123,6 @@ func TestTransaction_getTransactionByID(t *testing.T) {
 	})
 }
 
-// TestTransaction_getTransactionsByXpubID will test the method getTransactionsByXpubID()
 func TestTransaction_getTransactionsByXpubID(t *testing.T) {
 	t.Run("tx not found", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
@@ -157,7 +153,6 @@ func TestTransaction_getTransactionsByXpubID(t *testing.T) {
 	})
 }
 
-// TestTransaction_UpdateTransactionMetadata will test the method UpdateTransactionMetadata()
 func TestTransaction_UpdateTransactionMetadata(t *testing.T) {
 	t.Run("tx without meta data", func(t *testing.T) {
 		_, client, _ := CreateTestSQLiteClient(t, true, true)
@@ -201,7 +196,6 @@ func TestTransaction_UpdateTransactionMetadata(t *testing.T) {
 	})
 }
 
-// TestTransaction_BeforeCreating will test the method BeforeCreating()
 func TestTransaction_BeforeCreating(t *testing.T) {
 	// t.Parallel()
 
@@ -223,7 +217,6 @@ func TestTransaction_BeforeCreating(t *testing.T) {
 	})
 }
 
-// TestTransaction_BeforeCreating will test the method BeforeCreating()
 func (ts *EmbeddedDBTestSuite) TestTransaction_BeforeCreating() {
 	ts.T().Run("[sqlite] [in-memory] - valid transaction", func(t *testing.T) {
 		tc := ts.genericDBClient(t, datastore.SQLite, true)
@@ -238,7 +231,6 @@ func (ts *EmbeddedDBTestSuite) TestTransaction_BeforeCreating() {
 	})
 }
 
-// TestTransaction_GetID will test the method GetID()
 func TestTransaction_GetID(t *testing.T) {
 	t.Parallel()
 
@@ -257,7 +249,6 @@ func TestTransaction_GetID(t *testing.T) {
 	})
 }
 
-// TestTransaction_GetModelName will test the method GetModelName()
 func TestTransaction_GetModelName(t *testing.T) {
 	t.Parallel()
 
@@ -267,7 +258,6 @@ func TestTransaction_GetModelName(t *testing.T) {
 	})
 }
 
-// TestTransaction_processOutputs will test the method processConfigOutputs()
 func (ts *EmbeddedDBTestSuite) TestTransaction_processOutputs() {
 	ts.T().Run("no outputs", func(t *testing.T) {
 		tc := ts.genericDBClient(t, datastore.SQLite, true)
@@ -355,7 +345,6 @@ func (ts *EmbeddedDBTestSuite) TestTransaction_processOutputs() {
 	})
 }
 
-// TestTransaction_processInputs will test the method processInputs()
 func TestTransaction_processInputs(t *testing.T) {
 	// t.Parallel()
 
@@ -641,7 +630,6 @@ func TestTransaction_Display(t *testing.T) {
 	})
 }
 
-// TestTransaction_Save will test the method Save()
 func (ts *EmbeddedDBTestSuite) TestTransaction_Save() {
 	parsedTx, errP := trx.NewTransactionFromHex(testTxHex)
 	require.NoError(ts.T(), errP)

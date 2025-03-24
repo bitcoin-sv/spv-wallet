@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestMetaDataScan will test the db Scanner of the Metadata model
 func TestMetadata_Scan(t *testing.T) {
 	t.Parallel()
 
@@ -41,7 +40,6 @@ func TestMetadata_Scan(t *testing.T) {
 	})
 }
 
-// TestMetaDataValue will test the db Valuer of the Metadata model
 func TestMetadata_Value(t *testing.T) {
 	t.Parallel()
 
@@ -61,7 +59,6 @@ func TestMetadata_Value(t *testing.T) {
 	})
 }
 
-// TestXpubMetadata_Scan will test the db Scanner of the XpubMetadata model
 func TestXpubMetadata_Scan(t *testing.T) {
 	t.Parallel()
 
@@ -96,7 +93,6 @@ func TestXpubMetadata_Scan(t *testing.T) {
 	})
 }
 
-// TestXpubMetadata_Value will test the db Valuer of the XpubMetadata model
 func TestXpubMetadata_Value(t *testing.T) {
 	t.Parallel()
 

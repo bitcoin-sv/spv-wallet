@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestHash will test the method Hash()
 func TestSplitOutputValues(t *testing.T) {
 	t.Parallel()
 

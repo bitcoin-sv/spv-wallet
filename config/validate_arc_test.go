@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestNewRelicConfig_Validate will test the method Validate()
 func TestValidateArcConfig(t *testing.T) {
 	t.Parallel()
 

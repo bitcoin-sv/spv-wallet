@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestFactory_String will test the method String()
 func TestFactory_String(t *testing.T) {
 
 	t.Run("test all factories", func(t *testing.T) {
@@ -16,7 +15,6 @@ func TestFactory_String(t *testing.T) {
 	})
 }
 
-// TestFactory_IsEmpty will test the method IsEmpty()
 func TestFactory_IsEmpty(t *testing.T) {
 	t.Run("test empty factory", func(t *testing.T) {
 		f := FactoryEmpty

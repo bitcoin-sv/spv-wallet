@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestXPubRegisterRoutes will test routes
 func (ts *TestSuite) TestXPubRegisterRoutes() {
 	ts.T().Run("test routes", func(t *testing.T) {
 

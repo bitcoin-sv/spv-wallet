@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestModelSetRecordTime will test the method SetRecordTime()
 func TestModelSetRecordTime(t *testing.T) {
 	t.Parallel()
 
@@ -39,7 +38,6 @@ func TestModelSetRecordTime(t *testing.T) {
 	})
 }
 
-// TestModelSetRecordTime will test the method New()
 func TestModelNew(t *testing.T) {
 	t.Parallel()
 
@@ -55,7 +53,6 @@ func TestModelNew(t *testing.T) {
 	})
 }
 
-// TestModelGetOptions will test the method GetOptions()
 func TestModelGetOptions(t *testing.T) {
 	// t.Parallel()
 
@@ -72,7 +69,6 @@ func TestModelGetOptions(t *testing.T) {
 	})
 }
 
-// TestModel_IsNew will test the method IsNew()
 func TestModel_IsNew(t *testing.T) {
 	t.Parallel()
 
@@ -88,14 +84,12 @@ func TestModel_IsNew(t *testing.T) {
 	})
 }
 
-// TestModel_RawXpub will test the method RawXpub()
 func TestModel_RawXpub(t *testing.T) {
 	m := new(Model)
 	m.rawXpubKey = "xpub661MyMwAqRbcFqp1qzrF2AryEo4X8W1CNSAiT7t2wgXxkbt8nSrdZFYQeD19aTeiPtpAHDGtNUBxgFAg5d2GMzbAiVEsP8DJPLgTQ2LvZTz"
 	assert.Equal(t, "xpub661MyMwAqRbcFqp1qzrF2AryEo4X8W1CNSAiT7t2wgXxkbt8nSrdZFYQeD19aTeiPtpAHDGtNUBxgFAg5d2GMzbAiVEsP8DJPLgTQ2LvZTz", m.RawXpub())
 }
 
-// TestModel_Name will test the method Name()
 func TestModel_Name(t *testing.T) {
 	t.Parallel()
 

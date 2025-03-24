@@ -10,7 +10,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// Test_whereObject test the SQL where selector
 func Test_whereObject(t *testing.T) {
 	t.Parallel()
 
@@ -48,7 +47,6 @@ func Test_whereObject(t *testing.T) {
 	})
 }
 
-// Test_whereObject test the SQL where selector
 func Test_whereSlice(t *testing.T) {
 	t.Parallel()
 
@@ -89,7 +87,6 @@ func Test_whereSlice(t *testing.T) {
 	})
 }
 
-// Test_processConditions test the SQL where selectors
 func Test_processConditions(t *testing.T) {
 	t.Parallel()
 
@@ -137,7 +134,6 @@ func Test_processConditions(t *testing.T) {
 	})
 }
 
-// TestCustomWhere will test the method CustomWhere()
 func TestCustomWhere(t *testing.T) {
 	t.Parallel()
 

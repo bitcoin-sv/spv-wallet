@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestClient_NewXpub will test the method NewXpub()
 func (ts *EmbeddedDBTestSuite) TestClient_NewXpub() {
 	for _, testCase := range dbTestCases {
 		ts.T().Run(testCase.name+" - valid", func(t *testing.T) {
@@ -88,7 +87,6 @@ func (ts *EmbeddedDBTestSuite) TestClient_NewXpub() {
 	}
 }
 
-// TestClient_GetXpub will test the method GetXpub()
 func (ts *EmbeddedDBTestSuite) TestClient_GetXpub() {
 	for _, testCase := range dbTestCases {
 		ts.T().Run(testCase.name+" - valid", func(t *testing.T) {
@@ -130,7 +128,6 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetXpub() {
 	}
 }
 
-// TestClient_GetXpubByID will test the method GetXpubByID()
 func (ts *EmbeddedDBTestSuite) TestClient_GetXpubByID() {
 	for _, testCase := range dbTestCases {
 		ts.T().Run(testCase.name+" - valid", func(t *testing.T) {
@@ -167,7 +164,6 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetXpubByID() {
 	}
 }
 
-// TestClient_UpdateXpubMetadata will test the method UpdateXpubMetadata()
 func (ts *EmbeddedDBTestSuite) TestClient_UpdateXpubMetadata() {
 	for _, testCase := range dbTestCases {
 		ts.T().Run(testCase.name+" - valid", func(t *testing.T) {

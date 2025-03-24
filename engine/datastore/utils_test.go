@@ -32,7 +32,6 @@ type badModel struct {
 	Field string `json:"field"`
 }
 
-// TestGetModelStringAttribute will test the method GetModelStringAttribute()
 func TestGetModelStringAttribute(t *testing.T) {
 	t.Parallel()
 
@@ -63,7 +62,6 @@ func TestGetModelStringAttribute(t *testing.T) {
 	})
 }
 
-// TestGetModelBoolAttribute will test the method GetModelBoolAttribute()
 func TestGetModelBoolAttribute(t *testing.T) {
 	t.Parallel()
 
@@ -93,7 +91,6 @@ func TestGetModelBoolAttribute(t *testing.T) {
 	})
 }
 
-// TestGetModelUnset will test the method GetModelUnset()
 func TestGetModelUnset(t *testing.T) {
 	t.Parallel()
 
@@ -124,7 +121,6 @@ func TestGetModelUnset(t *testing.T) {
 	})
 }
 
-// TestIsModelSlice will test the method IsModelSlice()
 func TestIsModelSlice(t *testing.T) {
 	t.Parallel()
 
@@ -151,7 +147,6 @@ func TestIsModelSlice(t *testing.T) {
 	})
 }
 
-// TestGetModelName will test the method GetModelName()
 func TestGetModelName(t *testing.T) {
 	t.Parallel()
 
@@ -191,7 +186,6 @@ func TestGetModelName(t *testing.T) {
 	})
 }
 
-// TestGetModelTableName will test the method GetModelTableName()
 func TestGetModelTableName(t *testing.T) {
 	t.Parallel()
 
@@ -231,7 +225,6 @@ func TestGetModelTableName(t *testing.T) {
 	})
 }
 
-// TestGetModelType will test the method GetModelType()
 func TestGetModelType(t *testing.T) {
 	t.Parallel()
 
@@ -253,7 +246,6 @@ func TestGetModelType(t *testing.T) {
 	})
 }
 
-// TestStringInSlice will test the method StringInSlice()
 func TestStringInSlice(t *testing.T) {
 	t.Parallel()
 

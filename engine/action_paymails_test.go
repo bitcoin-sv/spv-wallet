@@ -15,7 +15,6 @@ var (
 	testPublicName = "Public Name"
 )
 
-// TestClient_NewPaymailAddress will test the method NewPaymailAddress()
 func (ts *EmbeddedDBTestSuite) TestClient_NewPaymailAddress() {
 	for _, testCase := range dbTestCases {
 		ts.T().Run(testCase.name+" - empty address", func(t *testing.T) {
@@ -71,7 +70,6 @@ func (ts *EmbeddedDBTestSuite) TestClient_NewPaymailAddress() {
 	}
 }
 
-// Test_DeletePaymailAddress will test the method DeletePaymailAddress()
 func (ts *EmbeddedDBTestSuite) Test_DeletePaymailAddress() {
 	for _, testCase := range dbTestCases {
 

@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestWithTaskQ will test the method WithTaskQ()
 func TestWithTaskQ(t *testing.T) {
 	t.Run("check type", func(t *testing.T) {
 		opt := WithTaskqConfig(nil)
@@ -37,7 +36,6 @@ func TestWithTaskQ(t *testing.T) {
 	})
 }
 
-// TestWithLogger will test the method WithLogger()
 func TestWithLogger(t *testing.T) {
 	t.Parallel()
 

@@ -17,7 +17,6 @@ var (
 	testDestinationID = "c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646"
 )
 
-// TestDestination_newDestination will test the method newDestination()
 func TestDestination_newDestination(t *testing.T) {
 	t.Parallel()
 
@@ -46,7 +45,6 @@ func TestDestination_newDestination(t *testing.T) {
 	})
 }
 
-// TestDestination_newAddress will test the method newAddress()
 func TestDestination_newAddress(t *testing.T) {
 	t.Parallel()
 
@@ -83,7 +81,6 @@ func TestDestination_newAddress(t *testing.T) {
 	})
 }
 
-// TestDestination_GetModelName will test the method GetModelName()
 func TestDestination_GetModelName(t *testing.T) {
 	t.Parallel()
 
@@ -96,7 +93,6 @@ func TestDestination_GetModelName(t *testing.T) {
 	})
 }
 
-// TestDestination_GetID will test the method GetID()
 func TestDestination_GetID(t *testing.T) {
 	t.Parallel()
 
@@ -118,7 +114,6 @@ func TestDestination_GetID(t *testing.T) {
 	})
 }
 
-// TestDestination_setAddress will test the method setAddress()
 func TestDestination_setAddress(t *testing.T) {
 	t.Run("internal 1", func(t *testing.T) {
 		destination := newDestination(testXPubID, testLockingScript)
@@ -157,7 +152,6 @@ func TestDestination_setAddress(t *testing.T) {
 	})
 }
 
-// TestDestination_getDestinationByID will test the method getDestinationByID()
 func TestDestination_getDestinationByID(t *testing.T) {
 	t.Run("does not exist", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
@@ -188,7 +182,6 @@ func TestDestination_getDestinationByID(t *testing.T) {
 	})
 }
 
-// TestDestination_getDestinationByAddress will test the method getDestinationByAddress()
 func TestDestination_getDestinationByAddress(t *testing.T) {
 	t.Run("does not exist", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
@@ -219,7 +212,6 @@ func TestDestination_getDestinationByAddress(t *testing.T) {
 	})
 }
 
-// TestDestination_getDestinationByLockingScript will test the method getDestinationByLockingScript()
 func TestDestination_getDestinationByLockingScript(t *testing.T) {
 	t.Run("does not exist", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())

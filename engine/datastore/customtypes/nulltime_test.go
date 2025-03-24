@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestNullTime will test the basics of the null time struct
 func TestNullTime(t *testing.T) {
 	t.Parallel()
 
@@ -33,7 +32,6 @@ func TestNullTime(t *testing.T) {
 	})
 }
 
-// TestMarshalNullTime will test the method MarshalNullTime()
 func TestMarshalNullTime(t *testing.T) {
 	t.Parallel()
 
@@ -55,7 +53,6 @@ func TestMarshalNullTime(t *testing.T) {
 	})
 }
 
-// TestUnmarshalNullTime will test the method UnmarshalNullTime()
 func TestUnmarshalNullTime(t *testing.T) {
 	t.Parallel()
 
@@ -86,7 +83,6 @@ func TestUnmarshalNullTime(t *testing.T) {
 	})
 }
 
-// TestNullTime_IsZero will test the method IsZero()
 func TestNullTime_IsZero(t *testing.T) {
 	t.Parallel()
 
@@ -101,7 +97,6 @@ func TestNullTime_IsZero(t *testing.T) {
 	})
 }
 
-// TestNullTime_MarshalJSON will test the method MarshalJSON()
 func TestNullTime_MarshalJSON(t *testing.T) {
 	t.Parallel()
 
@@ -124,7 +119,6 @@ func TestNullTime_MarshalJSON(t *testing.T) {
 	})
 }
 
-// TestNullTime_UnmarshalJSON will test the method UnmarshalJSON()
 func TestNullTime_UnmarshalJSON(t *testing.T) {
 	t.Parallel()
 

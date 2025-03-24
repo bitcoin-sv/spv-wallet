@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestErrorCode_IsValid tests the method IsValid()
 func TestErrorCode_IsValid(t *testing.T) {
 	t.Parallel()
 
@@ -76,7 +75,6 @@ func TestErrorCode_IsValid(t *testing.T) {
 	}
 }
 
-// TestGetInternalMessage tests the method GetInternalMessage()
 func TestGetInternalMessage(t *testing.T) {
 	t.Parallel()
 
@@ -145,7 +143,6 @@ func TestGetInternalMessage(t *testing.T) {
 	}
 }
 
-// TestGetPublicMessage tests the method GetPublicMessage()
 func TestGetPublicMessage(t *testing.T) {
 	t.Parallel()
 
@@ -214,7 +211,6 @@ func TestGetPublicMessage(t *testing.T) {
 	}
 }
 
-// TestGetStatusCode tests the method GetStatusCode()
 func TestGetStatusCode(t *testing.T) {
 	t.Parallel()
 
@@ -284,7 +280,6 @@ func TestGetStatusCode(t *testing.T) {
 	}
 }
 
-// TestGetError tests the method GetError()
 func TestGetError(t *testing.T) {
 	t.Parallel()
 

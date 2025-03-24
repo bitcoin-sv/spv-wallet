@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-// TestTestSuite kick-starts all suite tests
 func TestTestSuite(t *testing.T) {
 	suite.Run(t, new(EmbeddedDBTestSuite))
 }

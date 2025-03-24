@@ -10,7 +10,6 @@ const (
 	testEncryption = "35dbe09a941a90a5f59e57020face68860d7b284b7b2973a58de8b4242ec5a925a40ac2933b7e45e78a0b3a13123520e46f9566815589ba2d345577dadee0d5e"
 )
 
-// TestNew will test the method New()
 func TestNew(t *testing.T) {
 	t.Parallel()
 
@@ -27,7 +26,6 @@ func TestNew(t *testing.T) {
 	})
 }
 
-// TestWithMetadata will test the method WithMetadata()
 func TestWithMetadata(t *testing.T) {
 	t.Parallel()
 
@@ -44,7 +42,6 @@ func TestWithMetadata(t *testing.T) {
 	})
 }
 
-// TestWithMetadataFromJSON will test the method WithMetadataFromJSON()
 func TestWithMetadataFromJSON(t *testing.T) {
 	t.Parallel()
 
@@ -61,7 +58,6 @@ func TestWithMetadataFromJSON(t *testing.T) {
 	})
 }
 
-// TestWithXPub will test the method WithXPub()
 func TestWithXPub(t *testing.T) {
 	t.Parallel()
 
@@ -78,7 +74,6 @@ func TestWithXPub(t *testing.T) {
 	})
 }
 
-// TestWithEncryptionKey will test the method WithEncryptionKey()
 func TestWithEncryptionKey(t *testing.T) {
 	t.Parallel()
 
@@ -95,7 +90,6 @@ func TestWithEncryptionKey(t *testing.T) {
 	})
 }
 
-// TestWithMetadatas will test the method WithMetadatas()
 func TestWithMetadatas(t *testing.T) {
 	t.Parallel()
 

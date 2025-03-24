@@ -32,7 +32,6 @@ var mockDefaultFee = bsv.FeeUnit{
 	Bytes:    1000,
 }
 
-// TestDraftTransaction_newDraftTransaction will test the method newDraftTransaction()
 func TestDraftTransaction_newDraftTransaction(t *testing.T) {
 	t.Run("nil config, panic", func(t *testing.T) {
 		assert.Panics(t, func() {
@@ -66,7 +65,6 @@ func TestDraftTransaction_newDraftTransaction(t *testing.T) {
 	})
 }
 
-// TestDraftTransaction_GetModelName will test the method GetModelName()
 func TestDraftTransaction_GetModelName(t *testing.T) {
 	t.Run("model name", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
@@ -82,7 +80,6 @@ func TestDraftTransaction_GetModelName(t *testing.T) {
 	})
 }
 
-// TestDraftTransaction_getOutputSatoshis tests getting the output satoshis for the destinations
 func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 	t.Run("1 change destination", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
@@ -179,7 +176,6 @@ func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 	})
 }
 
-// TestDraftTransaction_setChangeDestinations sets the given of change destinations on the draft transaction
 func TestDraftTransaction_setChangeDestinations(t *testing.T) {
 	t.Run("1 change destination", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
@@ -222,7 +218,6 @@ func TestDraftTransaction_setChangeDestinations(t *testing.T) {
 	})
 }
 
-// TestDraftTransaction_getDraftTransactionID tests getting the draft transaction by draft id
 func TestDraftTransaction_getDraftTransactionID(t *testing.T) {
 	t.Run("not found", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
@@ -251,7 +246,6 @@ func TestDraftTransaction_getDraftTransactionID(t *testing.T) {
 	})
 }
 
-// TestDraftTransaction_createTransaction create a transaction hex
 func TestDraftTransaction_createTransaction(t *testing.T) {
 	const expectedFee = 1
 	const txAmount = 1000
@@ -748,7 +742,6 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 	})
 }
 
-// TestDraftTransaction_setChangeDestination setting the change destination
 func TestDraftTransaction_setChangeDestination(t *testing.T) {
 	t.Run("missing xpub", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
@@ -883,7 +876,6 @@ func TestDraftTransaction_setChangeDestination(t *testing.T) {
 	})
 }
 
-// TestDraftTransaction_getInputsFromUtxos getting bt.UTXOs from SPV Wallet Engine Utxos
 func TestDraftTransaction_getInputsFromUtxos(t *testing.T) {
 	t.Run("invalid lockingScript", func(t *testing.T) {
 		draftTransaction := &DraftTransaction{}
@@ -975,7 +967,6 @@ func TestDraftTransaction_getInputsFromUtxos(t *testing.T) {
 	})
 }
 
-// TestDraftTransaction_AfterUpdated after updated tests
 func TestDraftTransaction_AfterUpdated(t *testing.T) {
 	t.Run("cancel draft - update utxo reservation", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false)
@@ -1019,7 +1010,6 @@ func TestDraftTransaction_AfterUpdated(t *testing.T) {
 	})
 }
 
-// TestDraftTransaction_addIncludeUtxos will test the method addIncludeUtxos()
 func TestDraftTransaction_addIncludeUtxos(t *testing.T) {
 	t.Run("no includeUtxos", func(t *testing.T) {
 		ctx := context.Background()
@@ -1033,7 +1023,6 @@ func TestDraftTransaction_addIncludeUtxos(t *testing.T) {
 	})
 }
 
-// TestDraftTransaction_addOutputsToTx will test the method addOutputsToTx()
 func TestDraftTransaction_addOutputsToTx(t *testing.T) {
 	t.Run("no output", func(t *testing.T) {
 		draft := &DraftTransaction{
