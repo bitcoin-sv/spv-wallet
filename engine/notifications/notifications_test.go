@@ -178,7 +178,12 @@ func TestNotifications(t *testing.T) {
 		outputChanLength := 10
 		numberOfEvents := 50 // 50 > 10
 
-		notifier1 := newMockNotifier(ctx, 1)
+		// notifier1's buffer must hold every event: the fan-out send is non-blocking
+		// (see sendEventToChannel), so a buffer smaller than numberOfEvents can drop an
+		// event if the consumer goroutine isn't scheduled in time under CPU contention.
+		// Sizing the buffer to numberOfEvents makes the "all events delivered" assertion
+		// deterministic regardless of scheduling.
+		notifier1 := newMockNotifier(ctx, numberOfEvents)
 		notifier2 := newMockNotifier(ctx, outputChanLength)
 		n.AddNotifier("notifier1", notifier1.channel)
 		n.AddNotifier("notifier2", notifier2.channel)
