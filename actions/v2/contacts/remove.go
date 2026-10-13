@@ -18,7 +18,7 @@ func (s *APIContacts) RemoveContact(c *gin.Context, paymail string) {
 		return
 	}
 
-	err = s.contactsService.RemoveContact(c, userID, paymail)
+	err = s.contactsService.RemoveContact(c.Request.Context(), userID, paymail)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return

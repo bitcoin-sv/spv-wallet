@@ -18,7 +18,7 @@ func (s *APIContacts) UnconfirmContact(c *gin.Context, paymail string) {
 		return
 	}
 
-	err = s.contactsService.UnconfirmContact(c, userID, paymail)
+	err = s.contactsService.UnconfirmContact(c.Request.Context(), userID, paymail)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return

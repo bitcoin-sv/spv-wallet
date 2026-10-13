@@ -242,7 +242,7 @@ func contactsCreate(c *gin.Context, _ *reqctx.AdminContext) {
 	}
 
 	metadata := mappings.MapToMetadata(req.Metadata)
-	contact, err := reqctx.Engine(c).AdminCreateContact(c, contactPaymail, req.CreatorPaymail, req.FullName, metadata)
+	contact, err := reqctx.Engine(c).AdminCreateContact(c.Request.Context(), contactPaymail, req.CreatorPaymail, req.FullName, metadata)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, logger)
 		return
@@ -302,7 +302,7 @@ func contactsConfirm(c *gin.Context, _ *reqctx.AdminContext) {
 func contactUnconfirm(c *gin.Context, _ *reqctx.AdminContext) {
 	contactId := c.Param("id")
 
-	err := reqctx.Engine(c).AdminUnconfirmContact(c, contactId)
+	err := reqctx.Engine(c).AdminUnconfirmContact(c.Request.Context(), contactId)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return

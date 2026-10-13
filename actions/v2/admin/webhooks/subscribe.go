@@ -39,7 +39,7 @@ func (s *APIAdminWebhooks) SubscribeWebhook(c *gin.Context) {
 		return
 	}
 
-	err := s.webhooks.SubscribeWebhook(c, bodyReq.Url, bodyReq.TokenHeader, bodyReq.TokenValue)
+	err := s.webhooks.SubscribeWebhook(c.Request.Context(), bodyReq.Url, bodyReq.TokenHeader, bodyReq.TokenValue)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return

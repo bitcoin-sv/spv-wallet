@@ -29,7 +29,7 @@ func adminGetTxByID(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	id := c.Param("id")
 
-	transaction, err := reqctx.Engine(c).GetAdminTransaction(c, id)
+	transaction, err := reqctx.Engine(c).GetAdminTransaction(c.Request.Context(), id)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindTransaction.WithTrace(err), logger)
 		return

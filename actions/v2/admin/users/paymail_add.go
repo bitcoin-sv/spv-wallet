@@ -26,7 +26,7 @@ func (s *APIAdminUsers) AddPaymailToUser(c *gin.Context, id string) {
 		return
 	}
 
-	createdPaymail, err := s.engine.PaymailsService().Create(c, newPaymail)
+	createdPaymail, err := s.engine.PaymailsService().Create(c.Request.Context(), newPaymail)
 	if err != nil {
 		clienterr.Map(err).
 			IfOfType(configerrors.UnsupportedDomain).

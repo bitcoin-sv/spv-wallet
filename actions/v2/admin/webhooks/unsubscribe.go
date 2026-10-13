@@ -29,7 +29,7 @@ func (s *APIAdminWebhooks) UnsubscribeWebhook(c *gin.Context) {
 		return
 	}
 
-	if err := s.webhooks.UnsubscribeWebhook(c, bodyReq.Url); err != nil {
+	if err := s.webhooks.UnsubscribeWebhook(c.Request.Context(), bodyReq.Url); err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return
 	}

@@ -18,7 +18,7 @@ func (s *APIContacts) AcceptInvitation(c *gin.Context, paymail string) {
 		return
 	}
 
-	err = s.contactsService.AcceptContact(c, userID, paymail)
+	err = s.contactsService.AcceptContact(c.Request.Context(), userID, paymail)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return

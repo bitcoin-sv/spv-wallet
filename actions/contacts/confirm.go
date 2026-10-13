@@ -24,7 +24,7 @@ import (
 func confirmContact(c *gin.Context, userContext *reqctx.UserContext) {
 	paymail := c.Param("paymail")
 
-	err := reqctx.Engine(c).ConfirmContact(c, userContext.GetXPubID(), paymail)
+	err := reqctx.Engine(c).ConfirmContact(c.Request.Context(), userContext.GetXPubID(), paymail)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return

@@ -43,9 +43,9 @@ func (s *APITransactions) CreateTransactionOutline(c *gin.Context, params api.Cr
 	var txOutline *outlines.Transaction
 	switch format {
 	case bsv.TxHexFormatRAW:
-		txOutline, err = s.engine.TransactionOutlinesService().CreateRawTx(c, spec)
+		txOutline, err = s.engine.TransactionOutlinesService().CreateRawTx(c.Request.Context(), spec)
 	case bsv.TxHexFormatBEEF:
-		txOutline, err = s.engine.TransactionOutlinesService().CreateBEEF(c, spec)
+		txOutline, err = s.engine.TransactionOutlinesService().CreateBEEF(c.Request.Context(), spec)
 	}
 
 	if err != nil {

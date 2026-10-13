@@ -18,7 +18,7 @@ func (s *APIContacts) ConfirmContact(c *gin.Context, paymail string) {
 		return
 	}
 
-	err = s.contactsService.ConfirmContact(c, userID, paymail)
+	err = s.contactsService.ConfirmContact(c.Request.Context(), userID, paymail)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return
