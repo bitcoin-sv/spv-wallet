@@ -19,7 +19,7 @@ func (s *APIContacts) GetContact(c *gin.Context, paymail string) {
 		return
 	}
 
-	contact, err := s.contactsService.Find(c, userID, paymail)
+	contact, err := s.contactsService.Find(c.Request.Context(), userID, paymail)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrGetContact.WithTrace(err), s.logger)
 		return

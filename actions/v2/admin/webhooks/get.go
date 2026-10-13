@@ -11,7 +11,7 @@ import (
 
 // Webhooks returns all webhooks
 func (s *APIAdminWebhooks) Webhooks(c *gin.Context) {
-	wh, err := s.webhooks.GetWebhooks(c)
+	wh, err := s.webhooks.GetWebhooks(c.Request.Context())
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return

@@ -34,7 +34,7 @@ func (s *APIAdminUsers) CreateUser(c *gin.Context) {
 		return
 	}
 
-	createdUser, err := s.engine.UsersService().Create(c, newUser)
+	createdUser, err := s.engine.UsersService().Create(c.Request.Context(), newUser)
 	if err != nil {
 		clienterr.Map(err).
 			IfOfType(configerrors.UnsupportedDomain).

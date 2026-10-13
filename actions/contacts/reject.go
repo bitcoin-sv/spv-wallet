@@ -25,7 +25,7 @@ import (
 func rejectInvitation(c *gin.Context, userContext *reqctx.UserContext) {
 	paymail := c.Param("paymail")
 
-	err := reqctx.Engine(c).RejectContact(c, userContext.GetXPubID(), paymail)
+	err := reqctx.Engine(c).RejectContact(c.Request.Context(), userContext.GetXPubID(), paymail)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return

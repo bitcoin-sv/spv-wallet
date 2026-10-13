@@ -20,7 +20,7 @@ func (s *APIAdminContacts) AdminUpdateContact(c *gin.Context, id uint) {
 		return
 	}
 
-	contact, err := s.contactsService.UpdateFullNameByID(c, id, requestBody.FullName)
+	contact, err := s.contactsService.UpdateFullNameByID(c.Request.Context(), id, requestBody.FullName)
 	if err != nil {
 		clienterr.Response(c, err, s.logger)
 		return

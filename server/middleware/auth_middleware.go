@@ -58,7 +58,7 @@ func authByXPub(c *gin.Context, xPub string) (*reqctx.UserContext, error) {
 }
 
 func authByAccessKey(c *gin.Context, authAccessKey string) (*reqctx.UserContext, error) {
-	accessKey, err := reqctx.Engine(c).AuthenticateAccessKey(c, utils.Hash(authAccessKey))
+	accessKey, err := reqctx.Engine(c).AuthenticateAccessKey(c.Request.Context(), utils.Hash(authAccessKey))
 	if err != nil || accessKey == nil {
 		return nil, spverrors.ErrAuthorization
 	}
@@ -72,7 +72,7 @@ func authByAccessKey(c *gin.Context, authAccessKey string) (*reqctx.UserContext,
 }
 
 func getXPubByID(c *gin.Context, xPubID string) (*engine.Xpub, error) {
-	xPubObj, err := reqctx.Engine(c).GetXpubByID(c, xPubID)
+	xPubObj, err := reqctx.Engine(c).GetXpubByID(c.Request.Context(), xPubID)
 	if err != nil {
 		reqctx.Logger(c).Warn().Msgf("Could not get XPub by ID: %v", err)
 		return nil, spverrors.ErrAuthorization

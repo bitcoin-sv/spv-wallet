@@ -41,9 +41,9 @@ func broadcastCallbackHandler(service txSyncService) gin.HandlerFunc {
 			return
 		}
 
-		err = service.Handle(c, callbackResp)
+		err = service.Handle(c.Request.Context(), callbackResp)
 		if err != nil {
-			logger.Err(err).Ctx(c).Any("TxInfo", callbackResp).Msgf("failed to update transaction in ARC broadcast callback handler")
+			logger.Err(err).Ctx(c.Request.Context()).Any("TxInfo", callbackResp).Msgf("failed to update transaction in ARC broadcast callback handler")
 		}
 
 		c.Status(http.StatusOK)

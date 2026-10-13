@@ -40,7 +40,7 @@ func paymailAddressesSearch(c *gin.Context, userContext *reqctx.UserContext) {
 	pageOptions := mappings.MapToDbQueryParams(&searchParams.Page)
 
 	paymailAddresses, err := reqctx.Engine(c).GetPaymailAddressesByXPubID(
-		c,
+		c.Request.Context(),
 		userContext.GetXPubID(),
 		metadata,
 		conditions,

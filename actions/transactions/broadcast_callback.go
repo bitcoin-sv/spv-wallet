@@ -21,7 +21,7 @@ func broadcastCallback(c *gin.Context) {
 		return
 	}
 
-	err = reqctx.Engine(c).HandleTxCallback(c, &callbackResp)
+	err = reqctx.Engine(c).HandleTxCallback(c.Request.Context(), &callbackResp)
 	if err != nil {
 		logger.Err(err).Any("TxInfo", callbackResp).Msgf("failed to update transaction in ARC broadcast callback handler")
 	}

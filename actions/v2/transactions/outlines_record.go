@@ -33,7 +33,7 @@ func (s *APITransactions) RecordTransactionOutline(c *gin.Context) {
 	}
 
 	recordService := s.engine.TransactionRecordService()
-	recorded, err := recordService.RecordTransactionOutline(c, userID, outline)
+	recorded, err := recordService.RecordTransactionOutline(c.Request.Context(), userID, outline)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return

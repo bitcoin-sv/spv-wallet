@@ -49,7 +49,7 @@ func (s *APIContacts) UpsertContact(c *gin.Context, paymail string) {
 		UserID:            userID,
 	}
 
-	contact, err := s.contactsService.UpsertContact(c, newContact)
+	contact, err := s.contactsService.UpsertContact(c.Request.Context(), newContact)
 	if err != nil && !errors.Is(err, spverrors.ErrAddingContactRequest) {
 		spverrors.ErrorResponse(c, err, s.logger)
 		return
