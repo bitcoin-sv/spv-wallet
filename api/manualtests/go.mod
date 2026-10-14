@@ -9,7 +9,7 @@ replace github.com/joho/godotenv => github.com/joho/godotenv v1.5.1 //nolint:gom
 
 require (
 	github.com/bsv-blockchain/go-sdk v1.7.2
-	github.com/bsv-blockchain/spv-wallet-go-client v1.3.0
+	github.com/bsv-blockchain/spv-wallet-go-client v1.3.1
 	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/joomcode/errorx v1.2.0
 	github.com/oapi-codegen/runtime v1.7.0
@@ -39,8 +39,8 @@ require (
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
-	golang.org/x/crypto v0.57.0 // indirect
+	golang.org/x/crypto v0.58.0 // indirect
 	golang.org/x/net v0.60.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
-	golang.org/x/text v0.42.0 // indirect
+	golang.org/x/text v0.43.0 // indirect
 )

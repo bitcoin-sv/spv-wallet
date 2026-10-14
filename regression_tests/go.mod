@@ -11,7 +11,7 @@ replace github.com/joho/godotenv => github.com/joho/godotenv v1.5.1 //nolint:gom
 
 require (
 	github.com/bsv-blockchain/spv-wallet v1.0.1
-	github.com/bsv-blockchain/spv-wallet-go-client v1.3.0
+	github.com/bsv-blockchain/spv-wallet-go-client v1.3.1
 	github.com/bsv-blockchain/spv-wallet/models v1.0.1
 	github.com/joho/godotenv v1.5.1
 )
@@ -50,9 +50,9 @@ require (
 	github.com/ugorji/go/codec v1.3.2 // indirect
 	go.mongodb.org/mongo-driver/v2 v2.9.2 // indirect
 	golang.org/x/arch v0.32.0 // indirect
-	golang.org/x/crypto v0.57.0 // indirect
-	golang.org/x/net v0.60.0 // indirect
+	golang.org/x/crypto v0.58.0 // indirect
+	golang.org/x/net v0.61.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
-	golang.org/x/text v0.42.0 // indirect
+	golang.org/x/text v0.43.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 )
