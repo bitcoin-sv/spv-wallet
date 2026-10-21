@@ -122,7 +122,7 @@ services:
       retries: 3
 
   wallet-gateway:
-    image: traefik:v2.11
+    image: traefik:v3.6
     container_name: traefik
     command:
       - "--log.level=DEBUG"
