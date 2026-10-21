@@ -12,8 +12,8 @@ replace github.com/bsv-blockchain/spv-wallet/models => ./models
 require (
 	github.com/99designs/gqlgen v0.17.95
 	github.com/bitcoinschema/go-map v0.2.2
-	github.com/bsv-blockchain/go-paymail v0.27.1
-	github.com/bsv-blockchain/go-sdk v1.7.2
+	github.com/bsv-blockchain/go-paymail v0.27.2
+	github.com/bsv-blockchain/go-sdk v1.7.3
 	github.com/bsv-blockchain/spv-wallet/models v1.0.1
 	github.com/coocood/freecache v1.2.7
 	github.com/fergusstrange/embedded-postgres v1.34.0
@@ -29,8 +29,8 @@ require (
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jarcoal/httpmock v1.4.2
 	github.com/joomcode/errorx v1.2.0
-	github.com/mrz1836/go-cache v1.2.1
-	github.com/mrz1836/go-cachestore v1.4.0
+	github.com/mrz1836/go-cache v1.2.2
+	github.com/mrz1836/go-cachestore v1.5.0
 	github.com/mrz1836/go-logger v1.0.6
 	github.com/mrz1836/go-sanitize v1.6.0
 	github.com/mrz1836/go-validate v1.0.5
@@ -57,7 +57,7 @@ require (
 
 require (
 	github.com/go-openapi/swag/pools v0.29.2 // indirect
-	github.com/google/pprof v0.0.0-20261008003335-7bae8d8c4c9e // indirect
+	github.com/google/pprof v0.0.0-20261016150608-1facf8f91b50 // indirect
 	github.com/moby/moby/api v1.56.1 // indirect
 	github.com/moby/moby/client v0.6.2 // indirect
 	github.com/mrz1836/go-whatsonchain v1.3.0 // indirect
@@ -99,7 +99,7 @@ require (
 	github.com/ebitengine/purego v0.11.1 // indirect
 	github.com/felixge/httpsnoop v1.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.15 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.16 // indirect
 	github.com/gin-contrib/sse v1.1.2 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -129,7 +129,7 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.20.1 // indirect
-	github.com/klauspost/cpuid/v2 v2.4.0 // indirect
+	github.com/klauspost/cpuid/v2 v2.4.1 // indirect
 	github.com/leodido/go-urn v1.5.0 // indirect
 	github.com/lib/pq v1.12.3 // indirect
 	github.com/lufia/plan9stats v0.0.0-20260802145828-341c2f0c90b5 // indirect
@@ -160,7 +160,7 @@ require (
 	github.com/prometheus/common v0.72.0 // indirect
 	github.com/prometheus/procfs v0.22.0 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
-	github.com/quic-go/quic-go v0.63.0 // indirect
+	github.com/quic-go/quic-go v0.64.1 // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
 	github.com/shirou/gopsutil/v4 v4.26.9 // indirect
 	github.com/sirupsen/logrus v1.10.2 // indirect
@@ -194,7 +194,7 @@ require (
 	golang.org/x/sys v0.49.0 // indirect
 	golang.org/x/text v0.43.0 // indirect
 	golang.org/x/tools v0.51.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20261005182115-fad411399dd8 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20261012220534-4341edf3f941 // indirect
 	google.golang.org/grpc v1.84.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/yaml.v3 v3.0.1
